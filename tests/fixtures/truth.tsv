@@ -1,0 +1,7 @@
+sample	gene	allele1	allele2
+S1	A	A*01:01	A*02:01
+S1	B	B*07:02	B*08:01
+S1	C	C*07:01	C*07:02
+S2	A	A*03:01	A*24:02
+S2	B	B*44:02	B*35:01
+S2	C	C*04:01	C*05:01

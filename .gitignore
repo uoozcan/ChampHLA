@@ -1,0 +1,99 @@
+# Nextflow
+work/
+.nextflow/
+.nextflow.log*
+*.html
+*.txt
+.nextflow.pid
+timeline*.html
+report*.html
+dag*.html
+trace*.txt
+
+# Results and output directories
+results/
+output/
+outputs/
+logs/
+
+# Containers
+*.sif
+*.img
+singularity/
+docker/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test data
+test_data/
+test/
+testing/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Logs
+*.log
+*.out
+*.err
+
+# Data files (add patterns for your specific data)
+*.bam
+*.cram
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.sam
+*.vcf
+*.vcf.gz
+*.bai
+*.crai
+
+# Large reference files
+references/
+genome/
+*.fa
+*.fasta
+*.fa.gz
+*.fasta.gz
+
+# Except example data
+!test_data/example*
+!test/example*
+
+# Environment files
+.env
+.env.local
+
+# Documentation builds
+site/
+docs/_build/
