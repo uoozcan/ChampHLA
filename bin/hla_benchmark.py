@@ -1350,6 +1350,55 @@ def build_confidence_calibration_summary(rows, bin_count=5):
     return out
 
 
+def confidence_error_record(entries):
+    total = len(entries)
+    error_count = sum(1 for row in entries if row.get("is_correct") == "0")
+    mean_conf = statistics.mean(coerce_float(row["confidence_score"]) for row in entries) if entries else 0.0
+    return {
+        "n_rows": total,
+        "error_count": error_count,
+        "error_rate": ratio(error_count, total),
+        "observed_accuracy": ratio(total - error_count, total),
+        "mean_confidence": round(mean_conf, 4) if entries else "",
+    }
+
+
+def build_confidence_error_summary(rows, bin_count=5):
+    grouped = defaultdict(list)
+    gene_grouped = defaultdict(list)
+    for row in rows:
+        score = coerce_float(row.get("confidence_score", ""))
+        if score is None:
+            continue
+        bin_index, lower, upper = calibration_bin_label(score, bin_count)
+        grouped[(row["tool"], row["modality"], bin_index, lower, upper)].append(row)
+        gene_grouped[(row["tool"], row["modality"], row["gene"], bin_index, lower, upper)].append(row)
+    summary_rows = []
+    for key, entries in sorted(grouped.items(), key=lambda item: (modality_sort_key(item[0][1]), item[0][0], item[0][2])):
+        record = confidence_error_record(entries)
+        record.update({
+            "tool": key[0],
+            "modality": key[1],
+            "bin_index": key[2],
+            "bin_lower": key[3],
+            "bin_upper": key[4],
+        })
+        summary_rows.append(record)
+    per_gene_rows = []
+    for key, entries in sorted(gene_grouped.items(), key=lambda item: (modality_sort_key(item[0][1]), item[0][0], gene_sort_key(item[0][2]), item[0][3])):
+        record = confidence_error_record(entries)
+        record.update({
+            "tool": key[0],
+            "modality": key[1],
+            "gene": key[2],
+            "bin_index": key[3],
+            "bin_lower": key[4],
+            "bin_upper": key[5],
+        })
+        per_gene_rows.append(record)
+    return summary_rows, per_gene_rows
+
+
 def build_abstention_tradeoff(rows, weight_payload, config):
     base = consensus_thresholds(config)
     tradeoffs = []
@@ -1709,6 +1758,7 @@ def main():
     per_gene_gain_rows = build_per_gene_gain_table(method_per_gene_rows)
     calibration_bin_rows = build_confidence_bin_summary(main_rows)
     calibration_summary_rows = build_confidence_calibration_summary(main_rows)
+    confidence_error_rows, confidence_error_gene_rows = build_confidence_error_summary(main_rows)
     abstention_rows = build_abstention_tradeoff(main_rows, runtime_weights, config)
     discordance_rows = build_discordance_rows(main_rows, weighted_rows)
     discordance_summary_rows = summarize_discordance(discordance_rows)
@@ -1736,6 +1786,8 @@ def main():
     write_tsv(output_dir / "tables" / "per_gene_gain.tsv", per_gene_gain_rows, ["modality", "gene", "weighted_correct_call_rate", "majority_correct_call_rate", "best_single_tool", "best_single_tool_rate", "gain_vs_majority", "gain_vs_best_single"])
     write_tsv(output_dir / "tables" / "confidence_bin_summary.tsv", calibration_bin_rows, ["tool", "modality", "bin_index", "bin_lower", "bin_upper", "n_rows", "mean_confidence", "observed_accuracy"])
     write_tsv(output_dir / "tables" / "confidence_calibration_summary.tsv", calibration_summary_rows, ["tool", "modality", "n_rows", "mean_confidence", "observed_accuracy", "brier_score", "expected_calibration_error"])
+    write_tsv(output_dir / "tables" / "confidence_error_summary.tsv", confidence_error_rows, ["tool", "modality", "bin_index", "bin_lower", "bin_upper", "n_rows", "error_count", "error_rate", "observed_accuracy", "mean_confidence"])
+    write_tsv(output_dir / "tables" / "confidence_error_summary_by_gene.tsv", confidence_error_gene_rows, ["tool", "modality", "gene", "bin_index", "bin_lower", "bin_upper", "n_rows", "error_count", "error_rate", "observed_accuracy", "mean_confidence"])
     write_tsv(output_dir / "tables" / "abstention_tradeoff.tsv", abstention_rows, ["min_support", "min_margin", "call_rate", "no_call_rate", "low_confidence_rate", "accuracy_among_called", "overall_correct_call_rate"])
     write_tsv(output_dir / "tables" / "discordance_tags.tsv", discordance_rows, ["sample", "gene", "scope", "tag", "detail"])
     write_tsv(output_dir / "tables" / "discordance_summary.tsv", discordance_summary_rows, ["scope", "tag", "n_events"])

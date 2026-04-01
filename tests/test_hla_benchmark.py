@@ -113,6 +113,22 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             self.assertEqual(calibration_map[("OptiType", "wes")]["observed_accuracy"], "1")
             self.assertEqual(calibration_map[("OptiType", "wgs")]["observed_accuracy"], "0.8333")
             self.assertEqual(calibration_map[("ArcasHLA", "rnaseq")]["n_rows"], "6")
+            confidence_error_path = outdir / "tables" / "confidence_error_summary.tsv"
+            confidence_error_gene_path = outdir / "tables" / "confidence_error_summary_by_gene.tsv"
+            self.assertTrue(confidence_error_path.exists())
+            self.assertTrue(confidence_error_gene_path.exists())
+            with confidence_error_path.open("r", encoding="utf-8") as handle:
+                confidence_error_rows = list(csv.DictReader(handle, delimiter="\t"))
+            confidence_error_map = {(row["tool"], row["modality"], row["bin_index"]): row for row in confidence_error_rows}
+            self.assertEqual(confidence_error_map[("OptiType", "wgs", "5")]["error_rate"], "0.1667")
+            self.assertEqual(confidence_error_map[("ArcasHLA", "rnaseq", "2")]["observed_accuracy"], "0.0")
+            with confidence_error_gene_path.open("r", encoding="utf-8") as handle:
+                confidence_error_gene_rows = list(csv.DictReader(handle, delimiter="\t"))
+            confidence_error_gene_map = {
+                (row["tool"], row["modality"], row["gene"], row["bin_index"]): row for row in confidence_error_gene_rows
+            }
+            self.assertEqual(confidence_error_gene_map[("OptiType", "wgs", "C", "5")]["error_rate"], "0.5")
+            self.assertEqual(confidence_error_gene_map[("ArcasHLA", "rnaseq", "C", "2")]["error_count"], "1")
 
             discordance_path = outdir / "tables" / "discordance_summary.tsv"
             self.assertTrue(discordance_path.exists())

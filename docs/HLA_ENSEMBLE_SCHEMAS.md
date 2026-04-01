@@ -108,6 +108,10 @@ Method-level ambiguity outputs:
 - `method_ambiguity_summary.tsv`
 - `method_ambiguity_summary_by_gene.tsv`
 
+Confidence-stratified error outputs:
+- `confidence_error_summary.tsv`
+- `confidence_error_summary_by_gene.tsv`
+
 Consensus `call_status` values:
 - `called`
 - `low_confidence`

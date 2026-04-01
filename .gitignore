@@ -15,6 +15,7 @@ results/
 output/
 outputs/
 logs/
+analysis/
 
 # Containers
 *.sif

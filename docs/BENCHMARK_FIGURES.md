@@ -60,6 +60,8 @@ See [HLA_ENSEMBLE_SCHEMAS.md](/users/ozcanumu/scratch/project_2008084/pihla-publ
 - `per_gene_gain.tsv`
 - `confidence_bin_summary.tsv`
 - `confidence_calibration_summary.tsv`
+- `confidence_error_summary.tsv`
+- `confidence_error_summary_by_gene.tsv`
 - `abstention_tradeoff.tsv`
 - `discordance_tags.tsv`
 - `discordance_summary.tsv`
@@ -89,6 +91,11 @@ See [HLA_ENSEMBLE_SCHEMAS.md](/users/ozcanumu/scratch/project_2008084/pihla-publ
 - Calibration summary:
   - `brier_score`
   - `expected_calibration_error`
+- Confidence-stratified error summary:
+  - `error_count`
+  - `error_rate`
+  - `observed_accuracy`
+  - `mean_confidence`
 
 ## Discordance Taxonomy
 

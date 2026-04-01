@@ -52,7 +52,7 @@ Our goal is to build a calibrated, uncertainty-aware, multi-tool HLA ensemble pl
 - Extract tool-native confidence where available.
 - Accept sidecar read-support or confidence files when native confidence is absent.
 - Convert confidence evidence to normalized scores in `[0,1]`.
-- Summarize calibration using confidence-bin tables, Brier score, and expected calibration error.
+- Summarize calibration using confidence-bin tables, Brier score, expected calibration error, and confidence-stratified error tables by modality and gene.
 
 ### 4. Weight learning
 - Learn benchmark-derived weights at tool, gene, and modality levels.
@@ -124,7 +124,7 @@ In the current fixture benchmark:
 These results suggest that the benchmark-trained weighting layer already adds value in the mixed-confidence WGS setting, while RNA-seq remains a harder regime where more evidence sources or richer caller diversity may be needed.
 
 ### 4. Confidence calibration
-Current calibration summaries show clear modality dependence. OptiType on WES has mean confidence 0.985 with observed accuracy 1.0, whereas OptiType on WGS and RNA-seq shows larger calibration error. The current RNA-seq ArcasHLA sidecar-based confidence profile produces observed accuracy 0.8333 with mean confidence 0.7533. These early outputs support the motivation for calibrated rather than raw cross-tool confidence use.
+Current calibration summaries show clear modality dependence. OptiType on WES has mean confidence 0.985 with observed accuracy 1.0, whereas OptiType on WGS and RNA-seq shows larger calibration error. The current RNA-seq ArcasHLA sidecar-based confidence profile produces observed accuracy 0.8333 with mean confidence 0.7533. The new confidence-stratified error summaries add a more actionable view: OptiType WGS still places six loci in the top confidence bin but carries one error there, while ArcasHLA RNA-seq isolates its only error in a low-confidence bin for gene C. These early outputs support the motivation for calibrated rather than raw cross-tool confidence use.
 
 ### 5. Ambiguity-aware and version-aware evaluation
 The benchmark now records IMGT/HLA version 3.59.0 in both machine-readable metadata and row-level benchmark outputs. The new ambiguity summary layer shows that some tools retain perfect two-field performance while losing agreement at three-field resolution. In the current fixture benchmark, SpecHLA remains at 1.0 exact two-field rate on both WES and WGS but drops to 0.0 exact three-field rate, while OptiType retains 1.0 exact three-field rate on WES and 0.8333 on WGS. These results validate the need for resolution-aware reporting rather than a single exact-match metric.
