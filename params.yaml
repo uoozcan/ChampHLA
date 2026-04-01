@@ -19,8 +19,8 @@ outdir: './results'
 # ============================================================
 
 # Comma-separated list of tools to run
-# Available: optitype, arcashla, spechla
-tools: 'optitype,arcashla,spechla'
+# Available: optitype, arcashla, spechla, hlahd, polysolver, kourami, t1k, seq2hla
+tools: 'optitype,arcashla,spechla,hlahd'
 
 # ============================================================
 # REFERENCE GENOME
@@ -48,6 +48,24 @@ spechla_genes: 'A,B,C,DQA1,DQB1,DRB1'
 # Exon-only mode for SpecHLA (0 or 1)
 # IMPORTANT: Set to 1 for exome data!
 spechla_exon_only: 0
+
+## HLA-HD
+hlahd_genes: 'A,B,C,DQA1,DQB1,DRB1'
+hlahd_db: '/scratch/project_2008084/hla_references/databases/hlahd_db'
+
+## Kourami
+kourami_dir: null
+kourami_db: null
+kourami_hs38_ref: null
+
+## Seq type / modality hint
+seq_type: 'dna'  # dna or rna
+run_modality: null  # optional override: wgs|wes|rnaseq
+
+## Weighted consensus runtime options
+consensus_weight_file: null
+consensus_min_weight: 0.0
+consensus_use_gene_specific_weights: false
 
 # ============================================================
 # HLA REGION EXTRACTION (OPTIONAL)
@@ -123,7 +141,7 @@ save_intermediate: false
 
 # Example 3: All tools with consensus calling on CSC Puhti
 # Set: enable_majority_voting: true
-# Set: tools: 'optitype,arcashla,spechla'
+# Set: tools: 'optitype,arcashla,spechla,hlahd'
 # nextflow run main.nf -params-file params.yaml -profile puhti,singularity -resume
 
 # ============================================================

@@ -16,9 +16,14 @@
 nextflow.enable.dsl = 2
 
 // Import modules
-include { OPTITYPE } from './modules/optitype'
-include { ARCASHLA_BAM; ARCASHLA_FASTQ } from './modules/arcashla'
-include { SPECHLA_BAM; SPECHLA_FASTQ } from './modules/spechla'
+include { OPTITYPE_FASTQ as OPTITYPE } from './modules/optitype'
+include { ARCASHLA as ARCASHLA_BAM; ARCASHLA_FASTQ } from './modules/arcashla'
+include { SPECHLA as SPECHLA_BAM; SPECHLA_FASTQ } from './modules/spechla'
+include { HLAHD as HLAHD_BAM; HLAHD_FASTQ } from './modules/hlahd'
+include { POLYSOLVER } from './modules/polysolver'
+include { KOURAMI } from './modules/kourami'
+include { T1K_FASTQ } from './modules/t1k'
+include { SEQ2HLA } from './modules/seq2hla'
 include { EXTRACT_HLA_REGION; BAM_TO_FASTQ; EXTRACT_HLA_AND_CONVERT } from './modules/bam_to_fastq'
 include { AGGREGATE_RESULTS } from './modules/aggregation'
 include { MAJORITY_VOTING_WORKFLOW } from './modules/majority_voting'
@@ -44,8 +49,8 @@ def helpMessage() {
     
     Pipeline Options:
       --tools              Comma-separated list of tools to run
-                           Available: optitype,arcashla,spechla
-                           Default: optitype,arcashla
+                           Available: optitype,arcashla,spechla,hlahd,polysolver,kourami,t1k,seq2hla
+                           Default: optitype,arcashla,hlahd
       --outdir             Output directory [default: ./results]
       --reference_build    Reference genome build: hg19 or hg38 [default: hg38]
     
@@ -148,98 +153,141 @@ Max time            : ${params.max_time}
 
 workflow {
     // Parse tools to run
-    tools_list = params.tools.tokenize(',')*.trim()
-    
+    tools_list = params.tools.tokenize(',')*.trim()*.toLowerCase()
+
     // Create input channel based on input type
     if (params.input_type == 'fastq') {
         // FASTQ files: expect paired-end reads
         ch_input = Channel
             .fromFilePairs("${params.input}/*_{R1,R2,1,2}*.{fastq,fq,fastq.gz,fq.gz}", checkIfExists: true)
-            .map { sample_id, reads -> 
+            .map { sample_id, reads ->
                 tuple(sample_id, reads[0], reads[1])
             }
     } else if (params.input_type == 'bam' || params.input_type == 'cram') {
         // BAM/CRAM files
         ch_input = Channel
             .fromPath("${params.input}/*.{bam,cram}", checkIfExists: true)
-            .map { file -> 
+            .map { file ->
                 def sample_id = file.baseName.replaceAll(/\.(bam|cram)$/, '')
                 tuple(sample_id, file)
             }
     }
-    
+
     // Initialize result channels
     ch_optitype_results = Channel.empty()
     ch_arcashla_results = Channel.empty()
     ch_spechla_results = Channel.empty()
-    
-    // Process based on input type
+    ch_hlahd_results = Channel.empty()
+    ch_polysolver_results = Channel.empty()
+    ch_kourami_results = Channel.empty()
+    ch_t1k_results = Channel.empty()
+    ch_seq2hla_results = Channel.empty()
+
     if (params.input_type == 'fastq') {
-        // FASTQ input - tools can use directly
-        
+        // FASTQ input
         if ('optitype' in tools_list) {
-            OPTITYPE(ch_input)
+            OPTITYPE(ch_input, params.optitype_seq_type)
             ch_optitype_results = OPTITYPE.out.results
         }
-        
+
         if ('arcashla' in tools_list) {
             ARCASHLA_FASTQ(ch_input)
             ch_arcashla_results = ARCASHLA_FASTQ.out.results
         }
-        
+
         if ('spechla' in tools_list) {
             SPECHLA_FASTQ(ch_input)
             ch_spechla_results = SPECHLA_FASTQ.out.results
         }
-        
+
+        if ('hlahd' in tools_list) {
+            HLAHD_FASTQ(ch_input, params.hlahd_genes)
+            ch_hlahd_results = HLAHD_FASTQ.out.results
+        }
+
+        if ('t1k' in tools_list) {
+            T1K_FASTQ(ch_input)
+            ch_t1k_results = T1K_FASTQ.out.results
+        }
+
+        if ('seq2hla' in tools_list) {
+            if ((params.seq_type ?: '').toLowerCase() == 'rna') {
+                SEQ2HLA(ch_input)
+                ch_seq2hla_results = SEQ2HLA.out.results
+            } else {
+                log.warn "seq2HLA is RNA-seq focused. Set --seq_type rna to run seq2HLA with FASTQ input."
+            }
+        }
+
+        if ('polysolver' in tools_list || 'kourami' in tools_list) {
+            log.warn "POLYSOLVER/Kourami require BAM input and are skipped for FASTQ input."
+        }
+
     } else {
-        // BAM/CRAM input - need different processing per tool
-        
+        // BAM/CRAM input
         if ('arcashla' in tools_list) {
-            // ArcasHLA can work directly with BAM
-            ARCASHLA_BAM(ch_input)
+            ARCASHLA_BAM(ch_input, params.reference_build)
             ch_arcashla_results = ARCASHLA_BAM.out.results
         }
-        
+
         if ('spechla' in tools_list) {
-            // SpecHLA with chromosome 6 extraction (optimized for exome)
-            ch_bam_with_index = ch_input.map { sample_id, bam ->
-                def bai = file("${bam}.bai")
-                if (!bai.exists()) {
-                    bai = file("${bam.toString().replaceAll(/\.bam$/, '')}.bai")
-                }
-                tuple(sample_id, bam, bai)
-            }
-            
-            SPECHLA_BAM(ch_bam_with_index)
+            SPECHLA_BAM(ch_input, params.reference_build)
             ch_spechla_results = SPECHLA_BAM.out.results
         }
-        
-        // OptiType needs FASTQ - convert if requested
-        if ('optitype' in tools_list) {
+
+        if ('hlahd' in tools_list) {
+            HLAHD_BAM(ch_input, params.reference_build, params.hlahd_genes)
+            ch_hlahd_results = HLAHD_BAM.out.results
+        }
+
+        if ('polysolver' in tools_list) {
+            POLYSOLVER(ch_input)
+            ch_polysolver_results = POLYSOLVER.out.results
+        }
+
+        if ('kourami' in tools_list) {
+            KOURAMI(ch_input)
+            ch_kourami_results = KOURAMI.out.results
+        }
+
+        // Tools that require FASTQ conversion from BAM/CRAM
+        need_fastq = ('optitype' in tools_list) || ('t1k' in tools_list)
+        if (need_fastq) {
             if (params.extract_hla_region) {
-                // Extract HLA region and convert in one step
                 EXTRACT_HLA_AND_CONVERT(ch_input)
                 ch_fastq = EXTRACT_HLA_AND_CONVERT.out.reads
             } else {
-                // Full BAM to FASTQ conversion
                 BAM_TO_FASTQ(ch_input)
                 ch_fastq = BAM_TO_FASTQ.out.reads
             }
-            
-            OPTITYPE(ch_fastq)
-            ch_optitype_results = OPTITYPE.out.results
+
+            if ('optitype' in tools_list) {
+                OPTITYPE(ch_fastq, params.optitype_seq_type)
+                ch_optitype_results = OPTITYPE.out.results
+            }
+
+            if ('t1k' in tools_list) {
+                T1K_FASTQ(ch_fastq)
+                ch_t1k_results = T1K_FASTQ.out.results
+            }
+        }
+
+        if ('seq2hla' in tools_list) {
+            log.warn "seq2HLA is FASTQ/RNA-seq oriented and is skipped for BAM/CRAM input."
         }
     }
-    
+
     // Majority voting if enabled
     if (params.enable_majority_voting) {
         MAJORITY_VOTING_WORKFLOW(
             ch_optitype_results,
             ch_arcashla_results,
             ch_spechla_results,
-            Channel.empty(),  // hlahd
-            Channel.empty()   // hlala
+            ch_hlahd_results,
+            ch_polysolver_results,
+            ch_kourami_results,
+            ch_t1k_results,
+            ch_seq2hla_results
         )
     }
 }

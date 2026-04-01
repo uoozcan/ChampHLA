@@ -17,6 +17,7 @@ This pipeline integrates multiple HLA typing tools to provide robust and accurat
 ### Key Features
 
 ✨ **Multi-tool Integration**: Combines results from multiple HLA typing tools  
+**Native Extended Toolset**: Includes HLA-HD, POLYSOLVER, Kourami, T1K, and Seq2HLA execution modules  
 🎯 **Consensus Calling**: Optional majority voting for improved accuracy  
 📊 **Flexible Input**: Supports BAM, CRAM, and FASTQ files  
 🚀 **HPC Optimized**: Pre-configured for SLURM schedulers (CSC Puhti)  
@@ -93,7 +94,7 @@ nextflow run main.nf \
 nextflow run main.nf \
     --input samples/ \
     --input_type fastq \
-    --tools optitype,arcashla,spechla \
+    --tools optitype,arcashla,spechla,hlahd,t1k \
     --enable_majority_voting \
     --outdir results/ \
     -profile docker -resume
@@ -141,9 +142,9 @@ Index files (`.bai`) should be in the same directory.
 #### Tool Selection
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `--tools` | Comma-separated list of tools | `optitype,arcashla` |
+| `--tools` | Comma-separated list of tools | `optitype,arcashla,hlahd` |
 
-Available tools: `optitype`, `arcashla`, `spechla`
+Available tools: `optitype`, `arcashla`, `spechla`, `hlahd`, `polysolver`, `kourami`, `t1k`, `seq2hla`
 
 #### Tool-Specific Options
 
@@ -227,24 +228,30 @@ results/
     └── execution_trace.txt
 ```
 
-## 📊 Benchmark Figure Workflow
+## 📊 1000 Genomes Benchmark Workflow
 
-The repository includes a standalone benchmarking script for manuscript-style WES/WGS figure generation from completed tool runs and a local truth table:
+Scientific benchmarking now targets only real 1000 Genomes samples with public HLA ground truth and matched WGS, WES, and RNA-seq availability. The synthetic fixture in `tests/fixtures/` is retained only for CI and parser validation.
+
+Build canonical manifests:
 
 ```bash
-python3 bin/hla_benchmark.py \
-    --config conf/benchmark_figure_config.example.yaml \
-    --output-dir results/benchmark_figures
+python3 bin/build_1000g_benchmark_manifests.py     --truth /path/to/1000g_hla_truth.tsv     --sequencing /path/to/1000g_sequencing_source.tsv     --output-dir results/1000g_manifests     --acquisition-date 2014-07-25     --supported-loci A,B,C,DRB1,DQB1
 ```
 
-This workflow:
+Run the split-aware real-data benchmark:
 
-- harmonizes per-tool predictions into a common benchmark table
-- evaluates two-field allele accuracy against a local truth table
-- reports callability, correct-call rate, runtime, and peak RAM
-- generates SVG figures for full-cohort and matched WES/WGS comparisons
+```bash
+python3 bin/run_1000g_benchmark.py     --config conf/benchmark_1000g_config.example.yaml     --output-dir results/1000g_benchmark
+```
 
-See `docs/BENCHMARK_FIGURES.md` for the config format and output details.
+The benchmark runner:
+- assembles `truth_manifest.tsv`, `sequencing_manifest.tsv`, and `cohort_manifest.tsv`
+- restricts analysis to strict tri-modal truth-backed samples
+- learns confidence weights on training samples
+- tunes abstention support on validation when available
+- reports single-tool, majority-vote, and weighted-consensus results on holdout only
+
+See `docs/BENCHMARK_FIGURES.md` for the real-data benchmark interface and outputs.
 
 ## 🔧 Advanced Usage
 

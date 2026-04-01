@@ -1,0 +1,156 @@
+truth:
+  imgt_hla_version: 3.59.0
+  path: /absolute/path/to/1000g_hla_truth.tsv
+  source: ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/working/20140725_hla_genotypes/
+  acquisition_date: 2014-07-25
+  supported_loci:
+    - A
+    - B
+    - C
+    - DRB1
+    - DQB1
+
+manifests:
+  sequencing_source: /absolute/path/to/1000g_sequencing_source.tsv
+  population_manifest: /absolute/path/to/1000g_population_manifest.tsv
+
+benchmark:
+  resolution: 2
+  secondary_resolutions:
+    - 2
+    - 3
+  split_seed: 1000
+  splits:
+    training: calibration
+    validation: threshold_tuning
+    holdout: final_reporting
+  consensus:
+    min_support: 0.55
+    min_margin: 0.15
+
+# This config assumes tool outputs are produced by native pihla Nextflow runs.
+# Expected output layout:
+#   /absolute/path/to/pipeline_results/<modality>/<sample>/<tool>/<sample>_<tool>.txt
+runs:
+  # WGS tools
+  - tool: SpecHLA
+    modality: wgs
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/wgs/*/spechla/*_spechla.txt
+    sample_from_path_regex: /([^/]+)_spechla\.txt$
+
+  - tool: HLA-HD
+    modality: wgs
+    parser: hlahd_table
+    result_glob: /absolute/path/to/pipeline_results/wgs/*/hlahd/*_hlahd.txt
+    sample_from_path_regex: /([^/]+)_hlahd\.txt$
+
+  - tool: ArcasHLA
+    modality: wgs
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/wgs/*/arcashla/*_arcashla.txt
+    sample_from_path_regex: /([^/]+)_arcashla\.txt$
+
+  - tool: OptiType
+    modality: wgs
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/wgs/*/optitype/*_optitype.txt
+    sample_from_path_regex: /([^/]+)_optitype\.txt$
+
+  - tool: POLYSOLVER
+    modality: wgs
+    parser: polysolver_table
+    result_glob: /absolute/path/to/pipeline_results/wgs/*/polysolver/*_polysolver.txt
+    sample_from_path_regex: /([^/]+)_polysolver\.txt$
+
+  - tool: Kourami
+    modality: wgs
+    parser: kourami_table
+    result_glob: /absolute/path/to/pipeline_results/wgs/*/kourami/*_kourami.txt
+    sample_from_path_regex: /([^/]+)_kourami\.txt$
+
+  - tool: T1K
+    modality: wgs
+    parser: t1k_table
+    result_glob: /absolute/path/to/pipeline_results/wgs/*/t1k/*_t1k.txt
+    sample_from_path_regex: /([^/]+)_t1k\.txt$
+
+  # WES tools
+  - tool: SpecHLA
+    modality: wes
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/wes/*/spechla/*_spechla.txt
+    sample_from_path_regex: /([^/]+)_spechla\.txt$
+
+  - tool: HLA-HD
+    modality: wes
+    parser: hlahd_table
+    result_glob: /absolute/path/to/pipeline_results/wes/*/hlahd/*_hlahd.txt
+    sample_from_path_regex: /([^/]+)_hlahd\.txt$
+
+  - tool: OptiType
+    modality: wes
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/wes/*/optitype/*_optitype.txt
+    sample_from_path_regex: /([^/]+)_optitype\.txt$
+
+  - tool: POLYSOLVER
+    modality: wes
+    parser: polysolver_table
+    result_glob: /absolute/path/to/pipeline_results/wes/*/polysolver/*_polysolver.txt
+    sample_from_path_regex: /([^/]+)_polysolver\.txt$
+
+  - tool: Kourami
+    modality: wes
+    parser: kourami_table
+    result_glob: /absolute/path/to/pipeline_results/wes/*/kourami/*_kourami.txt
+    sample_from_path_regex: /([^/]+)_kourami\.txt$
+
+  - tool: T1K
+    modality: wes
+    parser: t1k_table
+    result_glob: /absolute/path/to/pipeline_results/wes/*/t1k/*_t1k.txt
+    sample_from_path_regex: /([^/]+)_t1k\.txt$
+
+  - tool: ArcasHLA
+    modality: wes
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/wes/*/arcashla/*_arcashla.txt
+    sample_from_path_regex: /([^/]+)_arcashla\.txt$
+
+  # RNA-seq tools
+  - tool: ArcasHLA
+    modality: rnaseq
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/rnaseq/*/arcashla/*_arcashla.txt
+    sample_from_path_regex: /([^/]+)_arcashla\.txt$
+
+  - tool: OptiType
+    modality: rnaseq
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/rnaseq/*/optitype/*_optitype.txt
+    sample_from_path_regex: /([^/]+)_optitype\.txt$
+
+  - tool: Seq2HLA
+    modality: rnaseq
+    parser: seq2hla_table
+    result_glob: /absolute/path/to/pipeline_results/rnaseq/*/seq2hla/*_seq2hla.txt
+    sample_from_path_regex: /([^/]+)_seq2hla\.txt$
+
+  - tool: T1K
+    modality: rnaseq
+    parser: t1k_table
+    result_glob: /absolute/path/to/pipeline_results/rnaseq/*/t1k/*_t1k.txt
+    sample_from_path_regex: /([^/]+)_t1k\.txt$
+
+  - tool: SpecHLA
+    modality: rnaseq
+    parser: long_hla_table
+    result_glob: /absolute/path/to/pipeline_results/rnaseq/*/spechla/*_spechla.txt
+    sample_from_path_regex: /([^/]+)_spechla\.txt$
+
+  - tool: HLA-HD
+    modality: rnaseq
+    parser: hlahd_table
+    result_glob: /absolute/path/to/pipeline_results/rnaseq/*/hlahd/*_hlahd.txt
+    sample_from_path_regex: /([^/]+)_hlahd\.txt$
