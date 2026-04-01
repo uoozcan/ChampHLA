@@ -22,7 +22,7 @@ The active split labels are recorded in `benchmark_metadata.json`.
 
 ## Frozen Schemas
 
-See [HLA_ENSEMBLE_SCHEMAS.md](/users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/docs/HLA_ENSEMBLE_SCHEMAS.md) for the frozen TSV/JSON interfaces used by the benchmark layer.
+See [HLA_ENSEMBLE_SCHEMAS.md](/users/ozcanumu/scratch/project_2008084/pihla-publish/docs/HLA_ENSEMBLE_SCHEMAS.md) for the frozen TSV/JSON interfaces used by the benchmark layer.
 
 ## Supported Result Parsers
 
@@ -55,6 +55,8 @@ See [HLA_ENSEMBLE_SCHEMAS.md](/users/ozcanumu/scratch/project_2008084/ozcanumu/r
 - `weighted_consensus_calls.tsv`
 - `method_comparison.tsv`
 - `method_per_gene.tsv`
+- `method_ambiguity_summary.tsv`
+- `method_ambiguity_summary_by_gene.tsv`
 - `per_gene_gain.tsv`
 - `confidence_bin_summary.tsv`
 - `confidence_calibration_summary.tsv`

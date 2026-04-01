@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-REPO = Path("/users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline")
+REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "bin" / "hla_benchmark.py"
 FIXTURES = REPO / "tests" / "fixtures"
 
@@ -76,6 +76,24 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             self.assertEqual(method_summary[("WeightedConsensus", "wgs")]["overall_correct_call_rate"], "1.0")
             self.assertEqual(method_summary[("WeightedConsensus", "rnaseq")]["overall_correct_call_rate"], "0.8333")
 
+            method_ambiguity_path = outdir / "tables" / "method_ambiguity_summary.tsv"
+            method_ambiguity_gene_path = outdir / "tables" / "method_ambiguity_summary_by_gene.tsv"
+            majority_calls_path = outdir / "tables" / "majority_vote_baseline.tsv"
+            weighted_calls_path = outdir / "tables" / "weighted_consensus_calls.tsv"
+            self.assertTrue(method_ambiguity_path.exists())
+            self.assertTrue(method_ambiguity_gene_path.exists())
+            self.assertTrue(majority_calls_path.exists())
+            self.assertTrue(weighted_calls_path.exists())
+            with method_ambiguity_path.open("r", encoding="utf-8") as handle:
+                method_ambiguity_rows = list(csv.DictReader(handle, delimiter="	"))
+            method_ambiguity_map = {(row["method"], row["modality"]): row for row in method_ambiguity_rows}
+            self.assertEqual(method_ambiguity_map[("MajorityVote", "wgs")]["exact_3field_rate"], "0.8333")
+            self.assertEqual(method_ambiguity_map[("WeightedConsensus", "wgs")]["exact_3field_rate"], "1.0")
+            with weighted_calls_path.open("r", encoding="utf-8") as handle:
+                weighted_rows = list(csv.DictReader(handle, delimiter="	"))
+            weighted_map = {(row["sample"], row["modality"], row["gene"]): row for row in weighted_rows}
+            self.assertIn("is_correct_3field", weighted_rows[0])
+            self.assertEqual(weighted_map[("S2", "wgs", "C")]["is_correct_3field"], "1")
             weights_path = outdir / "tables" / "tool_confidence_weights.tsv"
             runtime_weights_path = outdir / "tables" / "consensus_runtime_weights.json"
             self.assertTrue(weights_path.exists())

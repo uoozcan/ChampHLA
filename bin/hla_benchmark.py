@@ -871,6 +871,25 @@ def build_ambiguity_summary(rows):
     return summary_rows, per_gene_rows
 
 
+def build_method_ambiguity_summary(majority_rows, weighted_rows):
+    grouped = defaultdict(list)
+    gene_grouped = defaultdict(list)
+    for row in majority_rows + weighted_rows:
+        grouped[(row["method"], row["modality"])].append(row)
+        gene_grouped[(row["method"], row["modality"], row["gene"])].append(row)
+    summary_rows = []
+    for key, entries in sorted(grouped.items(), key=lambda item: (modality_sort_key(item[0][1]), item[0][0])):
+        record = ambiguity_summary_record(entries)
+        record.update({"method": key[0], "modality": key[1], "imgt_hla_version": entries[0].get("imgt_hla_version", "")})
+        summary_rows.append(record)
+    per_gene_rows = []
+    for key, entries in sorted(gene_grouped.items(), key=lambda item: (modality_sort_key(item[0][1]), item[0][0], gene_sort_key(item[0][2]))):
+        record = ambiguity_summary_record(entries)
+        record.update({"method": key[0], "modality": key[1], "gene": key[2], "imgt_hla_version": entries[0].get("imgt_hla_version", "")})
+        per_gene_rows.append(record)
+    return summary_rows, per_gene_rows
+
+
 def mean_confidence(entries):
     values = [coerce_float(row.get("confidence_score", "")) for row in entries if row.get("is_callable") == "1" and coerce_float(row.get("confidence_score", "")) is not None]
     return round(statistics.mean(values), 4) if values else None
@@ -1063,7 +1082,8 @@ def build_majority_vote_rows(rows):
         call_status = "called" if pair else "no_call"
         allele1, allele2 = pair if pair else ("", "")
         is_callable = "1" if pair else "0"
-        is_correct = "1" if pair and (allele1, allele2) == (truth_1, truth_2) else "0"
+        ambiguity = evaluate_ambiguity([allele1, allele2], [truth_1, truth_2], 2)
+        is_correct = "1" if pair and ambiguity["match_2field"] else "0"
         discordance_tag = "technical_conflict" if is_tie else ("no_evidence" if callable_tools == 0 else "consensus_call")
         out.append({
             "sample": key[0],
@@ -1074,9 +1094,19 @@ def build_majority_vote_rows(rows):
             "truth_allele2": truth_2,
             "allele1": allele1,
             "allele2": allele2,
+            "truth_allele1_3field": ambiguity["truth_3field"][0],
+            "truth_allele2_3field": ambiguity["truth_3field"][1],
+            "allele1_3field": ambiguity["typed_3field"][0],
+            "allele2_3field": ambiguity["typed_3field"][1],
             "call_status": call_status,
             "is_callable": is_callable,
             "is_correct": is_correct,
+            "is_correct_2field": "1" if ambiguity["match_2field"] else "0",
+            "is_correct_3field": "1" if ambiguity["match_3field"] else "0",
+            "is_correct_g_group": ambiguity_match_value(ambiguity["g_group_comparable"], ambiguity["match_g_group"]),
+            "is_correct_p_group": ambiguity_match_value(ambiguity["p_group_comparable"], ambiguity["match_p_group"]),
+            "match_grade": ambiguity["match_grade"],
+            "imgt_hla_version": entries[0].get("imgt_hla_version", ""),
             "agreeing_tools": agreeing_tools,
             "contributing_tools": callable_tools,
             "support_fraction": as_string_number(support_fraction),
@@ -1134,7 +1164,8 @@ def build_weighted_consensus_rows(rows, weight_payload, config):
         call_status = classify_consensus_status(support_fraction, support_margin, thresholds, contributing_tools > 0, is_tie)
         allele1, allele2 = pair if call_status == "called" and pair else ("", "")
         is_callable = "1" if call_status == "called" and pair else "0"
-        is_correct = "1" if pair and call_status == "called" and (allele1, allele2) == (truth_1, truth_2) else "0"
+        ambiguity = evaluate_ambiguity([allele1, allele2], [truth_1, truth_2], 2)
+        is_correct = "1" if pair and call_status == "called" and ambiguity["match_2field"] else "0"
         if contributing_tools == 0:
             discordance_tag = "no_evidence"
         elif is_tie:
@@ -1152,9 +1183,19 @@ def build_weighted_consensus_rows(rows, weight_payload, config):
             "truth_allele2": truth_2,
             "allele1": allele1,
             "allele2": allele2,
+            "truth_allele1_3field": ambiguity["truth_3field"][0],
+            "truth_allele2_3field": ambiguity["truth_3field"][1],
+            "allele1_3field": ambiguity["typed_3field"][0],
+            "allele2_3field": ambiguity["typed_3field"][1],
             "call_status": call_status,
             "is_callable": is_callable,
             "is_correct": is_correct,
+            "is_correct_2field": "1" if ambiguity["match_2field"] else "0",
+            "is_correct_3field": "1" if ambiguity["match_3field"] else "0",
+            "is_correct_g_group": ambiguity_match_value(ambiguity["g_group_comparable"], ambiguity["match_g_group"]),
+            "is_correct_p_group": ambiguity_match_value(ambiguity["p_group_comparable"], ambiguity["match_p_group"]),
+            "match_grade": ambiguity["match_grade"],
+            "imgt_hla_version": entries[0].get("imgt_hla_version", ""),
             "agreeing_tools": "" if call_status != "called" else contributing_tools,
             "contributing_tools": contributing_tools,
             "support_fraction": as_string_number(support_fraction),
@@ -1662,6 +1703,7 @@ def main():
     runtime_weights = build_runtime_weight_payload(tool_weights, gene_weights)
     majority_rows = build_majority_vote_rows(main_rows)
     weighted_rows = build_weighted_consensus_rows(main_rows, runtime_weights, config)
+    method_ambiguity_rows, method_ambiguity_gene_rows = build_method_ambiguity_summary(majority_rows, weighted_rows)
     method_comparison_rows = build_method_comparison(summary, majority_rows, weighted_rows)
     method_per_gene_rows = build_method_per_gene(per_gene, majority_rows, weighted_rows)
     per_gene_gain_rows = build_per_gene_gain_table(method_per_gene_rows)
@@ -1685,10 +1727,12 @@ def main():
     write_tsv(output_dir / "tables" / "truth_mismatches.tsv", build_truth_mismatches(harmonized_rows), ["sample", "modality", "tool", "gene", "truth_allele1", "truth_allele2", "typed_allele1", "typed_allele2", "call_status"])
     write_tsv(output_dir / "tables" / "tool_confidence_weights.tsv", tool_weights, ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "confidence_coverage_rate", "base_reliability", "calibrated_confidence", "final_weight", "weight_version"])
     write_tsv(output_dir / "tables" / "tool_confidence_weights_by_gene.tsv", gene_weights, ["tool", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "confidence_coverage_rate", "base_reliability", "calibrated_confidence", "final_weight", "weight_version"])
-    write_tsv(output_dir / "tables" / "majority_vote_baseline.tsv", majority_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "call_status", "is_callable", "is_correct", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "discordance_tag"])
-    write_tsv(output_dir / "tables" / "weighted_consensus_calls.tsv", weighted_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "call_status", "is_callable", "is_correct", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "discordance_tag"])
+    write_tsv(output_dir / "tables" / "majority_vote_baseline.tsv", majority_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "discordance_tag"])
+    write_tsv(output_dir / "tables" / "weighted_consensus_calls.tsv", weighted_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "discordance_tag"])
     write_tsv(output_dir / "tables" / "method_comparison.tsv", method_comparison_rows, ["method", "method_type", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate"])
     write_tsv(output_dir / "tables" / "method_per_gene.tsv", method_per_gene_rows, ["method", "method_type", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate"])
+    write_tsv(output_dir / "tables" / "method_ambiguity_summary.tsv", method_ambiguity_rows, ["method", "modality", "imgt_hla_version", "sample_count", "gene_rows", "exact_2field_rate", "exact_3field_rate", "g_group_comparable_rows", "g_group_match_rate", "p_group_comparable_rows", "p_group_match_rate"])
+    write_tsv(output_dir / "tables" / "method_ambiguity_summary_by_gene.tsv", method_ambiguity_gene_rows, ["method", "modality", "gene", "imgt_hla_version", "sample_count", "gene_rows", "exact_2field_rate", "exact_3field_rate", "g_group_comparable_rows", "g_group_match_rate", "p_group_comparable_rows", "p_group_match_rate"])
     write_tsv(output_dir / "tables" / "per_gene_gain.tsv", per_gene_gain_rows, ["modality", "gene", "weighted_correct_call_rate", "majority_correct_call_rate", "best_single_tool", "best_single_tool_rate", "gain_vs_majority", "gain_vs_best_single"])
     write_tsv(output_dir / "tables" / "confidence_bin_summary.tsv", calibration_bin_rows, ["tool", "modality", "bin_index", "bin_lower", "bin_upper", "n_rows", "mean_confidence", "observed_accuracy"])
     write_tsv(output_dir / "tables" / "confidence_calibration_summary.tsv", calibration_summary_rows, ["tool", "modality", "n_rows", "mean_confidence", "observed_accuracy", "brier_score", "expected_calibration_error"])

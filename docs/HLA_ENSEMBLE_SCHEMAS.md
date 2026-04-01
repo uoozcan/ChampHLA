@@ -81,9 +81,19 @@ Columns:
 - `truth_allele2`
 - `allele1`
 - `allele2`
+- `truth_allele1_3field`
+- `truth_allele2_3field`
+- `allele1_3field`
+- `allele2_3field`
 - `call_status`
 - `is_callable`
 - `is_correct`
+- `is_correct_2field`
+- `is_correct_3field`
+- `is_correct_g_group`
+- `is_correct_p_group`
+- `match_grade`
+- `imgt_hla_version`
 - `agreeing_tools`
 - `contributing_tools`
 - `support_fraction`
@@ -93,6 +103,10 @@ Columns:
 ### Weighted consensus benchmark
 Same grouping and core columns as majority vote, plus:
 - `total_weight`
+
+Method-level ambiguity outputs:
+- `method_ambiguity_summary.tsv`
+- `method_ambiguity_summary_by_gene.tsv`
 
 Consensus `call_status` values:
 - `called`
