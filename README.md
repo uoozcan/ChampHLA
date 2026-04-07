@@ -475,10 +475,9 @@ And cite the individual tools used:
 ## 📮 Contact
 
 For questions or issues, please open an issue on GitHub or contact:
-- **Email**: your.email@example.com
-- **GitHub**: [@yourusername](https://github.com/yourusername)
+- **GitHub**: [@ozcanumu](https://github.com/yourusername)
 
 ---
 
 **Version**: 2.0.0  
-**Last Updated**: November 2025
+**Last Updated**: April 2026
