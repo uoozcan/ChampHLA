@@ -1,0 +1,7 @@
+sample	population	modality	data_locator	available
+S1	EUR	wgs	/users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wgs	1
+S1	EUR	wes	/users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wes	1
+S1	EUR	rnaseq	/users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/rnaseq	1
+S2	AFR	wgs	/users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wgs	1
+S2	AFR	wes	/users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wes	1
+S2	AFR	rnaseq	/users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/rnaseq	1

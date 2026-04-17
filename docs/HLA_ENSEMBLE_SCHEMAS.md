@@ -1,5 +1,13 @@
 # HLA Ensemble Schemas
 
+## Headline vs Detailed Outputs
+
+Headline benchmark and consensus outputs are currently scoped to `HLA-A`, `HLA-B`, and `HLA-C`. This applies to benchmark-facing tables, manuscript-ready summaries, and default consensus interpretation.
+
+Detailed per-tool output directories may still contain additional loci such as `DQB1`, `DRB1`, and other tool-native HLA genes. These richer outputs are preserved for inspection, troubleshooting, and future scope expansion, but they are not part of the current headline benchmark claim set unless explicitly stated.
+
+Modality is resolved once at workflow runtime and then propagated explicitly into aggregation, weighting, and consensus layers so samplesheet and directory-based runs behave consistently. Runtime weight consumption supports both the native runtime-weight schema and imported `raw_accuracy` calibration JSON files.
+
 ## Unified HLA Call TSV Schema
 
 One row per `sample x modality x tool x gene`.
@@ -104,6 +112,10 @@ Columns:
 Same grouping and core columns as majority vote, plus:
 - `total_weight`
 
+Runtime weight inputs currently support two compatible machine-readable forms:
+- native runtime schema with `tool_weights` and `gene_weights` containing `final_weight`
+- imported calibration schema with `raw_accuracy`, converted at runtime into tool-level and gene-level weights
+
 Method-level ambiguity outputs:
 - `method_ambiguity_summary.tsv`
 - `method_ambiguity_summary_by_gene.tsv`
@@ -117,6 +129,11 @@ Consensus `call_status` values:
 - `low_confidence`
 - `no_call`
 
+Current default consensus gene scope:
+- `A`
+- `B`
+- `C`
+
 Discordance tags currently emitted by the benchmark layer:
 - `consensus_call`
 - `technical_conflict`
@@ -124,3 +141,50 @@ Discordance tags currently emitted by the benchmark layer:
 - `no_evidence`
 - `dna_rna_discordance`
 - `possible_expression_bias`
+
+
+## Real-Data Cohort Manifest Schemas
+
+### Truth manifest
+One row per truth-backed sample.
+
+Required columns:
+- `sample`
+- `population`
+- `truth_source`
+- `acquisition_date`
+- `truth_supported_loci`
+- `truth_gene_count`
+
+### Sequencing manifest
+One row per `sample x modality` availability record.
+
+Required columns:
+- `sample`
+- `population`
+- `modality`
+- `data_locator`
+- `available`
+
+Semantics:
+- `modality`: one of `wgs`, `wes`, `rnaseq`
+- `available`: `1` only when the modality is present and benchmarkable for that sample
+
+### Cohort manifest
+One row per sample after intersecting truth and sequencing availability.
+
+Required columns:
+- `sample`
+- `population`
+- `include`
+- `split`
+- `truth_supported_loci`
+- `wgs_available`
+- `wes_available`
+- `rnaseq_available`
+- `excluded_reason`
+
+Semantics:
+- `include`: `1` only for samples retained in the strict tri-modal benchmark cohort
+- `split`: `training`, `validation`, or `holdout` for included samples
+- `excluded_reason`: blank for included samples; otherwise records the exclusion rule that removed the sample

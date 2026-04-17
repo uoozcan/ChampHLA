@@ -1,0 +1,75 @@
+truth:
+  imgt_hla_version: 3.59.0
+  path: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/truth.tsv
+  source: ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/working/20140725_hla_genotypes/
+  acquisition_date: 2014-07-25
+  supported_loci:
+    - A
+    - B
+    - C
+
+manifests:
+  sequencing_source: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/sequencing_source.tsv
+
+benchmark:
+  resolution: 2
+  secondary_resolutions:
+    - 2
+    - 3
+  split_seed: 1000
+  splits:
+    training: calibration
+    validation: threshold_tuning
+    holdout: final_reporting
+  consensus:
+    min_support: 0.55
+    min_margin: 0.15
+
+runs:
+  - tool: SpecHLA
+    modality: wes
+    parser: spec_hla_result
+    result_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wes/spechla/**/hla.result.txt
+    runtime_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wes/spechla/**/time.log
+    sample_from_path_regex: /([^/]+)/hla\.result\.txt$
+
+  - tool: SpecHLA
+    modality: wgs
+    parser: spec_hla_result
+    result_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wgs/spechla/**/hla.result.txt
+    runtime_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wgs/spechla/**/time.log
+    sample_from_path_regex: /([^/]+)/hla\.result\.txt$
+
+  - tool: OptiType
+    modality: wes
+    parser: optitype_tsv
+    result_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wes/optitype/**/*_result.tsv
+    runtime_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wes/optitype/**/time.log
+    sample_from_path_regex: /([^/]+)/[^/]+_result\.tsv$
+    confidence_parser: optitype_result_objective
+
+  - tool: OptiType
+    modality: wgs
+    parser: optitype_tsv
+    result_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wgs/optitype/**/*_result.tsv
+    runtime_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/wgs/optitype/**/time.log
+    sample_from_path_regex: /([^/]+)/[^/]+_result\.tsv$
+    confidence_parser: optitype_result_objective
+
+  - tool: OptiType
+    modality: rnaseq
+    parser: optitype_tsv
+    result_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/rnaseq/optitype/**/*_result.tsv
+    runtime_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/rnaseq/optitype/**/time.log
+    sample_from_path_regex: /([^/]+)/[^/]+_result\.tsv$
+    confidence_parser: optitype_result_objective
+
+  - tool: ArcasHLA
+    modality: rnaseq
+    parser: arcashla_json
+    result_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/rnaseq/arcashla/**/*.genotype.json
+    sample_from_path_regex: /([^/]+)/[^/]+\.genotype\.json$
+    confidence_glob: /users/ozcanumu/scratch/project_2008084/pihla-publish/tests/fixtures/rnaseq/arcashla_confidence.tsv
+    confidence_parser: long_confidence_table
+    confidence_defaults:
+      target_reads: 50

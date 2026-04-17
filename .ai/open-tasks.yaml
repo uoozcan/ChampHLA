@@ -1,0 +1,70 @@
+{
+  "project": "pihla",
+  "version": 3,
+  "tasks": [
+    {
+      "id": "pihla-benchmark-triage",
+      "title": "Prepare benchmark triage workflow for PIHLA",
+      "task_type": "bug",
+      "lead_tool": "claude",
+      "support_tool": "codex",
+      "status": "ready",
+      "priority": "high",
+      "owner": "ai-system",
+      "required_checks": [
+        "benchmark-scope-check",
+        "handoff-file",
+        "task-log-entry"
+      ],
+      "summary": "Claude Code investigates ambiguous benchmark issues and implements fixes; Codex is optional for brainstorming, critique, or verification."
+    },
+    {
+      "id": "pihla-method-choice",
+      "title": "Compare scientific or workflow options before implementation",
+      "task_type": "decision-support",
+      "lead_tool": "codex",
+      "support_tool": "claude",
+      "status": "ready",
+      "priority": "medium",
+      "owner": "ai-system",
+      "required_checks": [
+        "options-list",
+        "recommendation",
+        "task-log-entry"
+      ],
+      "summary": "Codex compares options and recommends a direction; Claude Code implements the chosen path."
+    },
+    {
+      "id": "pihla-manuscript-consistency",
+      "title": "Review manuscript claims against code and benchmark outputs",
+      "task_type": "manuscript",
+      "lead_tool": "claude",
+      "support_tool": "codex",
+      "status": "ready",
+      "priority": "high",
+      "owner": "ai-system",
+      "required_checks": [
+        "scientific-scope-check",
+        "evidence-links",
+        "task-log-entry"
+      ],
+      "summary": "Claude Code owns direct manuscript changes; Codex may critique framing or evidence before edits."
+    },
+    {
+      "id": "pihla-review-diff",
+      "title": "Prepare review workflow for PIHLA diffs",
+      "task_type": "review",
+      "lead_tool": "codex",
+      "support_tool": "claude",
+      "status": "ready",
+      "priority": "medium",
+      "owner": "ai-system",
+      "required_checks": [
+        "review-notes",
+        "severity-scan",
+        "task-log-entry"
+      ],
+      "summary": "Codex leads /review-style diff inspection; Claude Code remains the default follow-up implementer."
+    }
+  ]
+}

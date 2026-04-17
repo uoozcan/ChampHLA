@@ -29,7 +29,7 @@ process POLYSOLVER {
     path "versions.yml", emit: versions
 
     script:
-    def build = params.reference == 'hg38' ? 'hg38' : 'hg19'
+    def build = (params.reference == 'hg38' || params.reference_build == 'hg38') ? 'hg38' : 'hg19'
     """
     mkdir -p ${sample_id}_polysolver_raw
 
@@ -44,15 +44,24 @@ process POLYSOLVER {
     # Fix 3: Picard SamToFastq "Illegal mate state" — pre-sort by name + fixmate + re-sort
     # Required when BAM has inconsistent mate flags (common in some pipelines)
     echo "[POLYSOLVER] Applying fixmate pre-processing for ${sample_id}..."
-    /home/polysolver/binaries/samtools sort -n -@ ${task.cpus} -o ${sample_id}_namesort.bam ${bam}
-    /home/polysolver/binaries/samtools fixmate -m ${sample_id}_namesort.bam ${sample_id}_fixmate.bam
-    /home/polysolver/binaries/samtools sort    -@ ${task.cpus} -o ${sample_id}_fixed.bam ${sample_id}_fixmate.bam
+    /home/polysolver/binaries/samtools sort -n ${bam} ${sample_id}_namesort
+    /home/polysolver/binaries/samtools fixmate ${sample_id}_namesort.bam ${sample_id}_fixmate.bam
+    /home/polysolver/binaries/samtools sort ${sample_id}_fixmate.bam ${sample_id}_fixed
     /home/polysolver/binaries/samtools index ${sample_id}_fixed.bam
     POLYSOLVER_INPUT="${sample_id}_fixed.bam"
 
+    # Fix 4: SortSam.jar has TMP_DIR=/home/polysolver hardcoded — patch script at runtime
+    # /home/polysolver is read-only in Singularity; replace with writable CWD tmp
+    mkdir -p picard_tmp
+    PICARD_TMP=\$(pwd)/picard_tmp
+    export _JAVA_OPTIONS="-Djava.io.tmpdir=\${PICARD_TMP}"
+    sed "s|TMP_DIR=/home/polysolver|TMP_DIR=\${PICARD_TMP}|g" \
+        /home/polysolver/scripts/shell_call_hla_type > patched_shell_call_hla_type
+    chmod +x patched_shell_call_hla_type
+
     # POLYSOLVER args: BAM race includeFreq build format insertCalc outdir
     # race=Unknown (population-agnostic), includeFreq=0, insertCalc=0 (germline)
-    bash /home/polysolver/scripts/shell_call_hla_type \
+    bash patched_shell_call_hla_type \
         \$POLYSOLVER_INPUT Unknown 0 ${build} STDFQ 0 ${sample_id}_polysolver_raw || true
 
     # Cleanup intermediate BAMs

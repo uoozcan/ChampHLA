@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark HLA typing runs, confidence weights, and figure-ready outputs."""
+"""Benchmark HLA typing runs, cohort-aware confidence weights, and figure-ready outputs."""
 
 import argparse
 import csv
@@ -22,7 +22,13 @@ MODALITY_STYLES = {
 }
 MISSING_TOKENS = {"", "na", "n/a", "none", "null", "nan", "-", ".", "failed", "fail", "no_call", "no result"}
 DEFAULT_TARGET_READS = 50.0
-WEIGHT_VERSION = "read_confidence_v1"
+WEIGHT_VERSION = "read_confidence_v2"
+DEFAULT_CONFIDENCE_GUARDRAIL = {
+    "enabled": True,
+    "max_expected_calibration_error_for_boost": 0.35,
+    "max_brier_score_for_boost": 0.35,
+    "min_confidence_coverage_for_boost": 0.5,
+}
 GROUP_SUFFIXES = {"G", "P"}
 
 
@@ -355,7 +361,44 @@ def load_truth(truth_cfg):
     raise ValueError("Could not parse truth table from %s" % truth_cfg["path"])
 
 
-def parse_wide_hla_file(path):
+def parse_gene_list(values):
+    if not values:
+        return []
+    if isinstance(values, str):
+        tokens = re.split(r"[,;|\s]+", values)
+    else:
+        tokens = []
+        for value in values:
+            tokens.extend(parse_gene_list(value) if isinstance(value, (list, tuple, set)) else [value])
+    genes = []
+    for token in tokens:
+        gene = normalize_gene(token)
+        if gene:
+            genes.append(gene)
+    ordered = []
+    for gene in genes:
+        if gene not in ordered:
+            ordered.append(gene)
+    return ordered
+
+
+def resolve_benchmark_genes(config):
+    truth_cfg = config.get("truth", {})
+    benchmark_cfg = config.get("benchmark", {})
+    genes = parse_gene_list(truth_cfg.get("supported_loci") or benchmark_cfg.get("genes"))
+    return sorted(genes, key=gene_sort_key)
+
+
+def load_runtime_weight_override(config):
+    benchmark_cfg = config.get("benchmark", {})
+    path_value = clean_token(benchmark_cfg.get("runtime_weight_override", ""))
+    if not path_value:
+        return None
+    with Path(path_value).open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def parse_wide_hla_file(path, sample_override=""):
     rows = read_table(path)
     if not rows:
         return []
@@ -363,13 +406,13 @@ def parse_wide_hla_file(path):
     sample_key = next((col for col in rows[0].keys() if normalize_column_name(col) in {"sample", "sampleid"}), None)
     records = []
     for row in rows:
-        sample = clean_token(row.get(sample_key, "")) if sample_key else ""
+        sample = sample_override or (clean_token(row.get(sample_key, "")) if sample_key else "")
         for gene, pair in header_pairs.items():
             records.append(CallRecord(sample=sample, gene=gene, allele1=row.get(pair[0], ""), allele2=row.get(pair[1], ""), source_file=str(path)))
     return records
 
 
-def parse_long_hla_file(path):
+def parse_long_hla_file(path, sample_override=""):
     rows = read_table(path)
     if not rows:
         return []
@@ -378,18 +421,36 @@ def parse_long_hla_file(path):
     gene_key = first_existing(key_map, ["gene", "locus"])
     allele1_key = first_existing(key_map, ["allele1", "typedallele1", "truthallele1", "ggroup1"])
     allele2_key = first_existing(key_map, ["allele2", "typedallele2", "truthallele2", "ggroup2"])
-    if not (sample_key and gene_key and allele1_key and allele2_key):
+    if not (gene_key and allele1_key and allele2_key):
         return []
-    return [
-        CallRecord(
-            sample=clean_token(row[key_map[sample_key]]),
+    records = []
+    for row in rows:
+        sample = clean_token(row.get(key_map[sample_key], "")) if sample_key else ""
+        sample = sample or sample_override
+        records.append(CallRecord(
+            sample=sample,
             gene=normalize_gene(row[key_map[gene_key]]),
             allele1=row[key_map[allele1_key]],
             allele2=row[key_map[allele2_key]],
             source_file=str(path),
-        )
-        for row in rows
-    ]
+        ))
+    return records
+
+
+def parse_hlahd_file(path, sample_override):
+    sample = sample_override or clean_token(path.stem)
+    records = []
+    for line in read_raw_lines(path):
+        if not line.strip() or line.startswith('#'):
+            continue
+        fields = [clean_token(part) for part in line.split('	')]
+        if len(fields) < 3:
+            continue
+        gene = normalize_gene(fields[0])
+        if not gene:
+            continue
+        records.append(CallRecord(sample=sample, gene=gene, allele1=fields[1], allele2=fields[2], source_file=str(path)))
+    return records
 
 
 def parse_optitype_file(path, sample_override):
@@ -429,10 +490,10 @@ def parse_auto_file(path, sample_override):
         header_names = {normalize_column_name(col) for col in rows[0].keys()}
         if {"a1", "a2", "b1", "b2", "c1", "c2"} & header_names:
             return parse_optitype_file(path, sample_override)
-        if any(name in header_names for name in {"sample", "sampleid"}) and any(name in header_names for name in {"gene", "locus"}):
-            return parse_long_hla_file(path)
+        if any(name in header_names for name in {"gene", "locus"}) and any(name in header_names for name in {"allele1", "typedallele1", "truthallele1", "ggroup1"}) and any(name in header_names for name in {"allele2", "typedallele2", "truthallele2", "ggroup2"}):
+            return parse_long_hla_file(path, sample_override)
         if extract_wide_gene_columns(rows[0].keys()):
-            return parse_wide_hla_file(path)
+            return parse_wide_hla_file(path, sample_override)
     return []
 
 
@@ -441,9 +502,11 @@ def parse_result_file(path, parser_name, sample_override):
     if parser_name in {"auto", ""}:
         return parse_auto_file(path, sample_override)
     if parser_name in {"spec_hla_result", "wide_hla_table"}:
-        return parse_wide_hla_file(path)
-    if parser_name == "long_hla_table":
-        return parse_long_hla_file(path)
+        return parse_wide_hla_file(path, sample_override)
+    if parser_name == "hlahd_table":
+        return parse_hlahd_file(path, sample_override)
+    if parser_name in {"long_hla_table", "polysolver_table", "kourami_table", "t1k_table", "seq2hla_table"}:
+        return parse_auto_file(path, sample_override)
     if parser_name == "optitype_tsv":
         return parse_optitype_file(path, sample_override)
     if parser_name == "arcashla_json":
@@ -571,6 +634,92 @@ def parse_json_confidence_table(path, sample_override, defaults):
     return out
 
 
+def parse_t1k_genotype_confidence(path, sample_override, defaults):
+    sample = sample_override or clean_token(path.stem.replace('_genotype', ''))
+    out = []
+    for line in read_raw_lines(path):
+        if not line.strip() or line.startswith('#'):
+            continue
+        fields = [clean_token(part) for part in line.split('	')]
+        if len(fields) < 5:
+            continue
+        gene = normalize_gene(fields[0])
+        if not gene:
+            continue
+        read_support = 0.0
+        for value in (fields[4] if len(fields) > 4 else None, fields[7] if len(fields) > 7 else None):
+            numeric = coerce_float(value)
+            if numeric is not None and numeric >= 0:
+                read_support += numeric
+        out.append(build_confidence_entry(sample, gene, None, read_support if read_support > 0 else None, defaults, 't1k_genotype_confidence', path))
+    return out
+
+
+def parse_arcashla_genes_confidence(path, sample_override, defaults):
+    with path.open('r', encoding='utf-8') as handle:
+        payload = json.load(handle)
+    sample = sample_override or clean_token(path.stem.replace('.genes', '')) or path.stem
+    out = []
+    if not isinstance(payload, dict):
+        return out
+    for raw_gene, values in payload.items():
+        gene = normalize_gene(raw_gene)
+        if not gene or not isinstance(values, list):
+            continue
+        read_support = values[1] if len(values) > 1 else None
+        raw_score = values[2] if len(values) > 2 else None
+        out.append(build_confidence_entry(sample, gene, raw_score, read_support, defaults, 'arcashla_genes_confidence', path))
+    return out
+
+
+def parse_hlahd_read_confidence(path, sample_override, defaults):
+    sample = sample_override or clean_token(path.name.split('_', 1)[0]) or path.stem
+    gene_token = clean_token(path.stem.split('_')[-1].replace('.read', ''))
+    gene = normalize_gene(gene_token)
+    if not gene:
+        return []
+    for line in read_raw_lines(path):
+        if not line.strip() or line.startswith('#'):
+            continue
+        fields = [clean_token(part) for part in line.split('	')]
+        if len(fields) < 2:
+            continue
+        if fields[0].lower().startswith('r1 only'):
+            continue
+        read_support = coerce_float(fields[1])
+        return [build_confidence_entry(sample, gene, None, read_support, defaults, 'hlahd_read_confidence', path)]
+    return [build_confidence_entry(sample, gene, None, None, defaults, 'hlahd_read_confidence', path)]
+
+
+def parse_kourami_result_confidence(path, sample_override, defaults):
+    sample = sample_override or clean_token(path.stem.replace('.kourami', '')) or path.stem
+    per_gene = {}
+    for line in read_raw_lines(path):
+        if not line.strip() or line.startswith('#'):
+            continue
+        fields = [clean_token(part) for part in line.split('	')]
+        if len(fields) < 3:
+            continue
+        allele = fields[0].split(';')[0]
+        gene_token = allele.split('*', 1)[0]
+        gene = normalize_gene(gene_token)
+        if not gene:
+            continue
+        raw_score = coerce_float(fields[2])
+        read_support = coerce_float(fields[1])
+        bucket = per_gene.setdefault(gene, {'scores': [], 'supports': []})
+        if raw_score is not None:
+            bucket['scores'].append(raw_score)
+        if read_support is not None:
+            bucket['supports'].append(read_support)
+    out = []
+    for gene, bucket in per_gene.items():
+        raw_score = sum(bucket['scores']) / len(bucket['scores']) if bucket['scores'] else None
+        read_support = max(bucket['supports']) if bucket['supports'] else None
+        out.append(build_confidence_entry(sample, gene, raw_score, read_support, defaults, 'kourami_result_confidence', path))
+    return out
+
+
 def parse_confidence_file(path, parser_name, sample_override, defaults):
     parser_name = clean_token(parser_name).lower()
     if not parser_name:
@@ -583,6 +732,14 @@ def parse_confidence_file(path, parser_name, sample_override, defaults):
         return parse_long_confidence_table(path, sample_override, defaults)
     if parser_name == "wide_confidence_table":
         return parse_wide_confidence_table(path, sample_override, defaults)
+    if parser_name == "t1k_genotype_confidence":
+        return parse_t1k_genotype_confidence(path, sample_override, defaults)
+    if parser_name == "arcashla_genes_confidence":
+        return parse_arcashla_genes_confidence(path, sample_override, defaults)
+    if parser_name == "hlahd_read_confidence":
+        return parse_hlahd_read_confidence(path, sample_override, defaults)
+    if parser_name == "kourami_result_confidence":
+        return parse_kourami_result_confidence(path, sample_override, defaults)
     raise ValueError("Unsupported confidence parser: %s" % parser_name)
 
 
@@ -649,6 +806,15 @@ def resolve_imgt_hla_version(config):
     return clean_token(truth_cfg.get("imgt_hla_version") or benchmark_cfg.get("imgt_hla_version") or config.get("imgt_hla_version") or "")
 
 
+def qualify_allele_for_gene(raw, gene):
+    value = clean_token(raw)
+    if not value or is_missing(value) or '*' in value:
+        return value
+    if re.match(r'^[0-9]+(?::[0-9A-Za-z]+)+$', value):
+        return f"{gene}*{value}"
+    return value
+
+
 def build_harmonized_rows(truth, runs, resolution=2, imgt_hla_version=""):
     rows = []
     for run in runs:
@@ -666,7 +832,7 @@ def build_harmonized_rows(truth, runs, resolution=2, imgt_hla_version=""):
                 if not truth_pair:
                     continue
                 raw_typed = [call.allele1, call.allele2]
-                raw_truth = [truth_pair[0], truth_pair[1]]
+                raw_truth = [qualify_allele_for_gene(truth_pair[0], gene), qualify_allele_for_gene(truth_pair[1], gene)]
                 ambiguity = evaluate_ambiguity(raw_typed, raw_truth, resolution)
                 typed_pair = ambiguity["typed_configured"]
                 truth_norm = ambiguity["truth_configured"]
@@ -903,20 +1069,83 @@ def confidence_coverage_rate(entries):
     return ratio(with_confidence, len(callable_entries))
 
 
-def compute_weight_record(entries, tool, modality, gene=None):
+def confidence_guardrail_settings(config):
+    benchmark_cfg = (config or {}).get("benchmark", {}) if isinstance(config, dict) else {}
+    raw = benchmark_cfg.get("confidence_guardrail", {}) if isinstance(benchmark_cfg, dict) else {}
+    settings = dict(DEFAULT_CONFIDENCE_GUARDRAIL)
+    if isinstance(raw, dict):
+        settings.update(raw)
+    settings["enabled"] = bool(settings.get("enabled", True))
+    settings["max_expected_calibration_error_for_boost"] = float(settings.get("max_expected_calibration_error_for_boost", DEFAULT_CONFIDENCE_GUARDRAIL["max_expected_calibration_error_for_boost"]))
+    settings["max_brier_score_for_boost"] = float(settings.get("max_brier_score_for_boost", DEFAULT_CONFIDENCE_GUARDRAIL["max_brier_score_for_boost"]))
+    settings["min_confidence_coverage_for_boost"] = float(settings.get("min_confidence_coverage_for_boost", DEFAULT_CONFIDENCE_GUARDRAIL["min_confidence_coverage_for_boost"]))
+    return settings
+
+
+def calibration_stats(entries, bin_count=5):
+    scored = [row for row in entries if coerce_float(row.get("confidence_score", "")) is not None]
+    n = len(scored)
+    if not n:
+        return {"n_rows": 0, "mean_confidence": None, "observed_accuracy": None, "brier_score": None, "expected_calibration_error": None}
+    grouped = defaultdict(list)
+    for row in scored:
+        grouped[calibration_bin_label(coerce_float(row.get("confidence_score", "")), bin_count)[0]].append(row)
+    brier = sum((coerce_float(row["confidence_score"]) - int(row["is_correct"])) ** 2 for row in scored) / float(n)
+    ece = 0.0
+    for entries_in_bin in grouped.values():
+        mean_conf = statistics.mean(coerce_float(row["confidence_score"]) for row in entries_in_bin)
+        observed = statistics.mean(int(row["is_correct"]) for row in entries_in_bin)
+        ece += abs(mean_conf - observed) * len(entries_in_bin)
+    ece = ece / float(n)
+    return {
+        "n_rows": n,
+        "mean_confidence": round(statistics.mean(coerce_float(row["confidence_score"]) for row in scored), 4),
+        "observed_accuracy": round(statistics.mean(int(row["is_correct"]) for row in scored), 4),
+        "brier_score": round(brier, 4),
+        "expected_calibration_error": round(ece, 4),
+    }
+
+
+def guarded_confidence_value(reliability, calibrated_confidence, coverage_rate, calibration, settings):
+    if calibrated_confidence is None:
+        return None, None, "no_confidence"
+    if not settings.get("enabled", True):
+        return calibrated_confidence, 1.0, "disabled"
+    if coverage_rate < settings["min_confidence_coverage_for_boost"]:
+        return reliability, 0.0, "coverage_too_low"
+    brier = calibration.get("brier_score")
+    ece = calibration.get("expected_calibration_error")
+    if brier is None or ece is None:
+        return reliability, 0.0, "missing_calibration"
+    if brier > settings["max_brier_score_for_boost"] or ece > settings["max_expected_calibration_error_for_boost"]:
+        return reliability, 0.0, "poor_calibration"
+    shrink_factor = round(max(0.0, 1.0 - max(brier, ece)), 4)
+    effective_confidence = round(reliability + shrink_factor * (calibrated_confidence - reliability), 4)
+    return effective_confidence, shrink_factor, "applied"
+
+
+def compute_weight_record(entries, tool, modality, gene=None, settings=None):
     summary = summarize_entries(entries)
     reliability = summary["overall_correct_call_rate"]
+    coverage_rate = confidence_coverage_rate(entries)
     calibrated_confidence = mean_confidence(entries)
-    final_weight = reliability if calibrated_confidence is None else round(0.7 * reliability + 0.3 * calibrated_confidence, 4)
+    calibration = calibration_stats(entries)
+    effective_confidence, guardrail_factor, guardrail_status = guarded_confidence_value(reliability, calibrated_confidence, coverage_rate, calibration, settings or DEFAULT_CONFIDENCE_GUARDRAIL)
+    final_weight = reliability if effective_confidence is None else round(0.7 * reliability + 0.3 * effective_confidence, 4)
     record = {
         "tool": tool,
         "modality": modality,
         "sample_count": summary["sample_count"],
         "gene_rows": summary["gene_rows"],
         "callable_rate": summary["callable_rate"],
-        "confidence_coverage_rate": confidence_coverage_rate(entries),
+        "confidence_coverage_rate": coverage_rate,
         "base_reliability": reliability,
         "calibrated_confidence": "" if calibrated_confidence is None else calibrated_confidence,
+        "effective_confidence": "" if effective_confidence is None else effective_confidence,
+        "guardrail_factor": "" if guardrail_factor is None else guardrail_factor,
+        "guardrail_status": guardrail_status,
+        "brier_score": "" if calibration["brier_score"] is None else calibration["brier_score"],
+        "expected_calibration_error": "" if calibration["expected_calibration_error"] is None else calibration["expected_calibration_error"],
         "final_weight": final_weight,
         "weight_version": WEIGHT_VERSION,
     }
@@ -925,7 +1154,8 @@ def compute_weight_record(entries, tool, modality, gene=None):
     return record
 
 
-def build_confidence_weights(rows):
+def build_confidence_weights(rows, config=None):
+    settings = confidence_guardrail_settings(config)
     grouped = defaultdict(list)
     gene_grouped = defaultdict(list)
     for row in rows:
@@ -933,10 +1163,10 @@ def build_confidence_weights(rows):
         gene_grouped[(row["tool"], row["modality"], row["gene"])].append(row)
     tool_rows = []
     for key, entries in sorted(grouped.items(), key=lambda item: (modality_sort_key(item[0][1]), item[0][0])):
-        tool_rows.append(compute_weight_record(entries, key[0], key[1]))
+        tool_rows.append(compute_weight_record(entries, key[0], key[1], settings=settings))
     gene_rows = []
     for key, entries in sorted(gene_grouped.items(), key=lambda item: (modality_sort_key(item[0][1]), item[0][0], gene_sort_key(item[0][2]))):
-        gene_rows.append(compute_weight_record(entries, key[0], key[1], gene=key[2]))
+        gene_rows.append(compute_weight_record(entries, key[0], key[1], gene=key[2], settings=settings))
     return tool_rows, gene_rows
 
 
@@ -944,8 +1174,9 @@ def build_runtime_weight_payload(tool_weights, gene_weights):
     payload = {
         "weight_version": WEIGHT_VERSION,
         "formula": {
-            "final_weight": "0.7 * overall_correct_call_rate + 0.3 * mean_confidence_score",
-            "fallback": "overall_correct_call_rate when confidence is missing",
+            "final_weight": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+            "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+            "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
         },
         "tool_weights": {},
         "gene_weights": {},
@@ -955,6 +1186,11 @@ def build_runtime_weight_payload(tool_weights, gene_weights):
             "final_weight": row["final_weight"],
             "base_reliability": row["base_reliability"],
             "calibrated_confidence": None if row["calibrated_confidence"] == "" else row["calibrated_confidence"],
+            "effective_confidence": None if row["effective_confidence"] == "" else row["effective_confidence"],
+            "guardrail_factor": None if row["guardrail_factor"] == "" else row["guardrail_factor"],
+            "guardrail_status": row["guardrail_status"],
+            "brier_score": None if row["brier_score"] == "" else row["brier_score"],
+            "expected_calibration_error": None if row["expected_calibration_error"] == "" else row["expected_calibration_error"],
             "confidence_coverage_rate": row["confidence_coverage_rate"],
             "sample_count": row["sample_count"],
             "gene_rows": row["gene_rows"],
@@ -965,6 +1201,11 @@ def build_runtime_weight_payload(tool_weights, gene_weights):
             "final_weight": row["final_weight"],
             "base_reliability": row["base_reliability"],
             "calibrated_confidence": None if row["calibrated_confidence"] == "" else row["calibrated_confidence"],
+            "effective_confidence": None if row["effective_confidence"] == "" else row["effective_confidence"],
+            "guardrail_factor": None if row["guardrail_factor"] == "" else row["guardrail_factor"],
+            "guardrail_status": row["guardrail_status"],
+            "brier_score": None if row["brier_score"] == "" else row["brier_score"],
+            "expected_calibration_error": None if row["expected_calibration_error"] == "" else row["expected_calibration_error"],
             "confidence_coverage_rate": row["confidence_coverage_rate"],
             "sample_count": row["sample_count"],
             "gene_rows": row["gene_rows"],
@@ -1325,7 +1566,6 @@ def build_confidence_bin_summary(rows, bin_count=5):
 
 
 def build_confidence_calibration_summary(rows, bin_count=5):
-    bin_summary = build_confidence_bin_summary(rows, bin_count=bin_count)
     grouped = defaultdict(list)
     for row in rows:
         score = coerce_float(row.get("confidence_score", ""))
@@ -1334,18 +1574,15 @@ def build_confidence_calibration_summary(rows, bin_count=5):
         grouped[(row["tool"], row["modality"])].append(row)
     out = []
     for key, entries in sorted(grouped.items(), key=lambda item: (modality_sort_key(item[0][1]), item[0][0])):
-        n = len(entries)
-        brier = sum((coerce_float(row["confidence_score"]) - int(row["is_correct"])) ** 2 for row in entries) / float(n) if n else 0.0
-        bins = [row for row in bin_summary if row["tool"] == key[0] and row["modality"] == key[1]]
-        ece = sum(abs(row["mean_confidence"] - row["observed_accuracy"]) * row["n_rows"] for row in bins) / float(n) if n else 0.0
+        stats = calibration_stats(entries, bin_count=bin_count)
         out.append({
             "tool": key[0],
             "modality": key[1],
-            "n_rows": n,
-            "mean_confidence": round(statistics.mean(coerce_float(row["confidence_score"]) for row in entries), 4),
-            "observed_accuracy": round(statistics.mean(int(row["is_correct"]) for row in entries), 4),
-            "brier_score": round(brier, 4),
-            "expected_calibration_error": round(ece, 4),
+            "n_rows": stats["n_rows"],
+            "mean_confidence": stats["mean_confidence"],
+            "observed_accuracy": stats["observed_accuracy"],
+            "brier_score": stats["brier_score"],
+            "expected_calibration_error": stats["expected_calibration_error"],
         })
     return out
 
@@ -1488,12 +1725,16 @@ def build_metadata(config, shared_genes, harmonized_rows, tool_weights):
             "group_levels": ["G", "P"],
             "notes": "G-group and P-group rates are only reported for rows where both truth and call include comparable group-suffixed alleles.",
         },
+        "configured_benchmark_genes": resolve_benchmark_genes(config),
         "confidence_weighting": {
             "weight_version": WEIGHT_VERSION,
             "default_target_reads": DEFAULT_TARGET_READS,
-            "formula": "0.7 * overall_correct_call_rate + 0.3 * mean_confidence_score",
-            "fallback": "overall_correct_call_rate when confidence is missing",
+            "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+            "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+            "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
+            "guardrail": confidence_guardrail_settings(config),
             "parser_coverage": parser_coverage,
+            "runtime_weight_override": benchmark_cfg.get("runtime_weight_override", ""),
             "tool_weight_count": len(tool_weights),
             "harmonized_rows_with_confidence": sum(1 for row in harmonized_rows if coerce_float(row.get("confidence_score", "")) is not None),
         },
@@ -1741,15 +1982,19 @@ def main():
     harmonized_rows = dedupe_rows(build_harmonized_rows(truth, runs, resolution=resolution, imgt_hla_version=imgt_hla_version))
     if not harmonized_rows:
         raise SystemExit("No harmonized benchmark rows were produced. Check the config globs and parser settings.")
-    shared_genes = calculate_shared_genes(harmonized_rows)
-    main_rows = filter_rows(harmonized_rows, genes=shared_genes or None)
+    benchmark_genes = resolve_benchmark_genes(config)
+    filtered_rows = filter_rows(harmonized_rows, genes=benchmark_genes or None)
+    if not filtered_rows:
+        raise SystemExit("No benchmark rows remained after applying the configured benchmark loci.")
+    shared_genes = calculate_shared_genes(filtered_rows)
+    main_rows = filtered_rows
     summary = aggregate_metrics(main_rows)
     per_gene = build_per_gene_summary(main_rows)
-    modality_gene = build_modality_gene_summary(harmonized_rows)
-    cohort = build_cohort_overview(main_rows, truth, shared_genes)
+    modality_gene = build_modality_gene_summary(main_rows)
+    cohort = build_cohort_overview(main_rows, truth, benchmark_genes or shared_genes)
     ambiguity_summary_rows, ambiguity_summary_gene_rows = build_ambiguity_summary(main_rows)
-    tool_weights, gene_weights = build_confidence_weights(main_rows)
-    runtime_weights = build_runtime_weight_payload(tool_weights, gene_weights)
+    tool_weights, gene_weights = build_confidence_weights(main_rows, config=config)
+    runtime_weights = load_runtime_weight_override(config) or build_runtime_weight_payload(tool_weights, gene_weights)
     majority_rows = build_majority_vote_rows(main_rows)
     weighted_rows = build_weighted_consensus_rows(main_rows, runtime_weights, config)
     method_ambiguity_rows, method_ambiguity_gene_rows = build_method_ambiguity_summary(majority_rows, weighted_rows)
@@ -1764,7 +2009,7 @@ def main():
     discordance_summary_rows = summarize_discordance(discordance_rows)
     metadata = build_metadata(config, shared_genes, harmonized_rows, tool_weights)
 
-    write_tsv(output_dir / "tables" / "harmonized_benchmark_rows.tsv", harmonized_rows, ["sample", "modality", "tool", "gene", "truth_allele1_raw", "truth_allele2_raw", "allele1_raw", "allele2_raw", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "correct_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "runtime_hours", "max_ram_gb", "confidence_score", "confidence_source", "raw_confidence", "read_support", "source_file"])
+    write_tsv(output_dir / "tables" / "harmonized_benchmark_rows.tsv", main_rows, ["sample", "modality", "tool", "gene", "truth_allele1_raw", "truth_allele2_raw", "allele1_raw", "allele2_raw", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "correct_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "runtime_hours", "max_ram_gb", "confidence_score", "confidence_source", "raw_confidence", "read_support", "source_file"])
     write_tsv(output_dir / "tables" / "summary_full_cohort.tsv", sorted(summary.values(), key=lambda row: (modality_sort_key(row["modality"]), row["tool"])), ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "median_runtime_hours", "median_max_ram_gb"])
     write_tsv(output_dir / "tables" / "summary_per_gene.tsv", per_gene, ["tool", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate"])
     write_tsv(output_dir / "tables" / "summary_modality_gene_coverage.tsv", modality_gene, ["modality", "gene"])
@@ -1775,8 +2020,8 @@ def main():
     write_tsv(output_dir / "tables" / "sample_level_disagreements.tsv", build_sample_disagreements(harmonized_rows), ["sample", "modality", "tool", "gene", "truth_allele1", "truth_allele2", "allele1", "allele2", "call_status", "correct_status", "source_file"])
     write_tsv(output_dir / "tables" / "missing_call_patterns.tsv", build_missing_patterns(harmonized_rows), ["tool", "modality", "gene", "missing_calls", "total_rows", "missing_rate"])
     write_tsv(output_dir / "tables" / "truth_mismatches.tsv", build_truth_mismatches(harmonized_rows), ["sample", "modality", "tool", "gene", "truth_allele1", "truth_allele2", "typed_allele1", "typed_allele2", "call_status"])
-    write_tsv(output_dir / "tables" / "tool_confidence_weights.tsv", tool_weights, ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "confidence_coverage_rate", "base_reliability", "calibrated_confidence", "final_weight", "weight_version"])
-    write_tsv(output_dir / "tables" / "tool_confidence_weights_by_gene.tsv", gene_weights, ["tool", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "confidence_coverage_rate", "base_reliability", "calibrated_confidence", "final_weight", "weight_version"])
+    write_tsv(output_dir / "tables" / "tool_confidence_weights.tsv", tool_weights, ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "confidence_coverage_rate", "base_reliability", "calibrated_confidence", "effective_confidence", "guardrail_factor", "guardrail_status", "brier_score", "expected_calibration_error", "final_weight", "weight_version"])
+    write_tsv(output_dir / "tables" / "tool_confidence_weights_by_gene.tsv", gene_weights, ["tool", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "confidence_coverage_rate", "base_reliability", "calibrated_confidence", "effective_confidence", "guardrail_factor", "guardrail_status", "brier_score", "expected_calibration_error", "final_weight", "weight_version"])
     write_tsv(output_dir / "tables" / "majority_vote_baseline.tsv", majority_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "discordance_tag"])
     write_tsv(output_dir / "tables" / "weighted_consensus_calls.tsv", weighted_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "discordance_tag"])
     write_tsv(output_dir / "tables" / "method_comparison.tsv", method_comparison_rows, ["method", "method_type", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate"])

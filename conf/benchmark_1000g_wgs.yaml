@@ -1,0 +1,81 @@
+benchmark:
+  consensus:
+    min_margin: 0.15
+    min_support: 0.55
+  resolution: 2
+  secondary_resolutions:
+  - 2
+  - 3
+  split_seed: 1001
+  splits:
+    holdout: final_reporting
+    training: calibration
+    validation: threshold_tuning
+  tool_coverage_policy: phase_gated
+manifests:
+  sequencing_source: /scratch/project_2008084/pihla-publish/analysis/1000g_realdata/full_cohort_inputs/sequencing_source_wgs.tsv
+runs:
+# ── WGS only ─────────────────────────────────────────────────────────────────
+- modality: wgs
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/*_spechla.txt
+  sample_from_path_regex: /results/([^/]+)/spechla/
+  tool: SpecHLA
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/hlahd/*/*/result/*_*.read.txt
+  confidence_parser: hlahd_read_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/hlahd/
+  modality: wgs
+  parser: hlahd_table
+  result_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/*_hlahd.txt
+  sample_from_path_regex: /results/([^/]+)/hlahd/
+  tool: HLA-HD
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/arcashla/*/*.genes.json
+  confidence_parser: arcashla_genes_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/arcashla/
+  modality: wgs
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/*_arcashla.txt
+  sample_from_path_regex: /results/([^/]+)/arcashla/
+  tool: ArcasHLA
+- confidence_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/optitype/*/*_result.tsv
+  confidence_parser: optitype_result_objective
+  confidence_sample_from_path_regex: /results/([^/]+)/optitype/
+  modality: wgs
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/*_optitype.txt
+  sample_from_path_regex: /results/([^/]+)/optitype/
+  tool: OptiType
+# NOTE: Polysolver excluded from WGS — BAM-only WES-optimised tool; WGS CRAMs produce no output
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/kourami/*.kourami.result
+  confidence_parser: kourami_result_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/kourami/
+  modality: wgs
+  parser: kourami_table
+  result_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/*_kourami.txt
+  sample_from_path_regex: /results/([^/]+)/kourami/
+  tool: Kourami
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/t1k/t1k_out/*_genotype.tsv
+  confidence_parser: t1k_genotype_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/t1k/
+  modality: wgs
+  parser: t1k_table
+  result_glob: /scratch/project_2008084/hla_calibration/wgs_batches/*/results/**/*_t1k.txt
+  sample_from_path_regex: /results/([^/]+)/t1k/
+  tool: T1K
+truth:
+  acquisition_date: 2014-07-25
+  imgt_hla_version: 3.59.0
+  path: /scratch/project_2008084/pihla-publish/analysis/1000g_realdata/full_cohort_inputs/truth_long.tsv
+  source: ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/working/20140725_hla_genotypes/
+  supported_loci:
+  - A
+  - B
+  - C

@@ -18,7 +18,6 @@ process SPECHLA {
 
     output:
     tuple val(sample_id), path("${sample_id}_spechla.txt"), emit: results
-    tuple val(sample_id), path("${sample_id}/*"), emit: full_results, optional: true
     path "versions.yml", emit: versions
 
     script:
@@ -45,6 +44,7 @@ process SPECHLA {
 
     # Create output directory
     mkdir -p ${sample_id}
+    trap 'rm -f ${sample_id}/namesort.bam ${sample_id}/R1.fastq ${sample_id}/R2.fastq ${sample_id}/R1.fastq.gz ${sample_id}/R2.fastq.gz core.*' EXIT
 
     # Check for BAM index, create if missing
     if [ ! -f "${hla_bam}.bai" ] && [ ! -f "${hla_bam.baseName}.bai" ]; then
@@ -112,7 +112,6 @@ process SPECHLA_FASTQ {
 
     output:
     tuple val(sample_id), path("${sample_id}_spechla.txt"), emit: results
-    tuple val(sample_id), path("${sample_id}/*"), emit: full_results, optional: true
     path "versions.yml", emit: versions
 
     script:
@@ -138,6 +137,7 @@ process SPECHLA_FASTQ {
 
     # Create output directory
     mkdir -p ${sample_id}
+    trap 'rm -f ${sample_id}/R1.fastq.gz ${sample_id}/R2.fastq.gz core.*' EXIT
 
     # Link FASTQ files using absolute paths (relative symlinks break after 'cd ${sample_id}')
     if [[ "${fastq1}" == *.gz ]]; then
@@ -157,7 +157,7 @@ process SPECHLA_FASTQ {
         -2 R2.fastq.gz \
         -o . \
         -j ${task.cpus} \
-        -u 1
+        -u ${params.spechla_exon_only ?: 0}
     cd ..
 
     # Parse results

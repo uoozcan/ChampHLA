@@ -27,7 +27,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def polysolver_to_standard(raw_allele: str) -> str:
+def polysolver_to_standard(raw_allele):
     """
     Convert POLYSOLVER allele notation to standard HLA format.
 
@@ -48,7 +48,7 @@ def polysolver_to_standard(raw_allele: str) -> str:
 
     gene = parts[0]
     fields = parts[1:]
-    return f"{gene}*{':'.join(fields)}"
+    return "{}*{}".format(gene, ':'.join(fields))
 
 
 def main():
@@ -63,7 +63,7 @@ def main():
                     continue
                 cols = line.split('\t')
                 if len(cols) < 3:
-                    print(f"Warning: skipping malformed line: {line!r}", file=sys.stderr)
+                    print("Warning: skipping malformed line: {!r}".format(line), file=sys.stderr)
                     continue
 
                 # Gene column: 'HLA-A' → 'A'
@@ -73,22 +73,22 @@ def main():
                 entries.append((gene, allele1, allele2))
 
     except FileNotFoundError:
-        print(f"Warning: POLYSOLVER output file not found: {args.input}", file=sys.stderr)
+        print("Warning: POLYSOLVER output file not found: {}".format(args.input), file=sys.stderr)
 
     with open(args.output, 'w') as out:
-        out.write(f"# POLYSOLVER results for {args.sample}\n")
-        out.write("# Tool: POLYSOLVER (Broad Institute) — Class I, hg19\n")
+        out.write("# POLYSOLVER results for {}\n".format(args.sample))
+        out.write("# Tool: POLYSOLVER (Broad Institute) - Class I, hg19\n")
         out.write("#\n")
         out.write("Gene\tAllele1\tAllele2\tReads1\tReads2\n")
 
         if not entries:
-            print(f"Warning: no alleles parsed from {args.input}", file=sys.stderr)
+            print("Warning: no alleles parsed from {}".format(args.input), file=sys.stderr)
         else:
             for gene, a1, a2 in entries:
-                out.write(f"{gene}\t{a1}\t{a2}\tNA\tNA\n")
+                out.write("{}\t{}\t{}\tNA\tNA\n".format(gene, a1, a2))
 
     total = len(entries)
-    print(f"POLYSOLVER parsing complete: {total} genes typed for {args.sample}")
+    print("POLYSOLVER parsing complete: {} genes typed for {}".format(total, args.sample))
 
 
 if __name__ == '__main__':

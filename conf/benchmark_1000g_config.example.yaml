@@ -20,6 +20,7 @@ benchmark:
     - 2
     - 3
   split_seed: 1000
+  tool_coverage_policy: phase_gated
   splits:
     training: calibration
     validation: threshold_tuning

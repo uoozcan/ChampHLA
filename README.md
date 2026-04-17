@@ -172,7 +172,9 @@ Available tools: `optitype`, `arcashla`, `spechla`, `hlahd`, `polysolver`, `kour
 | `--enable_majority_voting` | Enable consensus calling | `false` |
 | `--mv_min_tools` | Minimum tools for consensus | `2` |
 | `--mv_resolution` | Resolution level (2 or 4) | `2` |
-| `--mv_genes` | Genes for voting | `A,B,C,DQA1,DQB1,DRB1` |
+| `--mv_genes` | Genes for voting (consensus focus) | `A,B,C` |
+
+Consensus defaults to **HLA-A/B/C** for decision outputs. Detailed per-tool output files still include any additional loci each caller reports.
 
 #### Resource Limits
 | Parameter | Description | Default |
@@ -243,6 +245,21 @@ Run the split-aware real-data benchmark:
 ```bash
 python3 bin/run_1000g_benchmark.py     --config conf/benchmark_1000g_config.example.yaml     --output-dir results/1000g_benchmark
 ```
+
+Phase-gated real-data input generation from finished outputs:
+
+```bash
+python3 bin/build_1000g_phase_gated_inputs.py \
+    --truth-csv /scratch/project_2008084/ozcanumu/hla_calibration/conf/ground_truth_data.csv \
+    --wgs-results /scratch/project_2008084/hla_calibration/wgs/results \
+    --wes-results /scratch/project_2008084/hla_calibration/wes_3sample/results \
+    --rnaseq-results /scratch/project_2008084/hla_calibration/rna_3sample/results \
+    --samples NA06985,NA06986,NA06994 \
+    --supported-loci A,B,C,DRB1,DQB1 \
+    --output-dir /scratch/project_2008084/pihla-publish/analysis/1000g_realdata/phase_gated_inputs
+```
+
+Then point `manifests.sequencing_source` to the generated `sequencing_source.tsv` and `truth.path` to `truth_long.tsv`.
 
 The benchmark runner:
 - assembles `truth_manifest.tsv`, `sequencing_manifest.tsv`, and `cohort_manifest.tsv`

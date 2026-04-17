@@ -48,6 +48,7 @@ process OPTITYPE_FASTQ {
     """
     # Create output directory
     mkdir -p ${sample_id}
+    trap 'rm -f R1.fastq R2.fastq core.*' EXIT
 
     # Prepare FASTQ files
     if [[ "${fastq1}" == *.gz ]]; then

@@ -1,4 +1,5 @@
 import csv
+import importlib.util
 import subprocess
 import tempfile
 import unittest
@@ -7,6 +8,11 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "bin" / "hla_benchmark.py"
 FIXTURES = REPO / "tests" / "fixtures"
+
+
+spec = importlib.util.spec_from_file_location("hb_module", str(SCRIPT))
+hb = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(hb)
 
 
 class BenchmarkWorkflowTest(unittest.TestCase):
@@ -142,6 +148,80 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             self.assertTrue((outdir / "figures" / "figure_5_abstention_tradeoff.svg").exists())
             self.assertTrue((outdir / "figures" / "figure_6_discordance_taxonomy.svg").exists())
             self.assertTrue((outdir / "figures" / "figure_7_confidence_weights.svg").exists())
+
+    def test_calibration_guardrail_blocks_overconfident_boost(self):
+        poor_entries = [
+            {"is_callable": "1", "is_correct": "1", "confidence_score": "1.0", "sample": "S1", "gene": "A", "tool": "PoorTool", "modality": "wgs"},
+            {"is_callable": "1", "is_correct": "0", "confidence_score": "1.0", "sample": "S2", "gene": "A", "tool": "PoorTool", "modality": "wgs"},
+            {"is_callable": "1", "is_correct": "0", "confidence_score": "1.0", "sample": "S3", "gene": "A", "tool": "PoorTool", "modality": "wgs"},
+            {"is_callable": "1", "is_correct": "0", "confidence_score": "1.0", "sample": "S4", "gene": "A", "tool": "PoorTool", "modality": "wgs"},
+        ]
+        settings = hb.confidence_guardrail_settings({})
+        poor_record = hb.compute_weight_record(poor_entries, "PoorTool", "wgs", settings=settings)
+        self.assertEqual(poor_record["base_reliability"], 0.25)
+        self.assertEqual(poor_record["calibrated_confidence"], 1.0)
+        self.assertEqual(poor_record["guardrail_status"], "poor_calibration")
+        self.assertEqual(poor_record["guardrail_factor"], 0.0)
+        self.assertEqual(poor_record["effective_confidence"], 0.25)
+        self.assertEqual(poor_record["final_weight"], 0.25)
+
+        good_entries = [
+            {"is_callable": "1", "is_correct": "1", "confidence_score": "0.8", "sample": "S1", "gene": "A", "tool": "GoodTool", "modality": "wgs"},
+            {"is_callable": "1", "is_correct": "1", "confidence_score": "0.7", "sample": "S2", "gene": "A", "tool": "GoodTool", "modality": "wgs"},
+            {"is_callable": "1", "is_correct": "0", "confidence_score": "0.4", "sample": "S3", "gene": "A", "tool": "GoodTool", "modality": "wgs"},
+            {"is_callable": "1", "is_correct": "0", "confidence_score": "0.3", "sample": "S4", "gene": "A", "tool": "GoodTool", "modality": "wgs"},
+        ]
+        good_record = hb.compute_weight_record(good_entries, "GoodTool", "wgs", settings=settings)
+        self.assertEqual(good_record["guardrail_status"], "applied")
+        self.assertGreater(good_record["guardrail_factor"], 0.0)
+        self.assertGreater(good_record["effective_confidence"], good_record["base_reliability"])
+        self.assertGreater(good_record["final_weight"], good_record["base_reliability"])
+
+    def test_native_t1k_and_arcashla_confidence_parsers(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            t1k_path = tmpdir / "S1_genotype.tsv"
+            t1k_path.write_text("HLA-A\t2\tHLA-A*01:01:01\t55.0\t30\tHLA-A*02:01:01\t45.0\t20\nHLA-B\t1\tHLA-B*07:02:01\t50.0\t25\t.\t0\t-1\n", encoding="utf-8")
+            arcas_path = tmpdir / "S1.genes.json"
+            arcas_path.write_text('{"A": [66.0, 23, 0.25], "B": [103.0, 64, 0.5]}', encoding="utf-8")
+
+            t1k_entries = hb.parse_confidence_file(t1k_path, "t1k_genotype_confidence", "S1", {"target_reads": 50})
+            arcas_entries = hb.parse_confidence_file(arcas_path, "arcashla_genes_confidence", "S1", {"target_reads": 50})
+
+            t1k_map = {entry["gene"]: entry for entry in t1k_entries}
+            arcas_map = {entry["gene"]: entry for entry in arcas_entries}
+
+            self.assertEqual(t1k_map["A"]["sample"], "S1")
+            self.assertEqual(t1k_map["A"]["read_support"], 50.0)
+            self.assertEqual(t1k_map["A"]["confidence_score"], 1.0)
+            self.assertEqual(t1k_map["B"]["read_support"], 25.0)
+            self.assertEqual(t1k_map["B"]["confidence_source"], "t1k_genotype_confidence")
+
+            self.assertEqual(arcas_map["A"]["sample"], "S1")
+            self.assertEqual(arcas_map["A"]["read_support"], 23.0)
+            self.assertEqual(arcas_map["A"]["raw_confidence"], 0.25)
+            self.assertEqual(arcas_map["A"]["confidence_source"], "arcashla_genes_confidence")
+            self.assertEqual(arcas_map["B"]["confidence_score"], 0.5)
+
+            hlahd_path = tmpdir / "S1_A.read.txt"
+            hlahd_path.write_text("HLA-A*01:01:01:01\t251\nR1 only\t92\n", encoding="utf-8")
+            hlahd_entries = hb.parse_confidence_file(hlahd_path, "hlahd_read_confidence", "S1", {"target_reads": 50})
+            hlahd_map = {entry["gene"]: entry for entry in hlahd_entries}
+            self.assertEqual(hlahd_map["A"]["sample"], "S1")
+            self.assertEqual(hlahd_map["A"]["read_support"], 251.0)
+            self.assertEqual(hlahd_map["A"]["confidence_score"], 1.0)
+            self.assertEqual(hlahd_map["A"]["confidence_source"], "hlahd_read_confidence")
+
+            kourami_path = tmpdir / "S1.kourami.result"
+            kourami_path.write_text("A*01:01:01G\t540\t0.98\t546\t546\t15.0\t7.0\t8.0\nA*02:01:01G\t530\t0.94\t546\t546\t15.0\t7.0\t8.0\nB*07:02:01G\t300\t0.75\t320\t320\t10.0\t5.0\t5.0\n", encoding="utf-8")
+            kourami_entries = hb.parse_confidence_file(kourami_path, "kourami_result_confidence", "S1", {"target_reads": 50})
+            kourami_map = {entry["gene"]: entry for entry in kourami_entries}
+            self.assertEqual(kourami_map["A"]["sample"], "S1")
+            self.assertEqual(kourami_map["A"]["read_support"], 540.0)
+            self.assertAlmostEqual(kourami_map["A"]["raw_confidence"], 0.96, places=6)
+            self.assertAlmostEqual(kourami_map["A"]["confidence_score"], 0.96, places=6)
+            self.assertEqual(kourami_map["B"]["confidence_source"], "kourami_result_confidence")
+
 
 
 if __name__ == "__main__":

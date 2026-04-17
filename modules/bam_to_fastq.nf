@@ -2,6 +2,24 @@
  * Shared preprocessing utilities for BAM/CRAM inputs.
  */
 
+process CRAM_TO_BAM {
+    tag "$sample_id"
+    label 'process_medium'
+
+    input:
+    tuple val(sample_id), path(cram)
+    path reference_fasta
+
+    output:
+    tuple val(sample_id), path("${sample_id}.bam"), emit: bam
+
+    script:
+    """
+    samtools view -@ ${task.cpus} -b -T ${reference_fasta} -o ${sample_id}.bam ${cram}
+    samtools index -@ ${task.cpus} ${sample_id}.bam
+    """
+}
+
 process EXTRACT_HLA_REGION {
     tag "$sample_id"
     label 'process_medium'
@@ -14,6 +32,9 @@ process EXTRACT_HLA_REGION {
 
     script:
     """
+    if [ ! -f "${bam}.bai" ] && [ ! -f "${bam.baseName}.bai" ]; then
+      samtools index -@ ${task.cpus} ${bam}
+    fi
     CHR=\$(samtools view -H ${bam} | awk '/^@SQ.*SN:chr6\t/{print "chr6"; exit} /^@SQ.*SN:6\t/{print "6"; exit}')
     if [ -z "\$CHR" ]; then
       CHR=6
@@ -57,6 +78,9 @@ process EXTRACT_HLA_AND_CONVERT {
 
     script:
     """
+    if [ ! -f "${bam}.bai" ] && [ ! -f "${bam.baseName}.bai" ]; then
+      samtools index -@ ${task.cpus} ${bam}
+    fi
     CHR=\$(samtools view -H ${bam} | awk '/^@SQ.*SN:chr6\t/{print "chr6"; exit} /^@SQ.*SN:6\t/{print "6"; exit}')
     if [ -z "\$CHR" ]; then
       CHR=6
