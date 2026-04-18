@@ -5,6 +5,7 @@ to: codex
 task_type: decision-support
 priority: high
 created: 2026-04-18
+updated: 2026-04-19
 status: open
 ---
 
@@ -166,6 +167,51 @@ This split was chosen empirically. No ablation or sensitivity analysis has been 
 
 **Stakes**: If a sensitivity analysis is required, it needs to be added to `run_1000g_benchmark.py`
 as a weight-variant run mode before submission.
+
+---
+
+---
+
+## Question 6: Weight Formula Sub-Optimality for WGS — Correct Framing (ADDED 2026-04-19)
+
+Weight sensitivity analysis (α=1.0/β=0.0, α=0.5/β=0.5, α=0.0/β=1.0) has now been
+completed on the 100-sample tri-modal cohort. Results from
+`analysis/weight_sensitivity/sensitivity_comparison.tsv`:
+
+| Weight variant | WES WC | WGS WC | RNA WC |
+|---|---|---|---|
+| 0.7/0.3 (default) | 0.9167 | 0.2667 | 1.0000 |
+| 1.0/0.0 (reliability-only) | 0.8627 | 0.2963 | 0.8867 |
+| 0.5/0.5 (equal weight) | 0.8693 | 0.3030 | 0.8867 |
+| 0.0/1.0 (confidence-only) | 0.8693 | 0.3165 | 0.8867 |
+
+Key finding: 0.7/0.3 is optimal for WES (beats all variants) but is beaten by ALL three
+sensitivity variants for WGS (0.296–0.317 vs 0.267). Root cause: 4 of 5 WGS tools
+trigger `poor_calibration` guardrail, falling back to base_reliability regardless of β.
+ArcasHLA WGS has near-zero effective confidence (0.0068); higher β reduces its
+contribution slightly, which is why confidence-only (β=1.0) gives the best WGS result.
+RNA drops from 1.0 (default) to 0.887 (all variants) — confidence scores from some
+tools slightly hurt the RNA ensemble.
+
+**Q**:
+(a) How should this result be framed in the manuscript? The 0.7/0.3 split was not chosen
+    to optimise WGS performance — it was chosen for WES/RNA stability. The WGS result
+    is dominated by guardrail behaviour. Is "the formula was selected to maximise WES
+    stability; WGS performance is guardrail-dominated" a defensible framing?
+
+(b) Does the WGS sub-optimality of 0.7/0.3 require a change to the default formula
+    before submission, or is documenting the sensitivity analysis in supplementary
+    sufficient?
+
+(c) Given that RNA drops from 1.0 to 0.887 under any sensitivity variant, does the
+    default formula's RNA advantage reflect a real weighting benefit, or an artifact
+    of RNA tool agreement being so high that any deviation from reliability-only weights
+    can reduce it?
+
+**Stakes**: If (b) requires a formula change, the trimodal benchmark and wave1 must be
+re-run before submission. If the sensitivity analysis is supplementary-only, the
+manuscript framing needs to clearly acknowledge the WGS sub-optimality without
+undermining the overall claim.
 
 ---
 
