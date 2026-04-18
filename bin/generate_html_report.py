@@ -11,9 +11,9 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
-DEFAULT_FIGURES_DIR = Path("/scratch/project_2008084/pihla-publish/analysis/figures_v2")
-DEFAULT_TABLES_DIR = Path("/scratch/project_2008084/pihla-publish/analysis/full_cohort_benchmark/tables")
-DEFAULT_OUTPUT = Path("/users/ozcanumu/scratch/project_2008084/pihla-publish/analysis/pihla_benchmark_report_v2.html")
+DEFAULT_FIGURES_DIR = None
+DEFAULT_TABLES_DIR = None
+DEFAULT_OUTPUT = Path("pihla_benchmark_report_v2.html")
 
 FIGURE_SPECS = [
     {
@@ -147,8 +147,10 @@ TOOL_ORDER = ["ArcasHLA", "HLA-HD", "Kourami", "OptiType", "POLYSOLVER", "Seq2HL
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-html", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--figures-dir", type=Path, default=DEFAULT_FIGURES_DIR)
-    parser.add_argument("--tables-dir", type=Path, default=DEFAULT_TABLES_DIR)
+    parser.add_argument("--figures-dir", type=Path, required=True,
+                        help="Directory containing figure PNG files")
+    parser.add_argument("--tables-dir", type=Path, required=True,
+                        help="Directory containing benchmark TSV/JSON tables")
     parser.add_argument("--title", default="PIHLA Benchmark HTML Report")
     parser.add_argument(
         "--subtitle",

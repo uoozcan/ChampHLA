@@ -57,6 +57,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Benchmark HLA typing runs.")
     parser.add_argument("--config", required=True, help="YAML configuration describing truth and run outputs.")
     parser.add_argument("--output-dir", required=True, help="Directory for harmonized tables, summaries, and SVG figures.")
+    parser.add_argument("--weight-alpha", type=float, default=0.7,
+                        help="Weight on base_reliability in final_weight formula (default: 0.7).")
+    parser.add_argument("--weight-beta", type=float, default=0.3,
+                        help="Weight on effective_confidence in final_weight formula (default: 0.3).")
     return parser.parse_args()
 
 
@@ -1149,7 +1153,9 @@ def compute_weight_record(entries, tool, modality, gene=None, settings=None):
     calibrated_confidence = mean_confidence(entries)
     calibration = calibration_stats(entries)
     effective_confidence, guardrail_factor, guardrail_status = guarded_confidence_value(reliability, calibrated_confidence, coverage_rate, calibration, settings or DEFAULT_CONFIDENCE_GUARDRAIL)
-    final_weight = reliability if effective_confidence is None else round(0.7 * reliability + 0.3 * effective_confidence, 4)
+    alpha = (settings or {}).get("weight_alpha", 0.7)
+    beta = (settings or {}).get("weight_beta", 0.3)
+    final_weight = reliability if effective_confidence is None else round(alpha * reliability + beta * effective_confidence, 4)
     record = {
         "tool": tool,
         "modality": modality,
@@ -1172,8 +1178,10 @@ def compute_weight_record(entries, tool, modality, gene=None, settings=None):
     return record
 
 
-def build_confidence_weights(rows, config=None):
+def build_confidence_weights(rows, config=None, weight_alpha=0.7, weight_beta=0.3):
     settings = confidence_guardrail_settings(config)
+    settings["weight_alpha"] = weight_alpha
+    settings["weight_beta"] = weight_beta
     grouped = defaultdict(list)
     gene_grouped = defaultdict(list)
     for row in rows:
@@ -1192,7 +1200,7 @@ def build_runtime_weight_payload(tool_weights, gene_weights):
     payload = {
         "weight_version": WEIGHT_VERSION,
         "formula": {
-            "final_weight": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+            "final_weight": f"{args.weight_alpha} * overall_correct_call_rate + {args.weight_beta} * effective_confidence_score",
             "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
             "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
         },
@@ -1752,7 +1760,7 @@ def build_metadata(config, shared_genes, harmonized_rows, tool_weights):
         "confidence_weighting": {
             "weight_version": WEIGHT_VERSION,
             "default_target_reads": DEFAULT_TARGET_READS,
-            "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+            "formula": f"{args.weight_alpha} * overall_correct_call_rate + {args.weight_beta} * effective_confidence_score",
             "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
             "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
             "guardrail": confidence_guardrail_settings(config),
@@ -2016,7 +2024,7 @@ def main():
     modality_gene = build_modality_gene_summary(main_rows)
     cohort = build_cohort_overview(main_rows, truth, benchmark_genes or shared_genes)
     ambiguity_summary_rows, ambiguity_summary_gene_rows = build_ambiguity_summary(main_rows)
-    tool_weights, gene_weights = build_confidence_weights(main_rows, config=config)
+    tool_weights, gene_weights = build_confidence_weights(main_rows, config=config, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
     runtime_weights = load_runtime_weight_override(config) or build_runtime_weight_payload(tool_weights, gene_weights)
     majority_rows = build_majority_vote_rows(main_rows)
     weighted_rows = build_weighted_consensus_rows(main_rows, runtime_weights, config)
