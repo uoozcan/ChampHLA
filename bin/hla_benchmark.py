@@ -1196,11 +1196,11 @@ def build_confidence_weights(rows, config=None, weight_alpha=0.7, weight_beta=0.
     return tool_rows, gene_rows
 
 
-def build_runtime_weight_payload(tool_weights, gene_weights):
+def build_runtime_weight_payload(tool_weights, gene_weights, weight_alpha=0.7, weight_beta=0.3):
     payload = {
         "weight_version": WEIGHT_VERSION,
         "formula": {
-            "final_weight": f"{args.weight_alpha} * overall_correct_call_rate + {args.weight_beta} * effective_confidence_score",
+            "final_weight": f"{weight_alpha} * overall_correct_call_rate + {weight_beta} * effective_confidence_score",
             "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
             "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
         },
@@ -1730,7 +1730,7 @@ def summarize_discordance(rows):
     return out
 
 
-def build_metadata(config, shared_genes, harmonized_rows, tool_weights):
+def build_metadata(config, shared_genes, harmonized_rows, tool_weights, weight_alpha=0.7, weight_beta=0.3):
     parser_coverage = {}
     for run in config.get("runs", []):
         parser_coverage.setdefault(run.get("tool", ""), {})[clean_token(run.get("modality", "")).lower()] = {
@@ -1760,7 +1760,7 @@ def build_metadata(config, shared_genes, harmonized_rows, tool_weights):
         "confidence_weighting": {
             "weight_version": WEIGHT_VERSION,
             "default_target_reads": DEFAULT_TARGET_READS,
-            "formula": f"{args.weight_alpha} * overall_correct_call_rate + {args.weight_beta} * effective_confidence_score",
+            "formula": f"{weight_alpha} * overall_correct_call_rate + {weight_beta} * effective_confidence_score",
             "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
             "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
             "guardrail": confidence_guardrail_settings(config),
@@ -2025,7 +2025,7 @@ def main():
     cohort = build_cohort_overview(main_rows, truth, benchmark_genes or shared_genes)
     ambiguity_summary_rows, ambiguity_summary_gene_rows = build_ambiguity_summary(main_rows)
     tool_weights, gene_weights = build_confidence_weights(main_rows, config=config, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
-    runtime_weights = load_runtime_weight_override(config) or build_runtime_weight_payload(tool_weights, gene_weights)
+    runtime_weights = load_runtime_weight_override(config) or build_runtime_weight_payload(tool_weights, gene_weights, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
     majority_rows = build_majority_vote_rows(main_rows)
     weighted_rows = build_weighted_consensus_rows(main_rows, runtime_weights, config)
     method_ambiguity_rows, method_ambiguity_gene_rows = build_method_ambiguity_summary(majority_rows, weighted_rows)
@@ -2038,7 +2038,7 @@ def main():
     abstention_rows = build_abstention_tradeoff(main_rows, runtime_weights, config)
     discordance_rows = build_discordance_rows(main_rows, weighted_rows)
     discordance_summary_rows = summarize_discordance(discordance_rows)
-    metadata = build_metadata(config, shared_genes, harmonized_rows, tool_weights)
+    metadata = build_metadata(config, shared_genes, harmonized_rows, tool_weights, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
 
     write_tsv(output_dir / "tables" / "harmonized_benchmark_rows.tsv", main_rows, ["sample", "modality", "tool", "gene", "truth_allele1_raw", "truth_allele2_raw", "allele1_raw", "allele2_raw", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "correct_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "runtime_hours", "max_ram_gb", "confidence_score", "confidence_source", "raw_confidence", "read_support", "source_file"])
     write_tsv(output_dir / "tables" / "summary_full_cohort.tsv", sorted(summary.values(), key=lambda row: (modality_sort_key(row["modality"]), row["tool"])), ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi", "median_runtime_hours", "median_max_ram_gb"])
