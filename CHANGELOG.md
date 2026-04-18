@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-04-18
+
+### Added
+- 8-tool HLA typing ensemble: OptiType, ArcasHLA, SpecHLA, HLA-HD, Kourami, T1K, POLYSOLVER, Seq2HLA
+- `read_confidence_v2` confidence weighting: `final_weight = 0.7 × base_reliability + 0.3 × effective_confidence_score`
+- Guardrail system per tool × modality: `applied`, `poor_calibration`, `no_confidence` statuses with shrinkage factors
+- Tri-modal benchmark (WGS n=99, WES n=51, RNA-seq n=50) with 60/20/20 training/validation/holdout split
+- 1000 Genomes NYGC 30× CRAM integration: 49-sample wave-2 WGS batch downloaded from EBI and typed
+- Publication-quality figure generation (`bin/generate_figures_v2.py`): 8 figures PNG 300dpi + PDF
+- HTML benchmark report v4 (`analysis/generate_report_v4.py`): standalone 3MB report embedding all figures
+- IMGT/HLA v3.59.0 pinned for reproducibility
+- Abstention tradeoff analysis (`abstention_tradeoff.tsv`): callable rate vs accuracy at configurable thresholds
+- Discordance taxonomy (`discordance_summary.tsv`): DNA/RNA discordance, expression bias, technical conflict tags
+- SLURM array scripts with `%10` throttle for disk-safe batch processing
+
+### Key benchmark results (holdout)
+- WES (n=12): WeightedConsensus 91.7%, MajorityVote 94.4%
+- RNA-seq (n=7): WeightedConsensus/MajorityVote 100%, T1K 90.5%
+- WGS (n=20): WeightedConsensus 26.7%, callable rate 56.7% at threshold 0.45
+- WGS best single tool: OptiType 43.3%
+
+### Changed
+- Benchmark scope: `partial_realdata_benchmark` (A/B/C loci; DRB1/DQB1 excluded pending truth source)
+- Truth source: Gourraud et al. 2014 1000 Genomes (HLA-A, -B, -C only)
+- Benchmark split expanded from 30/10/10 to 60/20/20 to accommodate 100-sample tri-modal cohort
+
+---
+
 ## [2.0.0] - 2025-11-21
 
 ### Added
