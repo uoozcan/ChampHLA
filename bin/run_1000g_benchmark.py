@@ -33,6 +33,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run the 1000 Genomes real-data HLA benchmark.")
     parser.add_argument("--config", required=True, help="YAML config describing manifests, truth, and result globs.")
     parser.add_argument("--output-dir", required=True, help="Final output directory for the real-data benchmark.")
+    parser.add_argument("--weight-alpha", type=float, default=0.7,
+                        help="Weight on base_reliability in final_weight formula (default: 0.7).")
+    parser.add_argument("--weight-beta", type=float, default=0.3,
+                        help="Weight on effective_confidence in final_weight formula (default: 0.3).")
     return parser.parse_args()
 
 
@@ -128,7 +132,7 @@ def subset_config(config, truth_path, supported_loci, runtime_weight_override=No
     return cfg
 
 
-def run_benchmark(config_payload, output_dir):
+def run_benchmark(config_payload, output_dir, weight_alpha=0.7, weight_beta=0.3):
     with tempfile.TemporaryDirectory() as tmpdir:
         cfg_path = Path(tmpdir) / "benchmark.yaml"
         save_yaml(cfg_path, config_payload)
@@ -139,6 +143,10 @@ def run_benchmark(config_payload, output_dir):
             str(cfg_path),
             "--output-dir",
             str(output_dir),
+            "--weight-alpha",
+            str(weight_alpha),
+            "--weight-beta",
+            str(weight_beta),
         ], check=True)
 
 
@@ -337,17 +345,17 @@ def main():
         holdout_out = output_dir
 
         train_cfg = subset_config(config, train_truth, supported_loci)
-        run_benchmark(train_cfg, training_out)
+        run_benchmark(train_cfg, training_out, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
         runtime_weights = training_out / "tables" / "consensus_runtime_weights.json"
 
         tuned_min_support = float(config.get("benchmark", {}).get("consensus", {}).get("min_support", 0.55))
         if validation_samples:
             validation_cfg = subset_config(config, val_truth, supported_loci, runtime_weight_override=runtime_weights)
-            run_benchmark(validation_cfg, validation_out)
+            run_benchmark(validation_cfg, validation_out, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
             tuned_min_support = choose_best_support(validation_out, tuned_min_support)
 
         holdout_cfg = subset_config(config, holdout_truth, supported_loci, runtime_weight_override=runtime_weights, min_support=tuned_min_support)
-        run_benchmark(holdout_cfg, holdout_out)
+        run_benchmark(holdout_cfg, holdout_out, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
 
         shutil.copy2(training_out / "tables" / "tool_confidence_weights.tsv", output_dir / "tables" / "tool_confidence_weights.tsv")
         shutil.copy2(training_out / "tables" / "tool_confidence_weights_by_gene.tsv", output_dir / "tables" / "tool_confidence_weights_by_gene.tsv")

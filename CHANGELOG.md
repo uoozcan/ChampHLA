@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-04-19
+
+### Added
+- `--weight-alpha` / `--weight-beta` CLI flags on `hla_benchmark.py` and `run_1000g_benchmark.py`
+  to override the default 0.7/0.3 reliability-confidence split at runtime
+- `--figures-dir` and `--tables-dir` are now required args in `generate_html_report.py`;
+  hard-coded scratch paths and username removed for portability
+- Weight formula sensitivity analysis: three variants (1.0/0.0, 0.5/0.5, 0.0/1.0) evaluated
+  via `slurm_weight_sensitivity.sh`; results in `analysis/weight_sensitivity/`
+- Wilson 95% CIs on all `overall_correct_call_rate` summary columns in benchmark output tables
+- `analysis/weight_sensitivity/sensitivity_comparison.tsv`: cross-modality summary of
+  WeightedConsensus performance across all weight variants
+
+### Changed
+- `bin/generate_html_report.py`: `--figures-dir` and `--tables-dir` are now required (no defaults)
+
 ## [3.0.0] - 2026-04-18
 
 ### Added
