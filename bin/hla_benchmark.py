@@ -930,6 +930,21 @@ def ratio(numerator, denominator):
     return round((float(numerator) / denominator), 4) if denominator else 0.0
 
 
+def wilson_ci(k, n, z=1.96):
+    """Wilson score 95% confidence interval for a proportion k/n.
+
+    Returns (ci_lo, ci_hi) rounded to 4 decimal places.
+    Returns (0.0, 0.0) when n == 0.
+    """
+    if n == 0:
+        return 0.0, 0.0
+    p = k / n
+    denom = 1.0 + z * z / n
+    centre = (p + z * z / (2.0 * n)) / denom
+    margin = (z * (p * (1.0 - p) / n + z * z / (4.0 * n * n)) ** 0.5) / denom
+    return round(max(0.0, centre - margin), 4), round(min(1.0, centre + margin), 4)
+
+
 def median_or_none(values):
     return round(statistics.median(values), 4) if values else None
 
@@ -947,12 +962,15 @@ def summarize_entries(entries):
     total = len(entries)
     callable_n = sum(int(row["is_callable"]) for row in entries)
     correct_n = sum(int(row["is_correct"]) for row in entries)
+    ci_lo, ci_hi = wilson_ci(correct_n, total)
     return {
         "sample_count": len({row["sample"] for row in entries}),
         "gene_rows": total,
         "callable_rate": ratio(callable_n, total),
         "accuracy_among_callable": ratio(correct_n, callable_n),
         "overall_correct_call_rate": ratio(correct_n, total),
+        "overall_correct_call_rate_ci_lo": ci_lo,
+        "overall_correct_call_rate_ci_hi": ci_hi,
         "median_runtime_hours": median_or_none(sample_level_metric(entries, "runtime_hours")),
         "median_max_ram_gb": median_or_none(sample_level_metric(entries, "max_ram_gb")),
     }
@@ -1456,6 +1474,7 @@ def summarize_consensus_method(rows):
         total = len(entries)
         callable_n = sum(int(row["is_callable"]) for row in entries)
         correct_n = sum(int(row["is_correct"]) for row in entries)
+        ci_lo, ci_hi = wilson_ci(correct_n, total)
         out.append({
             "method": key[0],
             "modality": key[1],
@@ -1464,6 +1483,8 @@ def summarize_consensus_method(rows):
             "callable_rate": ratio(callable_n, total),
             "accuracy_among_callable": ratio(correct_n, callable_n),
             "overall_correct_call_rate": ratio(correct_n, total),
+            "overall_correct_call_rate_ci_lo": ci_lo,
+            "overall_correct_call_rate_ci_hi": ci_hi,
         })
     return out
 
@@ -1480,6 +1501,8 @@ def build_method_comparison(single_tool_summary, majority_rows, weighted_rows):
             "callable_rate": record["callable_rate"],
             "accuracy_among_callable": record["accuracy_among_callable"],
             "overall_correct_call_rate": record["overall_correct_call_rate"],
+            "overall_correct_call_rate_ci_lo": record.get("overall_correct_call_rate_ci_lo", ""),
+            "overall_correct_call_rate_ci_hi": record.get("overall_correct_call_rate_ci_hi", ""),
         })
     out.extend(dict(row, method_type="baseline") for row in summarize_consensus_method(majority_rows))
     out.extend(dict(row, method_type="ensemble") for row in summarize_consensus_method(weighted_rows))
@@ -2010,8 +2033,8 @@ def main():
     metadata = build_metadata(config, shared_genes, harmonized_rows, tool_weights)
 
     write_tsv(output_dir / "tables" / "harmonized_benchmark_rows.tsv", main_rows, ["sample", "modality", "tool", "gene", "truth_allele1_raw", "truth_allele2_raw", "allele1_raw", "allele2_raw", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "correct_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "runtime_hours", "max_ram_gb", "confidence_score", "confidence_source", "raw_confidence", "read_support", "source_file"])
-    write_tsv(output_dir / "tables" / "summary_full_cohort.tsv", sorted(summary.values(), key=lambda row: (modality_sort_key(row["modality"]), row["tool"])), ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "median_runtime_hours", "median_max_ram_gb"])
-    write_tsv(output_dir / "tables" / "summary_per_gene.tsv", per_gene, ["tool", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate"])
+    write_tsv(output_dir / "tables" / "summary_full_cohort.tsv", sorted(summary.values(), key=lambda row: (modality_sort_key(row["modality"]), row["tool"])), ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi", "median_runtime_hours", "median_max_ram_gb"])
+    write_tsv(output_dir / "tables" / "summary_per_gene.tsv", per_gene, ["tool", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi"])
     write_tsv(output_dir / "tables" / "summary_modality_gene_coverage.tsv", modality_gene, ["modality", "gene"])
     write_tsv(output_dir / "tables" / "cohort_overview.tsv", cohort, ["modality", "tool", "truth_samples", "completed_tool_samples", "modality_samples", "shared_gene_count"])
     write_tsv(output_dir / "tables" / "ambiguity_summary.tsv", ambiguity_summary_rows, ["tool", "modality", "imgt_hla_version", "sample_count", "gene_rows", "exact_2field_rate", "exact_3field_rate", "g_group_comparable_rows", "g_group_match_rate", "p_group_comparable_rows", "p_group_match_rate"])
@@ -2024,7 +2047,7 @@ def main():
     write_tsv(output_dir / "tables" / "tool_confidence_weights_by_gene.tsv", gene_weights, ["tool", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "confidence_coverage_rate", "base_reliability", "calibrated_confidence", "effective_confidence", "guardrail_factor", "guardrail_status", "brier_score", "expected_calibration_error", "final_weight", "weight_version"])
     write_tsv(output_dir / "tables" / "majority_vote_baseline.tsv", majority_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "discordance_tag"])
     write_tsv(output_dir / "tables" / "weighted_consensus_calls.tsv", weighted_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "match_grade", "imgt_hla_version", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "discordance_tag"])
-    write_tsv(output_dir / "tables" / "method_comparison.tsv", method_comparison_rows, ["method", "method_type", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate"])
+    write_tsv(output_dir / "tables" / "method_comparison.tsv", method_comparison_rows, ["method", "method_type", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi"])
     write_tsv(output_dir / "tables" / "method_per_gene.tsv", method_per_gene_rows, ["method", "method_type", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate"])
     write_tsv(output_dir / "tables" / "method_ambiguity_summary.tsv", method_ambiguity_rows, ["method", "modality", "imgt_hla_version", "sample_count", "gene_rows", "exact_2field_rate", "exact_3field_rate", "g_group_comparable_rows", "g_group_match_rate", "p_group_comparable_rows", "p_group_match_rate"])
     write_tsv(output_dir / "tables" / "method_ambiguity_summary_by_gene.tsv", method_ambiguity_gene_rows, ["method", "modality", "gene", "imgt_hla_version", "sample_count", "gene_rows", "exact_2field_rate", "exact_3field_rate", "g_group_comparable_rows", "g_group_match_rate", "p_group_comparable_rows", "p_group_match_rate"])
