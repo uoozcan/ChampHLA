@@ -6,7 +6,7 @@
 # ============================================================
 
 # Path to input files (directory or specific file)
-input: '/scratch/project_2008084/ozcanumu/hla_rnaseq_analysis/raw_fastq'
+input: null  # set to your BAM/CRAM/FASTQ directory
 
 # Input type: 'bam', 'cram', or 'fastq'
 input_type: 'fastq'
@@ -51,7 +51,7 @@ spechla_exon_only: 0
 
 ## HLA-HD
 hlahd_genes: 'A,B,C,DQA1,DQB1,DRB1'
-hlahd_db: '/scratch/project_2008084/hla_references/databases/hlahd_db'
+hlahd_db: null  # path to HLA-HD bowtie2 database directory
 
 ## Kourami
 kourami_dir: null
@@ -108,17 +108,19 @@ max_memory: '180.GB'
 max_time: '24.h'
 
 # ============================================================
-# HPC CONFIGURATION (CSC Puhti / SLURM)
+# HPC CONFIGURATION (SLURM)
 # ============================================================
+# Site-specific paths (hlahd_db, t1k_hlaidx, samtools_bin_dir, samtools_wrapper,
+# singularity_cache_dir, arcashla_container_opts_extra, kourami_container_opts_extra)
+# are set to null here. For CSC Puhti, use:
+#   -params-file conf/puhti_params.yaml
+# For other HPC sites, copy conf/puhti_params.yaml and adjust paths.
 
-# SLURM account (required on CSC Puhti)
-slurm_account: 'project_2008084'
+# SLURM account
+slurm_account: null
 
 # SLURM partition
 slurm_partition: 'small'
-
-# Singularity cache directory (CSC Puhti specific)
-singularity_cache_dir: '/scratch/project_2008084/hla_references/singularity_cache/containers'
 
 # ============================================================
 # OTHER OPTIONS
@@ -142,7 +144,8 @@ save_intermediate: false
 # Example 3: All tools with consensus calling on CSC Puhti
 # Set: enable_majority_voting: true
 # Set: tools: 'optitype,arcashla,spechla,hlahd'
-# nextflow run main.nf -params-file params.yaml -profile puhti,singularity -resume
+# nextflow run main.nf -params-file params.yaml -params-file conf/puhti_params.yaml -profile puhti -resume
+# (conf/puhti_params.yaml supplies the site-specific paths; your params.yaml supplies the run settings)
 
 # ============================================================
 # NOTES
