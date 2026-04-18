@@ -23,8 +23,8 @@ SCRIPT=$REPO/bin/generate_figures_v2.py
 
 mkdir -p $REPO/logs
 
-# Load Python environment (adjust module if needed)
-module load python-data/3.9
+# Load Python environment (CSC Puhti)
+module load python-data
 
 echo "=== Generating figures for benchmark_wgs_wave1 ==="
 python3 $SCRIPT \
