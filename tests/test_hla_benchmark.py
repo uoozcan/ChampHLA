@@ -80,7 +80,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             method_summary = {(row["method"], row["modality"]): row for row in method_rows}
             self.assertEqual(method_summary[("MajorityVote", "wgs")]["overall_correct_call_rate"], "0.8333")
             self.assertEqual(method_summary[("WeightedConsensus", "wgs")]["overall_correct_call_rate"], "1.0")
-            self.assertEqual(method_summary[("WeightedConsensus", "rnaseq")]["overall_correct_call_rate"], "0.8333")
+            self.assertEqual(method_summary[("WeightedConsensus", "rnaseq")]["overall_correct_call_rate"], "1.0")
 
             method_ambiguity_path = outdir / "tables" / "method_ambiguity_summary.tsv"
             method_ambiguity_gene_path = outdir / "tables" / "method_ambiguity_summary_by_gene.tsv"
@@ -140,7 +140,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             self.assertTrue(discordance_path.exists())
             with discordance_path.open("r", encoding="utf-8") as handle:
                 discordance_rows = list(csv.DictReader(handle, delimiter="\t"))
-            self.assertEqual(discordance_rows, [{"scope": "cross_modality", "tag": "dna_rna_discordance", "n_events": "1"}])
+            self.assertEqual(discordance_rows, [{"scope": "rnaseq", "tag": "possible_expression_bias", "n_events": "1"}])
 
             self.assertTrue((outdir / "figures" / "figure_2_accuracy_comparison.svg").exists())
             self.assertTrue((outdir / "figures" / "figure_3_per_gene_gains.svg").exists())

@@ -1,0 +1,5 @@
+# T1K results for S1
+Gene	Allele1	Allele2
+HLA-A	A*01:01	A*02:01
+HLA-B	B*07:02	B*08:01
+HLA-C	C*07:01	C*07:02

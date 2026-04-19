@@ -1,6 +1,6 @@
 truth:
   imgt_hla_version: 3.59.0
-  path: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/truth.tsv
+  path: truth.tsv
   source: ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/working/20140725_hla_genotypes/
   hierarchy:
     - orthogonal_clinical_typing
@@ -24,47 +24,89 @@ runs:
   - tool: SpecHLA
     modality: wes
     parser: spec_hla_result
-    result_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/wes/spechla/**/hla.result.txt
-    runtime_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/wes/spechla/**/time.log
+    result_glob: wes/spechla/**/hla.result.txt
+    runtime_glob: wes/spechla/**/time.log
     sample_from_path_regex: /([^/]+)/hla\.result\.txt$
 
   - tool: SpecHLA
     modality: wgs
     parser: spec_hla_result
-    result_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/wgs/spechla/**/hla.result.txt
-    runtime_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/wgs/spechla/**/time.log
+    result_glob: wgs/spechla/**/hla.result.txt
+    runtime_glob: wgs/spechla/**/time.log
     sample_from_path_regex: /([^/]+)/hla\.result\.txt$
 
   - tool: OptiType
     modality: wes
     parser: optitype_tsv
-    result_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/wes/optitype/**/*_result.tsv
-    runtime_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/wes/optitype/**/time.log
+    result_glob: wes/optitype/**/*_result.tsv
+    runtime_glob: wes/optitype/**/time.log
     sample_from_path_regex: /([^/]+)/[^/]+_result\.tsv$
     confidence_parser: optitype_result_objective
 
   - tool: OptiType
     modality: wgs
     parser: optitype_tsv
-    result_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/wgs/optitype/**/*_result.tsv
-    runtime_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/wgs/optitype/**/time.log
+    result_glob: wgs/optitype/**/*_result.tsv
+    runtime_glob: wgs/optitype/**/time.log
     sample_from_path_regex: /([^/]+)/[^/]+_result\.tsv$
     confidence_parser: optitype_result_objective
 
   - tool: OptiType
     modality: rnaseq
     parser: optitype_tsv
-    result_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/rnaseq/optitype/**/*_result.tsv
-    runtime_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/rnaseq/optitype/**/time.log
+    result_glob: rnaseq/optitype/**/*_result.tsv
+    runtime_glob: rnaseq/optitype/**/time.log
     sample_from_path_regex: /([^/]+)/[^/]+_result\.tsv$
     confidence_parser: optitype_result_objective
 
   - tool: ArcasHLA
     modality: rnaseq
     parser: arcashla_json
-    result_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/rnaseq/arcashla/**/*.genotype.json
+    result_glob: rnaseq/arcashla/**/*.genotype.json
     sample_from_path_regex: /([^/]+)/[^/]+\.genotype\.json$
-    confidence_glob: /users/ozcanumu/scratch/project_2008084/ozcanumu/repos/hla-typing-pipeline/tests/fixtures/rnaseq/arcashla_confidence.tsv
+    confidence_glob: rnaseq/arcashla_confidence.tsv
     confidence_parser: long_confidence_table
     confidence_defaults:
       target_reads: 50
+
+  - tool: HLA-HD
+    modality: wes
+    parser: hlahd_table
+    result_glob: wes/hlahd/**/*_final.result.txt
+    sample_from_path_regex: /([^/]+)/[^/]+_final\.result\.txt$
+
+  - tool: HLA-HD
+    modality: wgs
+    parser: hlahd_table
+    result_glob: wgs/hlahd/**/*_final.result.txt
+    sample_from_path_regex: /([^/]+)/[^/]+_final\.result\.txt$
+
+  - tool: POLYSOLVER
+    modality: wes
+    parser: polysolver_table
+    result_glob: wes/polysolver/**/*.hla.txt
+    sample_from_path_regex: /([^/]+)/[^/]+\.hla\.txt$
+
+  - tool: Kourami
+    modality: wgs
+    parser: kourami_table
+    result_glob: wgs/kourami/**/*.kourami.txt
+    sample_from_path_regex: /([^/]+)/[^/]+\.kourami\.txt$
+
+  - tool: T1K
+    modality: wgs
+    parser: t1k_table
+    result_glob: wgs/t1k/**/*.t1k.txt
+    sample_from_path_regex: /([^/]+)/[^/]+\.t1k\.txt$
+
+  - tool: T1K
+    modality: rnaseq
+    parser: t1k_table
+    result_glob: rnaseq/t1k/**/*.t1k.txt
+    sample_from_path_regex: /([^/]+)/[^/]+\.t1k\.txt$
+
+  - tool: Seq2HLA
+    modality: rnaseq
+    parser: seq2hla_table
+    result_glob: rnaseq/seq2hla/**/*.seq2hla.txt
+    sample_from_path_regex: /([^/]+)/[^/]+\.seq2hla\.txt$

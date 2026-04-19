@@ -747,6 +747,19 @@ def parse_confidence_file(path, parser_name, sample_override, defaults):
     raise ValueError("Unsupported confidence parser: %s" % parser_name)
 
 
+def resolve_config_paths(config, config_dir):
+    """Expand relative paths in config against config_dir (the directory of the config file)."""
+    truth = config.get("truth", {})
+    if truth.get("path") and not Path(truth["path"]).is_absolute():
+        truth["path"] = str((config_dir / truth["path"]).resolve())
+    for run in config.get("runs", []):
+        for key in ("result_glob", "runtime_glob", "confidence_glob"):
+            val = run.get(key)
+            if val and not Path(val).is_absolute():
+                run[key] = str((config_dir / val).resolve())
+    return config
+
+
 def load_run_records(config):
     records = []
     for raw in config.get("runs", []):
@@ -2003,7 +2016,9 @@ def generate_figures(output_dir, method_comparison_rows, per_gene_gain_rows, cal
 
 def main():
     args = parse_args()
-    config = load_yaml(Path(args.config))
+    config_path = Path(args.config)
+    config = load_yaml(config_path)
+    config = resolve_config_paths(config, config_path.parent)
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     truth = load_truth(config["truth"])
