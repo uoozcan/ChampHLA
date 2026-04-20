@@ -43,6 +43,38 @@
 
 # Project Notebook
 
+## 2026-04-20 12:05:00 EEST
+- status: in progress
+- what happened: aligned the manuscript front matter and conclusion with the conservative pending-Codex discussion framing, and updated the manuscript runbook/task notes so Claude must perform a Codex-response completeness check before running the existing synthesis prompt.
+- decision or interpretation:
+  - The working title, running title, core claim, abstract results, abstract conclusions, and conclusion now all use guarded reliability-weighting plus calibration-guardrail language rather than committing early to a final "confidence-calibrated" label.
+  - WES and RNA holdout statements in the abstract and conclusion are now explicitly secondary and provisional while the remaining Codex framing questions are open.
+  - Claude should not synthesize the Codex handoff until `codex_response_framing_2026-04-18.md` is no longer pending and all six question blocks plus the editorial and blocking summaries are substantively filled.
+  - The post-Codex reconciliation list now explicitly includes title/running title, core claim, abstract, discussion sections 1/5/6, and conclusion.
+- evidence/files/jobs:
+  - `docs/MANUSCRIPT_DRAFT_V1.md`
+  - `.ai/runbooks.md`
+  - `.ai/open-tasks.yaml`
+  - `.ai/handoffs/codex_response_framing_2026-04-18.md`
+- next action:
+  - wait for the Codex framing response, validate completeness, and then run the existing Claude post-Codex synthesis prompt before any final manuscript-framing decisions are locked.
+
+## 2026-04-20 11:30:00 EEST
+- status: in progress
+- what happened: drafted conservative pending-Codex placeholder prose for Discussion sections 1, 5, and 6 in `docs/MANUSCRIPT_DRAFT_V1.md` so manuscript work can continue without locking title-sensitive or venue-sensitive framing before the Codex handoff returns.
+- decision or interpretation:
+  - Discussion section 1 now uses benchmark-derived reliability weighting plus empirical calibration guardrails as the safe placeholder framing, while explicitly marking the final "confidence-calibrated" versus "reliability-weighted with confidence guardrails" terminology as blocked on Codex Q2.
+  - Discussion section 5 now compares PIHLA to prior work at the methods/framework level and avoids claiming that the current A/B/C-only evidence base is sufficient for any particular venue tier until Codex resolves Q4.
+  - Discussion section 6 has been converted from bullets into prose grouped around statistical, scope, and methodological limitations, with explicit revisit points for Codex Q1, Q3, and Q4.
+  - The immediate revisit list after Codex returns is: title/abstract terminology, Discussion section 1 main-contribution sentence, Discussion section 5 venue-facing comparison wording, and any softening or strengthening needed in Discussion section 6 for WES/WGS and holdout-size claims.
+- evidence/files/jobs:
+  - `docs/MANUSCRIPT_DRAFT_V1.md`
+  - `.ai/handoffs/codex_framing_questions.md`
+  - `.ai/handoffs/codex_response_framing_2026-04-18.md`
+  - `.ai/open-tasks.yaml`
+- next action:
+  - wait for the Codex framing response, then run the existing Claude post-Codex synthesis prompt before finalizing title/abstract wording or venue-sensitive discussion claims.
+
 This notebook is the operational record for PIHLA development, benchmarking, and run-state tracking. Entries are append-only in reverse chronological order. Scientific interpretation should be cited from the manuscript and benchmark outputs; procedural history should be cited from here.
 
 ## 2026-04-06 09:15:00 EEST

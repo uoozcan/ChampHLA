@@ -40,7 +40,7 @@
       "task_type": "manuscript",
       "lead_tool": "claude",
       "support_tool": "codex",
-      "status": "ready",
+      "status": "in_progress",
       "priority": "high",
       "owner": "ai-system",
       "required_checks": [
@@ -48,7 +48,17 @@
         "evidence-links",
         "task-log-entry"
       ],
-      "summary": "Claude Code owns direct manuscript changes; Codex may critique framing or evidence before edits."
+      "summary": "Claude Code owns direct manuscript changes; Codex may critique framing or evidence before edits.",
+      "notes": [
+        "Codex remains pending on framing handoff pihla-framing-2026-04-18.",
+        "Q2 blocks final Discussion section 1 terminology around confidence-calibrated versus reliability-weighted with confidence guardrails.",
+        "Q4 blocks final venue-facing positioning in Discussion section 5.",
+        "Q1, Q3, and Q4 may still soften Discussion section 6 wording on WES underperformance, holdout-size defensibility, and locus-scope risk.",
+        "Revisit after Codex returns: title/abstract terminology; Discussion section 1 main-contribution sentence; Discussion section 5 venue-sensitive wording; Discussion section 6 softening on WES/WGS/holdout-size claims.",
+        "Working Title, Running Title, Core Claim, Abstract Results, Abstract Conclusions, and Conclusion have been moved to conservative placeholder framing pending Codex synthesis.",
+        "Before Claude synthesis, validate that codex_response_framing_2026-04-18.md is complete: status not pending, six questions filled, Editorial Bottom Line filled, Blocking vs Non-Blocking filled.",
+        "Post-Codex reconciliation list: title/running title; core claim; abstract; Discussion sections 1, 5, and 6; conclusion."
+      ]
     },
     {
       "id": "pihla-review-diff",
