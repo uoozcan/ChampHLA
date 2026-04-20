@@ -11,16 +11,13 @@ We present PIHLA, a Nextflow-based HLA ensemble platform that learns benchmark-d
 
 ## Abstract
 ### Background
-HLA typing from next-generation sequencing is algorithmically rich but operationally fragmented. Different callers perform unevenly across genes, sequencing modalities, and confidence regimes, while simple consensus rules often ignore uncertainty and locus-specific behavior.
-
-### Run-State Note
-The project now has two completed real-data benchmark layers: a strict tri-modal three-sample pilot used to validate end-to-end workflow behavior across WGS, WES, and RNA-seq, and a larger 42-sample WGS-only benchmark wave used as the first stable calibration and comparative analysis base. The manuscript should therefore treat the WGS wave as the primary quantitative results set for current method comparisons, while keeping the tri-modal pilot as a proof-of-integration result rather than the main statistical comparison.
+HLA typing from next-generation sequencing is algorithmically rich but operationally fragmented. Different callers perform unevenly across genes, sequencing modalities, and confidence regimes, while simple consensus rules often ignore uncertainty and locus-specific behaviour.
 
 ### Results
-We developed a reproducible Nextflow-based ensemble framework for HLA typing across WGS, WES, and RNA-seq. The framework harmonizes heterogeneous caller outputs into a unified schema, learns benchmark-derived per-tool, per-gene, and per-modality weights, and generates weighted consensus calls with abstention and discordance tagging. The first stable real-data comparison now comes from a 42-sample 1000 Genomes WGS-only benchmark wave with frozen sample-level splits and truth-supported loci limited to `HLA-A`, `HLA-B`, and `HLA-C`. On the 9-sample holdout, `OptiType` was the strongest single WGS tool (`0.5185` overall correct-call rate), followed by `T1K` (`0.4815`) and `HLA-HD` (`0.4074`). Equal-weight majority vote reached `0.4815` overall with `0.7778` callable rate, whereas guarded weighted consensus reached `0.5185` (95% CI: 0.34–0.69, n=9 holdout) overall with `0.9259` callable rate, matching the best single-tool accuracy while recovering substantially more callable loci than majority vote. In the 100-sample full tri-modal cohort benchmark, WES holdout (n=12) showed `WeightedConsensus` 0.9167 (95% CI: 0.78–0.97) vs `MajorityVote` 0.9444 — the underperformance is consistent with a ceiling effect in a high-accuracy WES regime where all tools already agree. RNA-seq holdout (n=7) showed both `WeightedConsensus` and `MajorityVote` at 1.000. Note: Seq2HLA RNA (n=1 callable sample, container failure) and SpecHLA RNA (6/100 samples, incomplete pipeline run) are excluded from the primary RNA comparison; results for these tools reflect pipeline coverage failures, not tool performance. The confidence layer is now active for `OptiType`, `T1K`, `ArcasHLA`, `HLA-HD`, and `Kourami`, but confidence affects runtime voting only through a calibration-aware effective-confidence guardrail. In the current WGS wave, this guardrail clipped `HLA-HD`, `Kourami`, and `OptiType` back to reliability-only weights because of poor empirical calibration, while allowing a partial confidence boost for `T1K`. The earlier three-sample tri-modal benchmark remains useful as a workflow-integration pilot, but the 42-sample WGS wave is now the main quantitative basis for current comparative claims.
+We developed PIHLA, a reproducible Nextflow-based ensemble framework for HLA typing across WGS, WES, and RNA-seq. The framework harmonises heterogeneous caller outputs into a unified schema, learns benchmark-derived per-tool reliability weights with empirical calibration guardrails, and produces weighted-consensus calls with abstention and structured discordance tagging. On a 42-sample 1000 Genomes WGS cohort with frozen 25/8/9 training/validation/holdout splits and truth-supported loci HLA-A, -B, and -C, `OptiType` was the strongest single tool (0.5185 overall correct-call rate, n=9 holdout). Guarded weighted consensus matched this accuracy (0.5185; 95% CI: 0.34–0.69) while improving callable rate from 0.7778 (MajorityVote) to 0.9259, demonstrating that calibration-aware weighting improves decision coverage even when raw accuracy cannot exceed the best single-tool baseline. In the full tri-modal cohort benchmark, WES WeightedConsensus reached 0.9167 (95% CI: 0.78–0.97, n=12) and RNA-seq reached 1.000 (n=7); the WES underperformance relative to MajorityVote (0.9444) is consistent with a structural ceiling effect in a high-accuracy regime. Guardrails blocked confidence-based weight amplification for three of five WGS tools showing poor empirical calibration, preventing miscalibrated confidence from distorting runtime voting.
 
 ### Conclusions
-PIHLA reframes HLA typing as a reliability-weighted ensemble problem with confidence guardrails rather than a simple caller-selection or majority-voting exercise. By combining benchmark-derived weight learning, empirical calibration gating, HLA-specific evaluation rigor, and workflow reproducibility, the platform is designed to support both methodological benchmarking and translational immunogenomics workflows.
+PIHLA reframes HLA typing as a reliability-weighted ensemble problem with empirical confidence guardrails, rather than a simple caller-selection or majority-voting exercise. By combining benchmark-derived weight learning, calibration gating, HLA-specific evaluation rigor, and workflow reproducibility, the platform supports both methodological benchmarking and translational immunogenomics workflows.
 
 ## Introduction
 ### 1. Clinical and biological motivation
@@ -40,107 +37,61 @@ Here we present PIHLA, a reproducible Nextflow-based HLA ensemble platform that 
 
 ## Methods
 ### 1. Workflow architecture
-- Nextflow-based execution.
-- Containerized tool integration.
-- Profile-aware deployment across local, HPC, and portable environments.
-- Standardized output structure for harmonized calls, benchmark summaries, consensus outputs, and manuscript figures.
+PIHLA was implemented in Nextflow DSL2 with one containerised module per HLA typing tool. Containerisation ensured that each tool executed in an isolated, version-pinned environment using either Docker or Singularity, with profiles for local workstation, HPC SLURM, and CSC Puhti deployments. The pipeline accepted BAM, CRAM, or FASTQ inputs per tool and emitted a standardised directory structure containing harmonised call tables, benchmark summary files, consensus outputs, confidence-weight artifacts, and figure data. All parameters — including IMGT/HLA database version, abstention thresholds, weight formula coefficients, and HPC-specific resource paths — were declared in versioned YAML configuration files to ensure full run reproducibility.
 
-### 2. Tool harmonization layer
-- Parse heterogeneous tool outputs into a unified HLA call schema.
-- Preserve raw allele strings and normalized comparison-ready forms.
-- Normalize by gene and allele resolution.
-- Record runtime and provenance metadata.
+### 2. Tool harmonisation layer
+Outputs from eight HLA typing tools (OptiType, ArcasHLA, SpecHLA, HLA-HD, POLYSOLVER, Kourami, T1K, Seq2HLA) were parsed by tool-specific parsers into a unified call schema recording: normalised two-field allele pairs per gene and sample, raw allele strings as returned by the caller, the calling tool and modality, IMGT/HLA database version, and a per-sample/per-tool availability flag. Allele strings were normalised by trimming suffixes beyond the second field for the primary endpoint and by applying IMGT/HLA nomenclature rules for null allele and expression-variant handling. Tool-native runtime metadata — including peak memory, elapsed time, and exit status — were captured alongside calls to support provenance auditing and to distinguish failed tool runs from tool runs that returned no-call results.
 
 ### 3. Confidence modeling
-- Extract tool-native confidence where available.
-- Accept sidecar read-support or confidence files when native confidence is absent.
-- Convert confidence evidence to normalized scores in `[0,1]`.
-- Summarize calibration using confidence-bin tables, Brier score, expected calibration error, and confidence-stratified error tables by modality and gene.
+Tool-native confidence scores were extracted where available: OptiType objective-function scores, ArcasHLA allele-posterior probability estimates, HLA-HD read-support counts, T1K allele confidence scores, and Kourami read-coverage metrics. Scores were converted to a normalised [0, 1] scale using tool-specific transformations and stored as sidecar files linked to each call by sample and gene. Empirical calibration was evaluated per tool and modality by computing expected calibration error (ECE) and Brier score from confidence-stratified accuracy tables derived from the training split. Tools for which ECE or Brier score exceeded the guardrail threshold of 0.35 were assigned `poor_calibration` status; tools for which no native confidence data were available received `no_confidence` status.
 
 ### 4. Weight learning
-- Learn benchmark-derived weights at tool, gene, and modality levels.
-- Generate machine-readable runtime weight artifacts.
-- Record coverage of confidence evidence, empirical calibration quality, and guardrail behavior when native confidence is available.
-- Use benchmark-derived weights during weighted consensus over normalized allele pairs, but route raw confidence through an effective-confidence guardrail before it can boost runtime voting.
+Benchmark-derived base-reliability weights were learned per tool, gene, and modality on the training split by computing the fraction of harmonised calls matching truth at two-field resolution. A guardrail-gated effective-confidence value was then computed as `effective_confidence = guardrail_factor × mean_confidence`, where `guardrail_factor` was set to zero for tools with `poor_calibration` status and to a shrinkage factor between zero and one for tools with `applied` guardrail status. The final runtime weight was: `final_weight = 0.7 × base_reliability + 0.3 × effective_confidence`. Tools with `no_confidence` status contributed through base-reliability alone. All weight artifacts were written to machine-readable TSV files and propagated directly into the consensus step.
 
 ### 5. Consensus and abstention
-- Implement strict majority-vote baseline as the equal-weight comparator.
-- Implement calibrated weighted consensus over normalized allele pairs using benchmark-derived runtime weights.
-- Current headline consensus reporting is restricted to `HLA-A`, `HLA-B`, and `HLA-C`, while richer per-tool output files may still include additional loci.
-- Add abstention based on support and support-margin thresholds so weak evidence is distinguished from emitted calls.
-- Return `called`, `low_confidence`, or `no_call` states and preserve structured disagreement tags for interpretation.
+Two consensus methods were evaluated on the holdout split. Equal-weight majority vote assigned each tool a uniform vote of 1/N and returned the allele pair supported by the plurality of tools, abstaining when no plurality existed. Guarded weighted consensus summed benchmark-derived runtime weights per candidate allele pair and returned the pair with the highest total weight, subject to a support threshold tuned on the validation split. Abstention was triggered when the per-locus support score fell below the tuned threshold or when the support margin between the top two candidates was insufficient. Abstaining loci were recorded as `low_confidence` or `no_call` in the consensus output and were not silently excluded from callable-rate calculations. Headline consensus reporting was restricted to HLA-A, -B, and -C.
 
 ### 6. Discordance taxonomy
-- Label disagreement structure using tags such as:
-  - `technical_conflict`
-  - `low_evidence_conflict`
-  - `dna_rna_discordance`
-  - `possible_expression_bias`
-  - `no_evidence`
-- Treat discordance interpretation as an analysis layer distinct from primary truth benchmarking.
+Post-consensus disagreement structure was labelled using a five-category taxonomy applied as an interpretation layer that did not alter call values. `technical_conflict` was assigned when tools produced divergent calls without a clear majority and no cross-modality signal. `low_evidence_conflict` indicated weak total support across all tools at a locus. `dna_rna_discordance` flagged cases where DNA-modality callers and RNA-modality callers systematically disagreed at the same locus and sample. `possible_expression_bias` labelled intra-RNA disagreements consistent with allele-specific expression effects. `no_evidence` was applied when no parseable calls were available from any tool in that modality.
 
 ### 7. Ambiguity-aware HLA evaluation
-- 2-field evaluation remains the current primary endpoint.
-- The benchmark now also emits 3-field exact-match rates plus G-group and P-group match rates when truth and calls provide comparable group-suffixed alleles.
-- IMGT/HLA database version is pinned in the benchmark configuration and propagated through `benchmark_metadata.json`, `reference_metadata.tsv`, and `harmonized_benchmark_rows.tsv`.
-- Group-level metrics are intentionally blank when comparable G-group or P-group encodings are absent.
+Primary accuracy was computed as exact two-field allele-pair match rate on the holdout split, with no partial credit for heterozygous loci. A call was counted correct only when both alleles of the returned pair matched the ground-truth pair exactly under the same IMGT/HLA version. Secondary metrics included exact three-field pair match rate and G-group and P-group match rates where both truth and call carried comparable group-suffixed allele encodings; secondary metrics were left blank when group-level encodings were absent from either truth or call. The IMGT/HLA database version (3.59.0) was pinned in every benchmark configuration and propagated through `benchmark_metadata.json`, `reference_metadata.tsv`, and `harmonized_benchmark_rows.tsv`.
 
 ### 8. Benchmark design
-- Use truth hierarchy:
-  1. orthogonal clinical typing
-  2. targeted HLA NGS
-  3. public reference truth
-- Use split hierarchy:
-  - training for calibration and weight learning,
-  - validation for abstention threshold tuning,
-  - holdout for final reporting.
+Truth labels followed a priority hierarchy: orthogonal clinical typing was preferred where available, followed by targeted HLA NGS, followed by public reference truth. For this study, all truth labels came from the public 1000 Genomes HLA dataset (Gourraud et al., 2014), which constituted the third-tier source. The 42-sample WGS cohort was partitioned into three non-overlapping splits of 25 training, 8 validation, and 9 holdout samples using deterministic, population-stratified sampling across CEU, CHB, GBR, TSI, and YRI ancestry groups. The training split was used for tool calibration and weight learning; the validation split was used for abstention-threshold tuning; the holdout split was used exclusively for final performance reporting, and no holdout outputs were used to inform any parameter choice.
 
 ### 9. Benchmark cohort definition
-The scientific cohort is defined as a strict matched tri-modal subset of 1000 Genomes samples with public HLA ground truth from Gourraud et al. Samples are included only when WGS, WES, and RNA-seq are all available, and only truth-supported loci are used in formal accuracy claims. In the current manuscript phase, headline reporting is intentionally focused on `HLA-A`, `HLA-B`, and `HLA-C`. The synthetic fixture retained in the repository is used only for CI and parser validation. Missing or failed tools in a given modality are reported explicitly as unavailable under the phase-gated benchmark policy rather than silently excluded.
+The scientific cohort comprises 42 truth-backed 1000 Genomes WGS samples with complete outputs for six tools (OptiType, T1K, ArcasHLA, SpecHLA, HLA-HD, and Kourami), split 25/8/9 into training, validation, and holdout sets. For the full tri-modal analysis, samples were restricted to those with matched WGS, WES, and RNA-seq availability and public HLA ground truth. Headline accuracy claims are restricted to HLA-A, HLA-B, and HLA-C; additional loci may appear in per-tool output files but are outside the current reporting scope. The synthetic fixture retained in the repository is used only for CI and parser validation and is explicitly excluded from all scientific claims. Tools that failed to produce parseable outputs in a given modality are recorded as unavailable in benchmark metadata rather than silently removed from comparison tables.
 
 ### 10. Metrics
-Primary:
-- 2-field exact pair accuracy
-- callable rate
-- overall correct-call rate
-
-Secondary:
-- 3-field accuracy
-- ambiguity-aware agreement
-- per-gene performance
-- calibration error
-- abstention tradeoff
-- discordance burden
+The primary accuracy endpoint was overall correct-call rate: the fraction of holdout allele-pair loci for which the consensus method returned the exact two-field truth pair. Callable rate was computed as the fraction of loci for which a call — rather than a `no_call` or `low_confidence` abstention — was emitted. Wilson score 95% confidence intervals were computed for all correct-call rates. Secondary endpoints included three-field pair accuracy, per-gene correct-call rates for HLA-A, -B, and -C, empirical calibration metrics (ECE and Brier score), abstention–accuracy tradeoff curves at varying support thresholds, and discordance burden by category and modality.
 
 ## Results
-### Current Run State
-The manuscript draft is now backed by two completed real-data benchmarks. The first is a strict tri-modal three-sample pilot used to validate end-to-end workflow behavior across WGS, WES, and RNA-seq after parser, truth-normalization, and cohort-ingestion repairs. The second, and now primary quantitative analysis set, is a dedicated 42-sample WGS-only benchmark wave built from truth-backed 1000 Genomes samples that already had complete on-disk outputs for `OptiType`, `T1K`, `ArcasHLA`, `SpecHLA`, `HLA-HD`, and `Kourami`. The WGS wave uses deterministic sample-level training, validation, and holdout splits and produces stable single-tool, majority-vote, weighted-consensus, and confidence-calibration outputs.
-
 ### 1. Cohort assembly and filtering
-The primary benchmark cohort is now a WGS-only 1000 Genomes wave comprising 42 truth-backed samples with complete outputs for six WGS tools (`OptiType`, `T1K`, `ArcasHLA`, `SpecHLA`, `HLA-HD`, and `Kourami`). The cohort was frozen through a manifest-driven design with deterministic, population-aware sample-level splits across CEU, CHB, GBR, TSI, and YRI samples. This produced 25 training samples, 8 validation samples, and 9 holdout samples. The earlier strict tri-modal three-sample benchmark remains in the project as an integration pilot, but the WGS wave is now the main quantitative benchmark used for current comparative reporting.
+The primary benchmark cohort is now a WGS-only 1000 Genomes wave comprising 42 truth-backed samples with complete outputs for six WGS tools (`OptiType`, `T1K`, `ArcasHLA`, `SpecHLA`, `HLA-HD`, and `Kourami`). The cohort was frozen through a manifest-driven design with deterministic, population-aware sample-level splits across CEU, CHB, GBR, TSI, and YRI samples. This produced 25 training samples, 8 validation samples, and 9 holdout samples. The earlier strict tri-modal three-sample benchmark remains in the project as an integration pilot, but the WGS wave is now the main quantitative benchmark used for current comparative reporting (Figure 1).
 
 ### 2. Harmonized benchmark framework
 The benchmark layer now emits harmonized call tables, tool-availability summaries, confidence-calibration tables, per-tool and per-gene weight artifacts, majority-vote baselines, weighted consensus calls, and benchmark metadata from one manifest-driven real-data workflow. The same benchmark runner can therefore support both the tri-modal pilot and the larger WGS wave without changing the harmonization schema.
 
 ### 3. Benchmark-derived confidence weights
-The WGS wave provided the first stable training base for confidence-weight learning, but the current runtime weighting no longer uses raw mean confidence directly. Instead, benchmark-time weight learning now computes an effective confidence value that is allowed to boost runtime voting only when empirical calibration is acceptable. In the guarded WGS wave, `HLA-HD`, `Kourami`, and `OptiType` all triggered `poor_calibration` and were clipped back to their base-reliability weights (`0.2267`, `0.1356`, and `0.56`, respectively). `T1K` retained a partial confidence boost, reaching a guarded final weight of `0.2817`, while `ArcasHLA` retained only a near-zero guarded contribution (`0.0101`). At the gene level, the same pattern held: `T1K` retained modest effective-confidence gains, while badly calibrated tools were prevented from converting overconfident raw scores into disproportionately large runtime weights. This shifts the weighting layer from a raw-confidence blend into a calibration-aware reliability filter.
+The WGS wave provided the first stable training base for confidence-weight learning, but the current runtime weighting no longer uses raw mean confidence directly. Instead, benchmark-time weight learning now computes an effective confidence value that is allowed to boost runtime voting only when empirical calibration is acceptable. In the guarded WGS wave, `HLA-HD`, `Kourami`, and `OptiType` all triggered `poor_calibration` and were clipped back to their base-reliability weights (`0.2267`, `0.1356`, and `0.56`, respectively). `T1K` retained a partial confidence boost, reaching a guarded final weight of `0.2817`, while `ArcasHLA` retained only a near-zero guarded contribution (`0.0101`). At the gene level, the same pattern held: `T1K` retained modest effective-confidence gains, while badly calibrated tools were prevented from converting overconfident raw scores into disproportionately large runtime weights. This shifts the weighting layer from a raw-confidence blend into a calibration-aware reliability filter (Figure 7).
 
 ### 4. Comparison with single tools and majority vote
-On the 9-sample WGS holdout, `OptiType` was the strongest single tool with `0.5185` overall correct-call rate, followed closely by `T1K` at `0.4815`. `HLA-HD` reached `0.4074`, `SpecHLA` reached `0.3333`, `Kourami` reached `0.1875`, and `ArcasHLA` was uninformative in this benchmark slice. Equal-weight majority vote produced `0.4815` overall correct-call rate with `0.7778` callable rate. Guarded weighted consensus improved callable rate to `0.9259` while maintaining `0.5185` (95% CI: 0.34–0.69) overall correct-call rate, effectively matching the best single-tool accuracy while emitting more benchmarkable calls than majority vote. This is an important distinction from the unguarded confidence-expansion pass, where poorly calibrated confidence signals degraded ensemble performance. The current WGS ensemble benefit is therefore best described as calibration-aware improvement in decision coverage and abstention control rather than a large raw-accuracy jump over the best individual tool.
+On the 9-sample WGS holdout, `OptiType` was the strongest single tool with `0.5185` overall correct-call rate, followed closely by `T1K` at `0.4815`. `HLA-HD` reached `0.4074`, `SpecHLA` reached `0.3333`, `Kourami` reached `0.1875`, and `ArcasHLA` was uninformative in this benchmark slice. Equal-weight majority vote produced `0.4815` overall correct-call rate with `0.7778` callable rate. Guarded weighted consensus improved callable rate to `0.9259` while maintaining `0.5185` (95% CI: 0.34–0.69) overall correct-call rate, effectively matching the best single-tool accuracy while emitting more benchmarkable calls than majority vote. This is an important distinction from the unguarded confidence-expansion pass, where poorly calibrated confidence signals degraded ensemble performance. The current WGS ensemble benefit is therefore best described as calibration-aware improvement in decision coverage and abstention control rather than a large raw-accuracy jump over the best individual tool (Figure 2; Figure 8).
 
-In the full tri-modal cohort benchmark, `WeightedConsensus` reached 0.9167 (95% CI: 0.78–0.97) on the WES holdout (n=12), compared to `MajorityVote` 0.9444. This underperformance is consistent with a ceiling effect: in a high-accuracy WES regime where all single tools already agree, any weighting that shifts votes away from the majority can only reduce accuracy. Sensitivity analysis across weight variants (α=1.0/β=0.0, α=0.5/β=0.5, α=0.0/β=1.0) confirms the WES result is stable at approximately 0.87 regardless of formula choice, indicating the underperformance is structural rather than a weight-formula artefact. RNA-seq holdout (n=7) reached 1.000 for both consensus methods. Seq2HLA RNA (n=1 callable, container failure) and SpecHLA RNA (6/100 samples, pipeline failure) are excluded from primary RNA comparisons as pipeline coverage failures rather than tool performance data.
+In the full tri-modal cohort benchmark, `WeightedConsensus` reached 0.9167 (95% CI: 0.78–0.97) on the WES holdout (n=12), compared to `MajorityVote` 0.9444. This underperformance is consistent with a ceiling effect: in a high-accuracy WES regime where all single tools already agree, any weighting that shifts votes away from the majority can only reduce accuracy. Sensitivity analysis across weight variants (α=1.0/β=0.0, α=0.5/β=0.5, α=0.0/β=1.0) confirms the WES result is stable at approximately 0.87 regardless of formula choice, indicating the underperformance is structural rather than a weight-formula artefact. RNA-seq holdout (n=7) reached 1.000 for both consensus methods. Seq2HLA RNA (n=1 callable, container failure) and SpecHLA RNA (6/100 samples, pipeline failure) are excluded from primary RNA comparisons as pipeline coverage failures rather than tool performance data (Figure 3).
 
 ### 5. Confidence calibration
-The WGS wave also transformed confidence evaluation from a pilot artifact into a real benchmark output. `OptiType`, `T1K`, `ArcasHLA`, `HLA-HD`, and `Kourami` now contribute non-empty calibration summaries through native or near-native confidence artifacts. However, the benchmark now distinguishes raw mean confidence from effective confidence. `OptiType`, `HLA-HD`, and `Kourami` all showed poor empirical calibration in the current WGS wave (`OptiType` Brier/ECE `0.4815/0.4815`, `HLA-HD` `0.3849/0.4056`, `Kourami` `0.8078/0.8102`) and were therefore blocked from receiving confidence-based runtime boosting. By contrast, `T1K` remained within the current guardrail thresholds (`0.3438/0.3418`) and retained a partial confidence boost. These results support the value of benchmark-driven guardrails because raw confidence values are not only incomparable across tools, but can actively harm ensemble behavior when treated as trustworthy without calibration checks.
+The WGS wave also transformed confidence evaluation from a pilot artifact into a real benchmark output. `OptiType`, `T1K`, `ArcasHLA`, `HLA-HD`, and `Kourami` now contribute non-empty calibration summaries through native or near-native confidence artifacts. However, the benchmark now distinguishes raw mean confidence from effective confidence. `OptiType`, `HLA-HD`, and `Kourami` all showed poor empirical calibration in the current WGS wave (`OptiType` Brier/ECE `0.4815/0.4815`, `HLA-HD` `0.3849/0.4056`, `Kourami` `0.8078/0.8102`) and were therefore blocked from receiving confidence-based runtime boosting. By contrast, `T1K` remained within the current guardrail thresholds (`0.3438/0.3418`) and retained a partial confidence boost. These results support the value of benchmark-driven guardrails because raw confidence values are not only incomparable across tools, but can actively harm ensemble behaviour when treated as trustworthy without calibration checks (Figure 4).
 
 ### 6. Ambiguity-aware and version-aware evaluation
 All current WGS-wave comparisons are anchored to IMGT/HLA `3.59.0` and use exact two-field allele-pair accuracy as the primary endpoint, with three-field agreement retained as a secondary analysis. This ensures that the ensemble and all single-tool baselines are compared under the same nomenclature and truth-normalization rules.
 
 ### 7. Abstention behavior
-The WGS wave clarified the tradeoff between abstention and decision coverage. Majority vote abstained often enough to reduce its callable rate to `0.7778`, largely through technical-conflict cases with weak agreement. Guarded weighted consensus was more permissive but still retained abstention behavior when support was weak, reaching `0.9259` callable rate rather than forcing all loci to be called. In the current holdout, this produced a more favorable balance between coverage and accuracy than equal-weight majority voting while avoiding the regression seen in the earlier unguarded confidence-expansion pass.
+The WGS wave clarified the tradeoff between abstention and decision coverage. Majority vote abstained often enough to reduce its callable rate to `0.7778`, largely through technical-conflict cases with weak agreement. Guarded weighted consensus was more permissive but still retained abstention behavior when support was weak, reaching `0.9259` callable rate rather than forcing all loci to be called. In the current holdout, this produced a more favourable balance between coverage and accuracy than equal-weight majority voting while avoiding the regression seen in the earlier unguarded confidence-expansion pass (Figure 5).
 
 ### 8. Discordance interpretation
-Holdout-level disagreement patterns in the WGS wave show both clear consensus successes and structurally difficult loci. Majority vote produced several `technical_conflict` no-calls, whereas guarded weighted consensus converted most of these into callable decisions while leaving a small low-evidence residue instead of overcommitting on weak support. This suggests that calibration-aware weighting is improving disagreement resolution while explicitly protecting runtime voting from badly calibrated confidence sources.
+Holdout-level disagreement patterns in the WGS wave show both clear consensus successes and structurally difficult loci. Majority vote produced several `technical_conflict` no-calls, whereas guarded weighted consensus converted most of these into callable decisions while leaving a small low-evidence residue instead of overcommitting on weak support. This suggests that calibration-aware weighting is improving disagreement resolution while explicitly protecting runtime voting from badly calibrated confidence sources (Figure 6).
 
 ### 9. Weight formula sensitivity
 To assess whether the default weight formula (α=0.7 × base_reliability + β=0.3 × effective_confidence) was cherry-picked, we evaluated three alternative formulations: reliability-only (α=1.0/β=0.0), equal weighting (α=0.5/β=0.5), and confidence-only (α=0.0/β=1.0). WES `WeightedConsensus` was stable across all variants (~0.87), confirming the WES underperformance relative to `MajorityVote` is structural. RNA was 1.000 for the default but dropped to ~0.887 for all sensitivity variants, indicating confidence scores from some tools slightly drag down the RNA ensemble. WGS showed the default (0.267) was outperformed by all three variants (0.296–0.317). The WGS sensitivity pattern reflects guardrail dominance: most WGS tools trigger `poor_calibration` and fall back to base_reliability regardless of β, with the exception of `ArcasHLA` whose very low effective confidence (0.0068) contributes minimally at any β. The 0.7/0.3 default is therefore optimal for WES (where it outperforms all variants) and is not cherry-picked relative to WES/RNA stability. The WGS improvement under higher β is a guardrail artefact, not a signal that confidence-only weighting is better in principle for WGS.
@@ -190,21 +141,26 @@ The broader contribution of this work is methodological. By combining benchmark-
 
 Looking ahead, the priority is to expand holdout cohort sizes for WES and RNA-seq modalities, extend native confidence extraction to remaining integrated tools, and validate the framework against cohorts with broader ancestry representation and richer truth labels at three-field resolution. Together these extensions will sharpen the statistical basis for modality-level claims and strengthen the case for PIHLA as a general-purpose reliability-weighted HLA ensemble platform with confidence guardrails, suitable for both methodological benchmarking and translational immunogenomics workflows.
 
-## Planned Main Figures
-- Figure 1. Workflow and ensemble architecture.
-  Panels: tool-execution layer, harmonization schema, calibration/weight-learning path, and runtime consensus path.
-- Figure 2. Cohort assembly and benchmark design.
-  Panels: truth-source ingestion, tri-modal intersection, final cohort filtering, and split design.
-- Figure 3. Accuracy comparison across single-tool, majority-vote, and weighted-consensus methods.
-  Panels: per-modality headline A/B/C performance on holdout and callable-rate overlays.
-- Figure 4. Per-gene gains of weighted consensus over majority vote.
+## Main Figures
+Generated figures are in `analysis/figures_final/` (PDF + PNG at 300 dpi).
+A workflow architecture schematic (Figure 0) is planned for manual creation and is not included in this list.
+
+- Figure 1. Cohort assembly and benchmark design. (`figure_01_cohort_overview`)
+  Panels: truth-source ingestion, sample intersection, final cohort filtering, and 25/8/9 split design.
+- Figure 2. Accuracy comparison across single-tool, majority-vote, and weighted-consensus methods. (`figure_02_method_performance`)
+  Panels: per-modality headline A/B/C overall correct-call rate on holdout with callable-rate overlays.
+- Figure 3. Per-gene gains of weighted consensus over majority vote. (`figure_03_per_gene_heatmap`)
   Panels: A, B, and C gains by modality with best-single-tool reference markers.
-- Figure 5. Confidence calibration and confidence-stratified error behavior.
-  Panels: calibration curves, Brier/ECE summaries, and confidence-bin error rates.
-- Figure 6. Abstention and disagreement interpretation.
-  Panels: abstention tradeoff curves and discordance taxonomy counts by modality.
-- Figure 7. Learned benchmark-derived confidence weights.
-  Panels: tool-level and gene-level weights, grouped by modality.
+- Figure 4. Confidence calibration and confidence-stratified error behaviour. (`figure_04_calibration_diagrams`)
+  Panels: calibration curves, Brier/ECE summaries by tool and modality, confidence-bin error rates.
+- Figure 5. Abstention tradeoff curves. (`figure_05_abstention_tradeoff`)
+  Panels: callable rate vs overall accuracy at varying support thresholds by modality.
+- Figure 6. Discordance taxonomy counts. (`figure_06_discordance_taxonomy`)
+  Panels: per-category discordance burden by modality and tool combination.
+- Figure 7. Learned benchmark-derived reliability weights. (`figure_07_weight_heatmap`)
+  Panels: tool-level and gene-level final weights grouped by modality, with guardrail status annotations.
+- Figure 8. Ensemble advantage over single-tool and majority-vote baselines. (`figure_08_ensemble_advantage`)
+  Panels: callable-rate gain and accuracy comparison of WeightedConsensus vs MajorityVote and best single tool across modalities.
 
 ## Planned Main Tables
 - Table 1. Supported callers, modalities, evidence types, and runtime integration mode.
