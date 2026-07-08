@@ -73,6 +73,13 @@ PYEOF
       --min-weight ${minWeight} \
       ${useGeneSpecific}
     """
+
+    stub:
+    """
+    echo '{"tool_weights": {}, "gene_weights": {}}' > runtime_weights.json
+    printf 'sample\tgene\tallele1\tallele2\ttotal_weight\tagreeing_tools\tcontributing_tools\tconsensus_status\tchosen_by\twarnings\n' > consensus_calls.tsv
+    printf 'sample1\tA\tA*02:01\tA*11:01\t2.0\t2\t2\tcalled\toptitype,hlahd\t\n' >> consensus_calls.tsv
+    """
 }
 
 workflow MAJORITY_VOTING_WORKFLOW {
@@ -83,6 +90,7 @@ workflow MAJORITY_VOTING_WORKFLOW {
     ch_hlahd
     ch_polysolver
     ch_kourami
+    ch_locityper
     ch_t1k
     ch_seq2hla
     ch_modality
@@ -94,6 +102,7 @@ workflow MAJORITY_VOTING_WORKFLOW {
         .mix(ch_hlahd.map { sample_id, f -> f })
         .mix(ch_polysolver.map { sample_id, f -> f })
         .mix(ch_kourami.map { sample_id, f -> f })
+        .mix(ch_locityper.map { sample_id, f -> f })
         .mix(ch_t1k.map { sample_id, f -> f })
         .mix(ch_seq2hla.map { sample_id, f -> f })
 

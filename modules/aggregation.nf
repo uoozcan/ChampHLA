@@ -35,6 +35,7 @@ name_patterns = {
     "hlahd": re.compile(r"^(?P<sample>.+)_hlahd[.]txt"),
     "polysolver": re.compile(r"^(?P<sample>.+)_polysolver[.]txt"),
     "kourami": re.compile(r"^(?P<sample>.+)_kourami[.]txt"),
+    "locityper": re.compile(r"^(?P<sample>.+)_locityper[.]txt"),
     "t1k": re.compile(r"^(?P<sample>.+)_t1k[.]txt"),
     "seq2hla": re.compile(r"^(?P<sample>.+)_seq2hla[.]txt"),
 }
@@ -89,5 +90,12 @@ with out.open("w", encoding="utf-8", newline="") as handle:
     for row in rows:
         w.writerow(row)
 PYEOF
+    """
+
+    stub:
+    """
+    printf 'sample\ttool\tmodality\tgene\tallele1\tallele2\tis_callable\n' > aggregated_calls.tsv
+    printf 'sample1\toptitype\t${modality}\tA\tA*02:01\tA*11:01\t1\n' >> aggregated_calls.tsv
+    printf 'sample1\thlahd\t${modality}\tA\tA*02:01\tA*11:01\t1\n' >> aggregated_calls.tsv
     """
 }

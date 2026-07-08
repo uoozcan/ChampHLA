@@ -2,9 +2,7 @@
 
 **Authority model:** Repo-local `.ai/` files are authoritative for AI coordination. Claude memory is a synchronized copy.
 
-**Workspace path:** `/users/ozcanumu/scratch/project_2008084/pihla-publish/`
-
-**Runtime path:** `/scratch/project_2008084/pihla-publish/` is the execution truth for real runs, benchmark outputs, and scientific reporting.
+**Canonical path:** `/scratch/project_2008084/pihla-publish/` — use this for all work: execution, benchmark outputs, scientific reporting, scripts, and configs. Do not use `/users/ozcanumu/scratch/project_2008084/pihla-publish/`.
 
 ## Architecture
 - Workflow engine: Nextflow DSL2 pipeline with module-per-tool execution.
@@ -25,7 +23,7 @@
 - Handoffs must be written to `.ai/handoffs/` before ownership changes.
 
 ## Active risks
-- The workspace copy may drift from `/scratch/project_2008084/pihla-publish`; use the runtime path for execution truth.
+- Always use `/scratch/project_2008084/pihla-publish` as the canonical path; avoid the `/users/ozcanumu/scratch/...` alias in all scripts, configs, and fixtures.
 - Fixture-backed outputs must not be used as scientific evidence.
 - Benchmark and manuscript claims must match `benchmark_metadata.json` scope and reporting policy.
 

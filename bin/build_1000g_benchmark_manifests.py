@@ -3,7 +3,6 @@
 
 import argparse
 import csv
-import random
 from collections import defaultdict
 from pathlib import Path
 
@@ -21,7 +20,6 @@ def parse_args():
     parser.add_argument("--acquisition-date", default="", help="Acquisition date recorded in the manifest metadata.")
     parser.add_argument("--supported-loci", default="A,B,C,DRB1,DQB1", help="Comma-separated loci for formal benchmarking.")
     parser.add_argument("--population-manifest", default="", help="Optional TSV mapping sample to population.")
-    parser.add_argument("--split-seed", type=int, default=1000, help="Seed for deterministic split assignment.")
     return parser.parse_args()
 
 
@@ -92,33 +90,7 @@ def load_sequencing_manifest_rows(path_value, population_map):
     return sorted(normalized, key=lambda row: (row["sample"], hb.modality_sort_key(row["modality"])))
 
 
-def assign_split_group(samples, seed):
-    samples = list(samples)
-    random.Random(seed).shuffle(samples)
-    n = len(samples)
-    if n <= 1:
-        return {sample: "holdout" for sample in samples}
-    if n == 2:
-        return {samples[0]: "training", samples[1]: "holdout"}
-    if n == 3:
-        return {samples[0]: "training", samples[1]: "validation", samples[2]: "holdout"}
-    n_train = max(1, int(round(n * 0.6)))
-    n_val = max(1, int(round(n * 0.2)))
-    if n_train + n_val >= n:
-        n_train = max(1, n - 2)
-        n_val = 1
-    assignments = {}
-    for idx, sample in enumerate(samples):
-        if idx < n_train:
-            assignments[sample] = "training"
-        elif idx < n_train + n_val:
-            assignments[sample] = "validation"
-        else:
-            assignments[sample] = "holdout"
-    return assignments
-
-
-def build_cohort_manifest(truth_manifest_rows, sequencing_manifest_rows, supported_loci, split_seed, required_modalities=None):
+def build_cohort_manifest(truth_manifest_rows, sequencing_manifest_rows, supported_loci, required_modalities=None):
     if required_modalities is None:
         required_modalities = REQUIRED_MODALITIES
     truth_index = {row["sample"]: row for row in truth_manifest_rows}
@@ -139,7 +111,6 @@ def build_cohort_manifest(truth_manifest_rows, sequencing_manifest_rows, support
             "sample": sample,
             "population": truth_row.get("population", "") or next((modalities[m].get("population", "") for m in REQUIRED_MODALITIES if m in modalities), ""),
             "include": "1" if include else "0",
-            "split": "",
             "truth_supported_loci": ",".join(loci),
             "wgs_available": "1" if available.get("wgs") else "0",
             "wes_available": "1" if available.get("wes") else "0",
@@ -148,19 +119,6 @@ def build_cohort_manifest(truth_manifest_rows, sequencing_manifest_rows, support
         })
         if include:
             included_samples.append(sample)
-    by_population = defaultdict(list)
-    for row in rows:
-        if row["include"] == "1":
-            by_population[row["population"] or "unknown"].append(row["sample"])
-    split_map = {}
-    if by_population and max(len(samples) for samples in by_population.values()) >= 2:
-        for offset, population in enumerate(sorted(by_population)):
-            split_map.update(assign_split_group(sorted(by_population[population]), split_seed + offset))
-    else:
-        split_map.update(assign_split_group(sorted([row["sample"] for row in rows if row["include"] == "1"]), split_seed))
-    for row in rows:
-        if row["include"] == "1":
-            row["split"] = split_map.get(row["sample"], "holdout")
     return rows
 
 
@@ -181,10 +139,10 @@ def main():
     population_map = parse_population_map(args.population_manifest)
     truth_manifest_rows = load_truth_manifest_rows(args.truth, supported_loci, args.truth_source, args.acquisition_date, population_map)
     sequencing_manifest_rows = load_sequencing_manifest_rows(args.sequencing, population_map)
-    cohort_manifest_rows = build_cohort_manifest(truth_manifest_rows, sequencing_manifest_rows, supported_loci, args.split_seed)
+    cohort_manifest_rows = build_cohort_manifest(truth_manifest_rows, sequencing_manifest_rows, supported_loci)
     write_tsv(output_dir / "truth_manifest.tsv", truth_manifest_rows, ["sample", "population", "truth_source", "acquisition_date", "truth_supported_loci", "truth_gene_count"])
     write_tsv(output_dir / "sequencing_manifest.tsv", sequencing_manifest_rows, ["sample", "population", "modality", "data_locator", "available"])
-    write_tsv(output_dir / "cohort_manifest.tsv", cohort_manifest_rows, ["sample", "population", "include", "split", "truth_supported_loci", "wgs_available", "wes_available", "rnaseq_available", "excluded_reason"])
+    write_tsv(output_dir / "cohort_manifest.tsv", cohort_manifest_rows, ["sample", "population", "include", "truth_supported_loci", "wgs_available", "wes_available", "rnaseq_available", "excluded_reason"])
     return 0
 
 

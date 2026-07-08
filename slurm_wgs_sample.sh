@@ -46,17 +46,19 @@ mkdir -p "${LAUNCH_DIR}"
 cd "${LAUNCH_DIR}"
 
 nextflow run /scratch/project_2008084/pihla-publish/main.nf \
+  -params-file /scratch/project_2008084/pihla-publish/conf/puhti_params.yaml \
+  -c /scratch/project_2008084/pihla-publish/conf/wgs_disk_fix.config \
   -resume \
   -name pihla_wgs_${sample_id}_${SLURM_JOB_ID} \
   -w "${work_root}/wgs_${sample_id}" \
   --input_samplesheet "${samplesheet}" \
   --input_type bam \
-  --tools spechla,hlahd,optitype,polysolver,kourami,t1k,arcashla \
-  --spechla_exon_only 0 \
+  --tools hlahd,optitype,t1k \
   --seq_type dna \
   --run_modality wgs \
+  --extract_hla_region true \
   --outdir "${output_root}/${sample_id}/results" \
   --slurm_account project_2008084 \
-  --use_local_spechla true \
   --spechla_path /projappl/project_2008084/SpecHLAx \
+  --singularity_cache_dir /scratch/project_2008084/hla_references/singularity_cache/containers \
   -profile puhti,singularity

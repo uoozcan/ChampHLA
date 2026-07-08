@@ -8,16 +8,16 @@ This checklist will guide you through deploying your HLA typing pipeline to GitH
 - [ ] Create new GitHub repository (public or private)
 - [ ] Initialize local git repository
   ```bash
-  cd hla-typing-pipeline
+  cd mvhla
   git init
   ```
 - [ ] Add remote origin
   ```bash
-  git remote add origin https://github.com/yourusername/hla-typing-pipeline.git
+  git remote add origin https://github.com/uoozcan/mvhla.git
   ```
 
 ### 2. Update Documentation
-- [ ] Replace `yourusername` with your GitHub username in:
+- [ ] Verify repository URLs are correct in:
   - [ ] README.md
   - [ ] nextflow.config (manifest section)
   - [ ] params.yaml.example
@@ -118,7 +118,7 @@ git push -u origin main
    
    ## Quick Start
    ```bash
-   nextflow run yourusername/hla-typing-pipeline \
+   nextflow run uoozcan/mvhla \
        --input samples/ \
        --input_type fastq \
        --tools optitype,arcashla \
@@ -140,7 +140,7 @@ git push -u origin main
 
 - [ ] Test installation from GitHub:
   ```bash
-  nextflow run yourusername/hla-typing-pipeline \
+  nextflow run uoozcan/mvhla \
       --input test_data/ \
       --input_type fastq \
       --tools optitype \
@@ -160,8 +160,8 @@ If you want to host your own containers:
 2. Create repository for each tool
 3. Build and push containers:
    ```bash
-   docker build -t yourusername/optitype:latest optitype/
-   docker push yourusername/optitype:latest
+   docker build -t uoozcan/optitype:latest optitype/
+   docker push uoozcan/optitype:latest
    ```
 4. Update nextflow.config with new paths
 
@@ -174,8 +174,8 @@ If you want to host your own containers:
    ```
 3. Build and push:
    ```bash
-   docker build -t ghcr.io/yourusername/optitype:latest optitype/
-   docker push ghcr.io/yourusername/optitype:latest
+   docker build -t ghcr.io/uoozcan/optitype:latest optitype/
+   docker push ghcr.io/uoozcan/optitype:latest
    ```
 4. Update nextflow.config
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ========================================================================================
-    HLA TYPING MULTI-TOOL PIPELINE
+    MVHLA — Multi-tool Voting-based HLA Analysis Pipeline
 ========================================================================================
-    Github : https://github.com/yourusername/hla-typing-pipeline
+    Github : https://github.com/uoozcan/mvhla
     Version: 2.0.0
 ========================================================================================
     Comprehensive HLA typing pipeline integrating multiple state-of-the-art tools:
@@ -22,11 +22,14 @@ include { SPECHLA as SPECHLA_BAM; SPECHLA_FASTQ } from './modules/spechla'
 include { HLAHD as HLAHD_BAM; HLAHD_FASTQ } from './modules/hlahd'
 include { POLYSOLVER } from './modules/polysolver'
 include { KOURAMI } from './modules/kourami'
+include { LOCITYPER } from './modules/locityper'
+include { IMMUANNOT } from './modules/immuannot'
 include { T1K_FASTQ } from './modules/t1k'
 include { SEQ2HLA } from './modules/seq2hla'
 include { CRAM_TO_BAM; EXTRACT_HLA_REGION; BAM_TO_FASTQ; EXTRACT_HLA_AND_CONVERT } from './modules/bam_to_fastq'
 include { AGGREGATE_RESULTS } from './modules/aggregation'
 include { MAJORITY_VOTING_WORKFLOW } from './modules/majority_voting'
+include { SILVER_TRUTH_WORKFLOW } from './modules/silver_truth'
 
 /*
 ========================================================================================
@@ -37,7 +40,7 @@ include { MAJORITY_VOTING_WORKFLOW } from './modules/majority_voting'
 def helpMessage() {
     log.info"""
     ============================================================
-    HLA TYPING MULTI-TOOL PIPELINE v2.0.0
+    MVHLA — Multi-tool Voting-based HLA Analysis Pipeline v2.0.0
     ============================================================
     
     Usage:
@@ -145,10 +148,22 @@ if (params.input_type == 'cram' && !params.reference_fasta) {
     exit 1
 }
 
+// Validate tool-specific required parameters
+def tools_to_validate = params.tools?.tokenize(',')*.trim()*.toLowerCase() ?: []
+if ('hlahd' in tools_to_validate && !params.hlahd_db) {
+    log.error "ERROR: --hlahd_db (path to HLA-HD bowtie2 database directory) is required when hlahd is in --tools"
+    exit 1
+}
+if ('t1k' in tools_to_validate && !params.t1k_hlaidx) {
+    log.error "ERROR: --t1k_hlaidx (path to T1K HLA index file) is required when t1k is in --tools"
+    exit 1
+}
+// kourami_db defaults to bundled container path; kourami_hs38_ref is optional (null = samtools extraction)
+
 // Print parameter summary
 log.info """
 ========================================================================================
-    HLA TYPING MULTI-TOOL PIPELINE
+    MVHLA — Multi-tool Voting-based HLA Analysis Pipeline
 ========================================================================================
 Input               : ${params.input_samplesheet ?: params.input}
 Input type          : ${params.input_samplesheet ? 'samplesheet' : params.input_type}
@@ -176,13 +191,18 @@ workflow {
     // Filter tools by seq_type compatibility
     def seq_type = (params.seq_type ?: 'dna').toLowerCase()
     if (seq_type == 'rna') {
-        def bam_only = ['polysolver', 'kourami']
+        def bam_only = ['polysolver', 'kourami', 'locityper']
         def removed = tools_list.findAll { it in bam_only }
         if (removed) log.warn "RNA-seq mode: skipping BAM-only tools: ${removed.join(', ')}"
         tools_list = tools_list.findAll { !(it in bam_only) }
     }
+    if ('arcashla' in tools_list && seq_type != 'rna') {
+        log.warn "ArcasHLA uses kallisto cDNA pseudoalignment and is designed for RNA-seq. " +
+                 "On DNA data (WGS/WES) it typically achieves <5% accuracy and contributes " +
+                 "near-zero weight to the consensus. Consider removing it from --tools for DNA runs."
+    }
     if (seq_type in ['longreads_hifi', 'longreads_ont']) {
-        def kept = ['t1k']
+        def kept = ['t1k', 'locityper']
         def removed = tools_list.findAll { !(it in kept) }
         if (removed) log.warn "Long-read mode: skipping short-read tools: ${removed.join(', ')}"
         tools_list = tools_list.findAll { it in kept }
@@ -247,6 +267,9 @@ workflow {
     ch_hlahd_results     = Channel.empty()
     ch_polysolver_results = Channel.empty()
     ch_kourami_results   = Channel.empty()
+    ch_locityper_results = Channel.empty()
+    ch_locityper_conf    = Channel.empty()
+    ch_immuannot_results = Channel.empty()
     ch_t1k_results       = Channel.empty()
     ch_seq2hla_results   = Channel.empty()
 
@@ -261,7 +284,8 @@ workflow {
             ch_arcashla_results = ARCASHLA_FASTQ.out.results
         }
         if ('spechla' in tools_list) {
-            SPECHLA_FASTQ(ch_input_fastq)
+            def spechla_exon_flag = (seq_type == 'rna') ? 1 : (params.spechla_exon_only ?: 0)
+            SPECHLA_FASTQ(ch_input_fastq, spechla_exon_flag)
             ch_spechla_results = SPECHLA_FASTQ.out.results
         }
         if ('hlahd' in tools_list) {
@@ -280,8 +304,8 @@ workflow {
                 log.warn "seq2HLA is RNA-seq focused — set --seq_type rna to enable it."
             }
         }
-        if ('polysolver' in tools_list || 'kourami' in tools_list) {
-            log.warn "POLYSOLVER/Kourami require BAM input and are skipped for FASTQ."
+        if ('polysolver' in tools_list || 'kourami' in tools_list || 'locityper' in tools_list) {
+            log.warn "POLYSOLVER/Kourami/Locityper require BAM input and are skipped for FASTQ."
         }
 
     } else {
@@ -306,14 +330,41 @@ workflow {
             KOURAMI(ch_input_bam)
             ch_kourami_results = KOURAMI.out.results
         }
+        if ('locityper' in tools_list) {
+            if (resolved_modality == 'wes') {
+                log.warn "Locityper models full-locus (intronic) coverage and is intended for WGS/long-read; skipped for WES."
+            } else if (!params.locityper_db) {
+                log.warn "Locityper requested but --locityper_db is not set; skipping Locityper."
+            } else {
+                LOCITYPER(ch_input_bam)
+                ch_locityper_results = LOCITYPER.out.results
+                ch_locityper_conf = LOCITYPER.out.confidence
+            }
+        }
+        // Immuannot annotates ASSEMBLED contigs (not reads); opt-in and only when
+        // contigs are supplied via --contigs_dir. Used mainly as a truth source.
+        if ('immuannot' in tools_list) {
+            if (!params.contigs_dir) {
+                log.warn "Immuannot requires assembled contigs; set --contigs_dir to enable it. Skipping."
+            } else {
+                ch_contigs = Channel
+                    .fromPath("${params.contigs_dir}/*.{fa,fasta,fa.gz,fasta.gz}", checkIfExists: true)
+                    .map { f -> tuple(f.baseName.replaceAll(/\.(fa|fasta)(\.gz)?$/, ''), f) }
+                IMMUANNOT(ch_contigs)
+                ch_immuannot_results = IMMUANNOT.out.results
+            }
+        }
 
         // Tools that need FASTQ converted from BAM
-        def need_fastq = ('optitype' in tools_list) || ('t1k' in tools_list) || (resolved_modality == 'wes' && 'hlahd' in tools_list)
-        def use_region_fastq = params.extract_hla_region || (resolved_modality == 'wes')
+        def need_fastq = ('optitype' in tools_list) || ('t1k' in tools_list) || (resolved_modality == 'wes' && 'hlahd' in tools_list) || ('seq2hla' in tools_list && seq_type == 'rna')
+        def use_region_fastq = params.extract_hla_region || (resolved_modality == 'wes') || (resolved_modality == 'rnaseq')
         if (need_fastq) {
             if (use_region_fastq) {
                 if (resolved_modality == 'wes' && !params.extract_hla_region) {
                     log.info "WES BAM input detected: enabling HLA-region extraction before FASTQ conversion to reduce storage footprint"
+                }
+                if (resolved_modality == 'rnaseq' && !params.extract_hla_region) {
+                    log.info "RNA-seq BAM input detected: enabling HLA-region extraction before FASTQ conversion to reduce runtime"
                 }
                 EXTRACT_HLA_AND_CONVERT(ch_input_bam)
                 ch_fastq = EXTRACT_HLA_AND_CONVERT.out.reads
@@ -333,9 +384,13 @@ workflow {
                 HLAHD_FASTQ(ch_fastq, params.hlahd_genes)
                 ch_hlahd_results = HLAHD_FASTQ.out.results
             }
+            if ('seq2hla' in tools_list && seq_type == 'rna') {
+                SEQ2HLA(ch_fastq)
+                ch_seq2hla_results = SEQ2HLA.out.results
+            }
         }
-        if ('seq2hla' in tools_list) {
-            log.warn "seq2HLA is FASTQ/RNA-seq oriented — skipped for BAM input."
+        if ('seq2hla' in tools_list && seq_type != 'rna') {
+            log.warn "seq2HLA requires RNA-seq data — skipped for non-RNA BAM input."
         }
     }
 
@@ -349,9 +404,19 @@ workflow {
             ch_hlahd_results,
             ch_polysolver_results,
             ch_kourami_results,
+            ch_locityper_results,
             ch_t1k_results,
             ch_seq2hla_results,
             ch_modality
+        )
+    }
+
+    // Optional: build silver-standard truth from the orthogonal genotypers.
+    if (params.generate_truth) {
+        SILVER_TRUTH_WORKFLOW(
+            ch_locityper_results,
+            ch_locityper_conf,
+            ch_immuannot_results
         )
     }
 }

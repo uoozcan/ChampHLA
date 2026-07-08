@@ -158,13 +158,14 @@ def _empty_state_figure(figures_dir: Path, stem: str, title: str, message: str) 
 
 def _write_captions(figures_dir: Path, tables_dir: Path, include_exploratory: bool) -> None:
     metadata = _load_json(tables_dir, "benchmark_metadata.json")
+    source_dir = _infer_source_dir(tables_dir, None)
+    source_manifest = _load_json(source_dir / "metadata", "source_manifest.json")
     truth_source = metadata.get("truth_source") or metadata.get("reference", {}).get("truth_source") or "unspecified"
     supported_loci = metadata.get("supported_loci") or []
     if isinstance(supported_loci, list):
         supported_loci_text = ", ".join(supported_loci) if supported_loci else "unspecified"
     else:
         supported_loci_text = str(supported_loci)
-    cohort_size = metadata.get("final_tri_modal_cohort_size", "unspecified")
     tuned_support = metadata.get("tuned_consensus_min_support", "unspecified")
     lines = [
         "# Figure Captions",
@@ -172,12 +173,25 @@ def _write_captions(figures_dir: Path, tables_dir: Path, include_exploratory: bo
         "## Benchmark Figure Set",
         "",
         f"Truth source: {truth_source}",
-        f"Final tri-modal cohort size: {cohort_size}",
         f"Supported loci: {supported_loci_text}",
         f"Tuned minimum support: {tuned_support}",
+    ]
+    if source_manifest:
+        lines.extend([
+            "",
+            "## Authoritative Benchmark Roots",
+            "",
+            f"WGS authoritative source: {source_manifest.get('wgs_authoritative_root', source_manifest.get('wgs_root', 'unspecified'))}",
+            f"WES authoritative source: {source_manifest.get('wes_authoritative_root', source_manifest.get('wes_root', 'unspecified'))}",
+            f"RNA authoritative source: {source_manifest.get('rna_authoritative_root', source_manifest.get('rna_root', 'unspecified'))}",
+            f"Trimodal secondary source: {source_manifest.get('trimodal_root', 'unspecified')}",
+            "",
+            "Note: figures 1-7 are generated from a staged multi-root publication input built from the authoritative modality-specific benchmarks above.",
+        ])
+    lines.extend([
         "",
         "### Figure 2. Method comparison",
-        "Compares single-tool baselines, majority vote, and weighted consensus across sequencing modalities.",
+        "Compares single-tool baselines, majority vote, weighted consensus, and routed baselines across sequencing modalities.",
         "",
         "### Figure 3. Per-gene gains",
         "Shows weighted-consensus gains over majority vote and the best single-tool baseline by gene and modality.",
@@ -193,7 +207,7 @@ def _write_captions(figures_dir: Path, tables_dir: Path, include_exploratory: bo
         "",
         "### Figure 7. Confidence-calibrated weights",
         "Visualizes learned per-tool benchmark weights across modalities.",
-    ]
+    ])
     if include_exploratory:
         lines.extend([
             "",
@@ -711,9 +725,8 @@ def figure_6(tables_dir: Path, figures_dir: Path) -> None:
     total = df["n_events"].sum()
     ax.text(0.98, 0.97, f"Total events: {total}",
             transform=ax.transAxes, fontsize=8, ha="right", va="top", color="#64748B")
-    # Footnote for fixture data
     ax.text(0.01, -0.14,
-            "Note: counts shown from synthetic fixture. Real 1000G cohort counts pending.",
+            "Note: counts aggregate the current authoritative modality-specific benchmark roots.",
             transform=ax.transAxes, fontsize=6.5, color="#94a3b8", style="italic")
     fig.tight_layout()
     _save(fig, figures_dir, "figure_6_discordance_taxonomy")

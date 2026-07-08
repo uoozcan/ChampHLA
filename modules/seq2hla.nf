@@ -36,7 +36,11 @@ process SEQ2HLA {
         -r ${sample_id}. \
         -p ${task.cpus} \
         -1 ${fastq1} \
-        -2 ${fastq2} || true
+        -2 ${fastq2}
+    SEQ2HLA_EXIT=\$?
+    if [ \$SEQ2HLA_EXIT -ne 0 ]; then
+        echo "[seq2HLA] WARNING: seq2HLA exited with code \${SEQ2HLA_EXIT} for ${sample_id}" >&2
+    fi
 
     # Parse classical Class I + Class II result files → standard pipeline TSV
     # Uses the Python 2/3 compatible parse_seq2hla_results.py script

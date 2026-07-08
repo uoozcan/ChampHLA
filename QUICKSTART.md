@@ -14,8 +14,8 @@ Before you begin, ensure you have:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/hla-typing-pipeline.git
-cd hla-typing-pipeline
+git clone https://github.com/uoozcan/mvhla.git
+cd mvhla
 ```
 
 ### Step 2: Test Installation

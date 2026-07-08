@@ -14,16 +14,15 @@ mkdir -p /scratch/project_2008084/pihla-publish/analysis/logs
 
 cd /scratch/project_2008084/pihla-publish
 
-# NOTE: This benchmark has already been run (2026-04-18, benchmark_trimodal_50samples).
-# Re-submit only if the input data changes (e.g. additional samples typed).
-# Tri-modal cohort: WGS n=99, WES n=51, RNA-seq n=50; 60/20/20 split.
+# Tri-modal cohort: WGS+WES+RNA-seq, all included samples evaluated together.
+# Weights are computed from and applied to the full cohort (no holdout split).
 
 echo "[$(date)] Starting tri-modal benchmark (WGS+WES+RNA-seq)"
 echo "Config:     conf/benchmark_1000g_full_cohort.yaml"
-echo "Output dir: /scratch/project_2008084/pihla-publish/analysis/benchmark_trimodal_50samples"
+echo "Output dir: /scratch/project_2008084/pihla-publish/analysis/benchmark_trimodal_all_samples"
 
 python3 bin/run_1000g_benchmark.py \
     --config conf/benchmark_1000g_full_cohort.yaml \
-    --output-dir /scratch/project_2008084/pihla-publish/analysis/benchmark_trimodal_50samples
+    --output-dir /scratch/project_2008084/pihla-publish/analysis/benchmark_trimodal_all_samples
 
 echo "[$(date)] Tri-modal benchmark complete"

@@ -69,61 +69,66 @@ These aliases support benchmark-time ingestion of precomputed result tables. The
 
 ## Current Primary Results Set
 
-The current primary quantitative benchmark is the dedicated 42-sample WGS-only wave in:
-- `/scratch/project_2008084/pihla-publish/analysis/1000g_realdata/benchmark_wgs_wave1`
+The current primary quantitative benchmark is the expanded 50-sample WGS-only wave in:
+- `/scratch/project_2008084/pihla-publish/analysis/1000g_realdata/benchmark_wgs_wave2`
 
-This wave should now be treated as the main source for manuscript-ready quantitative results because it provides:
-- stable sample-level training/validation/holdout splits (`25/8/9`)
-- six WGS tools with truth-backed comparison scope
+This wave should now be treated as the authoritative WGS benchmark because it provides:
+- stable sample-level training/validation/holdout splits (`28/10/12`)
+- a larger truth-backed six-tool WGS cohort than the original 42-sample wave
 - non-empty calibration outputs for `OptiType`, `T1K`, `ArcasHLA`, `HLA-HD`, and `Kourami`
-- finalized method-comparison, consensus, abstention, guardrail, and weight tables
+- finalized baseline and routed-method comparison tables
+- a direct comparison artifact against the earlier 42-sample wave
 
-The earlier tri-modal three-sample run remains useful for workflow integration and multi-modality demonstrations, but not as the primary statistical comparison set.
+The 42-sample WGS wave remains useful as a development and calibration reference, but it should no longer be the main manuscript-facing quantitative benchmark. The earlier tri-modal three-sample run remains useful for workflow integration and multi-modality demonstrations, but not as the primary statistical comparison set.
 
-## WGS Wave 1 Figure Mapping
+## WGS Wave 2 Figure Mapping
 
 ### Figure 2. WGS cohort assembly and split design
 Data source:
-- `analysis/1000g_realdata/wgs_wave1_inputs/truth_manifest.tsv`
-- `analysis/1000g_realdata/wgs_wave1_inputs/cohort_manifest.tsv`
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/benchmark_metadata.json`
+- `analysis/1000g_realdata/wgs_wave2_inputs/truth_manifest.tsv`
+- `analysis/1000g_realdata/wgs_wave2_inputs/cohort_manifest.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/benchmark_metadata.json`
 Primary message:
-- the first stable benchmark wave uses 42 truth-backed WGS samples with deterministic, population-aware splits.
+- the primary WGS benchmark now uses 50 truth-backed samples with deterministic, population-aware splits.
 
 ### Figure 3. WGS holdout method comparison
 Data source:
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/method_comparison.tsv`
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/summary_full_cohort.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/method_comparison.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/champion_challenger_method_comparison.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/locus_expert_method_comparison.tsv`
 Primary message:
-- guarded weighted consensus matches the best single-tool WGS accuracy (`0.5185`) while improving callable rate over majority vote (`0.9259` vs `0.7778`).
+- the earlier 42-sample baseline tie does not survive the expanded cohort: `WeightedConsensus` falls behind `OptiType`, while the strongest routed baselines recover but do not exceed the `OptiType` ceiling.
 
 ### Figure 4. WGS per-gene tool behavior
 Data source:
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/summary_per_gene.tsv`
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/weighted_consensus_calls.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/method_per_gene.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/champion_challenger_method_per_gene.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/locus_difficulty_summary.tsv`
 Primary message:
-- WGS performance is strongly gene-dependent, with OptiType strongest on `HLA-B`, T1K relatively stronger on `HLA-C`, and consensus behavior driven by locus-specific tool complementarity.
+- WGS performance remains strongly gene-dependent, with `HLA-B` strongest, `HLA-A` intermediate, and `HLA-C` the dominant unresolved failure locus.
 
 ### Figure 5. WGS calibration and confidence reliability
 Data source:
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/confidence_calibration_summary.tsv`
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/tool_confidence_weights.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/confidence_calibration_summary.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/tool_confidence_weights.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/wgs_wave2_vs_wave1_diff.tsv`
 Primary message:
-- raw confidence is not equally trustworthy across tools, so the benchmark now distinguishes raw mean confidence from guardrailed effective confidence. Poorly calibrated tools are clipped back to reliability-only weights, while only calibration-acceptable tools retain confidence boosting.
+- the calibration story is stable after cohort expansion: recalibration remains methodologically necessary, but the larger wave does not rescue weighted consensus above the best single tool.
 
-### Figure 6. WGS abstention and disagreement interpretation
+### Figure 6. WGS disagreement and routed-baseline interpretation
 Data source:
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/majority_vote_baseline.tsv`
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/weighted_consensus_calls.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/consensus_decision_trace.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/champion_challenger_trace.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/tool_vs_truth_error_taxonomy.tsv`
 Primary message:
-- guardrailed weighting reduces technical-conflict no-calls while preventing overconfident tools from dominating weak-evidence loci.
+- routed baselines can recover the strongest single-tool decisions on difficult loci, but disagreement structure still points to a tool-limited WGS regime rather than a remaining consensus-architecture gap.
 
 ### Figure 7. WGS learned confidence weights
 Data source:
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/tool_confidence_weights.tsv`
-- `analysis/1000g_realdata/benchmark_wgs_wave1/tables/tool_confidence_weights_by_gene.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/tool_confidence_weights.tsv`
+- `analysis/1000g_realdata/benchmark_wgs_wave2/tables/tool_confidence_weights_by_gene.tsv`
 Primary message:
-- the WGS benchmark now exports both raw calibrated confidence and guardrailed effective confidence, showing that only some tools retain confidence-based boosting after empirical calibration checks.
+- runtime weights remain stable after expansion, with `OptiType` still dominant and other tools contributing limited or guarded signal.
 
 ## Main Outputs
 

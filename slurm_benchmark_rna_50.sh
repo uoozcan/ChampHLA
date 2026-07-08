@@ -14,12 +14,12 @@ mkdir -p /scratch/project_2008084/pihla-publish/analysis/logs
 
 cd /scratch/project_2008084/pihla-publish
 
-echo "[$(date)] Starting RNA-seq 50-sample benchmark"
+echo "[$(date)] Starting RNA-seq benchmark (all included samples)"
 echo "Config:     conf/benchmark_1000g_rna.yaml"
-echo "Output dir: /scratch/project_2008084/pihla-publish/analysis/benchmark_rna_50samples"
+echo "Output dir: /scratch/project_2008084/pihla-publish/analysis/benchmark_rna_all_samples"
 
 python3 bin/run_1000g_benchmark.py \
     --config conf/benchmark_1000g_rna.yaml \
-    --output-dir /scratch/project_2008084/pihla-publish/analysis/benchmark_rna_50samples
+    --output-dir /scratch/project_2008084/pihla-publish/analysis/benchmark_rna_all_samples
 
 echo "[$(date)] RNA-seq benchmark complete"

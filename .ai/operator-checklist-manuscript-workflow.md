@@ -3,7 +3,7 @@
 Use this checklist to run the full PIHLA manuscript-framing loop without guessing who should do what next.
 
 ## 1. Confirm starting state
-- Work from `/users/ozcanumu/scratch/project_2008084/pihla-publish`.
+- Work from `/scratch/project_2008084/pihla-publish`.
 - Treat `/scratch/project_2008084/pihla-publish` as runtime truth for execution and scientific reporting.
 - Confirm the repo-local AI files are present:
   - `.ai/context.md`

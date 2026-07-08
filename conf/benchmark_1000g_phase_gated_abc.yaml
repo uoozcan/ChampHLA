@@ -6,11 +6,6 @@ benchmark:
   secondary_resolutions:
   - 2
   - 3
-  split_seed: 1000
-  splits:
-    holdout: final_reporting
-    training: calibration
-    validation: threshold_tuning
   tool_coverage_policy: phase_gated
 manifests:
   sequencing_source: /scratch/project_2008084/pihla-publish/analysis/1000g_realdata/phase_gated_inputs/sequencing_source.tsv

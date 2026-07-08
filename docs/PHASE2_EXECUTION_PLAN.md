@@ -59,6 +59,20 @@ Success criteria:
 - holdout sample count increases or at minimum training size grows substantially
 - weighted-consensus behavior remains interpretable under the larger cohort
 
+Status update:
+- completed
+
+Outcome:
+- the expanded truth-backed WGS benchmark is now frozen as `benchmark_wgs_wave2`
+- cohort size increased from 42 to 50 samples, with holdout increasing from 9 to 12 samples
+- the earlier wave1 baseline tie did not survive the expanded holdout
+- `WeightedConsensus` fell behind `OptiType`, while `ChampionChallenger`, `GatedConsensus`, and the best locus-expert panel recovered but did not exceed the `OptiType` ceiling
+- `HLA-C` remained the dominant unresolved failure locus
+
+Interpretation:
+- the current WGS regime is now better described as tool-limited rather than consensus-limited
+- further WGS progress is more likely to come from expanded truth-backed data or stronger underlying tools than from additional ensemble variants on the current tool set
+
 ### Workstream B: WES and RNA Stabilization
 
 Priority: `P0`
@@ -211,23 +225,21 @@ Exact deliverables:
 
 ## Recommended Execution Order
 
-1. `P0` WGS benchmark expansion
-2. `P0` WES/RNA stabilization
-3. `P0` confidence recalibration
+1. `P0` WES/RNA stabilization
+2. `P0` confidence recalibration
+3. `P1` manuscript and figure polish
 4. `P1` abstention and discordance refinement
-5. `P1` manuscript and figure polish
-6. `P1` workflow hardening
-7. `P2` advanced extensions
+5. `P1` workflow hardening
+6. `P2` advanced extensions
 
 ## Immediate Next Package
 
 The most practical next package to execute immediately is:
 
-1. freeze an expanded WGS cohort manifest
-2. run the expanded WGS benchmark
-3. compare the expanded WGS results against the current 42-sample wave
-4. produce WES and RNA tool-failure matrices
-5. design the recalibration layer using the larger WGS training set
+1. update the manuscript and figure language to use `benchmark_wgs_wave2` as the authoritative WGS benchmark
+2. keep the WGS method claim conservative: routed baselines recover the best single-tool ceiling but do not beat it
+3. use the completed WES and RNA benchmarks to finalize modality-by-modality framing
+4. prioritize upstream WGS data/tool quality work over new ensemble variants
 
 ## Definition of Phase 2 Success
 
@@ -240,4 +252,4 @@ Phase 2 will be considered successful if the project reaches all of the followin
 
 ## Guiding Principle
 
-The core value of PIHLA is no longer just that it runs many HLA tools. Its real value is that it benchmarks them on truth-backed real data, learns from their strengths and weaknesses, and uses calibration-aware logic to decide when their evidence should or should not shape consensus. Phase 2 should strengthen that identity rather than dilute it.
+The core value of PIHLA is no longer just that it runs many HLA tools. Its real value is that it benchmarks them on truth-backed real data, learns from their strengths and weaknesses, and uses calibration-aware logic to decide when their evidence should or should not shape consensus. The expanded WGS wave now shows a practical boundary for that logic: with the current WGS tool set, better routing can recover the best single-tool ceiling, but the remaining bottleneck is underlying tool quality rather than another consensus architecture tweak.

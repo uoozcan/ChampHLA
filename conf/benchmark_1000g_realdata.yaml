@@ -19,11 +19,6 @@ benchmark:
   secondary_resolutions:
     - 2
     - 3
-  split_seed: 1000
-  splits:
-    training: calibration
-    validation: threshold_tuning
-    holdout: final_reporting
   consensus:
     min_support: 0.55
     min_margin: 0.15

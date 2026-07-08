@@ -37,6 +37,8 @@ def parse_args():
                         help="Weight on base_reliability in final_weight formula (default: 0.7).")
     parser.add_argument("--weight-beta", type=float, default=0.3,
                         help="Weight on effective_confidence in final_weight formula (default: 0.3).")
+    parser.add_argument("--benchmark-mode", default="",
+                        help="Override benchmark.mode from config (legacy_heuristic, probabilistic_recalibrated, bayesian_shrinkage).")
     return parser.parse_args()
 
 
@@ -89,13 +91,17 @@ def ensure_manifests(config, base_output_dir):
     # Determine required modalities from config runs (if all three are present, use default behaviour)
     config_modalities = list({run["modality"] for run in config.get("runs", []) if "modality" in run})
     required_modalities = config_modalities if config_modalities else None
-    cohort_rows = build_cohort_manifest(truth_rows, sequencing_rows, supported_loci, int(config.get("benchmark", {}).get("split_seed", 1000)), required_modalities=required_modalities)
+    cohort_rows = build_cohort_manifest(truth_rows, sequencing_rows, supported_loci, required_modalities=required_modalities)
     truth_manifest = generated_dir / "truth_manifest.tsv"
     sequencing_manifest = generated_dir / "sequencing_manifest.tsv"
     cohort_manifest = generated_dir / "cohort_manifest.tsv"
     write_tsv(truth_manifest, truth_rows, ["sample", "population", "truth_source", "acquisition_date", "truth_supported_loci", "truth_gene_count"])
     write_tsv(sequencing_manifest, sequencing_rows, ["sample", "population", "modality", "data_locator", "available"])
-    write_tsv(cohort_manifest, cohort_rows, ["sample", "population", "include", "split", "truth_supported_loci", "wgs_available", "wes_available", "rnaseq_available", "excluded_reason"])
+    cohort_fields = ["sample", "population", "include"]
+    if any(hb.clean_token(row.get("split", "")) for row in cohort_rows):
+        cohort_fields.append("split")
+    cohort_fields.extend(["truth_supported_loci", "wgs_available", "wes_available", "rnaseq_available", "excluded_reason"])
+    write_tsv(cohort_manifest, cohort_rows, cohort_fields)
     manifests_cfg["truth_manifest"] = str(truth_manifest)
     manifests_cfg["sequencing_manifest"] = str(sequencing_manifest)
     manifests_cfg["cohort_manifest"] = str(cohort_manifest)
@@ -117,26 +123,21 @@ def write_filtered_truth(path, truth_rows):
     write_tsv(path, truth_rows, ["sample", "gene", "allele1", "allele2"])
 
 
-def subset_config(config, truth_path, supported_loci, runtime_weight_override=None, min_support=None):
+def subset_config(config, truth_path, supported_loci):
     cfg = deepcopy(config)
     cfg.setdefault("truth", {})
     cfg["truth"]["path"] = str(truth_path)
     cfg["truth"]["supported_loci"] = supported_loci
     cfg.setdefault("benchmark", {})
     cfg["benchmark"].pop("runtime_weight_override", None)
-    if runtime_weight_override:
-        cfg["benchmark"]["runtime_weight_override"] = str(runtime_weight_override)
-    if min_support is not None:
-        cfg.setdefault("benchmark", {}).setdefault("consensus", {})
-        cfg["benchmark"]["consensus"]["min_support"] = min_support
     return cfg
 
 
-def run_benchmark(config_payload, output_dir, weight_alpha=0.7, weight_beta=0.3):
+def run_benchmark(config_payload, output_dir, weight_alpha=0.7, weight_beta=0.3, benchmark_mode="", population_manifest=""):
     with tempfile.TemporaryDirectory() as tmpdir:
         cfg_path = Path(tmpdir) / "benchmark.yaml"
         save_yaml(cfg_path, config_payload)
-        subprocess.run([
+        cmd = [
             "python3",
             str(Path(__file__).with_name("hla_benchmark.py")),
             "--config",
@@ -147,27 +148,12 @@ def run_benchmark(config_payload, output_dir, weight_alpha=0.7, weight_beta=0.3)
             str(weight_alpha),
             "--weight-beta",
             str(weight_beta),
-        ], check=True)
-
-
-def choose_best_support(validation_output_dir, default_support):
-    tradeoff_path = Path(validation_output_dir) / "tables" / "abstention_tradeoff.tsv"
-    if not tradeoff_path.exists():
-        return default_support
-    rows = load_rows(tradeoff_path)
-    if not rows:
-        return default_support
-    ranked = sorted(
-        rows,
-        key=lambda row: (
-            float(row.get("overall_correct_call_rate", 0) or 0),
-            float(row.get("accuracy_among_called", 0) or 0),
-            float(row.get("call_rate", 0) or 0),
-            -float(row.get("min_support", default_support) or default_support),
-        ),
-        reverse=True,
-    )
-    return float(ranked[0].get("min_support", default_support))
+        ]
+        if benchmark_mode:
+            cmd.extend(["--benchmark-mode", benchmark_mode])
+        if population_manifest:
+            cmd.extend(["--population-manifest", population_manifest])
+        subprocess.run(cmd, check=True)
 
 
 def copy_manifest_outputs(output_dir, truth_manifest, sequencing_manifest, cohort_manifest):
@@ -184,14 +170,6 @@ def build_population_counts(cohort_rows, included_only=True):
         if included_only and row.get("include") != "1":
             continue
         counter[row.get("population", "") or "unknown"] += 1
-    return dict(sorted(counter.items()))
-
-
-def build_split_summary(cohort_rows):
-    counter = Counter()
-    for row in cohort_rows:
-        if row.get("include") == "1":
-            counter[row.get("split", "unspecified") or "unspecified"] += 1
     return dict(sorted(counter.items()))
 
 
@@ -274,17 +252,15 @@ def build_tool_availability(config, harmonized_rows, included_samples):
     return sample_rows, summary_rows, meta
 
 
-def enrich_metadata(output_dir, config, cohort_rows, sequencing_rows, supported_loci, tuned_min_support, tool_meta):
+def enrich_metadata(output_dir, config, cohort_rows, sequencing_rows, supported_loci, tool_meta):
     metadata_path = Path(output_dir) / "tables" / "benchmark_metadata.json"
     metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.exists() else {}
     metadata["truth_acquisition_date"] = string_value(config.get("truth", {}).get("acquisition_date", ""))
     metadata["final_tri_modal_cohort_size"] = sum(1 for row in cohort_rows if row.get("include") == "1")
     metadata["supported_loci"] = supported_loci
     metadata["population_counts"] = build_population_counts(cohort_rows)
-    metadata["split_membership_summary"] = build_split_summary(cohort_rows)
     metadata["excluded_sample_counts_by_reason"] = build_excluded_summary(cohort_rows)
     metadata["per_modality_sample_counts"] = build_modality_counts(sequencing_rows, cohort_rows)
-    metadata["tuned_consensus_min_support"] = tuned_min_support
     metadata["tool_coverage_policy"] = config.get("benchmark", {}).get("tool_coverage_policy", "phase_gated")
     metadata.update(tool_meta)
     metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
@@ -296,12 +272,67 @@ def update_reference_metadata(output_dir, config, supported_loci):
     row = rows[0] if rows else {}
     row["truth_acquisition_date"] = string_value(config.get("truth", {}).get("acquisition_date", ""))
     row["supported_loci"] = ",".join(supported_loci)
-    write_tsv(path, [row], ["truth_source", "truth_path", "imgt_hla_version", "primary_resolution", "secondary_resolutions", "truth_acquisition_date", "supported_loci"])
+    row["benchmark_mode"] = string_value(config.get("benchmark", {}).get("mode", ""))
+    write_tsv(path, [row], ["truth_source", "truth_path", "imgt_hla_version", "primary_resolution", "secondary_resolutions", "truth_acquisition_date", "supported_loci", "benchmark_mode"])
+
+
+def split_sample_sets(cohort_rows):
+    grouped = defaultdict(list)
+    for row in cohort_rows:
+        if row.get("include") != "1":
+            continue
+        split = hb.clean_token(row.get("split", "")).lower()
+        if split:
+            grouped[split].append(row["sample"])
+    required = {"training", "validation", "holdout"}
+    if not required.issubset(grouped):
+        return None
+    return {key: sorted(values) for key, values in grouped.items()}
+
+
+def tune_validation_support(validation_dir, config):
+    path = Path(validation_dir) / "tables" / "abstention_tradeoff.tsv"
+    if not path.exists():
+        return config.get("benchmark", {}).get("consensus", {}).get("min_support", 0.55)
+    rows = load_rows(path)
+    if not rows:
+        return config.get("benchmark", {}).get("consensus", {}).get("min_support", 0.55)
+    best = max(
+        rows,
+        key=lambda row: (
+            float(row.get("overall_correct_call_rate", 0.0) or 0.0),
+            float(row.get("accuracy_among_called", 0.0) or 0.0),
+            float(row.get("call_rate", 0.0) or 0.0),
+        ),
+    )
+    return float(best.get("min_support", 0.55) or 0.55)
+
+
+def copy_training_artifacts(training_dir, output_dir):
+    source_tables = Path(training_dir) / "tables"
+    dest_tables = Path(output_dir) / "tables"
+    for name in [
+        "tool_confidence_weights.tsv",
+        "tool_confidence_weights_by_gene.tsv",
+        "tool_confidence_weights_cv.tsv",
+        "cross_validation_weight_summary.tsv",
+        "confidence_calibration_summary.tsv",
+        "consensus_runtime_weights.json",
+        "tool_confidence_weights_by_population.tsv",
+        "tool_population_diagnostics.tsv",
+        "tool_population_calibration.tsv",
+    ]:
+        src = source_tables / name
+        if src.exists():
+            shutil.copy2(src, dest_tables / name)
 
 
 def main():
     args = parse_args()
     config = load_yaml(Path(args.config))
+    if args.benchmark_mode:
+        config.setdefault("benchmark", {})
+        config["benchmark"]["mode"] = args.benchmark_mode
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     truth_manifest, sequencing_manifest, cohort_manifest = ensure_manifests(config, output_dir)
@@ -313,53 +344,71 @@ def main():
         raise SystemExit("No tri-modal truth-backed samples were included in the cohort manifest.")
 
     truth_map = hb.load_truth(config["truth"])
-    training_samples = [row["sample"] for row in included_rows if row.get("split") == "training"]
-    validation_samples = [row["sample"] for row in included_rows if row.get("split") == "validation"]
-    holdout_samples = [row["sample"] for row in included_rows if row.get("split") == "holdout"]
-    if not training_samples:
-        training_samples = [included_rows[0]["sample"]]
-    if not holdout_samples:
-        holdout_samples = [row["sample"] for row in included_rows if row["sample"] not in training_samples] or training_samples
-
-    small_cohort_mode = len(included_rows) <= 3
-    if small_cohort_mode:
-        pooled_training = []
-        for sample in training_samples + validation_samples:
-            if sample not in pooled_training:
-                pooled_training.append(sample)
-        training_samples = pooled_training or training_samples
-        validation_samples = []
+    all_samples = [row["sample"] for row in included_rows]
+    population_manifest_path = str(cohort_manifest)
+    split_sets = split_sample_sets(cohort_rows)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
-        train_truth = tmpdir / "training_truth.tsv"
-        val_truth = tmpdir / "validation_truth.tsv"
-        holdout_truth = tmpdir / "holdout_truth.tsv"
-        write_filtered_truth(train_truth, build_filtered_truth_rows(truth_map, training_samples, supported_loci))
-        write_filtered_truth(val_truth, build_filtered_truth_rows(truth_map, validation_samples, supported_loci))
-        write_filtered_truth(holdout_truth, build_filtered_truth_rows(truth_map, holdout_samples, supported_loci))
+        if split_sets:
+            train_truth = tmpdir / "training_truth.tsv"
+            validation_truth = tmpdir / "validation_truth.tsv"
+            holdout_truth = tmpdir / "holdout_truth.tsv"
+            write_filtered_truth(train_truth, build_filtered_truth_rows(truth_map, split_sets["training"], supported_loci))
+            write_filtered_truth(validation_truth, build_filtered_truth_rows(truth_map, split_sets["validation"], supported_loci))
+            write_filtered_truth(holdout_truth, build_filtered_truth_rows(truth_map, split_sets["holdout"], supported_loci))
 
-        intermediate = output_dir / "intermediate"
-        training_out = intermediate / "training"
-        validation_out = intermediate / "validation"
-        holdout_out = output_dir
+            train_cfg = subset_config(config, train_truth, supported_loci)
+            training_dir = output_dir / "training"
+            validation_dir = output_dir / "validation"
+            run_benchmark(
+                train_cfg,
+                training_dir,
+                weight_alpha=args.weight_alpha,
+                weight_beta=args.weight_beta,
+                benchmark_mode=config.get("benchmark", {}).get("mode", ""),
+                population_manifest=population_manifest_path,
+            )
 
-        train_cfg = subset_config(config, train_truth, supported_loci)
-        run_benchmark(train_cfg, training_out, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
-        runtime_weights = training_out / "tables" / "consensus_runtime_weights.json"
+            validation_cfg = subset_config(config, validation_truth, supported_loci)
+            validation_cfg.setdefault("benchmark", {})
+            validation_cfg["benchmark"]["runtime_weight_override"] = str(training_dir / "tables" / "consensus_runtime_weights.json")
+            run_benchmark(
+                validation_cfg,
+                validation_dir,
+                weight_alpha=args.weight_alpha,
+                weight_beta=args.weight_beta,
+                benchmark_mode=config.get("benchmark", {}).get("mode", ""),
+                population_manifest=population_manifest_path,
+            )
 
-        tuned_min_support = float(config.get("benchmark", {}).get("consensus", {}).get("min_support", 0.55))
-        if validation_samples:
-            validation_cfg = subset_config(config, val_truth, supported_loci, runtime_weight_override=runtime_weights)
-            run_benchmark(validation_cfg, validation_out, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
-            tuned_min_support = choose_best_support(validation_out, tuned_min_support)
-
-        holdout_cfg = subset_config(config, holdout_truth, supported_loci, runtime_weight_override=runtime_weights, min_support=tuned_min_support)
-        run_benchmark(holdout_cfg, holdout_out, weight_alpha=args.weight_alpha, weight_beta=args.weight_beta)
-
-        shutil.copy2(training_out / "tables" / "tool_confidence_weights.tsv", output_dir / "tables" / "tool_confidence_weights.tsv")
-        shutil.copy2(training_out / "tables" / "tool_confidence_weights_by_gene.tsv", output_dir / "tables" / "tool_confidence_weights_by_gene.tsv")
-        shutil.copy2(training_out / "tables" / "consensus_runtime_weights.json", output_dir / "tables" / "consensus_runtime_weights.json")
+            tuned_support = tune_validation_support(validation_dir, config)
+            holdout_cfg = subset_config(config, holdout_truth, supported_loci)
+            holdout_cfg.setdefault("benchmark", {})
+            holdout_cfg["benchmark"]["runtime_weight_override"] = str(training_dir / "tables" / "consensus_runtime_weights.json")
+            holdout_cfg.setdefault("benchmark", {}).setdefault("consensus", {})
+            holdout_cfg["benchmark"]["consensus"]["min_support"] = tuned_support
+            run_benchmark(
+                holdout_cfg,
+                output_dir,
+                weight_alpha=args.weight_alpha,
+                weight_beta=args.weight_beta,
+                benchmark_mode=config.get("benchmark", {}).get("mode", ""),
+                population_manifest=population_manifest_path,
+            )
+            copy_training_artifacts(training_dir, output_dir)
+        else:
+            all_truth = tmpdir / "all_truth.tsv"
+            write_filtered_truth(all_truth, build_filtered_truth_rows(truth_map, all_samples, supported_loci))
+            all_cfg = subset_config(config, all_truth, supported_loci)
+            run_benchmark(
+                all_cfg,
+                output_dir,
+                weight_alpha=args.weight_alpha,
+                weight_beta=args.weight_beta,
+                benchmark_mode=config.get("benchmark", {}).get("mode", ""),
+                population_manifest=population_manifest_path,
+            )
 
     copy_manifest_outputs(output_dir, truth_manifest, sequencing_manifest, cohort_manifest)
 
@@ -370,14 +419,15 @@ def main():
     write_tsv(output_dir / "tables" / "tool_availability_by_sample.tsv", sample_tool_rows, ["sample", "modality", "tool", "status", "observed_rows"])
     write_tsv(output_dir / "tables" / "tool_availability_by_modality.tsv", summary_tool_rows, ["modality", "tool", "status", "n_samples"])
 
-    enrich_metadata(output_dir, config, cohort_rows, sequencing_rows, supported_loci, tuned_min_support, tool_meta)
-    metadata_path = Path(output_dir) / "tables" / "benchmark_metadata.json"
-    if metadata_path.exists():
-        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-        metadata["small_cohort_mode"] = small_cohort_mode
-        metadata["effective_training_samples"] = training_samples
-        metadata["effective_validation_samples"] = validation_samples
-        metadata["effective_holdout_samples"] = holdout_samples
+    enrich_metadata(output_dir, config, cohort_rows, sequencing_rows, supported_loci, tool_meta)
+    if split_sets:
+        metadata_path = output_dir / "tables" / "benchmark_metadata.json"
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.exists() else {}
+        metadata["split_counts"] = {name: len(samples) for name, samples in split_sets.items()}
+        metadata["weight_learning_split"] = "training"
+        metadata["threshold_tuning_split"] = "validation"
+        metadata["final_evaluation_split"] = "holdout"
+        metadata["population_manifest_path"] = population_manifest_path
         metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
     update_reference_metadata(output_dir, config, supported_loci)
     return 0

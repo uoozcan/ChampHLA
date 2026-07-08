@@ -34,8 +34,8 @@ process HLAHD {
 
     # Extract HLA reads from BAM
     echo "[Step 1] Extracting HLA reads..."
-    samtools view -b -h ${bam} chr6:28000000-34000000 > hla_region.bam 2>/dev/null || \
-    samtools view -b -h ${bam} 6:28000000-34000000 > hla_region.bam
+    samtools view -b -h ${bam} chr6:${params.hla_region_start}-${params.hla_region_end} > hla_region.bam 2>/dev/null || \
+    samtools view -b -h ${bam} 6:${params.hla_region_start}-${params.hla_region_end} > hla_region.bam
 
     # Add unmapped reads
     samtools view -b -f 4 ${bam} > unmapped.bam
@@ -181,5 +181,11 @@ process HLAHD_FASTQ {
     # Version info
     HLAHD_VER=\$([ -n "\$HLAHD_BIN" ] && "\$HLAHD_BIN" 2>&1 | grep -i version | head -1 || echo "1.4.0")
     printf '"${task.process}":\n    hlahd: %s\n' "\$HLAHD_VER" > versions.yml
+    """
+
+    stub:
+    """
+    printf '# HLA-HD results for ${sample_id} (STUB)\nGene\tAllele1\tAllele2\tReads1\tReads2\nA\tA*02:01\tA*11:01\t50\t50\nB\tB*07:02\tB*08:01\t50\t50\nC\tC*03:04\tC*04:01\t50\t50\n' > ${sample_id}_hlahd.txt
+    printf '"${task.process}":\n    hlahd: stub\n' > versions.yml
     """
 }

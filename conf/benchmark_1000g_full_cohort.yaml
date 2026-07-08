@@ -1,16 +1,11 @@
 benchmark:
   consensus:
-    min_margin: 0.15
-    min_support: 0.55
+    min_margin: 0.0
+    min_support: 0.0
   resolution: 2
   secondary_resolutions:
   - 2
   - 3
-  split_seed: 1000
-  splits:
-    holdout: final_reporting
-    training: calibration
-    validation: threshold_tuning
   tool_coverage_policy: phase_gated
 manifests:
   sequencing_source: /scratch/project_2008084/pihla-publish/analysis/1000g_realdata/full_cohort_inputs/sequencing_source.tsv

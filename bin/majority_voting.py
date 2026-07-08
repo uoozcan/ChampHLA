@@ -191,6 +191,12 @@ CLINICAL_WARNING_DESCRIPTIONS = {
     "LOW_CONFIDENCE":        "Total weight < 0.30 — low-confidence call, treat with caution",
     "LOW_RESOLUTION":        "Allele at lower than 2-field resolution — insufficient for transplant matching",
     "ALLELE_AMBIGUITY":      "Ambiguous allele notation (contains '/' or 'g' suffix) — multiple alleles possible",
+    # Added by the Locityper/Immuannot interpretive layer (see bin/annotate_hla_calls.py):
+    "NULL_ALLELE":           "Null / non-expressed allele (N suffix) — no surface HLA expression; clinically critical",
+    "LOW_EXPRESSION":        "Reduced/aberrant expression allele (L/S/Q/A/C suffix) — verify expression status",
+    "NOVEL_ALLELE_CANDIDATE": "Sequence-level genotyper found no good haplotype fit (low GQ / high novelty) — possible novel or structurally divergent allele",
+    "CROSS_TRACK_DISCORD":   "Independent sequence-level genotype (Locityper) disagrees with the consensus call — manual review recommended",
+    "ALLELE_DROPOUT_SUSPECTED": "Homozygous call contradicted by diploid sequence-level read depth — verify allele dropout",
 }
 
 LOW_CONFIDENCE_THRESHOLD = 0.30

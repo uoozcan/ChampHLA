@@ -96,7 +96,7 @@ class ModalityWiringTest(unittest.TestCase):
 
     def test_default_consensus_genes_are_abc(self):
         text = (REPO / "nextflow.config").read_text(encoding="utf-8")
-        self.assertIn("mv_genes                = 'A,B,C'", text)
+        self.assertIn("mv_genes                = 'A,B,C,DQA1,DQB1,DRB1'", text)
 
 
 if __name__ == "__main__":

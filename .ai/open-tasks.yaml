@@ -50,14 +50,24 @@
       ],
       "summary": "Claude Code owns direct manuscript changes; Codex may critique framing or evidence before edits.",
       "notes": [
-        "Codex remains pending on framing handoff pihla-framing-2026-04-18.",
-        "Q2 blocks final Discussion section 1 terminology around confidence-calibrated versus reliability-weighted with confidence guardrails.",
-        "Q4 blocks final venue-facing positioning in Discussion section 5.",
-        "Q1, Q3, and Q4 may still soften Discussion section 6 wording on WES underperformance, holdout-size defensibility, and locus-scope risk.",
-        "Revisit after Codex returns: title/abstract terminology; Discussion section 1 main-contribution sentence; Discussion section 5 venue-sensitive wording; Discussion section 6 softening on WES/WGS/holdout-size claims.",
-        "Working Title, Running Title, Core Claim, Abstract Results, Abstract Conclusions, and Conclusion have been moved to conservative placeholder framing pending Codex synthesis.",
-        "Before Claude synthesis, validate that codex_response_framing_2026-04-18.md is complete: status not pending, six questions filled, Editorial Bottom Line filled, Blocking vs Non-Blocking filled.",
-        "Post-Codex reconciliation list: title/running title; core claim; abstract; Discussion sections 1, 5, and 6; conclusion."
+        "Codex framing response received (codex_response_framing_2026-04-18.md, status: complete). All six questions answered.",
+        "COMPLETED 2026-05-12: All manuscript numbers updated to match authoritative benchmark tables (benchmark_wgs_all_samples/, benchmark_wes_all_samples/, benchmark_rna_all_samples/).",
+        "COMPLETED 2026-05-12: Codex Q2 framing implemented — title, Core Claim, and abstract updated to reliability-weighted with calibration-gated confidence integration.",
+        "COMPLETED 2026-05-12: WGS cohort size corrected from 136 to 131 throughout.",
+        "COMPLETED 2026-05-12: Duplicate Results section 11 resolved — sections renumbered 11/12/13.",
+        "COMPLETED 2026-05-12: WGS abstention self-contradiction fixed (38%/43% → consistent 40.2%).",
+        "COMPLETED 2026-05-12: DRB1/DQB1 contradiction resolved — partial truth coverage acknowledged, n=38/35, no longer marked unavailable.",
+        "COMPLETED 2026-05-12: VENEX status documented — no truth labels, excluded from scientific claims, figures to be removed from publication set.",
+        "COMPLETED 2026-05-12: consHLA citation corrected to Bowen-James et al. 2025, BMC Bioinformatics 26:215, DOI:10.1186/s12859-025-06223-z.",
+        "COMPLETED 2026-05-12: Circular bias bound estimate added to Limitations.",
+        "COMPLETED 2026-05-12: WES ceiling-effect framing qualified as provisional with ablation suggestion.",
+        "COMPLETED 2026-05-12: WGS formula sub-optimality acknowledged in Limitations.",
+        "COMPLETED 2026-05-12: Wilson CIs added to Table 3 for all methods and modalities.",
+        "STILL OPEN: Figure 1 (pipeline architecture diagram) must be created manually before submission.",
+        "COMPLETED 2026-05-12: Figure 9 (bimodal per-gene) generated — analysis/figures_final/figure_09_bimodal_per_gene.pdf/.png.",
+        "COMPLETED 2026-05-12: Figure 10 (trimodal vs bimodal, two-panel) generated — analysis/figures_final/figure_10_trimodal_comparison.pdf/.png.",
+        "COMPLETED 2026-05-12: Plain-text callout boxes reformatted — all 7 blockquotes converted to inline prose paragraphs.",
+        "STILL OPEN: Supplementary material files need to be assembled (Tables S1-S3, Figures S1-S2)."
       ]
     },
     {

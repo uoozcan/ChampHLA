@@ -29,7 +29,7 @@ process POLYSOLVER {
     path "versions.yml", emit: versions
 
     script:
-    def build = (params.reference == 'hg38' || params.reference_build == 'hg38') ? 'hg38' : 'hg19'
+    def build = params.reference_build == 'hg38' ? 'hg38' : 'hg19'
     """
     mkdir -p ${sample_id}_polysolver_raw
 

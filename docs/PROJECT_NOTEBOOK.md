@@ -1,3 +1,58 @@
+## 2026-04-20 13:20:00 EEST
+- status: completed
+- what happened: froze and ran an expanded truth-backed WGS benchmark wave (`wave2`) using the broader six-tool overlap from `wgs_batches`, then compared it directly against the earlier 42-sample WGS wave.
+- decision or interpretation:
+  - The expanded WGS cohort is now 50 samples total with split counts `28/10/12` for training/validation/holdout, up from `25/8/9` in the 42-sample wave.
+  - The earlier wave1 baseline tie did not survive the larger holdout. On wave2 holdout, `OptiType` reached `0.4722` overall correct-call rate, `WeightedConsensus` fell to `0.4444`, and `MajorityVote` fell to `0.3889`.
+  - Routed baselines (`ChampionChallenger`, `GatedConsensus`, and the best `LocusExpertConsensus` panel) recovered the `OptiType` ceiling at `0.4722` but did not exceed it.
+  - `HLA-C` remained the dominant unresolved failure locus, while `HLA-B` remained the strongest locus.
+  - Confidence recalibration conclusions stayed stable after expansion; the main benchmark interpretation changed in ranking, not in calibration validity.
+  - The correct WGS framing is now tool-limited rather than consensus-limited.
+- evidence/files/jobs:
+  - `conf/1000g_wgs_wave2_manifest.tsv`
+  - `conf/benchmark_1000g_wgs_wave2.yaml`
+  - `analysis/1000g_realdata/wgs_wave2_inputs/`
+  - `analysis/1000g_realdata/benchmark_wgs_wave2/tables/method_comparison.tsv`
+  - `analysis/1000g_realdata/benchmark_wgs_wave2/tables/champion_challenger_method_comparison.tsv`
+  - `analysis/1000g_realdata/benchmark_wgs_wave2/tables/locus_expert_method_comparison.tsv`
+  - `analysis/1000g_realdata/benchmark_wgs_wave2/tables/wgs_wave2_vs_wave1_diff.tsv`
+  - `analysis/1000g_realdata/benchmark_wgs_wave2/WGS_WAVE2_COMPARISON.md`
+- next action:
+  - update manuscript and benchmark-figure language so `wave2` becomes the authoritative WGS benchmark and the WGS method claim is narrowed to routed-ceiling recovery rather than ensemble superiority.
+
+## 2026-04-20 12:50:00 EEST
+- status: completed
+- what happened: completed a truth-backed 1000 Genomes RNA-seq benchmark with modality-aware threshold sweeps and forced `SpecHLA` into headline RNA accuracy scoring for this run only.
+- decision or interpretation:
+  - RNA baseline `WeightedConsensus` is threshold-limited rather than coverage-limited on the current cohort.
+  - `ChampionChallenger` has a small but real useful override regime on RNA.
+  - Forced `SpecHLA` inclusion confirmed that `SpecHLA` is an unsuitable RNA accuracy tool, but it did not change the main ensemble ranking.
+  - The correct production policy remains keeping `SpecHLA` as coverage-only for RNA headline benchmarking.
+- evidence/files/jobs:
+  - `analysis/1000g_realdata/benchmark_rna_truthbacked/benchmark_1000g_rna_truthbacked.yaml`
+  - `analysis/1000g_realdata/benchmark_rna_truthbacked/run/tables/method_comparison.tsv`
+  - `analysis/1000g_realdata/benchmark_rna_truthbacked/run/sweeps/rna_weighted_threshold_sweep.tsv`
+  - `analysis/1000g_realdata/benchmark_rna_truthbacked/run/sweeps/rna_champion_override_sweep.tsv`
+  - `analysis/1000g_realdata/benchmark_rna_truthbacked/run/sweeps/rna_sweep_summary.json`
+- next action:
+  - keep the tuned RNA champion settings as experimental, but revert `SpecHLA` to coverage-only outside this targeted RNA stress-test run.
+
+## 2026-04-20 12:35:00 EEST
+- status: completed
+- what happened: completed a truth-backed 1000 Genomes WES benchmark with weighted-threshold and champion-override sweeps on the real WES cohort.
+- decision or interpretation:
+  - WES baseline `WeightedConsensus` is suboptimal at default thresholds.
+  - Threshold retuning recovers WES weighted-consensus performance to the `MajorityVote` ceiling, and tuned `ChampionChallenger` improves beyond both.
+  - The current WES cohort is not meaningfully coverage-limited for the configured tools; the main issue is decision-policy tuning rather than missing benchmark rows.
+- evidence/files/jobs:
+  - `analysis/1000g_realdata/benchmark_wes_truthbacked/benchmark_1000g_wes_truthbacked.yaml`
+  - `analysis/1000g_realdata/benchmark_wes_truthbacked/run/tables/method_comparison.tsv`
+  - `analysis/1000g_realdata/benchmark_wes_truthbacked/run/sweeps/wes_weighted_threshold_sweep.tsv`
+  - `analysis/1000g_realdata/benchmark_wes_truthbacked/run/sweeps/wes_champion_override_sweep.tsv`
+  - `analysis/1000g_realdata/benchmark_wes_truthbacked/run/sweeps/wes_sweep_summary.json`
+- next action:
+  - carry the tuned WES champion settings forward only as an experimental routed baseline and keep the main manuscript claim focused on the truth-backed benchmark outcomes rather than a production default change.
+
 ## 2026-04-06  WES Root-Cause Pass
 - Status: completed
 - What happened: performed a focused root-cause pass on the failed 3-sample WES run (`33828475`) using launcher logs, execution trace, and task-level `.command.err` files under `/scratch/project_2008084/hla_calibration/work/wes_3sample_33828475/`.

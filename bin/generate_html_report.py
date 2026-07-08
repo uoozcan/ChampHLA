@@ -21,6 +21,15 @@ FIGURE_SPECS = [
         "label": "Figure 1",
         "title": "Cohort overview and modality coverage",
         "caption": "Overview of the benchmark cohort, truth support, and the distribution of usable modality-specific outputs that feed downstream evaluation.",
+        "background": (
+            "HLA (Human Leukocyte Antigen) genes are the most polymorphic loci in the human genome and govern immune recognition. "
+            "Typing them accurately from sequencing data requires matched truth labels — verified allele calls from orthogonal clinical or NGS methods. "
+            "This figure summarises which samples from the 1000 Genomes Project were included. "
+            "The three 'modalities' are types of sequencing: WGS sequences the entire genome, WES targets only protein-coding regions, and RNA-seq sequences expressed transcripts. "
+            "Each bar shows how many samples have usable data AND a verified truth label for a given modality. "
+            "Samples missing truth or sequencing data are excluded before any method is evaluated. "
+            "The numbers here set the ceiling for every comparison in the rest of the report."
+        ),
         "explanation": (
             "This figure summarizes the structure of the benchmark before any method-level interpretation is attempted. "
             "It is expected to show how the cohort is assembled, how many samples carry the required truth annotations, "
@@ -37,6 +46,14 @@ FIGURE_SPECS = [
         "label": "Figure 2",
         "title": "Method performance across modalities",
         "caption": "Comparison of single-tool baselines, majority vote, and weighted consensus across the evaluated sequencing modalities.",
+        "background": (
+            "'Overall correct-call rate' is the fraction of HLA gene loci where a method returned the exact right pair of alleles — "
+            "both alleles, at two-field resolution (for example, A*02:01). Higher is better. "
+            "'Callable rate' is the fraction of loci where any call was made at all (rather than the system abstaining due to low confidence). "
+            "'MajorityVote' is the simplest ensemble rule: whichever allele most tools agreed on wins. "
+            "'WeightedConsensus' is PIHLA's approach: tools vote in proportion to how reliable and well-calibrated they were on the benchmark training data. "
+            "Each bar group represents one sequencing modality; within each group, bars represent individual tools or ensemble strategies."
+        ),
         "explanation": (
             "This figure compares end-point benchmark performance for the major calling strategies. "
             "It should be interpreted by reading across modalities and then within each modality across method families: "
@@ -53,6 +70,15 @@ FIGURE_SPECS = [
         "label": "Figure 3",
         "title": "Per-gene performance heatmap",
         "caption": "Gene-level heatmap of comparative performance across tools and modalities for the benchmark loci A, B, and C.",
+        "background": (
+            "HLA-A, HLA-B, and HLA-C are three separate genes within the HLA complex, each producing a distinct immune-receptor protein. "
+            "Typing accuracy often differs across these genes because allele frequencies and polymorphism density vary. "
+            "A heatmap encodes a number as colour intensity — warmer or darker colours indicate higher values, lighter indicates lower. "
+            "Rows are tools or methods; columns are genes (A, B, C) or modalities. "
+            "This lets you see at a glance whether any tool's strength or weakness is gene-specific. "
+            "For example, a tool might be accurate for HLA-A but unreliable for HLA-C. "
+            "If the ensemble advantage is concentrated in one gene, that is informative about where calibration or parser improvements are needed."
+        ),
         "explanation": (
             "This figure breaks aggregate accuracy into gene-specific behavior so that improvements are not hidden by averaging. "
             "The heatmap structure is useful for detecting whether gains are broad-based across loci or concentrated in one gene or one modality. "
@@ -68,6 +94,15 @@ FIGURE_SPECS = [
         "label": "Figure 4",
         "title": "Confidence calibration diagrams",
         "caption": "Calibration plots comparing predicted confidence against observed correctness for tools and modalities with usable confidence signals.",
+        "background": (
+            "A calibration plot compares how confident a tool claims to be (x-axis) against how often it is actually correct (y-axis). "
+            "A perfectly calibrated tool sits exactly on the diagonal line: if it says 80% confidence, it is right 80% of the time. "
+            "Points above the diagonal mean the tool is more often correct than its stated confidence suggests (underconfidence). "
+            "Points below the diagonal mean the tool overclaims certainty (overconfidence — dangerous for ensemble weighting). "
+            "PIHLA evaluates calibration using two metrics: ECE (Expected Calibration Error) and Brier score. "
+            "If either exceeds 0.35, the tool is assigned 'poor_calibration' status and its confidence score is blocked from influencing the ensemble vote. "
+            "This panel therefore directly justifies the guardrail decisions visible in Figure 7."
+        ),
         "explanation": (
             "This figure examines whether tool-native confidence behaves like a trustworthy probability proxy. "
             "A well-calibrated tool should place high-confidence predictions in bins that are actually more often correct, while poorly calibrated tools will show overconfident or underconfident behavior. "
@@ -83,6 +118,14 @@ FIGURE_SPECS = [
         "label": "Figure 5",
         "title": "Abstention versus accuracy tradeoff",
         "caption": "Tradeoff curve showing how stricter support thresholds affect callable fraction and correctness among emitted calls.",
+        "background": (
+            "Abstention means the system refuses to produce a call when it lacks sufficient supporting evidence, rather than guessing. "
+            "This figure shows the tradeoff between coverage (callable rate — how many loci get a call) and quality (accuracy among the calls that are made). "
+            "As the support threshold rises, the system becomes more selective: fewer loci receive calls, but those calls are more likely to be correct. "
+            "The ideal operating point depends on use case: a research screening context may prefer maximum coverage; "
+            "a clinical or transplantation context may require that every emitted call be highly reliable. "
+            "This curve lets practitioners choose the threshold that fits their tolerance for errors versus unanswered loci."
+        ),
         "explanation": (
             "This figure evaluates the operational cost of being selective. "
             "As the minimum support threshold rises, the system should emit fewer calls but ideally improve the accuracy of the calls it keeps. "
@@ -98,6 +141,16 @@ FIGURE_SPECS = [
         "label": "Figure 6",
         "title": "Discordance taxonomy",
         "caption": "Categorization of disagreement patterns observed across tools, modalities, and consensus outputs in the benchmark cohort.",
+        "background": (
+            "Discordance occurs when tools disagree, or when the consensus call does not match the truth. "
+            "Rather than treating all errors identically, PIHLA labels each discordance event with a cause category. "
+            "'technical_conflict' means tools gave different answers without a biological explanation — likely a parser or model difference. "
+            "'low_evidence_conflict' means no tool produced strong support at that locus. "
+            "'dna_rna_discordance' means DNA-based callers and RNA-based callers systematically disagreed — this can occur when an allele is expressed at very low levels in the sampled tissue. "
+            "'possible_expression_bias' flags intra-RNA disagreements consistent with allele-specific expression. "
+            "'no_evidence' means no parseable calls existed. "
+            "The bar chart shows counts per category; knowing which type dominates tells you where to focus improvements."
+        ),
         "explanation": (
             "This figure moves beyond accuracy into error structure. "
             "Rather than treating all wrong calls equally, it groups disagreements into interpretable categories such as broad tool conflict, partial support, or modality-specific inconsistency. "
@@ -113,6 +166,14 @@ FIGURE_SPECS = [
         "label": "Figure 7",
         "title": "Confidence-weight heatmap",
         "caption": "Heatmap of learned tool weights across modalities, reflecting benchmark performance and usable confidence behavior.",
+        "background": (
+            "This figure makes the ensemble's decision logic transparent. "
+            "Each cell shows the final weight PIHLA assigns to a specific tool (row) in a specific modality (column) at runtime. "
+            "A higher weight means the ensemble trusts that tool more when computing the consensus vote. "
+            "Weights combine two components: base reliability (how often the tool was correct on training data) and effective confidence (the tool's own confidence score, if it is well-calibrated). "
+            "Tools assigned 'poor_calibration' status receive a zero confidence component, which is visible as a lower combined weight relative to their base reliability alone. "
+            "Reading this heatmap tells you which tools drive each modality's consensus and whether the ensemble is relying primarily on reliability or on a blend of reliability and calibrated confidence."
+        ),
         "explanation": (
             "This figure visualizes the ensemble's learned weighting scheme. "
             "Each cell reflects how PIHLA translates benchmark evidence into modality-specific trust for a tool, incorporating both overall correctness and the quality of the confidence signal when available. "
@@ -128,6 +189,14 @@ FIGURE_SPECS = [
         "label": "Figure 8",
         "title": "Ensemble advantage summary",
         "caption": "Focused comparison of how weighted consensus performs relative to majority vote and the strongest available single-tool baselines.",
+        "background": (
+            "This figure directly answers the most important practical question: is using PIHLA's ensemble worth it compared to the simplest alternatives? "
+            "Three strategies are compared in each modality: the best individual tool available, simple majority vote (every tool counts equally), and PIHLA's guarded weighted consensus. "
+            "The gap between these strategies — in correct-call rate and callable rate — quantifies PIHLA's added value. "
+            "A large gap in the ensemble's favour means the framework is providing real benefit beyond just picking the strongest individual tool. "
+            "A small gap means the benefit is mainly in interpretability, abstention behaviour, and modality-specific coverage rather than raw accuracy gains. "
+            "In the current WGS benchmark, the ensemble matches the best single tool in accuracy while substantially improving callable rate."
+        ),
         "explanation": (
             "This figure isolates the central comparative claim of the report: when and how much the ensemble helps. "
             "Rather than listing all methods equally, it emphasizes the delta between weighted consensus, simpler aggregation, and the best individual tool performance available for the same setting. "
@@ -361,6 +430,7 @@ def figure_card(spec: Dict[str, str], figures_dir: Path) -> str:
       </div>
       <div class="figure-copy">
         <p><strong>Caption.</strong> {safe(spec['caption'])}</p>
+        <p><strong>Background and how to read this figure.</strong> {safe(spec['background'])}</p>
         <p><strong>What this figure shows.</strong> {safe(spec['explanation'])}</p>
         <p><strong>Meaning and importance.</strong> {safe(spec['importance'])}</p>
       </div>
@@ -804,7 +874,20 @@ def build_html(args: argparse.Namespace) -> str:
       <section id="{section_id('Figure Gallery')}">
         <div class="section-header">
           <h2>Figure Gallery</h2>
-          <p>Every figure is embedded directly into this HTML file and accompanied by a caption, a detailed explanation of what the figure is showing, and a statement of why the result matters for PIHLA.</p>
+          <p>Every figure is embedded directly into this HTML file and accompanied by a caption, a background explanation for non-specialist readers, a detailed explanation of what the figure is showing, and a statement of why the result matters for PIHLA.</p>
+        </div>
+        <div class="panel" style="background:#f0f4ff;border-left:4px solid #3b6fdb;padding:1.2rem 1.5rem;margin-bottom:1.5rem;">
+          <p><strong>How to read this report.</strong>
+          HLA (Human Leukocyte Antigen) genes control how immune cells recognise pathogens and foreign tissue.
+          Accurate HLA typing from sequencing data matters for transplantation matching, vaccine design, and disease-association studies.
+          PIHLA benchmarks eight HLA typing tools across three sequencing technologies:
+          WGS (whole-genome sequencing), WES (whole-exome sequencing, targeting protein-coding regions), and RNA-seq (sequencing of expressed transcripts).
+          Alleles are reported at two-field resolution (e.g., A*02:01).
+          <em>Overall correct-call rate</em> is the fraction of loci with the exact correct allele pair;
+          <em>callable rate</em> is the fraction where any call was made at all.
+          <em>Ensemble</em> means combining the calls of multiple tools according to a weighting formula rather than relying on a single caller.
+          Each figure below includes a <strong>Background and how to read this figure</strong> paragraph that defines key terms
+          for readers unfamiliar with HLA genomics or bioinformatics benchmarking.</p>
         </div>
         <div class="figure-grid">{figure_html}</div>
       </section>

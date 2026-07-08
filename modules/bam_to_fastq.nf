@@ -85,13 +85,13 @@ process EXTRACT_HLA_AND_CONVERT {
     if [ -z "\$CHR" ]; then
       CHR=6
     fi
-    samtools view -@ ${task.cpus} -b ${bam} "\${CHR}:${params.hla_region_start}-${params.hla_region_end}" > ${sample_id}.hla.bam
-    samtools sort -n -@ ${task.cpus} ${sample_id}.hla.bam -o ${sample_id}.hla.namesort.bam
+    samtools view -@ ${task.cpus} -b ${bam} "\${CHR}:${params.hla_region_start}-${params.hla_region_end}" > ${sample_id}.hla.extracted.bam
+    samtools sort -n -@ ${task.cpus} ${sample_id}.hla.extracted.bam -o ${sample_id}.hla.namesort.bam
     samtools fastq -@ ${task.cpus} \
       -1 ${sample_id}_R1.fastq.gz \
       -2 ${sample_id}_R2.fastq.gz \
       -0 /dev/null -s /dev/null \
       ${sample_id}.hla.namesort.bam
-    rm -f ${sample_id}.hla.bam ${sample_id}.hla.namesort.bam
+    rm -f ${sample_id}.hla.extracted.bam ${sample_id}.hla.namesort.bam
     """
 }

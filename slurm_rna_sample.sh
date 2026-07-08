@@ -46,6 +46,7 @@ mkdir -p "${LAUNCH_DIR}"
 cd "${LAUNCH_DIR}"
 
 nextflow run /scratch/project_2008084/pihla-publish/main.nf \
+  -params-file /scratch/project_2008084/pihla-publish/conf/puhti_params.yaml \
   -resume \
   -name pihla_rna_${sample_id}_${SLURM_JOB_ID} \
   -w "${work_root}/rna_${sample_id}" \
@@ -59,4 +60,5 @@ nextflow run /scratch/project_2008084/pihla-publish/main.nf \
   --slurm_account project_2008084 \
   --use_local_spechla true \
   --spechla_path /projappl/project_2008084/SpecHLAx \
+  --singularity_cache_dir /scratch/project_2008084/hla_references/singularity_cache/containers \
   -profile puhti,singularity

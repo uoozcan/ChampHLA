@@ -14,12 +14,12 @@ mkdir -p /scratch/project_2008084/pihla-publish/analysis/logs
 
 cd /scratch/project_2008084/pihla-publish
 
-echo "[$(date)] Starting WES 51-sample benchmark"
+echo "[$(date)] Starting WES benchmark (all included samples)"
 echo "Config:     conf/benchmark_1000g_wes.yaml"
-echo "Output dir: /scratch/project_2008084/pihla-publish/analysis/benchmark_wes_50samples"
+echo "Output dir: /scratch/project_2008084/pihla-publish/analysis/benchmark_wes_all_samples"
 
 python3 bin/run_1000g_benchmark.py \
     --config conf/benchmark_1000g_wes.yaml \
-    --output-dir /scratch/project_2008084/pihla-publish/analysis/benchmark_wes_50samples
+    --output-dir /scratch/project_2008084/pihla-publish/analysis/benchmark_wes_all_samples
 
 echo "[$(date)] WES benchmark complete"
