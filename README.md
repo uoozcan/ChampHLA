@@ -452,12 +452,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you use this pipeline in your research, please cite:
 
 ```
-@software{hla_typing_pipeline_2025,
-  author = {Umut Onur Canumu},
-  title = {HLA Typing Multi-Tool Pipeline},
-  year = {2025},
-  url = {https://github.com/yourusername/hla-typing-pipeline},
-  version = {2.0.0}
+
 }
 ```
 
