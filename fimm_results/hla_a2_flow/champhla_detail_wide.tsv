@@ -1,0 +1,17 @@
+donor	flow_A2	A2_subtype	A_consensus_A2	A2_matches_flow	n_samples	A_consensus	A_zygosity	A_n_tools	A_unanimous	A_conflict	B_consensus	B_zygosity	B_n_tools	B_unanimous	B_conflict	C_consensus	C_zygosity	C_n_tools	C_unanimous	C_conflict
+fh_2030	yes	A*02:01	yes	yes	5	A*02:01/A*03:01	het	7	yes		B*27:05/B*44:02	het	7	no		C*01:02/C*05:01	het	7	yes	
+fh_2908	no		no	yes	5	A*01:01/A*24:02	het	3	no		B*37:01	hom	3	yes		C*06:02	hom	3	yes	
+fh_4634	yes	A*02:01	yes	yes	4	A*02:01/A*68:01	het	3	yes		B*07:44/B*35:01	het	3	no		C*04:01/C*07:02	het	3	yes	
+fh_5143	yes	A*02:01	yes	yes	5	A*02:01	hom	7	no	SWAP?	B*13:02/B*15:01	het	6	no	SWAP?	C*03:04/C*06:02	het	6	no	
+fh_5238	no		no	yes	3	A*24:02	hom	3	no		B*15:01/B*40:01	het	2	yes		C*03:04	hom	2	no	
+fh_6088	no		no	yes	6	A*03:01/A*68:01	het	6	yes		B*27:05/B*40:01	het	6	yes		C*02:02/C*03:04	het	6	yes	
+fh_6412	no		no	yes	1	A*03:01/A*25:01	het	5	no	SWAP?	B*15:01/B*18:01	het	5	yes		C*03:03/C*12:03	het	5	yes	
+fh_6730	no		no	yes	3	A*32:01/A*33:03	het	2	yes		B*27:05	hom	3	yes		C*02:02/C*07:01	het	3	no	
+fh_6753	yes	A*02:01	yes	yes	6	A*02:01	hom	6	yes		B*15:01/B*40:01	het	5	yes		C*03:04	hom	6	no	
+fh_7087	no		no	yes	6	A*03:01	hom	5	no		B*35:01/B*40:01	het	4	no		C*03:04/C*04:01	het	4	no	
+fh_8668	yes	A*02:01	yes	yes	1	A*02:01/A*24:02	het	4	yes		B*35:08/B*56:01	het	4	yes		C*01:08/C*04:01	het	4	no	
+fhrb_1886	yes	A*02:06	yes	yes	2	A*02:06/A*11:01	het	2	yes		B*08:01/B*35:01	het	2	yes		C*04:01/C*07:01	het	2	yes	
+fhrb_4555	yes	A*02:01	yes	yes	1	A*02:01/A*03:01	het	1	yes		B*35:01/B*39:01	het	1	yes		C*04:01/C*07:02	het	1	yes	
+fhrb_4697	yes	A*02:01	yes	yes	9	A*02:01	hom	8	yes		B*27:05/B*58:01	het	7	no		C*01:02/C*04:01	het	7	no	
+fhrb_743	no		no	yes	9	A*11:01/A*31:01	het	7	no		B*15:01/B*18:03	het	7	no		C*03:04/C*04:01	het	7	yes	
+fhrb_997	no	A*02:01	yes	NO	2	A*02:01/A*03:01	het	1	yes		B*40:01	hom	1	yes		C*03:02/C*14:02	het	1	yes	

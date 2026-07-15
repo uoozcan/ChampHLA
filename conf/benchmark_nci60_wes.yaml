@@ -1,0 +1,92 @@
+# NCI-60 external-validation benchmark (WES) — ChampHLA / MVHLA
+# Independent, non-1000G cohort. Truth: Adams et al. 2005 (J Transl Med 3:11, PMC555742) SBT.
+# Reads: NCI-60 exome capture, SRA SRP150855. Second modality on the same lines as the RNA pilot.
+# Framing: held-out generalisation test applying the FROZEN 1000G-derived WES Champion-Challenger
+# policy (champions A/B/C=OptiType; override support=0.65, margin=0.20, tools=2) from
+# analysis/1000g_realdata/benchmark_wes_truthbacked.
+# Scoring caveat: Adams SBT mixed-resolution; these 5 lines all have full A/B/C 2-field truth.
+truth:
+  path: /scratch/project_2008084/pihla-publish/analysis/nci60_benchmark/truth_long.tsv
+  source: "Adams et al. 2005, J Transl Med 3:11 (PMC555742), Table 2 (SBT class I)"
+  acquisition_date: 2005-03-04
+  imgt_hla_version: 3.59.0
+  supported_loci:
+  - A
+  - B
+  - C
+
+manifests:
+  sequencing_source: /scratch/project_2008084/pihla-publish/analysis/nci60_wes_benchmark/sequencing_source.tsv
+
+benchmark:
+  resolution: 2
+  secondary_resolutions:
+  - 2
+  - 3
+  tool_coverage_policy: phase_gated
+  consensus:
+    min_margin: 0.15
+    min_support: 0.55
+  # FROZEN tuned WES Champion-Challenger policy from the 1000G WES truth-backed run.
+  champion_challenger:
+    enabled: true
+    fallback_method: weighted_consensus
+    champion_by_gene:
+      A: OptiType
+      B: OptiType
+      C: OptiType
+    override_policy:
+      min_challenger_support_fraction: 0.35
+      min_challenger_margin: 0.0
+      min_supporting_tools: 1
+      require_non_ambiguity_override: true
+
+runs:
+# ── WES (exome capture; SRP150855) ──────────────────────────────────────────────
+- confidence_glob: /scratch/project_2008084/hla_calibration/nci60/wes/results/**/optitype/*/*_result.tsv
+  confidence_parser: optitype_result_objective
+  confidence_sample_from_path_regex: /results/([^/]+)/optitype/
+  modality: wes
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/nci60/wes/results/**/*_optitype.txt
+  sample_from_path_regex: /results/([^/]+)/optitype/
+  tool: OptiType
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/nci60/wes/results/**/t1k/t1k_out/*_genotype.tsv
+  confidence_parser: t1k_genotype_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/t1k/
+  modality: wes
+  parser: t1k_table
+  result_glob: /scratch/project_2008084/hla_calibration/nci60/wes/results/**/*_t1k.txt
+  sample_from_path_regex: /results/([^/]+)/t1k/
+  tool: T1K
+- modality: wes
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/nci60/wes/results/**/*_spechla.txt
+  sample_from_path_regex: /results/([^/]+)/spechla/
+  tool: SpecHLA
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/nci60/wes/results/**/hlahd/*/*/result/*_*.read.txt
+  confidence_parser: hlahd_read_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/hlahd/
+  modality: wes
+  parser: hlahd_table
+  result_glob: /scratch/project_2008084/hla_calibration/nci60/wes/results/**/*_hlahd.txt
+  sample_from_path_regex: /results/([^/]+)/hlahd/
+  tool: HLA-HD
+
+# ── (a) WES override-gate sweep (diagnostic; does NOT change the frozen headline) ──
+benchmark_analysis:
+  threshold_sweeps:
+    enabled: true
+    champion_challenger:
+      champion_by_gene:
+        A: OptiType
+        B: OptiType
+        C: OptiType
+      min_challenger_support_fraction_values: [0.20, 0.35, 0.50, 0.65]
+      min_challenger_margin_values: [0.00, 0.05, 0.10, 0.20]
+      min_supporting_tools_values: [1, 2, 3]
+      require_non_ambiguity_override: true

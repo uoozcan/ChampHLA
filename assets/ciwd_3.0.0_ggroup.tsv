@@ -1,0 +1,3759 @@
+allele	designation	ciwd_highest	ciwd_total	ciwd_AFA	ciwd_API	ciwd_EURO	ciwd_MENA	ciwd_HIS	ciwd_NAM	ciwd_UNK	cwd2_category
+A*01:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*01:01:02	G	WD	WD			WD					
+A*01:01:03	G	I	WD		WD	I					
+A*01:01:05	G	WD	WD			WD					
+A*01:01:10	G	WD	WD			WD					
+A*01:01:11	G	WD	WD			WD				WD	
+A*01:01:13	G	WD	WD			WD					
+A*01:01:16	G	WD	WD			WD					
+A*01:01:18	G	WD	WD			WD					
+A*01:01:21	G	WD	WD								
+A*01:01:22	G	WD	WD			WD					
+A*01:01:29	G	WD	WD			WD					
+A*01:01:33	G	WD	WD			WD					
+A*01:01:34	G	WD	WD								
+A*01:01:47	G	WD	WD			WD					
+A*01:02	G	C	C	C	I	C	C	C	C	C	
+A*01:03:01G	G	C	C	C	C	C	C	C	WD	C	
+A*01:06	G	C	I			I	C	I		I	
+A*01:09:01G	G	WD	WD	WD							
+A*01:100	G	WD	WD			WD					
+A*01:104	G	WD	WD		WD						
+A*01:113	G	WD	WD			WD					
+A*01:12	G	I	WD		I						
+A*01:123N	G	WD	WD			WD					
+A*01:126	G	WD	WD								
+A*01:14	G	WD	WD			WD					
+A*01:156	G	WD	WD								
+A*01:15N	G	WD	WD			WD					
+A*01:16N	G	WD	WD			WD				WD	
+A*01:17	G	WD	WD			WD				WD	
+A*01:190	G	WD	WD			WD					
+A*01:23	G	WD	WD	WD		WD	WD			WD	
+A*01:24	G	WD	WD					WD			
+A*01:25	G	I	I	WD		I				I	
+A*01:26	G	I	WD		I	WD					
+A*01:29	G	WD	WD			WD					
+A*01:30	G	WD	WD								
+A*01:38	G	WD	WD			WD					
+A*01:39	G	WD	WD			WD					
+A*01:40	G	WD	WD			WD					
+A*01:42	G	WD	WD			WD					
+A*01:43	G	I	WD		I						
+A*01:44	G	WD	WD			WD					
+A*01:46	G	WD	WD							WD	
+A*01:48	G	WD	WD							WD	
+A*01:51	G	WD	WD			WD					
+A*01:57N	G	WD	WD			WD					
+A*01:61	G	WD	WD			WD					
+A*01:68	G	WD	WD			WD					
+A*01:69:01	G	WD	WD			WD					
+A*01:69:02	G	WD	WD			WD		WD			
+A*01:72	G	WD	WD			WD					
+A*01:74	G	WD	WD		WD						
+A*01:82	G	I	WD		I						
+A*01:86	G	WD	WD			WD				WD	
+A*01:92	G	WD	WD			WD					
+A*01:98	G	WD	WD			WD					
+A*02:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*02:01:02	G	I	I	WD	I	I	WD	I		I	
+A*02:01:04	G	C	C	WD	I	I	C	C	C	C	
+A*02:01:05	G	C	I			I	WD	I		C	
+A*02:01:09	G	I	I			I	WD			I	
+A*02:01:116	G	WD	WD								
+A*02:01:12	G	WD	WD			WD					
+A*02:01:18	G	WD	WD			WD	WD			WD	
+A*02:01:22	G	WD	WD			WD	WD			WD	
+A*02:01:23	G	WD	WD			WD					
+A*02:01:24	G	WD	WD			WD					
+A*02:01:25	G	WD	WD			WD					
+A*02:01:26	G	WD	WD			WD					
+A*02:01:27	G	WD	WD			WD					
+A*02:01:29	G	WD	WD			WD					
+A*02:01:30	G	WD	WD			WD					
+A*02:01:31	G	WD	WD	WD		WD				WD	
+A*02:01:32	G	WD	WD			WD					
+A*02:01:34	G	WD	WD			WD					
+A*02:01:35	G	WD	WD								
+A*02:01:37	G	WD	WD			WD					
+A*02:01:38	G	WD	WD			WD					
+A*02:01:39	G	WD	WD			WD					
+A*02:01:41	G	WD	WD			WD					
+A*02:01:42	G	WD	WD			WD					
+A*02:01:43	G	WD	WD			WD					
+A*02:01:46	G	WD	WD			WD					
+A*02:01:49	G	WD	WD			WD					
+A*02:01:52	G	WD	WD			WD					
+A*02:01:54	G	I	WD					I		WD	
+A*02:01:65	G	WD	WD								
+A*02:01:71	G	WD	WD			WD					
+A*02:01:74	G	WD	WD			WD					
+A*02:01:86	G	WD	WD			WD					
+A*02:01:90	G	WD	WD					WD			
+A*02:02:01G	G	C	C	C	C	C	C	C	C	C	
+A*02:03:01G	G	C	C	C	C	I	C	C	C	C	
+A*02:03:02	G	I	WD		I						
+A*02:04:01G	G	C	C	C	WD	I	WD	C	C	C	
+A*02:05:01G	G	C	C	C	C	C	C	C	C	C	
+A*02:05:02	G	WD	WD			WD					
+A*02:05:03	G	WD	WD				WD				
+A*02:06:01G	G	C	C	C	C	C	C	C	C	C	
+A*02:06:05	G	I	WD					I		WD	
+A*02:06:07	G	WD	WD			WD					
+A*02:06:08	G	I	WD					I			
+A*02:06:11	G	WD	WD		WD						
+A*02:07:01G	G	C	C	WD	C	C	C	C	C	C	
+A*02:08	G	C	C	WD	C	C	C	I		I	
+A*02:101:01	G	WD	WD			WD					
+A*02:101:02	G	WD	WD			WD					
+A*02:102	G	I	WD				WD			I	
+A*02:105	G	WD	WD			WD					
+A*02:107	G	WD	WD			WD				WD	
+A*02:109	G	WD	WD			WD					
+A*02:10:01G	G	C	I		C	WD				I	
+A*02:110	G	WD	WD			WD	WD				
+A*02:114	G	WD	WD								
+A*02:118	G	WD	WD			WD					
+A*02:119	G	WD	WD			WD					
+A*02:11:01G	G	C	C	C	C	C	C	C	C	C	
+A*02:11:02	G	WD	WD		WD						
+A*02:11:04	G	WD	WD		WD						
+A*02:11:06	G	I	WD		I						
+A*02:12	G	I	I		I	I	WD	I		I	
+A*02:120	G	WD	WD			WD					
+A*02:121	G	WD	WD			WD					
+A*02:122	G	WD	WD	WD							
+A*02:123	G	WD	WD			WD				WD	
+A*02:125N	G	WD	WD			WD					
+A*02:128	G	WD	WD		WD						
+A*02:13	G	C	I	WD	WD	I		C	C	C	
+A*02:133	G	WD	WD			WD					
+A*02:135	G	WD	WD			WD					
+A*02:136	G	I	WD					I		WD	
+A*02:137	G	I	WD					I			
+A*02:138	G	WD	WD			WD					
+A*02:139	G	WD	WD			WD					
+A*02:14	G	C	I	C		WD	C	I		I	
+A*02:141	G	WD	WD			WD	WD				
+A*02:147	G	I	WD					I			
+A*02:149	G	WD	WD			WD					
+A*02:151	G	I	WD			I				WD	
+A*02:154	G	WD	WD				WD				
+A*02:156	G	WD	WD			WD					
+A*02:158	G	WD	WD			WD					
+A*02:160	G	WD	WD			WD					
+A*02:161	G	WD	WD				WD				
+A*02:162	G	WD	WD			WD					
+A*02:163	G	WD	WD			WD					
+A*02:165	G	WD	WD			WD					
+A*02:166	G	WD	WD			WD					
+A*02:16:01G	G	C	C	WD	C	WD	WD			I	
+A*02:172	G	WD	WD			WD					
+A*02:173	G	WD	WD			WD					
+A*02:174	G	WD	WD								
+A*02:177	G	WD	WD	WD							
+A*02:17:01G	G	C	C	C	I	C	C	C	C	C	
+A*02:18	G	WD	WD							WD	
+A*02:180	G	WD	WD			WD					
+A*02:182	G	WD	WD			WD					
+A*02:183	G	WD	WD			WD				WD	
+A*02:186	G	WD	WD	WD							
+A*02:188	G	WD	WD			WD					
+A*02:189	G	WD	WD			WD					
+A*02:19	G	I	I			WD		I		I	
+A*02:190	G	WD	WD			WD					
+A*02:194	G	WD	WD			WD					
+A*02:195	G	WD	WD			WD					
+A*02:198	G	WD	WD			WD					
+A*02:199	G	WD	WD			WD					
+A*02:203	G	WD	WD			WD					
+A*02:205	G	WD	WD			WD					
+A*02:206	G	WD	WD			WD					
+A*02:209	G	WD	WD								
+A*02:20:01	G	C	C	WD	I	C	C	C	C	C	
+A*02:20:02	G	C	I		C	WD	C			I	
+A*02:21	G	WD	WD			WD					
+A*02:210	G	WD	WD			WD					
+A*02:211:01	G	I	WD			WD		I			
+A*02:212	G	WD	WD			WD					
+A*02:217:01	G	WD	WD			WD					
+A*02:217:02	G	WD	WD			WD					
+A*02:218	G	WD	WD			WD					
+A*02:221	G	WD	WD			WD					
+A*02:227N	G	WD	WD			WD					
+A*02:22:01G	G	C	C	C	I	C	C	C	C	C	
+A*02:235	G	WD	WD			WD					
+A*02:236	G	WD	WD			WD					
+A*02:237	G	WD	WD			WD					
+A*02:245	G	WD	WD			WD					
+A*02:246	G	WD	WD			WD				WD	
+A*02:24:01	G	I	I	WD		I		I		I	
+A*02:26	G	WD	WD			WD				WD	
+A*02:263	G	WD	WD								
+A*02:27	G	I	I		WD	I				WD	
+A*02:273	G	WD	WD			WD					
+A*02:277	G	WD	WD			WD					
+A*02:278	G	WD	WD					WD			
+A*02:28	G	WD	WD		WD						
+A*02:283	G	WD	WD			WD					
+A*02:289:01	G	WD	WD			WD					
+A*02:29	G	I	I			I		WD		I	
+A*02:299	G	WD	WD			WD					
+A*02:306	G	WD	WD			WD					
+A*02:30:01	G	I	I			I		WD		I	
+A*02:31	G	WD	WD			WD					
+A*02:312	G	WD	WD								
+A*02:325	G	WD	WD			WD					
+A*02:326	G	WD	WD			WD					
+A*02:33	G	C	I			WD		C	C	I	
+A*02:332	G	WD	WD			WD					
+A*02:338	G	WD	WD			WD					
+A*02:34	G	WD	WD			WD				WD	
+A*02:342	G	WD	WD			WD					
+A*02:343	G	WD	WD			WD					
+A*02:346	G	WD	WD			WD					
+A*02:359	G	WD	WD								
+A*02:35:01	G	C	C	WD	I	C	WD			I	
+A*02:35:02	G	WD	WD			WD					
+A*02:36	G	WD	WD			WD				WD	
+A*02:367	G	WD	WD			WD					
+A*02:37	G	WD	WD			WD					
+A*02:38	G	I	I			I				WD	
+A*02:380	G	WD	WD			WD					
+A*02:382	G	WD	WD				WD				
+A*02:39	G	I	WD					I		WD	
+A*02:392	G	WD	WD								
+A*02:393	G	WD	WD			WD					
+A*02:40:01	G	WD	WD								
+A*02:42	G	WD	WD		WD						
+A*02:423	G	WD	WD		WD						
+A*02:433	G	WD	WD				WD				
+A*02:434	G	WD	WD				WD				
+A*02:436	G	I	WD		I						
+A*02:44	G	I	WD			WD		I		I	
+A*02:45	G	I	WD			WD		I			
+A*02:46	G	WD	WD			WD					
+A*02:47	G	WD	WD								
+A*02:48	G	WD	WD		WD						
+A*02:484	G	WD	WD			WD					
+A*02:498	G	WD	WD			WD					
+A*02:49:01G	G	WD	WD			WD	WD			WD	
+A*02:51	G	WD	WD								
+A*02:514N	G	WD	WD		WD						
+A*02:52	G	I	WD			WD		I		I	
+A*02:53N	G	I	WD		I					WD	
+A*02:562	G	WD	WD				WD				
+A*02:56:01	G	WD	WD			WD					
+A*02:57	G	WD	WD					WD			
+A*02:58	G	I	WD					I			
+A*02:580	G	WD	WD		WD						
+A*02:59	G	WD	WD			WD					
+A*02:60:01	G	C	I	C		WD		I		I	
+A*02:623	G	I	WD							I	
+A*02:63	G	WD	WD	WD							
+A*02:64:01	G	I	WD		WD	WD		I		WD	
+A*02:67	G	WD	WD			WD					
+A*02:74:01	G	WD	WD			WD					
+A*02:74:02	G	WD	WD			WD					
+A*02:77	G	WD	WD			WD					
+A*02:81:01G	G	WD	WD			WD					
+A*02:84	G	WD	WD	WD					WD	WD	
+A*02:85	G	C	I	WD		WD	C			I	
+A*02:86:01	G	WD	WD			WD					
+A*02:87	G	I	WD			WD		I		WD	
+A*02:90	G	WD	WD			WD					
+A*02:93:01	G	WD	WD				WD				
+A*02:94N	G	WD	WD			WD					
+A*02:95	G	WD	WD			WD					
+A*02:96	G	I	WD			WD		WD		I	
+A*03:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*03:01:02	G	C	WD	C		WD		WD		I	
+A*03:01:03	G	C	I	WD		I		C	C	I	
+A*03:01:05	G	WD	WD			WD					
+A*03:01:11	G	WD	WD			WD					
+A*03:01:12	G	WD	WD			WD					
+A*03:01:14	G	I	I			I					
+A*03:01:15	G	WD	WD			WD					
+A*03:01:16	G	WD	WD								
+A*03:01:17	G	WD	WD			WD					
+A*03:01:18	G	WD	WD			WD					
+A*03:01:19	G	WD	WD			WD					
+A*03:01:21	G	WD	WD			WD				WD	
+A*03:01:23	G	WD	WD			WD				WD	
+A*03:01:28	G	WD	WD			WD					
+A*03:01:31	G	WD	WD			WD					
+A*03:01:33	G	WD	WD			WD					
+A*03:01:34	G	WD	WD								
+A*03:01:38	G	WD	WD								
+A*03:01:39	G	WD	WD			WD					
+A*03:01:43	G	WD	WD		WD						
+A*03:02:01G	G	C	C	C	C	C	C	C	C	C	
+A*03:04:01	G	I	WD			WD		I			
+A*03:05:01	G	I	I			I		I		I	
+A*03:06	G	WD	WD			WD					
+A*03:07:01	G	WD	WD			WD					
+A*03:08	G	I	WD	WD		WD				I	
+A*03:09	G	WD	WD								
+A*03:10	G	WD	WD		WD						
+A*03:102	G	WD	WD			WD					
+A*03:107	G	WD	WD			WD					
+A*03:108	G	WD	WD			WD					
+A*03:111	G	WD	WD			WD					
+A*03:12	G	WD	WD			WD					
+A*03:120	G	WD	WD			WD					
+A*03:123:01	G	WD	WD			WD					
+A*03:13	G	WD	WD			WD					
+A*03:14	G	WD	WD			WD					
+A*03:144	G	WD	WD			WD					
+A*03:149	G	WD	WD			WD					
+A*03:15	G	WD	WD			WD					
+A*03:16	G	WD	WD			WD					
+A*03:167	G	WD	WD								
+A*03:17:01	G	WD	WD			WD					
+A*03:18	G	WD	WD				WD				
+A*03:202	G	WD	WD				WD				
+A*03:216	G	WD	WD				WD				
+A*03:228	G	WD	WD		WD						
+A*03:22:01	G	WD	WD			WD					
+A*03:22:02	G	WD	WD			WD					
+A*03:23:02	G	WD	WD			WD					
+A*03:25	G	WD	WD			WD					
+A*03:27	G	WD	WD			WD					
+A*03:28	G	WD	WD			WD					
+A*03:29	G	WD	WD			WD				WD	
+A*03:33	G	I	I			I				I	
+A*03:38	G	WD	WD			WD					
+A*03:46	G	WD	WD			WD					
+A*03:47	G	WD	WD			WD					
+A*03:48	G	WD	WD			WD					
+A*03:49	G	WD	WD			WD					
+A*03:50	G	WD	WD			WD					
+A*03:51	G	WD	WD	WD							
+A*03:53	G	WD	WD			WD					
+A*03:56	G	WD	WD			WD					
+A*03:57	G	WD	WD								
+A*03:62	G	WD	WD			WD				WD	
+A*03:63	G	WD	WD			WD					
+A*03:65	G	WD	WD			WD					
+A*03:74	G	WD	WD			WD					
+A*03:81	G	WD	WD			WD					
+A*03:86	G	WD	WD			WD					
+A*03:87	G	WD	WD			WD					
+A*03:93	G	WD	WD			WD					
+A*03:94	G	WD	WD			WD					
+A*11:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*11:01:02	G	I	WD		I						
+A*11:01:04	G	I	WD		I						
+A*11:01:05	G	WD	WD		WD						
+A*11:01:06	G	I	WD		I						
+A*11:01:07	G	WD	WD		WD						
+A*11:01:08	G	WD	WD			WD					
+A*11:01:11	G	WD	WD			WD					
+A*11:01:13	G	I	WD		I					WD	
+A*11:01:15	G	WD	WD			WD					
+A*11:01:17	G	WD	WD			WD					
+A*11:01:25	G	I	WD		I						
+A*11:01:27	G	WD	WD			WD					
+A*11:01:35	G	WD	WD		WD						
+A*11:01:36	G	WD	WD			WD					
+A*11:01:38	G	WD	WD			WD					
+A*11:01:44	G	WD	WD			WD					
+A*11:02:01G	G	C	C	WD	C	I	WD	I	WD	C	
+A*11:03:01G	G	C	C	WD	C	WD	WD	WD	C	I	
+A*11:04	G	C	I		C	I				I	
+A*11:05:01G	G	I	I	WD		I		I		I	
+A*11:06	G	WD	WD								
+A*11:08	G	I	WD			WD		I		WD	
+A*11:09	G	WD	WD			WD					
+A*11:10	G	WD	WD			WD					
+A*11:109N	G	WD	WD			WD					
+A*11:117	G	WD	WD			WD					
+A*11:12	G	I	I		WD	I		I		I	
+A*11:159	G	WD	WD		WD						
+A*11:15:01	G	WD	WD		WD						
+A*11:15:02	G	WD	WD			WD					
+A*11:160	G	WD	WD								
+A*11:161	G	WD	WD		WD						
+A*11:18	G	WD	WD			WD	WD				
+A*11:183	G	I	WD		I						
+A*11:187	G	WD	WD		WD						
+A*11:19	G	I	WD		I	WD					
+A*11:20	G	I	WD		I						
+A*11:211	G	WD	WD		WD						
+A*11:221	G	WD	WD			WD					
+A*11:29	G	I	WD			I				WD	
+A*11:30	G	WD	WD			WD					
+A*11:37	G	WD	WD			WD					
+A*11:39	G	WD	WD			WD					
+A*11:41	G	WD	WD								
+A*11:44	G	I	WD		I						
+A*11:45	G	WD	WD				WD				
+A*11:47	G	WD	WD			WD					
+A*11:58	G	I	WD		I						
+A*11:64	G	WD	WD		WD						
+A*11:67	G	WD	WD			WD					
+A*11:74	G	WD	WD			WD					
+A*11:81	G	WD	WD			WD					
+A*11:89	G	I	WD		I						
+A*11:91:01	G	WD	WD			WD					
+A*11:92	G	WD	WD			WD					
+A*23:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*23:01:02	G	WD	WD			WD					
+A*23:01:03	G	WD	WD	WD							
+A*23:01:04	G	WD	WD								
+A*23:01:06	G	WD	WD			WD					
+A*23:01:10	G	WD	WD			WD					
+A*23:02	G	WD	WD	WD							
+A*23:03:01	G	WD	WD								
+A*23:03:02	G	WD	WD	WD		WD					
+A*23:04	G	WD	WD	WD							
+A*23:05	G	C	I	WD		WD		C	C	I	
+A*23:06	G	WD	WD	WD		WD				WD	
+A*23:11N	G	WD	WD	WD							
+A*23:12	G	WD	WD			WD					
+A*23:13	G	WD	WD			WD					
+A*23:14:02	G	WD	WD								
+A*23:15	G	C	WD	C		WD				I	
+A*23:19N	G	C	WD	C						WD	
+A*23:23	G	WD	WD			WD					
+A*23:30	G	WD	WD				WD				
+A*23:39	G	WD	WD				WD				
+A*23:47	G	WD	WD			WD					
+A*23:48	G	WD	WD			WD					
+A*23:53	G	WD	WD			WD					
+A*23:56	G	WD	WD								
+A*24:02:01G	G	C	C	C	C	C	C	C	C	C	
+A*24:02:02	G	I	I			I		I		I	
+A*24:02:04	G	C	I	WD	I	I	C	C	C	C	
+A*24:02:05	G	C	I		C	WD	C	WD		I	
+A*24:02:07	G	WD	WD			WD					
+A*24:02:14	G	WD	WD			WD					
+A*24:02:15	G	I	WD		I						
+A*24:02:18	G	WD	WD			WD					
+A*24:02:19	G	WD	WD			WD				WD	
+A*24:02:22	G	WD	WD				WD				
+A*24:02:23	G	WD	WD			WD					
+A*24:02:24	G	WD	WD			WD					
+A*24:02:25	G	WD	WD			WD					
+A*24:02:26	G	WD	WD			WD					
+A*24:02:27	G	WD	WD			WD				WD	
+A*24:02:29	G	WD	WD			WD					
+A*24:02:35	G	I	WD		I		WD				
+A*24:02:53	G	WD	WD			WD					
+A*24:02:62	G	WD	WD		WD	WD					
+A*24:02:72	G	WD	WD								
+A*24:03:01G	G	C	C	C	C	C	C	C	C	C	
+A*24:03:02	G	C	I	WD		WD		C		I	
+A*24:04	G	I	WD		I	WD					
+A*24:05:01G	G	C	I	WD	I	WD		C	C	I	
+A*24:06	G	WD	WD		WD	WD					
+A*24:07:01	G	C	C	C	C	I	C	C	C	C	
+A*24:07:02	G	WD	WD		WD						
+A*24:08	G	I	WD		I					WD	
+A*24:103	G	WD	WD			WD					
+A*24:104	G	WD	WD			WD					
+A*24:105	G	WD	WD			WD					
+A*24:106	G	WD	WD			WD					
+A*24:107	G	WD	WD								
+A*24:108	G	WD	WD								
+A*24:10:01	G	C	C		C	WD	WD			C	
+A*24:110	G	WD	WD			WD					
+A*24:118	G	WD	WD			WD					
+A*24:120	G	WD	WD								
+A*24:121	G	WD	WD			WD					
+A*24:122	G	WD	WD			WD					
+A*24:123	G	WD	WD				WD				
+A*24:130	G	WD	WD		WD						
+A*24:138	G	WD	WD								
+A*24:13:01	G	I	WD		I						
+A*24:13:02	G	I	WD		WD	WD		I			
+A*24:140	G	WD	WD		WD						
+A*24:145	G	I	WD			WD				I	
+A*24:146	G	WD	WD				WD				
+A*24:14:01G	G	C	I	WD	WD	WD		C	C	I	
+A*24:15	G	WD	WD					WD			
+A*24:159	G	WD	WD					WD			
+A*24:164	G	WD	WD			WD					
+A*24:165	G	WD	WD		WD						
+A*24:168	G	WD	WD			WD					
+A*24:169	G	WD	WD			WD					
+A*24:17	G	C	C	WD	C	WD	WD		C	I	
+A*24:173	G	WD	WD							WD	
+A*24:175	G	I	WD			WD		WD		I	
+A*24:176	G	WD	WD			WD					
+A*24:18	G	WD	WD			WD					
+A*24:180	G	WD	WD					WD			
+A*24:192	G	WD	WD								
+A*24:193	G	WD	WD			WD					
+A*24:194	G	WD	WD								
+A*24:196	G	I	WD		I						
+A*24:203	G	WD	WD			WD					
+A*24:205	G	WD	WD								
+A*24:206	G	WD	WD			WD					
+A*24:20:01G	G	C	I		C	WD	WD			C	
+A*24:21:01	G	WD	WD			WD				WD	
+A*24:22	G	C	I	WD		WD		C	C	I	
+A*24:220	G	WD	WD								
+A*24:228	G	WD	WD			WD					
+A*24:23	G	C	I	C	WD	WD		I	C	I	
+A*24:234	G	WD	WD								
+A*24:24	G	WD	WD	WD							
+A*24:25	G	C	C	WD	WD	WD		C	C	C	
+A*24:252N	G	WD	WD			WD	WD				
+A*24:26:01G	G	I	I	WD		WD	WD	I		I	
+A*24:28	G	I	WD			WD		I		WD	
+A*24:29	G	I	I			I	WD			WD	
+A*24:30	G	I	WD		I	WD					
+A*24:31	G	I	I			I				WD	
+A*24:32	G	I	WD			WD				I	
+A*24:35	G	WD	WD			WD					
+A*24:36N	G	WD	WD			WD					
+A*24:37	G	I	WD		I					WD	
+A*24:38	G	I	WD					I		WD	
+A*24:39	G	WD	WD			WD					
+A*24:42	G	WD	WD			WD					
+A*24:43	G	I	WD			I				WD	
+A*24:46	G	WD	WD								
+A*24:47	G	WD	WD			WD					
+A*24:50	G	WD	WD								
+A*24:52	G	WD	WD			WD	WD			WD	
+A*24:53	G	C	I			WD		C	C	I	
+A*24:56	G	I	I			I	WD			WD	
+A*24:57	G	I	WD			WD				I	
+A*24:58	G	I	I			I				WD	
+A*24:64	G	I	WD		I						
+A*24:68	G	WD	WD		WD						
+A*24:71	G	WD	WD			WD					
+A*24:72	G	I	I			I					
+A*24:81	G	I	WD			WD				I	
+A*24:84N	G	WD	WD			WD					
+A*24:87	G	WD	WD			WD				WD	
+A*24:95	G	C	WD			WD	WD	C		I	
+A*24:97	G	I	WD		I						
+A*25:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*25:01:06	G	WD	WD			WD					
+A*25:02	G	I	WD			I				WD	
+A*25:03	G	WD	WD			WD					
+A*25:04	G	WD	WD			WD					
+A*25:08	G	WD	WD			WD					
+A*25:11	G	WD	WD			WD					
+A*25:12N	G	WD	WD			WD					
+A*25:13	G	WD	WD								
+A*25:14	G	WD	WD			WD					
+A*25:16	G	WD	WD			WD					
+A*25:24	G	WD	WD					WD			
+A*26:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*26:01:02	G	I	WD		I						
+A*26:01:03	G	WD	WD								
+A*26:01:04	G	C	I	C		WD	WD			I	
+A*26:01:06	G	I	WD		I						
+A*26:01:11	G	WD	WD								
+A*26:01:17	G	WD	WD			WD					
+A*26:01:20	G	WD	WD								
+A*26:01:23	G	I	WD					I		WD	
+A*26:02:01	G	C	I		C	WD				C	
+A*26:03:01	G	C	I		C	WD				C	
+A*26:05	G	WD	WD		WD					WD	
+A*26:06	G	WD	WD							WD	
+A*26:07:01	G	I	WD		I						
+A*26:07:02	G	I	WD			WD		I		WD	
+A*26:08	G	C	C	C	I	C	C	C	C	C	
+A*26:09	G	I	I			I	WD			I	
+A*26:10	G	WD	WD		WD						
+A*26:104	G	WD	WD			WD					
+A*26:12	G	C	I	C		WD	WD	I		I	
+A*26:13	G	WD	WD			WD					
+A*26:14	G	I	WD		I	WD					
+A*26:15	G	I	I			I				I	
+A*26:16	G	WD	WD			WD	WD				
+A*26:17	G	C	I		I	WD	C	I		I	
+A*26:18	G	I	WD		I						
+A*26:20	G	WD	WD								
+A*26:27	G	I	WD			WD		I			
+A*26:30	G	WD	WD	WD							
+A*26:31	G	WD	WD			WD					
+A*26:37	G	WD	WD			WD					
+A*26:38	G	WD	WD			WD					
+A*26:39	G	WD	WD			WD					
+A*26:42	G	WD	WD								
+A*26:45	G	WD	WD			WD					
+A*26:47	G	WD	WD			WD					
+A*26:49	G	WD	WD			WD					
+A*26:52	G	WD	WD								
+A*26:59	G	WD	WD								
+A*26:62	G	WD	WD			WD					
+A*26:63	G	I	WD		I						
+A*26:65	G	WD	WD			WD					
+A*26:75	G	WD	WD			WD					
+A*26:76	G	I	WD		I						
+A*29:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*29:02:01G	G	C	C	C	C	C	C	C	C	C	
+A*29:02:02	G	WD	WD			WD					
+A*29:02:03	G	C	I		WD	WD		C	C	I	
+A*29:02:04	G	WD	WD			WD					
+A*29:02:06	G	WD	WD			WD				WD	
+A*29:02:09	G	WD	WD			WD				WD	
+A*29:02:12	G	WD	WD			WD					
+A*29:03	G	WD	WD			WD					
+A*29:04	G	WD	WD			WD				WD	
+A*29:07	G	WD	WD			WD					
+A*29:09	G	WD	WD			WD					
+A*29:10:01	G	C	I			I	C	WD		I	
+A*29:11	G	WD	WD	WD		WD	WD			WD	
+A*29:12	G	WD	WD			WD	WD			WD	
+A*29:13	G	WD	WD								
+A*29:14	G	WD	WD								
+A*29:16	G	WD	WD			WD					
+A*29:21	G	WD	WD			WD					
+A*29:23	G	WD	WD	WD							
+A*29:32	G	WD	WD			WD					
+A*29:34	G	WD	WD			WD					
+A*29:40	G	WD	WD								
+A*29:44	G	WD	WD			WD					
+A*29:48	G	WD	WD			WD					
+A*29:64	G	WD	WD		WD						
+A*29:88	G	WD	WD								
+A*30:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*30:02:01G	G	C	C	C	C	C	C	C	C	C	
+A*30:02:03	G	I	WD					I			
+A*30:02:04	G	WD	WD	WD							
+A*30:02:05	G	WD	WD	WD							
+A*30:02:06	G	WD	WD			WD					
+A*30:03	G	WD	WD			WD					
+A*30:04:01G	G	C	C	C	C	C	C	C	C	C	
+A*30:04:02	G	WD	WD				WD				
+A*30:07	G	C	WD	C						I	
+A*30:08	G	WD	WD	WD			WD				
+A*30:09	G	I	WD	WD			WD	I		WD	
+A*30:10	G	C	C	C	I	I	C	C	C	C	
+A*30:11:01	G	WD	WD			WD					
+A*30:11:02	G	I	WD		I						
+A*30:15	G	WD	WD			WD					
+A*30:16	G	WD	WD	WD							
+A*30:18	G	WD	WD		WD						
+A*30:25	G	WD	WD								
+A*30:28	G	WD	WD	WD							
+A*30:29	G	WD	WD			WD	WD				
+A*30:30	G	WD	WD			WD					
+A*30:31	G	WD	WD	WD							
+A*30:36	G	WD	WD			WD					
+A*30:40	G	WD	WD			WD					
+A*30:47	G	WD	WD				WD				
+A*30:51	G	I	WD					I			
+A*30:54	G	WD	WD								
+A*30:56	G	WD	WD								
+A*30:58	G	WD	WD			WD					
+A*30:70N	G	WD	WD	WD							
+A*30:78N	G	WD	WD	WD							
+A*31:01:02G	G	C	C	C	C	C	C	C	C	C	
+A*31:01:04	G	C	WD					C	WD	WD	
+A*31:01:16	G	WD	WD								
+A*31:02	G	C	I	WD		WD		C	C	C	
+A*31:04	G	C	I	C		WD	C	WD		I	
+A*31:05	G	WD	WD								
+A*31:06	G	C	I		C	WD	WD			I	
+A*31:07	G	I	WD					I			
+A*31:08	G	I	I			I				WD	
+A*31:09	G	C	I			WD		C	C	I	
+A*31:11	G	I	WD		I						
+A*31:12	G	C	I		C	WD				I	
+A*31:13	G	I	WD		I						
+A*31:15	G	C	I	WD		WD		C		I	
+A*31:16	G	C	I		C	WD	WD		WD	WD	
+A*31:18	G	I	WD					I		WD	
+A*31:19	G	WD	WD			WD					
+A*31:20	G	WD	WD			WD				WD	
+A*31:25	G	WD	WD			WD					
+A*31:26	G	WD	WD			WD					
+A*31:27	G	WD	WD			WD					
+A*31:28	G	WD	WD			WD					
+A*31:30	G	WD	WD								
+A*31:36	G	I	WD					I			
+A*31:38	G	WD	WD			WD					
+A*31:39	G	WD	WD			WD					
+A*31:40	G	I	WD			WD				I	
+A*31:60N	G	WD	WD								
+A*31:68	G	WD	WD		WD						
+A*31:88	G	WD	WD				WD				
+A*32:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*32:01:04	G	WD	WD			WD					
+A*32:01:09	G	WD	WD			WD					
+A*32:01:12	G	WD	WD			WD					
+A*32:01:14	G	WD	WD			WD					
+A*32:02	G	I	WD			WD		I		I	
+A*32:03	G	I	I		WD	I				WD	
+A*32:04	G	I	I			I		WD		I	
+A*32:05	G	WD	WD		WD						
+A*32:06	G	WD	WD			WD					
+A*32:07	G	WD	WD			WD				WD	
+A*32:08	G	WD	WD			WD				WD	
+A*32:11Q	G	I	WD		I						
+A*32:12	G	WD	WD			WD					
+A*32:16	G	WD	WD			WD					
+A*32:17	G	WD	WD			WD					
+A*32:18	G	WD	WD			WD					
+A*32:21	G	WD	WD								
+A*32:22	G	WD	WD								
+A*32:27N	G	WD	WD			WD					
+A*32:28	G	WD	WD			WD					
+A*32:31	G	WD	WD			WD					
+A*32:44	G	WD	WD			WD					
+A*32:45N	G	WD	WD			WD					
+A*32:47	G	WD	WD								
+A*32:55:01	G	WD	WD			WD					
+A*32:60	G	WD	WD			WD					
+A*32:62	G	WD	WD			WD					
+A*33:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*33:01:02	G	WD	WD			WD					
+A*33:01:03	G	WD	WD			WD					
+A*33:03:01G	G	C	C	C	C	C	C	C	C	C	
+A*33:03:07	G	I	WD		I						
+A*33:03:08	G	WD	WD								
+A*33:03:10	G	WD	WD	WD							
+A*33:03:16	G	WD	WD		WD						
+A*33:04	G	I	WD			WD		WD		I	
+A*33:05	G	C	C	C	I	C	C	C	C	C	
+A*33:08	G	WD	WD								
+A*33:09	G	WD	WD			WD					
+A*33:10	G	I	WD		I						
+A*33:11	G	WD	WD								
+A*33:12	G	WD	WD			WD					
+A*33:13	G	WD	WD		WD						
+A*33:16	G	WD	WD					WD			
+A*33:26	G	C	WD				C				
+A*33:27	G	WD	WD			WD					
+A*33:33	G	WD	WD				WD				
+A*33:34	G	WD	WD			WD					
+A*33:48	G	I	WD		I						
+A*33:55	G	WD	WD		WD						
+A*33:60	G	WD	WD			WD					
+A*33:64	G	WD	WD			WD					
+A*33:65	G	I	WD		I						
+A*34:01:01G	G	C	C	WD	C	I	WD	C	C	C	
+A*34:02:01	G	C	C	C	I	C	C	C	C	C	
+A*34:02:03	G	WD	WD			WD				WD	
+A*34:04	G	WD	WD			WD					
+A*34:05	G	C	I		C	WD		I		C	
+A*34:06	G	WD	WD			WD					
+A*34:07	G	WD	WD	WD							
+A*34:08	G	WD	WD								
+A*34:10N	G	WD	WD	WD							
+A*36:01	G	C	C	C	I	I	C	C	C	C	
+A*36:02	G	WD	WD								
+A*36:03	G	C	I	C			WD	WD		I	
+A*36:04	G	I	WD			WD				I	
+A*43:01	G	C	I	C	WD	WD	C	WD		I	
+A*66:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*66:02	G	C	C	C	WD	I	WD	C	C	C	
+A*66:03:01G	G	C	I	C		WD	WD	C	C	C	
+A*66:04	G	WD	WD	WD							
+A*66:05	G	WD	WD			WD					
+A*66:13	G	WD	WD			WD					
+A*66:15	G	WD	WD				WD				
+A*68:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*68:01:02G	G	C	C	C	C	C	C	C	C	C	
+A*68:01:03	G	I	WD		I						
+A*68:01:04	G	I	WD			WD				I	
+A*68:01:06	G	WD	WD			WD					
+A*68:01:11	G	WD	WD								
+A*68:01:20	G	WD	WD	WD							
+A*68:01:24	G	WD	WD								
+A*68:02:01G	G	C	C	C	C	C	C	C	C	C	
+A*68:02:02	G	C	I	C		WD		I	WD	I	
+A*68:02:03	G	WD	WD			WD					
+A*68:02:04	G	WD	WD	WD							
+A*68:02:05	G	WD	WD			WD					
+A*68:03:01	G	C	C	C	I	I	WD	C	C	C	
+A*68:03:03	G	WD	WD								
+A*68:04:02	G	WD	WD							WD	
+A*68:05	G	C	C	WD	I	WD		C	C	C	
+A*68:06	G	I	WD					I		WD	
+A*68:07	G	C	I	WD		WD		C	C	I	
+A*68:08:01	G	WD	WD	WD							
+A*68:08:02	G	WD	WD			WD					
+A*68:10	G	C	WD	C						I	
+A*68:101	G	WD	WD			WD					
+A*68:104:01	G	WD	WD					WD			
+A*68:12	G	C	I		WD	I	C	I	C	I	
+A*68:13:01	G	WD	WD			WD	WD				
+A*68:15	G	C	I	C		WD		I		I	
+A*68:16	G	I	I			WD		I		I	
+A*68:17	G	C	C			I		C	C	C	
+A*68:18N	G	WD	WD			WD					
+A*68:19	G	WD	WD			WD					
+A*68:20	G	I	WD					I		WD	
+A*68:21:01	G	WD	WD					WD			
+A*68:22	G	WD	WD			WD					
+A*68:23	G	I	WD			WD		I		I	
+A*68:24	G	C	I	WD	C	I	WD	I		I	
+A*68:25	G	I	I			I				WD	
+A*68:26	G	WD	WD			WD				WD	
+A*68:27:01	G	WD	WD			WD					
+A*68:29	G	WD	WD					WD			
+A*68:30	G	I	WD					I			
+A*68:31	G	I	WD					I			
+A*68:32	G	WD	WD			WD					
+A*68:35	G	I	I			I				WD	
+A*68:36	G	WD	WD					WD			
+A*68:37	G	I	WD			I					
+A*68:38	G	WD	WD				WD				
+A*68:40	G	WD	WD	WD							
+A*68:45	G	WD	WD								
+A*68:46	G	WD	WD					WD			
+A*68:54	G	WD	WD	WD						WD	
+A*68:55:01	G	I	WD			WD	WD			I	
+A*68:57	G	WD	WD			WD					
+A*68:60	G	WD	WD								
+A*68:67	G	WD	WD	WD							
+A*68:68	G	WD	WD	WD							
+A*68:72	G	WD	WD			WD					
+A*68:85	G	WD	WD					WD			
+A*68:91	G	WD	WD			WD	WD				
+A*68:95	G	WD	WD			WD					
+A*68:99	G	I	WD		I						
+A*69:01:01G	G	C	I	WD	I	I	C	C	WD	C	
+A*74:01:01G	G	C	C	C	C	C	C	C	C	C	
+A*74:03	G	C	C	C	I	C	C	C	WD	C	
+A*74:05	G	I	WD		I	WD					
+A*74:06	G	I	I			I				I	
+A*74:07	G	WD	WD								
+A*74:08	G	I	WD					I			
+A*74:09	G	C	I	C		WD		WD		I	
+A*74:10	G	WD	WD	WD							
+A*74:11	G	C	I	C		WD		I	WD	I	
+A*74:13	G	WD	WD								
+A*74:16:01	G	WD	WD								
+A*74:16:02	G	WD	WD								
+A*80:01:01G	G	C	C	C	I	C	C	C	C	C	
+B*07:02:01G	G	C	C	C	C	C	C	C	C	C	
+B*07:02:02	G	WD	WD			WD					
+B*07:02:03	G	I	WD	WD		I		WD		WD	
+B*07:02:04	G	C	I			WD				C	
+B*07:02:05	G	WD	WD			WD					
+B*07:02:07	G	WD	WD			WD					
+B*07:02:08	G	WD	WD			WD					
+B*07:02:10	G	WD	WD			WD					
+B*07:02:13	G	WD	WD	WD		WD					
+B*07:02:14	G	WD	WD			WD					
+B*07:02:17	G	WD	WD				WD				
+B*07:02:21	G	WD	WD			WD					
+B*07:02:23	G	WD	WD			WD					
+B*07:02:27	G	WD	WD			WD					
+B*07:02:28	G	WD	WD			WD					
+B*07:02:43	G	WD	WD			WD					
+B*07:03	G	I	I			I		WD		I	
+B*07:04	G	C	C	WD	WD	C	WD	I		C	
+B*07:05:01G	G	C	C	C	C	C	C	C	C	C	
+B*07:05:02	G	WD	WD			WD					
+B*07:05:08	G	WD	WD		WD						
+B*07:06:02	G	WD	WD		WD						
+B*07:07	G	I	I	WD		I	WD	I		I	
+B*07:08:01	G	WD	WD			WD					
+B*07:09	G	C	I	C	I	I		I	C	I	
+B*07:10	G	C	I	WD	I	C	C	I		C	
+B*07:102	G	WD	WD			WD					
+B*07:103	G	WD	WD	WD							
+B*07:104	G	WD	WD								
+B*07:105	G	WD	WD		WD						
+B*07:106	G	WD	WD				WD				
+B*07:109	G	WD	WD			WD					
+B*07:110	G	WD	WD			WD					
+B*07:112	G	WD	WD			WD					
+B*07:113	G	WD	WD			WD					
+B*07:12	G	C	WD	C						WD	
+B*07:122	G	WD	WD			WD					
+B*07:13	G	WD	WD	WD							
+B*07:131	G	WD	WD			WD					
+B*07:132	G	WD	WD			WD					
+B*07:136:01	G	WD	WD			WD					
+B*07:14	G	C	I			I	C	C	WD	I	
+B*07:143	G	WD	WD				WD				
+B*07:15	G	I	I			I				WD	
+B*07:151:01	G	WD	WD			WD					
+B*07:158	G	WD	WD								
+B*07:16	G	WD	WD			WD					
+B*07:165	G	WD	WD			WD					
+B*07:17	G	WD	WD								
+B*07:181N	G	WD	WD			WD					
+B*07:188	G	WD	WD			WD					
+B*07:18:01	G	I	WD		I						
+B*07:19	G	WD	WD			WD					
+B*07:193	G	WD	WD			WD					
+B*07:20	G	I	WD			WD		I		WD	
+B*07:206	G	WD	WD			WD					
+B*07:208	G	WD	WD			WD					
+B*07:222	G	WD	WD		WD						
+B*07:22:01	G	I	WD			WD				I	
+B*07:22:02	G	WD	WD			WD				WD	
+B*07:23	G	WD	WD			WD				WD	
+B*07:237	G	WD	WD								
+B*07:24	G	WD	WD			WD					
+B*07:252	G	WD	WD			WD					
+B*07:26	G	I	WD		WD	WD		I		WD	
+B*07:29	G	WD	WD								
+B*07:31	G	WD	WD			WD					
+B*07:33:01	G	WD	WD			WD					
+B*07:33:02	G	WD	WD		WD						
+B*07:36	G	WD	WD		WD	WD				WD	
+B*07:37:01G	G	I	WD			WD				I	
+B*07:38	G	WD	WD			WD					
+B*07:42	G	WD	WD			WD				WD	
+B*07:46	G	I	WD			WD				I	
+B*07:47	G	I	I			I				WD	
+B*07:48	G	WD	WD			WD	WD				
+B*07:51	G	I	WD			WD		I			
+B*07:53	G	WD	WD			WD					
+B*07:56:02	G	WD	WD							WD	
+B*07:57	G	WD	WD			WD					
+B*07:62	G	WD	WD			WD					
+B*07:63	G	WD	WD			WD					
+B*07:67N	G	WD	WD			WD					
+B*07:68:01	G	WD	WD			WD					
+B*07:68:02	G	WD	WD			WD					
+B*07:68:03	G	WD	WD								
+B*07:71	G	WD	WD								
+B*07:73	G	WD	WD			WD					
+B*07:74	G	WD	WD			WD					
+B*07:77	G	WD	WD				WD				
+B*07:80	G	WD	WD		WD						
+B*07:81	G	WD	WD		WD						
+B*07:85	G	WD	WD								
+B*07:86	G	WD	WD			WD					
+B*07:87	G	WD	WD			WD					
+B*07:88	G	WD	WD			WD					
+B*07:92	G	WD	WD			WD					
+B*07:94	G	WD	WD								
+B*07:95	G	WD	WD			WD					
+B*07:96:01	G	WD	WD			WD					
+B*07:98	G	WD	WD			WD					
+B*08:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*08:01:02	G	C	C			C		I		I	
+B*08:01:03	G	WD	WD			WD					
+B*08:01:04	G	I	I			I					
+B*08:01:05	G	WD	WD			WD					
+B*08:01:06	G	WD	WD			WD					
+B*08:01:07	G	WD	WD			WD					
+B*08:01:08	G	WD	WD			WD					
+B*08:01:13	G	WD	WD			WD					
+B*08:01:17	G	WD	WD			WD					
+B*08:02	G	WD	WD			WD					
+B*08:03	G	WD	WD								
+B*08:04:01	G	WD	WD							WD	
+B*08:07	G	WD	WD			WD					
+B*08:09	G	I	I	WD		I		I		I	
+B*08:104	G	WD	WD			WD					
+B*08:11	G	WD	WD			WD					
+B*08:110	G	WD	WD			WD					
+B*08:12:01	G	C	WD	C		WD				WD	
+B*08:13	G	WD	WD			WD				WD	
+B*08:14	G	WD	WD			WD					
+B*08:15	G	WD	WD			WD					
+B*08:16	G	WD	WD	WD							
+B*08:18	G	I	I	WD		I		I		I	
+B*08:20	G	WD	WD			WD					
+B*08:22	G	WD	WD			WD					
+B*08:23	G	WD	WD	WD		WD					
+B*08:24	G	I	WD			I					
+B*08:25	G	WD	WD			WD					
+B*08:26:01	G	WD	WD							WD	
+B*08:28	G	WD	WD			WD					
+B*08:31	G	WD	WD			WD					
+B*08:33	G	I	WD			WD		I		I	
+B*08:34	G	WD	WD			WD					
+B*08:35	G	WD	WD			WD					
+B*08:36	G	WD	WD								
+B*08:37	G	WD	WD			WD					
+B*08:39	G	WD	WD			WD					
+B*08:41	G	WD	WD			WD					
+B*08:50	G	WD	WD								
+B*08:52	G	WD	WD			WD					
+B*08:59:01	G	I	WD		I						
+B*08:63	G	WD	WD			WD					
+B*08:71	G	WD	WD			WD					
+B*08:75	G	WD	WD			WD					
+B*08:78	G	WD	WD			WD				WD	
+B*08:88	G	WD	WD			WD					
+B*08:97	G	WD	WD			WD					
+B*13:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*13:01:10	G	WD	WD		WD						
+B*13:02:01G	G	C	C	C	C	C	C	C	C	C	
+B*13:02:02	G	WD	WD			WD					
+B*13:02:04	G	WD	WD			WD					
+B*13:02:11	G	WD	WD			WD					
+B*13:03	G	WD	WD	WD		WD	WD				
+B*13:04	G	WD	WD								
+B*13:06	G	WD	WD								
+B*13:08	G	WD	WD			WD					
+B*13:10	G	WD	WD			WD					
+B*13:11	G	WD	WD			WD					
+B*13:12:01	G	WD	WD		WD					WD	
+B*13:14	G	WD	WD			WD					
+B*13:45	G	WD	WD			WD					
+B*13:47	G	WD	WD			WD					
+B*13:57	G	WD	WD		WD						
+B*14:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*14:02:01G	G	C	C	C	C	C	C	C	C	C	
+B*14:02:02	G	C	I	WD	WD	WD	WD	C	C	C	
+B*14:02:03	G	WD	WD			WD					
+B*14:03	G	C	I	C	WD	I	C	C	C	C	
+B*14:05	G	C	WD	C		WD				I	
+B*14:06:01	G	WD	WD			WD					
+B*14:06:02	G	WD	WD			WD				WD	
+B*14:07N	G	WD	WD			WD					
+B*14:08:01	G	WD	WD			WD					
+B*14:09	G	WD	WD	WD							
+B*14:10	G	WD	WD			WD					
+B*14:19	G	WD	WD			WD					
+B*14:20	G	WD	WD			WD					
+B*14:23	G	WD	WD								
+B*14:29	G	WD	WD			WD					
+B*14:32	G	WD	WD			WD					
+B*15:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*15:01:02	G	C	I		C						
+B*15:01:03	G	WD	WD			WD					
+B*15:01:04	G	WD	WD			WD					
+B*15:01:08	G	WD	WD			WD					
+B*15:01:10	G	WD	WD			WD					
+B*15:01:12	G	WD	WD			WD					
+B*15:01:14	G	WD	WD			WD					
+B*15:01:15	G	WD	WD			WD					
+B*15:01:16	G	WD	WD			WD					
+B*15:01:21	G	WD	WD			WD					
+B*15:01:31	G	WD	WD							WD	
+B*15:02:01G	G	C	C	C	C	I	C	C	C	C	
+B*15:03:01G	G	C	C	C	C	C	C	C	C	C	
+B*15:03:03	G	WD	WD	WD		WD					
+B*15:03:04	G	WD	WD								
+B*15:04:01G	G	C	C	WD	C	I		C	C	C	
+B*15:05:01	G	C	C	WD	C	WD	WD	C	C	C	
+B*15:05:02	G	WD	WD			WD					
+B*15:06	G	C	I		C	WD		I		I	
+B*15:07:01G	G	C	C	WD	C	C		C	C	C	
+B*15:08:01	G	C	C	WD	C	C	C	C	C	C	
+B*15:09:01G	G	C	C	WD	I	C	C	C	C	C	
+B*15:106	G	WD	WD		WD						
+B*15:108	G	WD	WD			WD		WD			
+B*15:10:01	G	C	C	C	C	C	C	C	C	C	
+B*15:10:02	G	WD	WD	WD							
+B*15:110	G	I	WD					I			
+B*15:113	G	I	WD		I						
+B*15:117	G	WD	WD			WD					
+B*15:11:01G	G	C	C		C	I	C	WD		C	
+B*15:122	G	WD	WD			WD					
+B*15:123:01G	G	WD	WD				WD				
+B*15:125	G	I	I			I					
+B*15:128	G	WD	WD			WD					
+B*15:12:01G	G	C	C		C	WD		I		C	
+B*15:132	G	WD	WD			WD				WD	
+B*15:135	G	I	WD			I				WD	
+B*15:13:01	G	C	C	C	C	WD	WD	I		C	
+B*15:14	G	WD	WD			WD				WD	
+B*15:141	G	I	WD		I					I	
+B*15:142	G	WD	WD			WD					
+B*15:147	G	WD	WD			WD				WD	
+B*15:15	G	C	C	C	I	I	WD	C	C	C	
+B*15:150	G	I	WD					I			
+B*15:153	G	WD	WD			WD				WD	
+B*15:154	G	WD	WD			WD					
+B*15:157	G	WD	WD			WD					
+B*15:158	G	WD	WD	WD							
+B*15:159	G	WD	WD		WD						
+B*15:160	G	WD	WD			WD					
+B*15:162	G	I	WD				WD			I	
+B*15:164	G	WD	WD			WD					
+B*15:167	G	WD	WD			WD					
+B*15:16:01G	G	C	C	C	I	C	C	C	C	C	
+B*15:16:02	G	WD	WD	WD							
+B*15:170	G	I	WD		I						
+B*15:172	G	WD	WD			WD					
+B*15:173	G	WD	WD			WD					
+B*15:174	G	WD	WD			WD					
+B*15:175	G	WD	WD								
+B*15:17:01G	G	C	C	C	C	C	C	C	C	C	
+B*15:17:02	G	I	WD			WD	WD			I	
+B*15:181N	G	WD	WD			WD					
+B*15:183	G	WD	WD			WD					
+B*15:18:01G	G	C	C	C	C	C	C	C	C	C	
+B*15:190N	G	WD	WD			WD					
+B*15:20	G	C	I	WD		I		C	C	C	
+B*15:204	G	WD	WD		WD						
+B*15:207	G	WD	WD			WD					
+B*15:208	G	WD	WD			WD					
+B*15:211	G	WD	WD			WD					
+B*15:21:01G	G	C	C	WD	C	I	WD	I		C	
+B*15:23	G	I	I	WD		I		I		I	
+B*15:237	G	WD	WD			WD					
+B*15:239	G	WD	WD			WD					
+B*15:240	G	I	WD		I						
+B*15:248	G	WD	WD			WD					
+B*15:24:01	G	C	C	WD	I	C	C	C	WD	C	
+B*15:25:01G	G	C	C	WD	C	I	C	I	C	C	
+B*15:27:01	G	C	C		C	WD	WD			I	
+B*15:27:02	G	I	I			WD		I		I	
+B*15:29	G	C	C		C	I	C	I		C	
+B*15:290	G	I	WD		I						
+B*15:30:01G	G	C	C	WD	I	I	WD	C	C	C	
+B*15:31	G	C	I	C		WD	C	I	WD	I	
+B*15:319	G	WD	WD		WD						
+B*15:32:01	G	C	I		C	WD	WD	WD		I	
+B*15:33	G	C	I			I		I	C	I	
+B*15:335	G	WD	WD		WD						
+B*15:34	G	I	I		I	I	WD	I		I	
+B*15:35	G	C	C		C	I	WD	C	C	C	
+B*15:37	G	C	I	C		WD	WD	I	WD	I	
+B*15:38:01	G	C	I		C	WD		I		I	
+B*15:39:01	G	C	C	WD	I	C	WD	C	C	C	
+B*15:39:02	G	WD	WD			WD					
+B*15:40:01	G	C	WD					I	C	WD	
+B*15:42	G	WD	WD			WD					
+B*15:44	G	I	WD		I					WD	
+B*15:45	G	I	I			I				I	
+B*15:46	G	I	WD		I						
+B*15:47:01	G	C	I	C		WD	WD	I	C	I	
+B*15:48	G	C	I			WD		C	C	WD	
+B*15:52	G	C	WD	C						I	
+B*15:53	G	WD	WD								
+B*15:54	G	C	WD	C						WD	
+B*15:55	G	I	WD				WD	I			
+B*15:56	G	WD	WD		WD						
+B*15:57	G	WD	WD			WD					
+B*15:58	G	I	WD		I					WD	
+B*15:62	G	WD	WD	WD							
+B*15:63	G	C	WD			WD		I	C	I	
+B*15:64:01	G	I	WD		I						
+B*15:65	G	WD	WD			WD		WD		WD	
+B*15:67	G	WD	WD	WD			WD			WD	
+B*15:69	G	WD	WD							WD	
+B*15:70	G	WD	WD			WD		WD			
+B*15:71	G	I	I			I	WD	WD		I	
+B*15:72	G	WD	WD		WD						
+B*15:73	G	I	I			I	WD			I	
+B*15:75	G	C	I		C		WD				
+B*15:76	G	WD	WD			WD					
+B*15:78:01	G	WD	WD			WD					
+B*15:79N	G	WD	WD			WD					
+B*15:80	G	WD	WD								
+B*15:82	G	I	I			I				I	
+B*15:83	G	WD	WD	WD							
+B*15:87	G	WD	WD								
+B*15:88	G	WD	WD		WD						
+B*15:89	G	WD	WD		WD						
+B*15:96	G	WD	WD			WD					
+B*15:98	G	WD	WD			WD					
+B*18:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*18:01:02	G	I	I	WD		I		I		I	
+B*18:01:05	G	WD	WD			WD					
+B*18:01:06	G	I	WD		I						
+B*18:01:08	G	WD	WD							WD	
+B*18:01:09	G	WD	WD			WD					
+B*18:01:10	G	WD	WD			WD					
+B*18:01:12	G	WD	WD			WD					
+B*18:02	G	C	C		C	WD	WD			C	
+B*18:03	G	C	C	C	I	C	C	C	C	C	
+B*18:04:01	G	WD	WD			WD					
+B*18:05:01G	G	C	C	WD	I	C	C	C	C	C	
+B*18:06	G	I	WD			WD	WD	I		WD	
+B*18:07:01	G	I	I			I	WD			WD	
+B*18:07:02	G	WD	WD			WD					
+B*18:08	G	WD	WD			WD				WD	
+B*18:09	G	WD	WD			WD					
+B*18:10	G	WD	WD								
+B*18:11	G	WD	WD			WD				WD	
+B*18:114	G	WD	WD		WD						
+B*18:12:01	G	WD	WD			WD					
+B*18:13	G	I	WD			WD				I	
+B*18:14	G	I	I			I		WD		WD	
+B*18:15	G	WD	WD			WD				WD	
+B*18:18:01G	G	I	I			I				I	
+B*18:19	G	WD	WD			WD	WD				
+B*18:20	G	WD	WD			WD		WD		WD	
+B*18:22	G	WD	WD		WD						
+B*18:25	G	C	WD	C	I	WD				I	
+B*18:28	G	WD	WD			WD					
+B*18:30	G	WD	WD			WD					
+B*18:32	G	WD	WD								
+B*18:33	G	WD	WD			WD					
+B*18:34	G	WD	WD			WD					
+B*18:36	G	WD	WD			WD					
+B*18:40	G	WD	WD			WD					
+B*18:43	G	WD	WD			WD					
+B*18:44:01	G	WD	WD			WD					
+B*18:49	G	WD	WD			WD					
+B*18:60	G	WD	WD			WD					
+B*18:68	G	WD	WD	WD							
+B*18:69	G	WD	WD				WD				
+B*18:73	G	WD	WD								
+B*18:95	G	WD	WD								
+B*27:01	G	I	I			I				WD	
+B*27:02:01G	G	C	C	C	C	C	C	C	C	C	
+B*27:03	G	C	C	C	I	C	C	C	C	C	
+B*27:04:01G	G	C	C	WD	C	I	C	I	C	C	
+B*27:04:03	G	I	WD		I						
+B*27:05:02G	G	C	C	C	C	C	C	C	C	C	
+B*27:05:03	G	C	C		I	C	WD	I		C	
+B*27:05:05	G	I	WD			WD		I			
+B*27:05:07	G	WD	WD			WD					
+B*27:05:08	G	WD	WD			WD					
+B*27:05:09	G	WD	WD			WD					
+B*27:05:10	G	WD	WD			WD					
+B*27:05:18	G	WD	WD			WD					
+B*27:05:21	G	WD	WD			WD					
+B*27:05:23	G	WD	WD			WD					
+B*27:06	G	C	C	C	C	WD	WD	I		C	
+B*27:07:01G	G	C	C	WD	C	C	C	C	C	C	
+B*27:08	G	C	I	WD		I	WD	C	WD	I	
+B*27:09	G	C	C		I	C	WD	I		I	
+B*27:10	G	I	I	WD		I		I		I	
+B*27:12:01G	G	C	I	WD		I	C	C		C	
+B*27:14	G	C	C	WD	I	C	WD	I		I	
+B*27:15	G	I	WD		I						
+B*27:17	G	WD	WD	WD		WD				WD	
+B*27:18	G	WD	WD		WD						
+B*27:19	G	WD	WD			WD	WD				
+B*27:20	G	I	WD		I						
+B*27:23	G	WD	WD								
+B*27:24	G	WD	WD		WD						
+B*27:25	G	WD	WD		WD	WD					
+B*27:26	G	WD	WD	WD							
+B*27:27	G	I	WD					I			
+B*27:30	G	WD	WD			WD					
+B*27:32	G	WD	WD			WD					
+B*27:34	G	WD	WD			WD					
+B*27:35	G	WD	WD			WD				WD	
+B*27:41	G	WD	WD							WD	
+B*27:42	G	WD	WD			WD				WD	
+B*27:43	G	WD	WD		WD						
+B*27:46	G	WD	WD								
+B*27:47	G	WD	WD			WD					
+B*27:48	G	WD	WD			WD					
+B*27:49	G	WD	WD			WD					
+B*27:51	G	I	WD			I					
+B*27:53	G	WD	WD			WD					
+B*27:56	G	WD	WD			WD					
+B*27:60	G	WD	WD			WD					
+B*27:61	G	WD	WD		WD						
+B*27:70	G	WD	WD			WD					
+B*27:73	G	WD	WD			WD					
+B*27:80	G	WD	WD								
+B*27:82	G	WD	WD			WD					
+B*27:83	G	WD	WD			WD					
+B*27:84	G	WD	WD								
+B*27:85	G	WD	WD			WD					
+B*35:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*35:01:02	G	WD	WD			WD					
+B*35:01:04	G	WD	WD	WD							
+B*35:01:05	G	I	WD			WD				I	
+B*35:01:06	G	WD	WD			WD					
+B*35:01:07	G	WD	WD			WD					
+B*35:01:08	G	WD	WD			WD					
+B*35:01:11	G	WD	WD				WD				
+B*35:01:19	G	WD	WD			WD					
+B*35:01:27	G	WD	WD	WD							
+B*35:01:29	G	WD	WD			WD					
+B*35:02:01G	G	C	C	C	C	C	C	C	C	C	
+B*35:02:02	G	I	I			I				WD	
+B*35:03:01G	G	C	C	C	C	C	C	C	C	C	
+B*35:03:02	G	WD	WD			WD					
+B*35:03:10	G	WD	WD		WD						
+B*35:04:01	G	C	C	C	WD	I		C	C	C	
+B*35:04:02	G	C	WD			WD		C	WD	I	
+B*35:05:01G	G	C	C	C	C	I	C	C	C	C	
+B*35:06	G	C	I	WD		WD		C	C	C	
+B*35:08:01G	G	C	C	C	C	C	C	C	C	C	
+B*35:08:02	G	WD	WD			WD					
+B*35:09:01	G	C	C		WD	I		C	C	C	
+B*35:09:02	G	I	WD			WD		I		WD	
+B*35:09:03	G	WD	WD								
+B*35:10	G	C	I	WD	WD	WD		C	C	I	
+B*35:100	G	WD	WD			WD					
+B*35:103	G	WD	WD								
+B*35:104	G	WD	WD			WD					
+B*35:106	G	WD	WD				WD				
+B*35:108:01	G	WD	WD								
+B*35:109	G	I	WD		I						
+B*35:112	G	WD	WD			WD					
+B*35:115	G	WD	WD			WD					
+B*35:116	G	I	WD					I		WD	
+B*35:11:01	G	C	I	WD	WD	WD		C	C	I	
+B*35:11:02	G	WD	WD								
+B*35:11:03	G	WD	WD								
+B*35:121	G	I	WD					I			
+B*35:123	G	WD	WD								
+B*35:128	G	WD	WD								
+B*35:12:01	G	C	C	C	I	I	WD	C	C	C	
+B*35:12:03	G	WD	WD					WD			
+B*35:13	G	I	WD		I		WD				
+B*35:132	G	I	WD		I						
+B*35:136	G	WD	WD			WD					
+B*35:139	G	WD	WD								
+B*35:14:01	G	C	C	WD	I	WD		C	C	C	
+B*35:14:02	G	WD	WD			WD	WD			WD	
+B*35:157	G	WD	WD			WD					
+B*35:158	G	WD	WD			WD	WD				
+B*35:15:01	G	WD	WD		WD	WD		WD		WD	
+B*35:16	G	C	I	WD	I	WD		C	C	C	
+B*35:163	G	WD	WD			WD					
+B*35:165N	G	WD	WD								
+B*35:167	G	WD	WD		WD	WD					
+B*35:174	G	WD	WD				WD				
+B*35:178	G	WD	WD								
+B*35:17:01	G	C	C	C	I	I	WD	C	C	C	
+B*35:18	G	I	WD			WD		I		I	
+B*35:183	G	WD	WD			WD					
+B*35:19	G	C	C			I		C	C	C	
+B*35:191	G	WD	WD							WD	
+B*35:193	G	WD	WD				WD				
+B*35:204	G	WD	WD			WD					
+B*35:20:01	G	C	C	WD	I	I		C	C	C	
+B*35:20:02	G	WD	WD			WD				WD	
+B*35:21	G	C	I		WD	WD		C	C	C	
+B*35:214	G	WD	WD			WD					
+B*35:22	G	C	I	WD		WD		C	C	I	
+B*35:225	G	WD	WD								
+B*35:23	G	C	I		I	WD		C	C	I	
+B*35:247	G	WD	WD			WD				WD	
+B*35:24:01	G	C	I			WD		C	C	I	
+B*35:24:02	G	I	WD					I			
+B*35:25	G	WD	WD			WD					
+B*35:259	G	WD	WD								
+B*35:26	G	I	WD					I			
+B*35:263	G	WD	WD			WD					
+B*35:27	G	I	WD			I				I	
+B*35:278	G	WD	WD			WD					
+B*35:28	G	C	I			WD		C	C	I	
+B*35:29:01	G	I	I			I				WD	
+B*35:30	G	C	I		C	WD		C	C	I	
+B*35:31	G	C	I			WD		C	C	I	
+B*35:321	G	WD	WD			WD				WD	
+B*35:32:01	G	WD	WD			WD				WD	
+B*35:33	G	WD	WD			WD					
+B*35:34	G	C	WD			WD		I	C	WD	
+B*35:36	G	I	WD			I	WD				
+B*35:37	G	WD	WD		WD	WD					
+B*35:38	G	WD	WD			WD	WD				
+B*35:41	G	I	I	WD		I		I	WD	I	
+B*35:43:01G	G	C	C	C	I	I	WD	C	C	C	
+B*35:44	G	I	WD					I			
+B*35:45	G	WD	WD			WD					
+B*35:47	G	I	WD					I			
+B*35:48	G	C	WD					I	C	WD	
+B*35:49	G	I	WD	WD				I		WD	
+B*35:55	G	I	I			I		I		I	
+B*35:58	G	WD	WD								
+B*35:65Q	G	WD	WD			WD					
+B*35:68:01	G	WD	WD			WD					
+B*35:68:02	G	I	WD			WD		I			
+B*35:72	G	WD	WD		WD						
+B*35:74	G	WD	WD								
+B*35:77	G	I	WD			WD				I	
+B*35:80	G	WD	WD			WD					
+B*35:81	G	WD	WD			WD					
+B*35:87	G	WD	WD			WD					
+B*35:90	G	WD	WD								
+B*35:93	G	WD	WD			WD					
+B*35:95	G	WD	WD			WD					
+B*35:96	G	WD	WD			WD					
+B*37:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*37:01:02	G	WD	WD			WD					
+B*37:01:03	G	I	WD		I	WD					
+B*37:01:06	G	WD	WD			WD					
+B*37:01:07	G	WD	WD			WD					
+B*37:01:09	G	WD	WD								
+B*37:02	G	C	I			I	C			C	
+B*37:03N	G	WD	WD			WD					
+B*37:04:01	G	I	I		I	I	WD			I	
+B*37:04:02	G	I	WD		I						
+B*37:05	G	WD	WD		WD						
+B*37:07	G	WD	WD			WD					
+B*37:09	G	WD	WD								
+B*37:10	G	WD	WD			WD					
+B*37:16Q	G	WD	WD			WD					
+B*37:17	G	WD	WD			WD					
+B*37:18	G	WD	WD								
+B*37:21	G	WD	WD			WD					
+B*37:22	G	WD	WD		WD						
+B*37:27	G	WD	WD								
+B*37:35	G	WD	WD		WD						
+B*37:42N	G	WD	WD			WD					
+B*37:48	G	WD	WD		WD						
+B*38:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*38:01:04	G	WD	WD				WD			WD	
+B*38:01:06	G	WD	WD			WD					
+B*38:02:01G	G	C	C	C	C	I	C	C	C	C	
+B*38:02:02	G	C	I		C	WD		I		C	
+B*38:03	G	I	WD			WD		I			
+B*38:06	G	WD	WD								
+B*38:09	G	C	I			I		WD		C	
+B*38:12	G	WD	WD			WD	WD				
+B*38:13	G	WD	WD			WD					
+B*38:14	G	I	WD			WD				I	
+B*38:15	G	WD	WD		WD						
+B*38:17	G	WD	WD								
+B*38:24	G	I	WD			WD				I	
+B*38:27	G	WD	WD							WD	
+B*38:31	G	WD	WD			WD					
+B*38:32	G	WD	WD			WD					
+B*38:35	G	I	WD		I					WD	
+B*38:37	G	WD	WD			WD					
+B*39:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*39:01:04	G	C	I	WD		WD		C	WD	I	
+B*39:01:05	G	I	WD					I			
+B*39:01:10	G	WD	WD			WD					
+B*39:01:12	G	WD	WD			WD					
+B*39:02:01	G	I	WD		I					I	
+B*39:02:02G	G	C	C	C	I	I		C	C	C	
+B*39:03:01G	G	C	C	WD		I		C	C	C	
+B*39:04	G	I	WD		I					I	
+B*39:05:01G	G	C	C	C	C	C	C	C	C	C	
+B*39:06:01	G	C	I	WD		WD		C	C	I	
+B*39:06:02G	G	C	C	C	C	C	C	C	C	C	
+B*39:07	G	I	WD					I		WD	
+B*39:08	G	C	C	WD	I	WD		C	C	C	
+B*39:09:01G	G	C	C	WD	C	I		C	C	C	
+B*39:10:01	G	C	C	C	I	I	C	C	C	C	
+B*39:11	G	C	I	WD	I	WD		C	C	C	
+B*39:12	G	C	I			WD		C	C	I	
+B*39:13:01	G	C	I	WD		WD		C	C	C	
+B*39:13:02	G	WD	WD					WD			
+B*39:14:01G	G	C	I			WD		C	C	I	
+B*39:15	G	C	I		C	WD	WD			I	
+B*39:19:01	G	WD	WD			WD					
+B*39:19:02	G	WD	WD								
+B*39:20	G	C	I	WD		WD		C		I	
+B*39:22	G	I	WD					I		WD	
+B*39:24:01	G	C	C	C	I	C	C	C	C	C	
+B*39:26	G	WD	WD			WD					
+B*39:29	G	WD	WD			WD					
+B*39:31:01G	G	C	I	WD	I	C	C	I		I	
+B*39:33	G	WD	WD			WD					
+B*39:34	G	WD	WD								
+B*39:37	G	I	WD			WD		I		I	
+B*39:39:01	G	I	WD					I			
+B*39:43	G	WD	WD		WD						
+B*39:47	G	WD	WD		WD						
+B*39:53	G	WD	WD			WD					
+B*39:57	G	WD	WD			WD					
+B*39:62	G	WD	WD			WD					
+B*39:68	G	WD	WD								
+B*39:75	G	WD	WD					WD			
+B*39:79	G	WD	WD			WD				WD	
+B*39:93	G	WD	WD			WD					
+B*40:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*40:01:03	G	WD	WD			WD				WD	
+B*40:01:04	G	I	I			I				WD	
+B*40:01:05	G	WD	WD			WD					
+B*40:01:07	G	WD	WD			WD					
+B*40:01:18	G	WD	WD			WD					
+B*40:01:21	G	WD	WD			WD					
+B*40:01:23	G	WD	WD			WD					
+B*40:01:24	G	WD	WD								
+B*40:02:01G	G	C	C	C	C	C	C	C	C	C	
+B*40:02:06	G	WD	WD			WD					
+B*40:02:14	G	WD	WD			WD					
+B*40:02:16	G	WD	WD			WD					
+B*40:03:01G	G	C	I	WD	C	WD		C	C	C	
+B*40:04	G	C	C	C	I	I		C	C	C	
+B*40:05:01G	G	C	C	WD	I	I		C	C	C	
+B*40:06:01G	G	C	C	C	C	C	C	C	C	C	
+B*40:07	G	WD	WD			WD					
+B*40:08	G	C	C	WD	I	I		C	C	C	
+B*40:09	G	I	WD			WD		I		I	
+B*40:102	G	WD	WD			WD	WD				
+B*40:103	G	WD	WD				WD				
+B*40:108	G	WD	WD			WD					
+B*40:10:01G	G	C	I		C	WD		WD		C	
+B*40:110	G	WD	WD		WD						
+B*40:111	G	WD	WD					WD			
+B*40:113	G	WD	WD			WD					
+B*40:114:01	G	WD	WD			WD					
+B*40:115	G	I	WD		I						
+B*40:117	G	WD	WD								
+B*40:119	G	WD	WD								
+B*40:11:01	G	C	I	WD	WD	WD		C	C	C	
+B*40:11:02	G	WD	WD					WD			
+B*40:12	G	C	I	C		I	C	I		I	
+B*40:126	G	WD	WD								
+B*40:129	G	WD	WD					WD			
+B*40:13	G	C	I			I		C		C	
+B*40:130:01	G	WD	WD		WD						
+B*40:130:02	G	WD	WD								
+B*40:135	G	WD	WD								
+B*40:142N	G	WD	WD								
+B*40:14:02	G	WD	WD			WD					
+B*40:14:03	G	WD	WD			WD				WD	
+B*40:155:01G	G	WD	WD		WD						
+B*40:157	G	WD	WD								
+B*40:159	G	WD	WD		WD						
+B*40:16	G	C	I	C		WD	WD	C	C	I	
+B*40:160:01	G	WD	WD								
+B*40:160:02	G	WD	WD			WD					
+B*40:168	G	WD	WD								
+B*40:177	G	WD	WD								
+B*40:18	G	WD	WD			WD					
+B*40:183	G	I	WD		I						
+B*40:19	G	WD	WD			WD					
+B*40:197	G	WD	WD			WD					
+B*40:200	G	WD	WD			WD					
+B*40:201	G	WD	WD			WD					
+B*40:203	G	WD	WD			WD					
+B*40:20:01G	G	C	I			WD		C	C	I	
+B*40:21	G	WD	WD								
+B*40:226	G	WD	WD					WD			
+B*40:22N	G	WD	WD								
+B*40:23	G	C	I		C	WD				I	
+B*40:26	G	C	I		C	WD				WD	
+B*40:27:01	G	C	I	WD	WD	WD		C	C	C	
+B*40:295	G	I	WD		I						
+B*40:30	G	WD	WD			WD					
+B*40:31	G	WD	WD			WD					
+B*40:310	G	WD	WD		WD						
+B*40:32	G	I	I			I					
+B*40:334	G	I	WD					I		WD	
+B*40:35:01	G	WD	WD								
+B*40:40:01G	G	I	WD		I					WD	
+B*40:42	G	WD	WD			WD				WD	
+B*40:43	G	WD	WD			WD					
+B*40:44	G	I	WD		I						
+B*40:47	G	WD	WD			WD					
+B*40:48	G	WD	WD		WD						
+B*40:49	G	WD	WD			WD					
+B*40:50	G	C	I		C	WD	WD			I	
+B*40:52	G	WD	WD			WD					
+B*40:53	G	WD	WD								
+B*40:61	G	WD	WD		WD						
+B*40:63	G	WD	WD			WD					
+B*40:64	G	I	WD			WD		I		I	
+B*40:72:02	G	WD	WD			WD					
+B*40:74	G	WD	WD								
+B*40:78	G	WD	WD		WD		WD				
+B*40:79	G	WD	WD			WD					
+B*40:84	G	WD	WD								
+B*40:87:01	G	WD	WD			WD					
+B*40:90	G	C	WD	WD		WD			C	WD	
+B*40:94	G	WD	WD			WD					
+B*40:95	G	I	WD		I						
+B*40:99	G	WD	WD								
+B*41:01:01	G	C	C	C	C	C	C	C	C	C	
+B*41:01:03	G	WD	WD				WD				
+B*41:02:01G	G	C	C	C	C	C	C	C	C	C	
+B*41:02:05	G	WD	WD								
+B*41:03:01	G	C	I	C		WD		WD		I	
+B*41:05	G	WD	WD			WD					
+B*41:06	G	I	WD			WD		I			
+B*41:07	G	I	WD					I		WD	
+B*41:09	G	WD	WD								
+B*41:10	G	WD	WD			WD					
+B*41:11	G	WD	WD			WD					
+B*41:14	G	WD	WD								
+B*41:16	G	WD	WD			WD					
+B*41:18	G	WD	WD			WD					
+B*41:19	G	WD	WD			WD					
+B*42:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*42:02:01G	G	C	C	C	I	C	C	C	C	C	
+B*42:05:01	G	I	WD			I					
+B*42:07	G	WD	WD				WD				
+B*42:10	G	WD	WD	WD							
+B*42:18	G	I	WD			WD		I		WD	
+B*44:02:01G	G	C	C	C	C	C	C	C	C	C	
+B*44:02:02	G	WD	WD			WD				WD	
+B*44:02:05	G	WD	WD								
+B*44:02:06	G	I	WD			WD		I		WD	
+B*44:02:07	G	WD	WD			WD					
+B*44:02:09	G	WD	WD			WD					
+B*44:02:10	G	WD	WD			WD					
+B*44:02:12	G	WD	WD			WD					
+B*44:02:15	G	WD	WD			WD				WD	
+B*44:02:18	G	WD	WD			WD					
+B*44:02:19	G	WD	WD								
+B*44:02:22	G	WD	WD			WD					
+B*44:03:01G	G	C	C	C	C	C	C	C	C	C	
+B*44:03:02G	G	C	C	C	C	C	C	C	C	C	
+B*44:03:08	G	WD	WD	WD							
+B*44:03:10	G	WD	WD								
+B*44:03:11	G	WD	WD			WD					
+B*44:03:13	G	WD	WD		WD						
+B*44:03:19	G	WD	WD			WD					
+B*44:03:23	G	WD	WD								
+B*44:04	G	C	C	C	WD	C	WD	C	C	C	
+B*44:05:01	G	C	C	C	C	C	C	C	C	C	
+B*44:05:03	G	I	WD							I	
+B*44:06	G	I	I		I	I	WD	I		I	
+B*44:07	G	C	WD	C						I	
+B*44:08	G	I	I	WD		I		WD		I	
+B*44:09	G	I	I			I				I	
+B*44:10	G	C	I	C		WD		C	C	I	
+B*44:104	G	WD	WD			WD					
+B*44:107	G	WD	WD			WD					
+B*44:111	G	WD	WD			WD					
+B*44:115	G	WD	WD			WD					
+B*44:116	G	WD	WD			WD					
+B*44:120	G	WD	WD			WD					
+B*44:122	G	WD	WD			WD					
+B*44:13	G	WD	WD			WD				WD	
+B*44:146	G	WD	WD			WD					
+B*44:15:01G	G	C	WD	C		WD				WD	
+B*44:166	G	WD	WD			WD					
+B*44:17	G	I	WD			WD	WD			I	
+B*44:173	G	WD	WD			WD					
+B*44:18	G	WD	WD	WD							
+B*44:20	G	WD	WD			WD				WD	
+B*44:205:01	G	WD	WD			WD					
+B*44:21	G	I	WD			I	WD	WD		WD	
+B*44:22	G	WD	WD			WD					
+B*44:23N	G	WD	WD			WD					
+B*44:24	G	WD	WD			WD					
+B*44:25	G	WD	WD			WD					
+B*44:28:02	G	WD	WD			WD					
+B*44:29	G	C	I		WD	I	C	I		I	
+B*44:30	G	I	WD					I			
+B*44:31	G	WD	WD				WD				
+B*44:32	G	WD	WD			WD					
+B*44:34:01	G	WD	WD			WD					
+B*44:36	G	WD	WD			WD				WD	
+B*44:37:01	G	WD	WD			WD					
+B*44:37:02	G	WD	WD		WD						
+B*44:41:01	G	WD	WD			WD					
+B*44:43:01	G	WD	WD			WD					
+B*44:45	G	WD	WD			WD					
+B*44:48	G	WD	WD			WD					
+B*44:50:01	G	WD	WD								
+B*44:60	G	WD	WD								
+B*44:64:02	G	WD	WD			WD					
+B*44:67	G	WD	WD			WD					
+B*44:68	G	WD	WD			WD					
+B*44:73	G	WD	WD			WD					
+B*44:74	G	WD	WD			WD					
+B*44:76	G	WD	WD			WD					
+B*44:77	G	WD	WD			WD					
+B*44:80	G	WD	WD			WD					
+B*44:83	G	WD	WD								
+B*44:86	G	WD	WD			WD					
+B*44:87	G	I	WD		I						
+B*44:88	G	WD	WD			WD					
+B*44:91	G	WD	WD			WD					
+B*44:92	G	WD	WD			WD					
+B*44:96	G	WD	WD			WD					
+B*44:98	G	WD	WD							WD	
+B*44:99	G	WD	WD								
+B*45:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*45:02	G	WD	WD	WD						WD	
+B*46:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*46:01:02	G	WD	WD		WD						
+B*46:22	G	WD	WD		WD						
+B*47:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*47:02	G	I	I	WD		I				WD	
+B*47:03	G	C	I	C		WD	C	WD		I	
+B*47:04	G	WD	WD			WD				WD	
+B*47:05	G	WD	WD								
+B*48:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*48:02:01	G	C	I	WD	WD	I		C	C	C	
+B*48:02:03	G	WD	WD					WD			
+B*48:03:01	G	C	C	WD	C	I		C	C	C	
+B*48:03:02	G	I	WD					I			
+B*48:04:01	G	C	C		C	WD				I	
+B*48:05	G	WD	WD	WD			WD				
+B*48:06	G	WD	WD					WD			
+B*48:07	G	C	WD			WD		WD	C	I	
+B*48:12	G	I	WD					I			
+B*48:13	G	I	WD					I			
+B*48:24	G	WD	WD		WD						
+B*48:26	G	WD	WD							WD	
+B*48:29	G	WD	WD								
+B*49:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*49:09	G	WD	WD				WD				
+B*49:18:02	G	WD	WD					WD		WD	
+B*49:38	G	WD	WD			WD					
+B*50:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*50:02	G	C	C	C	I	C	C	C	C	C	
+B*50:04	G	I	WD		I						
+B*50:08	G	WD	WD			WD					
+B*50:09	G	WD	WD			WD					
+B*50:12	G	WD	WD			WD					
+B*51:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*51:01:02	G	C	C	C	C	WD	WD	I		C	
+B*51:01:03	G	WD	WD			WD					
+B*51:01:04	G	WD	WD			WD					
+B*51:01:09	G	I	WD		I					WD	
+B*51:01:10	G	WD	WD			WD					
+B*51:01:19	G	WD	WD			WD					
+B*51:01:20	G	WD	WD								
+B*51:01:21	G	WD	WD								
+B*51:01:32	G	WD	WD								
+B*51:01:34	G	WD	WD								
+B*51:02:01G	G	C	C	C	C	I	C	C	C	C	
+B*51:02:02	G	C	I	C	C	WD	WD	I		I	
+B*51:04	G	I	WD	WD		WD	WD	I		I	
+B*51:05	G	C	C	WD	I	C	C	C		C	
+B*51:06:01	G	C	C	WD	C	WD	WD	I	C	C	
+B*51:06:02	G	WD	WD			WD					
+B*51:07:01	G	C	C	C	C	C	C	C	C	C	
+B*51:08:01	G	C	C	C	C	C	C	C	C	C	
+B*51:09:01	G	C	C	C	I	C	C	C	C	C	
+B*51:09:02	G	WD	WD							WD	
+B*51:10	G	I	WD		WD	WD		I		WD	
+B*51:100	G	WD	WD			WD					
+B*51:105	G	WD	WD			WD					
+B*51:107	G	WD	WD		WD	WD					
+B*51:109	G	WD	WD		WD						
+B*51:114	G	WD	WD			WD					
+B*51:116	G	WD	WD			WD					
+B*51:117	G	WD	WD			WD					
+B*51:122	G	WD	WD			WD					
+B*51:123	G	WD	WD					WD			
+B*51:127	G	WD	WD								
+B*51:134	G	WD	WD			WD					
+B*51:13:01	G	C	I			WD		C	C	I	
+B*51:13:02	G	I	WD					I	WD	WD	
+B*51:14	G	C	I	WD		WD		C	C	I	
+B*51:158:01	G	WD	WD		WD						
+B*51:158:02	G	WD	WD			WD					
+B*51:17	G	I	WD		I						
+B*51:177	G	WD	WD			WD					
+B*51:19	G	C	I		C	WD		I		I	
+B*51:20	G	WD	WD			WD					
+B*51:21	G	WD	WD			WD					
+B*51:22	G	C	I		WD	I		C	C	I	
+B*51:23	G	I	WD					I		WD	
+B*51:24:04	G	WD	WD			WD					
+B*51:24:05	G	WD	WD			WD					
+B*51:26	G	WD	WD			WD					
+B*51:29	G	WD	WD			WD	WD				
+B*51:31	G	I	WD			WD		I		I	
+B*51:33	G	WD	WD								
+B*51:34	G	I	WD		I	WD	WD			WD	
+B*51:36	G	WD	WD		WD						
+B*51:37	G	WD	WD							WD	
+B*51:38	G	WD	WD			WD					
+B*51:39	G	WD	WD		WD						
+B*51:40	G	WD	WD			WD					
+B*51:43	G	I	I			WD				I	
+B*51:46	G	WD	WD			WD					
+B*51:49	G	I	WD			WD				I	
+B*51:50	G	I	WD			I					
+B*51:55	G	WD	WD			WD					
+B*51:56:01	G	WD	WD			WD					
+B*51:56:02	G	WD	WD			WD					
+B*51:61:01	G	WD	WD			WD					
+B*51:64	G	WD	WD	WD							
+B*51:65	G	I	WD			WD	WD	I		WD	
+B*51:67	G	WD	WD			WD					
+B*51:68	G	WD	WD			WD					
+B*51:69	G	WD	WD			WD	WD				
+B*51:70	G	WD	WD				WD				
+B*51:71	G	WD	WD			WD					
+B*51:73	G	WD	WD			WD					
+B*51:74	G	WD	WD				WD				
+B*51:75	G	I	WD			WD		I		WD	
+B*51:76	G	WD	WD			WD					
+B*51:79	G	WD	WD			WD					
+B*51:82	G	WD	WD			WD					
+B*51:83	G	WD	WD			WD	WD				
+B*51:87	G	WD	WD			WD					
+B*52:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*52:01:02G	G	C	C	C	C	C	C	C	C	C	
+B*52:01:05	G	WD	WD		WD						
+B*52:01:06	G	WD	WD		WD						
+B*52:01:07	G	I	WD		I						
+B*52:01:09	G	WD	WD								
+B*52:01:14	G	WD	WD		WD						
+B*52:02:01	G	I	WD					I			
+B*52:03	G	I	WD					I			
+B*52:04	G	C	I	WD	C	WD			C	I	
+B*52:06:02	G	WD	WD			WD					
+B*52:10:01	G	WD	WD					WD			
+B*52:11	G	WD	WD			WD					
+B*52:17	G	WD	WD								
+B*52:27	G	WD	WD								
+B*52:37	G	WD	WD								
+B*53:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*53:01:03	G	WD	WD		WD						
+B*53:01:05	G	WD	WD	WD							
+B*53:01:06	G	WD	WD	WD							
+B*53:04	G	WD	WD			WD					
+B*53:05:01	G	WD	WD			WD					
+B*53:06	G	WD	WD			WD					
+B*53:09	G	I	WD		I						
+B*53:10	G	WD	WD			WD		WD		WD	
+B*53:15	G	WD	WD	WD							
+B*53:18	G	WD	WD								
+B*53:20	G	WD	WD	WD							
+B*53:23	G	WD	WD								
+B*53:24	G	WD	WD			WD					
+B*53:28	G	WD	WD		WD						
+B*53:31	G	WD	WD			WD					
+B*54:01:01G	G	C	C	WD	C	I	C	I	C	C	
+B*55:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*55:01:02	G	WD	WD			WD					
+B*55:01:04	G	C	I		C	WD	WD				
+B*55:01:05	G	WD	WD			WD					
+B*55:01:06	G	WD	WD			WD					
+B*55:02:01G	G	C	C	WD	C	I	C	I		C	
+B*55:02:03	G	I	WD		I						
+B*55:03	G	I	WD		I						
+B*55:04	G	C	I		C	WD				I	
+B*55:05	G	WD	WD			WD					
+B*55:07	G	I	WD		I	WD	WD				
+B*55:09	G	WD	WD			WD					
+B*55:11	G	WD	WD			WD		WD			
+B*55:12	G	I	WD		I					WD	
+B*55:14	G	WD	WD			WD					
+B*55:17	G	WD	WD			WD					
+B*55:18	G	WD	WD								
+B*55:20	G	WD	WD			WD					
+B*55:21	G	WD	WD				WD				
+B*55:23	G	WD	WD								
+B*55:25	G	WD	WD			WD					
+B*55:29	G	WD	WD			WD					
+B*55:31	G	WD	WD								
+B*55:33	G	WD	WD			WD					
+B*55:45	G	WD	WD			WD					
+B*55:78	G	WD	WD		WD						
+B*56:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*56:01:02	G	WD	WD			WD					
+B*56:01:03	G	WD	WD			WD					
+B*56:01:04	G	WD	WD			WD					
+B*56:02:01	G	I	WD		I	WD				I	
+B*56:03	G	C	I		C	WD				I	
+B*56:04	G	C	I		C	WD	WD	WD		C	
+B*56:05:01	G	WD	WD		WD						
+B*56:05:02	G	WD	WD		WD						
+B*56:07	G	WD	WD		WD						
+B*56:10	G	I	WD		I						
+B*56:13	G	WD	WD			WD					
+B*56:15	G	WD	WD			WD		WD			
+B*56:16	G	WD	WD			WD					
+B*56:22	G	I	WD		I						
+B*56:25	G	WD	WD			WD					
+B*56:27	G	WD	WD			WD					
+B*56:33	G	WD	WD			WD					
+B*57:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*57:01:02	G	WD	WD			WD					
+B*57:01:06	G	WD	WD			WD					
+B*57:01:07	G	C	WD				C				
+B*57:01:10	G	WD	WD			WD					
+B*57:02:01	G	C	C	C	I	C	C	C	C	C	
+B*57:02:02	G	WD	WD	WD							
+B*57:03:01G	G	C	C	C	C	C	C	C	C	C	
+B*57:04:01	G	C	I	C		WD		I		I	
+B*57:05	G	WD	WD	WD							
+B*57:09	G	WD	WD	WD							
+B*57:11	G	WD	WD								
+B*57:14:01	G	WD	WD			WD					
+B*57:15	G	WD	WD			WD					
+B*57:21	G	WD	WD			WD					
+B*57:22	G	WD	WD		WD						
+B*57:23	G	WD	WD			WD					
+B*57:24	G	WD	WD			WD					
+B*57:26	G	WD	WD			WD					
+B*57:32	G	WD	WD			WD					
+B*57:34	G	WD	WD			WD					
+B*57:40	G	WD	WD			WD					
+B*57:44	G	WD	WD			WD					
+B*57:48	G	WD	WD			WD					
+B*57:58	G	WD	WD								
+B*57:61	G	I	WD		I						
+B*58:01:01G	G	C	C	C	C	C	C	C	C	C	
+B*58:02:01	G	C	C	C	I	I	WD	C	C	C	
+B*58:04	G	WD	WD	WD							
+B*58:05	G	WD	WD			WD					
+B*58:06	G	WD	WD								
+B*58:08:01	G	WD	WD		WD						
+B*58:16:02	G	WD	WD								
+B*58:18	G	I	WD		I						
+B*58:23	G	WD	WD			WD					
+B*58:28:02	G	WD	WD		WD						
+B*58:37	G	WD	WD			WD					
+B*58:62	G	WD	WD		WD						
+B*59:01:01G	G	C	I		C	WD		I		C	
+B*67:01:01	G	C	I		C	WD	WD			C	
+B*67:01:02G	G	C	I	WD	C	I		I		I	
+B*67:02	G	WD	WD								
+B*73:01	G	C	C	C	C	C	C	C	C	C	
+B*78:01:01G	G	C	C	C	I	I	C	C	C	C	
+B*78:01:02	G	WD	WD								
+B*78:02:01	G	WD	WD			WD					
+B*78:02:02	G	I	I			I		WD		I	
+B*78:04	G	I	WD					I		WD	
+B*81:01:01G	G	C	C	C	C	I	C	C	C	C	
+B*81:05	G	WD	WD	WD							
+B*82:01	G	C	I	C		WD		C	C	C	
+B*82:02:01	G	C	I	C		WD	C	WD		I	
+B*83:01	G	WD	WD			WD					
+C*01:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*01:02:03	G	C	I		C	WD				I	
+C*01:02:04	G	WD	WD			WD					
+C*01:02:07	G	WD	WD			WD					
+C*01:02:08	G	I	I			I					
+C*01:02:10	G	WD	WD					WD			
+C*01:02:16	G	I	WD					I		WD	
+C*01:03:01G	G	C	I		C	WD	C			I	
+C*01:04	G	WD	WD		WD						
+C*01:06	G	I	WD		I	WD				WD	
+C*01:07:01	G	WD	WD			WD					
+C*01:08	G	C	I		C					WD	
+C*01:10	G	I	WD			WD		I		WD	
+C*01:103	G	WD	WD			WD					
+C*01:121Q	G	WD	WD								
+C*01:12:01	G	WD	WD								
+C*01:13	G	WD	WD			WD					
+C*01:14	G	WD	WD								
+C*01:17	G	C	I		C	WD	WD				
+C*01:22	G	I	WD			WD		I		WD	
+C*01:27	G	WD	WD			WD				WD	
+C*01:30	G	WD	WD								
+C*01:32:01	G	WD	WD			WD					
+C*01:33	G	WD	WD								
+C*01:45	G	WD	WD			WD					
+C*01:51	G	WD	WD								
+C*01:52	G	WD	WD			WD					
+C*01:54	G	WD	WD			WD					
+C*01:58	G	WD	WD			WD	WD				
+C*01:59	G	WD	WD			WD					
+C*01:62	G	WD	WD			WD					
+C*01:67	G	WD	WD								
+C*01:70	G	WD	WD			WD					
+C*01:74	G	WD	WD			WD					
+C*01:96	G	WD	WD								
+C*02:02:01	G	WD	WD			WD					
+C*02:02:02G	G	C	C	C	C	C	C	C	C	C	
+C*02:02:03	G	WD	WD			WD	WD			WD	
+C*02:02:06	G	WD	WD			WD					
+C*02:02:07	G	I	I			I				WD	
+C*02:02:08	G	WD	WD			WD					
+C*02:02:09	G	WD	WD			WD					
+C*02:02:12	G	WD	WD			WD					
+C*02:02:14	G	WD	WD								
+C*02:02:18	G	WD	WD			WD					
+C*02:03	G	WD	WD			WD					
+C*02:04	G	WD	WD			WD			WD		
+C*02:05:02	G	WD	WD								
+C*02:06:01	G	I	I			I				WD	
+C*02:07	G	I	I			I	WD	I		I	
+C*02:08	G	I	I		I	WD	WD	I		WD	
+C*02:10:01G	G	C	C	C	I	C	C	C	C	C	
+C*02:12	G	WD	WD	WD							
+C*02:13	G	WD	WD			WD					
+C*02:14:01G	G	C	I	C		WD		I		I	
+C*02:16:01	G	WD	WD	WD							
+C*02:16:02	G	WD	WD			WD					
+C*02:19	G	I	WD			WD				I	
+C*02:21	G	I	WD			WD	WD	I		I	
+C*02:23	G	WD	WD			WD					
+C*02:24	G	WD	WD			WD					
+C*02:25Q	G	WD	WD			WD					
+C*02:26:01	G	WD	WD			WD				WD	
+C*02:26:02	G	WD	WD			WD				WD	
+C*02:26:03	G	I	WD							I	
+C*02:27:01	G	I	WD	WD		WD		I		WD	
+C*02:30	G	WD	WD			WD					
+C*02:31	G	WD	WD			WD					
+C*02:32	G	WD	WD			WD					
+C*02:34	G	WD	WD			WD					
+C*02:35	G	WD	WD							WD	
+C*02:38N	G	WD	WD			WD					
+C*02:40:01	G	WD	WD			WD					
+C*02:44	G	WD	WD			WD					
+C*02:45	G	WD	WD								
+C*02:46	G	WD	WD			WD		WD			
+C*02:48	G	WD	WD			WD					
+C*02:49	G	WD	WD	WD							
+C*02:55:01	G	WD	WD			WD					
+C*02:56	G	WD	WD			WD					
+C*02:67Q	G	WD	WD			WD					
+C*02:87	G	WD	WD			WD					
+C*02:92N	G	WD	WD			WD					
+C*03:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*03:02:09	G	I	WD		I						
+C*03:03:01G	G	C	C	C	C	C	C	C	C	C	
+C*03:03:02	G	I	I	WD		I				I	
+C*03:03:03	G	WD	WD		WD						
+C*03:03:04	G	C	I	C	I	WD	WD	I	C	I	
+C*03:03:05	G	WD	WD			WD				WD	
+C*03:03:07	G	WD	WD			WD					
+C*03:03:10	G	WD	WD		WD						
+C*03:03:12	G	I	WD		I						
+C*03:03:16	G	WD	WD			WD					
+C*03:04:01G	G	C	C	C	C	C	C	C	C	C	
+C*03:04:02G	G	C	C	C	C	C	C	C	C	C	
+C*03:04:04	G	C	I		C	WD				I	
+C*03:04:05	G	WD	WD			WD					
+C*03:04:06	G	WD	WD	WD							
+C*03:04:08	G	WD	WD			WD					
+C*03:04:09	G	WD	WD			WD					
+C*03:04:10	G	WD	WD		WD						
+C*03:04:11	G	WD	WD			WD					
+C*03:04:13	G	WD	WD			WD					
+C*03:04:14	G	WD	WD			WD					
+C*03:04:15	G	WD	WD			WD					
+C*03:04:17	G	WD	WD			WD					
+C*03:04:18	G	WD	WD	WD							
+C*03:04:19	G	WD	WD			WD					
+C*03:04:21	G	WD	WD		WD						
+C*03:04:22	G	WD	WD								
+C*03:04:27	G	I	WD			WD		I		WD	
+C*03:04:42	G	WD	WD			WD					
+C*03:05:01G	G	C	C	C	I	I	WD	C	C	C	
+C*03:06:01	G	C	C	WD	I	WD		C	C	C	
+C*03:07:01	G	WD	WD			WD					
+C*03:08	G	C	I			WD	WD	C	C	I	
+C*03:09	G	I	I	WD		I				I	
+C*03:10	G	I	I	WD		I				I	
+C*03:103	G	WD	WD								
+C*03:109	G	WD	WD			WD					
+C*03:115	G	WD	WD			WD					
+C*03:116:01	G	WD	WD								
+C*03:117	G	WD	WD			WD					
+C*03:11:02	G	WD	WD			WD				WD	
+C*03:120	G	WD	WD			WD					
+C*03:122	G	WD	WD			WD					
+C*03:126	G	WD	WD			WD					
+C*03:127	G	WD	WD			WD					
+C*03:136	G	WD	WD			WD					
+C*03:139	G	WD	WD								
+C*03:13:01	G	WD	WD			WD					
+C*03:140	G	WD	WD		WD					WD	
+C*03:143	G	I	WD			WD		I		I	
+C*03:147	G	WD	WD			WD					
+C*03:148	G	WD	WD			WD					
+C*03:14:01G	G	I	I			I		I		I	
+C*03:151	G	WD	WD			WD					
+C*03:153	G	I	WD		I						
+C*03:154	G	WD	WD			WD					
+C*03:159	G	WD	WD								
+C*03:16	G	I	I			I	WD	I		I	
+C*03:18:01	G	WD	WD			WD				WD	
+C*03:19	G	C	I			I	C	I		I	
+C*03:21	G	I	WD		I						
+C*03:251	G	WD	WD								
+C*03:258	G	WD	WD		WD						
+C*03:26	G	WD	WD			WD					
+C*03:28	G	WD	WD			WD					
+C*03:30	G	WD	WD			WD					
+C*03:32	G	WD	WD		WD	WD					
+C*03:35:01	G	WD	WD								
+C*03:36	G	I	WD		I					I	
+C*03:37:01	G	WD	WD		WD						
+C*03:38:01	G	C	WD	C				I	WD	I	
+C*03:38:02	G	WD	WD								
+C*03:40:01G	G	I	WD			WD		I		I	
+C*03:41:01	G	WD	WD								
+C*03:42	G	WD	WD			WD					
+C*03:43:01	G	WD	WD		WD	WD					
+C*03:44	G	I	I			I				WD	
+C*03:45	G	I	WD			WD		I		I	
+C*03:46	G	WD	WD			WD					
+C*03:47	G	I	WD			WD		I		I	
+C*03:49	G	WD	WD		WD						
+C*03:51	G	WD	WD			WD					
+C*03:53	G	WD	WD			WD					
+C*03:54	G	WD	WD			WD					
+C*03:56	G	WD	WD		WD						
+C*03:59	G	WD	WD			WD					
+C*03:60	G	WD	WD								
+C*03:64:01	G	WD	WD			WD					
+C*03:69	G	WD	WD			WD					
+C*03:70	G	WD	WD			WD					
+C*03:75	G	WD	WD			WD					
+C*03:78	G	I	WD					I			
+C*03:81	G	WD	WD								
+C*03:85	G	I	WD		I						
+C*03:86	G	WD	WD								
+C*03:87:01	G	WD	WD			WD					
+C*03:87:02	G	I	WD					I			
+C*03:88	G	C	I		C		WD				
+C*03:91:01	G	WD	WD			WD					
+C*03:94	G	I	WD		I						
+C*04:01:01G	G	C	C	C	C	C	C	C	C	C	
+C*04:01:03	G	I	WD			WD		I		WD	
+C*04:01:04	G	WD	WD								
+C*04:01:08	G	WD	WD			WD					
+C*04:01:09	G	WD	WD			WD	WD				
+C*04:01:10	G	I	I			I				WD	
+C*04:01:13	G	WD	WD			WD					
+C*04:01:14	G	WD	WD								
+C*04:01:15	G	WD	WD			WD					
+C*04:01:16	G	WD	WD			WD					
+C*04:01:23	G	WD	WD								
+C*04:01:28	G	I	WD				WD			I	
+C*04:01:29	G	WD	WD				WD				
+C*04:01:30	G	WD	WD								
+C*04:01:33	G	I	WD					I			
+C*04:01:41	G	WD	WD								
+C*04:03:01G	G	C	C	C	C	C	C	C	C	C	
+C*04:04:01G	G	C	C	C	WD	I	C	C	C	C	
+C*04:04:02	G	I	WD					I		WD	
+C*04:05	G	WD	WD			WD				WD	
+C*04:06:01	G	WD	WD		WD						
+C*04:07	G	C	C	C	I	I	C	C	WD	C	
+C*04:08	G	C	I	C		WD		I		I	
+C*04:10	G	C	I		C	WD	WD	I	WD	I	
+C*04:104	G	WD	WD								
+C*04:108	G	WD	WD								
+C*04:11	G	WD	WD			WD				WD	
+C*04:113	G	WD	WD								
+C*04:114	G	WD	WD			WD					
+C*04:118	G	WD	WD			WD					
+C*04:12	G	WD	WD			WD					
+C*04:121	G	WD	WD								
+C*04:125	G	WD	WD			WD					
+C*04:13	G	C	I	C		WD		I	WD	I	
+C*04:131	G	WD	WD					WD			
+C*04:132	G	WD	WD			WD	WD				
+C*04:139	G	WD	WD			WD					
+C*04:14	G	WD	WD	WD		WD	WD				
+C*04:141	G	WD	WD				WD				
+C*04:150	G	WD	WD			WD					
+C*04:153	G	WD	WD			WD					
+C*04:155	G	WD	WD								
+C*04:15:01	G	WD	WD								
+C*04:15:02	G	WD	WD			WD				WD	
+C*04:16	G	WD	WD			WD					
+C*04:163	G	WD	WD		WD						
+C*04:17	G	I	WD					I			
+C*04:19	G	C	WD					C	C	WD	
+C*04:204	G	WD	WD		WD						
+C*04:207	G	WD	WD		WD						
+C*04:209	G	WD	WD								
+C*04:218	G	WD	WD								
+C*04:23	G	WD	WD								
+C*04:24	G	WD	WD			WD					
+C*04:26	G	I	WD		I						
+C*04:27	G	C	WD	C						WD	
+C*04:29	G	WD	WD		WD	WD	WD			WD	
+C*04:32	G	WD	WD			WD					
+C*04:33	G	WD	WD	WD	WD	WD	WD	WD		WD	
+C*04:34	G	WD	WD	WD							
+C*04:36	G	WD	WD	WD							
+C*04:37	G	WD	WD			WD					
+C*04:39	G	WD	WD				WD				
+C*04:40	G	WD	WD	WD							
+C*04:45	G	WD	WD			WD					
+C*04:46	G	I	WD					I			
+C*04:47	G	WD	WD			WD					
+C*04:52	G	WD	WD			WD					
+C*04:54	G	WD	WD			WD					
+C*04:55	G	WD	WD			WD					
+C*04:56	G	WD	WD			WD					
+C*04:59Q	G	WD	WD			WD					
+C*04:63	G	WD	WD			WD					
+C*04:65	G	WD	WD			WD					
+C*04:70	G	WD	WD								
+C*04:71	G	WD	WD			WD					
+C*04:75	G	WD	WD			WD					
+C*04:77	G	WD	WD			WD					
+C*04:86	G	WD	WD			WD					
+C*04:87	G	WD	WD								
+C*04:93N	G	WD	WD			WD					
+C*04:95N	G	WD	WD			WD					
+C*04:96	G	WD	WD			WD					
+C*05:01:01G	G	C	C	C	C	C	C	C	C	C	
+C*05:01:02	G	WD	WD			WD				WD	
+C*05:01:03	G	WD	WD			WD				WD	
+C*05:01:07	G	WD	WD			WD					
+C*05:01:08	G	I	WD			WD				I	
+C*05:01:11	G	WD	WD			WD				WD	
+C*05:01:16	G	WD	WD			WD				WD	
+C*05:01:17	G	WD	WD								
+C*05:01:20	G	WD	WD			WD					
+C*05:01:24	G	WD	WD			WD					
+C*05:01:27	G	WD	WD			WD					
+C*05:04:01	G	I	WD			WD		I		WD	
+C*05:05:01	G	WD	WD			WD					
+C*05:06	G	WD	WD			WD					
+C*05:07N	G	I	I			I		I		I	
+C*05:08	G	I	I			I		I		I	
+C*05:09:01	G	C	I	WD		I		C	C	C	
+C*05:10	G	WD	WD			WD				WD	
+C*05:104	G	WD	WD			WD					
+C*05:11	G	WD	WD	WD		WD				WD	
+C*05:111	G	WD	WD			WD					
+C*05:13	G	WD	WD			WD					
+C*05:14	G	I	WD			WD				I	
+C*05:15	G	WD	WD			WD					
+C*05:16	G	WD	WD			WD					
+C*05:18:01	G	WD	WD			WD	WD				
+C*05:19	G	WD	WD			WD					
+C*05:22:01	G	WD	WD			WD					
+C*05:22:02	G	WD	WD			WD					
+C*05:24	G	WD	WD			WD					
+C*05:26	G	WD	WD			WD	WD				
+C*05:27	G	WD	WD			WD					
+C*05:28	G	WD	WD			WD					
+C*05:29:01	G	WD	WD			WD					
+C*05:32	G	WD	WD			WD					
+C*05:33	G	WD	WD			WD					
+C*05:34	G	WD	WD			WD					
+C*05:35	G	WD	WD			WD					
+C*05:36	G	WD	WD			WD				WD	
+C*05:39	G	WD	WD			WD					
+C*05:43	G	WD	WD			WD					
+C*05:44:02	G	WD	WD								
+C*05:46	G	WD	WD			WD					
+C*05:47	G	WD	WD			WD					
+C*05:51Q	G	WD	WD			WD					
+C*05:55	G	WD	WD			WD					
+C*05:65	G	WD	WD			WD					
+C*05:67	G	WD	WD			WD					
+C*05:77	G	WD	WD			WD					
+C*05:80	G	WD	WD			WD					
+C*05:97	G	WD	WD			WD					
+C*05:98	G	WD	WD			WD					
+C*05:99N	G	WD	WD			WD					
+C*06:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*06:02:05	G	WD	WD			WD					
+C*06:02:06	G	WD	WD			WD					
+C*06:02:07	G	I	WD			WD		I		WD	
+C*06:02:08	G	WD	WD			WD				WD	
+C*06:02:12	G	WD	WD			WD					
+C*06:02:18	G	WD	WD			WD					
+C*06:02:20	G	WD	WD								
+C*06:02:22	G	WD	WD			WD					
+C*06:02:33	G	WD	WD								
+C*06:02:37	G	WD	WD		WD						
+C*06:02:38	G	C	I				C			WD	
+C*06:03:01	G	WD	WD			WD					
+C*06:03:02	G	WD	WD			WD					
+C*06:04:01	G	WD	WD			WD					
+C*06:06	G	C	I	WD	WD	I	C	I		I	
+C*06:07	G	I	I			I		WD		I	
+C*06:08	G	C	WD	C		WD		I		I	
+C*06:09	G	C	WD	C		WD		I		WD	
+C*06:10	G	WD	WD			WD					
+C*06:11	G	WD	WD			WD	WD				
+C*06:115	G	WD	WD		WD						
+C*06:12	G	WD	WD								
+C*06:127:01G	G	I	WD		I						
+C*06:13	G	WD	WD			WD					
+C*06:138	G	WD	WD								
+C*06:14	G	WD	WD			WD					
+C*06:16N	G	WD	WD			WD					
+C*06:17	G	WD	WD			WD					
+C*06:18	G	I	WD			I					
+C*06:23	G	WD	WD			WD					
+C*06:26	G	WD	WD			WD					
+C*06:27	G	C	I		C	WD	WD			WD	
+C*06:28	G	WD	WD			WD					
+C*06:30	G	WD	WD			WD					
+C*06:32	G	WD	WD			WD					
+C*06:34:01	G	WD	WD			WD					
+C*06:35	G	I	WD		I						
+C*06:37	G	WD	WD								
+C*06:38	G	WD	WD			WD					
+C*06:39	G	WD	WD								
+C*06:47	G	WD	WD			WD					
+C*06:50	G	WD	WD			WD					
+C*06:53:01	G	WD	WD				WD				
+C*06:54	G	WD	WD			WD					
+C*06:58	G	WD	WD			WD					
+C*06:59	G	WD	WD			WD				WD	
+C*06:65	G	WD	WD			WD					
+C*06:66	G	WD	WD			WD					
+C*06:70:01	G	WD	WD			WD					
+C*06:71	G	WD	WD			WD					
+C*06:79N	G	I	WD		I						
+C*06:86	G	WD	WD			WD					
+C*06:87	G	WD	WD			WD					
+C*06:91	G	WD	WD			WD					
+C*06:96	G	WD	WD		WD						
+C*07:01:01G	G	C	C	C	C	C	C	C	C	C	
+C*07:01:03	G	C	WD	C				I		I	
+C*07:01:04	G	WD	WD			WD					
+C*07:01:05	G	WD	WD	WD		WD	WD			WD	
+C*07:01:07	G	WD	WD			WD					
+C*07:01:08	G	I	I			I				I	
+C*07:01:10	G	WD	WD			WD					
+C*07:01:12	G	WD	WD				WD				
+C*07:01:15	G	WD	WD			WD					
+C*07:01:18	G	I	WD		I						
+C*07:01:23	G	I	WD		I	WD					
+C*07:01:24	G	WD	WD								
+C*07:01:25	G	WD	WD								
+C*07:01:28	G	WD	WD			WD					
+C*07:01:30	G	WD	WD								
+C*07:01:31	G	WD	WD								
+C*07:01:47	G	WD	WD			WD					
+C*07:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*07:02:02	G	WD	WD								
+C*07:02:04	G	WD	WD			WD					
+C*07:02:06	G	I	WD		I						
+C*07:02:07	G	WD	WD			WD					
+C*07:02:08	G	I	I			I				WD	
+C*07:02:10	G	I	I			I				WD	
+C*07:02:11	G	WD	WD			WD					
+C*07:02:13	G	WD	WD		WD						
+C*07:02:14	G	WD	WD			WD					
+C*07:02:16	G	WD	WD			WD				WD	
+C*07:02:18	G	WD	WD			WD					
+C*07:02:20	G	I	WD			WD		I		WD	
+C*07:02:24	G	WD	WD			WD					
+C*07:02:28	G	WD	WD			WD					
+C*07:02:32	G	WD	WD			WD					
+C*07:02:36	G	WD	WD		WD						
+C*07:02:39	G	WD	WD			WD					
+C*07:02:54	G	WD	WD								
+C*07:02:55	G	WD	WD		WD						
+C*07:04:01G	G	C	C	C	C	C	C	C	C	C	
+C*07:04:02G	G	WD	WD			WD					
+C*07:04:04	G	I	WD		I						
+C*07:04:06	G	WD	WD			WD					
+C*07:05	G	C	I	C		WD	WD	I	WD	I	
+C*07:07	G	I	I			I	WD	I		I	
+C*07:09	G	WD	WD								
+C*07:10	G	I	I			I				I	
+C*07:100	G	WD	WD			WD					
+C*07:101	G	WD	WD			WD					
+C*07:102	G	WD	WD			WD					
+C*07:104N	G	WD	WD			WD					
+C*07:105	G	WD	WD			WD					
+C*07:106	G	WD	WD			WD					
+C*07:108:01	G	WD	WD			WD					
+C*07:108:02	G	WD	WD								
+C*07:112	G	WD	WD	WD							
+C*07:114	G	WD	WD			WD					
+C*07:116	G	WD	WD			WD					
+C*07:117	G	WD	WD			WD					
+C*07:118	G	WD	WD			WD					
+C*07:119	G	WD	WD			WD				WD	
+C*07:12	G	I	I			I				I	
+C*07:120	G	WD	WD			WD					
+C*07:121Q	G	WD	WD			WD					
+C*07:122	G	WD	WD			WD					
+C*07:123	G	WD	WD								
+C*07:124	G	WD	WD			WD				WD	
+C*07:126	G	WD	WD			WD					
+C*07:127	G	WD	WD			WD					
+C*07:128	G	WD	WD								
+C*07:13	G	I	WD		I	WD	WD			WD	
+C*07:130	G	WD	WD		WD	WD					
+C*07:137:02	G	WD	WD			WD					
+C*07:138	G	WD	WD			WD					
+C*07:141:02	G	WD	WD								
+C*07:143	G	WD	WD			WD					
+C*07:147	G	WD	WD			WD					
+C*07:148	G	WD	WD			WD					
+C*07:149	G	WD	WD			WD					
+C*07:15	G	I	WD			I					
+C*07:151	G	WD	WD			WD					
+C*07:154	G	WD	WD		WD						
+C*07:155	G	WD	WD			WD					
+C*07:16	G	I	WD			WD				I	
+C*07:165	G	WD	WD			WD					
+C*07:172:01	G	WD	WD			WD					
+C*07:173	G	WD	WD	WD		WD					
+C*07:179	G	WD	WD			WD					
+C*07:17:01	G	C	I	WD		I		C	C	I	
+C*07:180	G	WD	WD			WD					
+C*07:181	G	WD	WD								
+C*07:184	G	WD	WD	WD							
+C*07:19	G	C	I	C		I	C	I		I	
+C*07:192	G	WD	WD			WD					
+C*07:196	G	WD	WD								
+C*07:198N	G	WD	WD								
+C*07:199:01	G	WD	WD		WD						
+C*07:199:02	G	WD	WD			WD					
+C*07:205	G	WD	WD			WD					
+C*07:206	G	WD	WD			WD					
+C*07:209	G	WD	WD			WD					
+C*07:21	G	I	WD			WD				I	
+C*07:212	G	WD	WD			WD					
+C*07:214	G	WD	WD			WD					
+C*07:218	G	WD	WD			WD					
+C*07:22	G	I	I			I				I	
+C*07:222	G	WD	WD			WD					
+C*07:223	G	WD	WD								
+C*07:224	G	WD	WD								
+C*07:227N	G	WD	WD								
+C*07:232	G	I	WD		I						
+C*07:234	G	WD	WD			WD					
+C*07:24	G	WD	WD			WD				WD	
+C*07:241	G	WD	WD			WD					
+C*07:242	G	WD	WD			WD					
+C*07:243	G	WD	WD								
+C*07:247	G	WD	WD								
+C*07:25	G	I	I			I				I	
+C*07:250	G	WD	WD			WD					
+C*07:252	G	WD	WD			WD					
+C*07:256	G	WD	WD			WD					
+C*07:261	G	WD	WD			WD					
+C*07:262	G	WD	WD			WD					
+C*07:26:01	G	C	C		C	WD				I	
+C*07:279	G	WD	WD			WD					
+C*07:27:01	G	C	I		C	WD	C	I		I	
+C*07:27:02	G	WD	WD		WD	WD					
+C*07:28	G	WD	WD	WD		WD					
+C*07:285	G	WD	WD			WD					
+C*07:287	G	WD	WD			WD					
+C*07:293	G	WD	WD								
+C*07:298	G	WD	WD			WD					
+C*07:29:01	G	C	I		C	WD					
+C*07:301	G	WD	WD			WD					
+C*07:303	G	WD	WD			WD					
+C*07:312	G	WD	WD								
+C*07:31:01	G	WD	WD			WD					
+C*07:326	G	WD	WD					WD			
+C*07:32N	G	WD	WD			WD				WD	
+C*07:335	G	WD	WD			WD					
+C*07:339	G	I	WD		I						
+C*07:33N	G	WD	WD			WD					
+C*07:340	G	I	WD		I						
+C*07:35	G	C	WD	C				I		I	
+C*07:36	G	I	I			I	WD				
+C*07:360	G	WD	WD			WD					
+C*07:369	G	WD	WD								
+C*07:37	G	WD	WD			WD					
+C*07:38:01	G	WD	WD			WD					
+C*07:39	G	WD	WD			WD					
+C*07:391	G	WD	WD			WD					
+C*07:40	G	I	I			I				WD	
+C*07:409	G	WD	WD								
+C*07:44	G	WD	WD			WD					
+C*07:450	G	WD	WD			WD					
+C*07:452N	G	WD	WD			WD					
+C*07:46	G	I	I			I				WD	
+C*07:48	G	I	WD		I						
+C*07:49	G	WD	WD			WD					
+C*07:51	G	WD	WD		WD	WD				WD	
+C*07:54	G	WD	WD			WD					
+C*07:55N	G	WD	WD			WD					
+C*07:56:02	G	I	WD		I						
+C*07:57	G	WD	WD			WD					
+C*07:60	G	I	I			I					
+C*07:61N	G	WD	WD	WD							
+C*07:63	G	I	WD		I						
+C*07:68	G	I	I			I				WD	
+C*07:70	G	WD	WD			WD					
+C*07:72	G	WD	WD			WD				WD	
+C*07:73	G	WD	WD			WD					
+C*07:75	G	WD	WD			WD					
+C*07:76:01	G	WD	WD			WD					
+C*07:76:02	G	WD	WD			WD					
+C*07:79	G	WD	WD			WD					
+C*07:80	G	WD	WD			WD	WD	WD		WD	
+C*07:83	G	WD	WD			WD					
+C*07:85	G	WD	WD			WD					
+C*07:88	G	WD	WD			WD					
+C*07:89	G	WD	WD								
+C*07:90	G	WD	WD			WD					
+C*07:91	G	WD	WD			WD					
+C*07:92	G	WD	WD			WD					
+C*07:93	G	WD	WD			WD	WD			WD	
+C*07:95	G	WD	WD			WD					
+C*07:96:01	G	WD	WD			WD					
+C*07:97	G	WD	WD			WD					
+C*08:01:01G	G	C	C	C	C	C	C	C	C	C	
+C*08:01:02	G	WD	WD		WD						
+C*08:01:07	G	WD	WD		WD						
+C*08:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*08:02:02	G	WD	WD			WD					
+C*08:02:04	G	WD	WD			WD					
+C*08:02:06	G	WD	WD								
+C*08:02:08	G	WD	WD								
+C*08:03:01G	G	C	C	C	C	C	C	C	C	C	
+C*08:04:01	G	C	C	C	I	I	C	C	C	C	
+C*08:04:02	G	WD	WD	WD							
+C*08:05	G	I	WD	WD		WD				I	
+C*08:06	G	C	WD		I	WD			C	I	
+C*08:07	G	WD	WD								
+C*08:08:01	G	I	WD			WD		I		I	
+C*08:10	G	C	I			WD		C	C	I	
+C*08:103	G	WD	WD			WD					
+C*08:11	G	I	WD			WD		I	WD	WD	
+C*08:12	G	WD	WD			WD				WD	
+C*08:127N	G	WD	WD		WD						
+C*08:13	G	I	WD	WD				I			
+C*08:15:01	G	WD	WD			WD				WD	
+C*08:23	G	WD	WD			WD					
+C*08:25	G	WD	WD								
+C*08:28	G	WD	WD			WD					
+C*08:30	G	WD	WD			WD				WD	
+C*08:32	G	WD	WD	WD							
+C*08:35	G	I	WD					I		WD	
+C*08:43	G	WD	WD	WD							
+C*08:50	G	WD	WD		WD						
+C*08:51	G	WD	WD			WD					
+C*08:53	G	WD	WD			WD					
+C*08:54	G	WD	WD								
+C*08:76	G	WD	WD								
+C*08:92	G	WD	WD			WD					
+C*12:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*12:02:03	G	WD	WD		WD	WD					
+C*12:02:04	G	WD	WD		WD						
+C*12:02:08	G	WD	WD			WD					
+C*12:03:01G	G	C	C	C	C	C	C	C	C	C	
+C*12:03:03	G	WD	WD			WD				WD	
+C*12:03:04	G	WD	WD								
+C*12:03:05	G	WD	WD			WD					
+C*12:03:08	G	C	I		WD	WD	C			WD	
+C*12:03:09	G	WD	WD			WD					
+C*12:03:10	G	WD	WD			WD					
+C*12:03:11	G	WD	WD			WD					
+C*12:03:15	G	WD	WD			WD					
+C*12:03:17	G	WD	WD								
+C*12:03:18	G	WD	WD			WD					
+C*12:03:26	G	WD	WD								
+C*12:03:29	G	WD	WD			WD					
+C*12:03:35	G	WD	WD							WD	
+C*12:04:01	G	WD	WD			WD					
+C*12:04:02	G	C	C	WD	C	I	WD	I	C	C	
+C*12:05	G	C	C	WD	C	I	C	I		I	
+C*12:06	G	WD	WD			WD					
+C*12:07	G	WD	WD	WD							
+C*12:08	G	WD	WD								
+C*12:09	G	C	I		C	WD	WD			I	
+C*12:101	G	I	WD		I						
+C*12:11	G	WD	WD			WD					
+C*12:12	G	C	I	WD		WD	WD	C	C	I	
+C*12:13	G	I	I			I				I	
+C*12:136	G	WD	WD		WD						
+C*12:139	G	WD	WD				WD				
+C*12:149	G	WD	WD								
+C*12:14:01	G	WD	WD			WD					
+C*12:16	G	I	I			I				WD	
+C*12:162	G	WD	WD		WD						
+C*12:18:01	G	I	WD		I						
+C*12:19	G	WD	WD	WD							
+C*12:20	G	WD	WD								
+C*12:21	G	WD	WD			WD					
+C*12:24	G	WD	WD			WD				WD	
+C*12:27	G	WD	WD				WD				
+C*12:28	G	WD	WD			WD					
+C*12:30	G	I	I			I					
+C*12:33	G	WD	WD			WD					
+C*12:34	G	I	I			I				WD	
+C*12:38	G	I	WD		I						
+C*12:40	G	WD	WD		WD						
+C*12:41	G	I	WD		I						
+C*12:42Q	G	WD	WD			WD					
+C*12:43	G	WD	WD			WD					
+C*12:45	G	WD	WD			WD					
+C*12:47	G	WD	WD			WD				WD	
+C*12:48	G	WD	WD			WD					
+C*12:54	G	WD	WD		WD	WD					
+C*12:59	G	WD	WD	WD							
+C*12:60	G	I	WD		I						
+C*12:61	G	WD	WD								
+C*12:62	G	WD	WD			WD					
+C*12:64	G	WD	WD								
+C*12:67	G	WD	WD			WD					
+C*12:72	G	I	WD		I						
+C*12:78	G	WD	WD								
+C*12:86	G	WD	WD			WD					
+C*12:90	G	WD	WD			WD					
+C*12:98	G	WD	WD				WD			WD	
+C*12:99:01	G	WD	WD			WD					
+C*14:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*14:02:02	G	I	I			I	WD	WD		WD	
+C*14:02:03	G	C	I	C		WD	WD	I	WD	I	
+C*14:02:04	G	WD	WD			WD					
+C*14:02:05	G	WD	WD			WD					
+C*14:02:17	G	WD	WD			WD					
+C*14:03:01G	G	C	C	C	C	C	C	C	C	C	
+C*14:04	G	I	I	WD		I				I	
+C*14:05	G	I	I			I				WD	
+C*14:06	G	I	WD	WD		WD		I		WD	
+C*14:10	G	WD	WD	WD							
+C*14:11	G	I	I			I				WD	
+C*14:12	G	I	WD		I						
+C*14:18	G	WD	WD			WD					
+C*14:24:02	G	I	WD		I						
+C*14:25	G	WD	WD			WD					
+C*14:29	G	WD	WD		WD						
+C*14:32	G	WD	WD			WD					
+C*14:41	G	WD	WD			WD					
+C*14:50	G	WD	WD			WD					
+C*14:66	G	I	WD					I			
+C*14:67	G	WD	WD								
+C*15:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*15:02:02	G	I	I			I	WD	I		I	
+C*15:02:03	G	WD	WD			WD					
+C*15:02:05	G	WD	WD			WD					
+C*15:02:10	G	WD	WD		WD						
+C*15:02:23	G	WD	WD		WD						
+C*15:03	G	I	WD			WD		I		I	
+C*15:04:01G	G	C	C	WD	C	C	C	C	C	C	
+C*15:05:01G	G	C	C	C	C	C	C	C	C	C	
+C*15:05:06	G	WD	WD	WD						WD	
+C*15:05:07	G	WD	WD			WD					
+C*15:05:08	G	WD	WD								
+C*15:06:01	G	C	C	WD	I	C	C	C	C	C	
+C*15:06:02	G	WD	WD			WD					
+C*15:06:03	G	WD	WD			WD					
+C*15:07	G	C	C		C	WD	WD			I	
+C*15:08	G	I	WD		I	WD		I		I	
+C*15:09	G	C	C	WD	I	I	C	C	C	C	
+C*15:102	G	WD	WD							WD	
+C*15:10:02	G	I	WD		I	WD					
+C*15:11	G	I	I	WD	I	I	WD	I		I	
+C*15:122N	G	WD	WD								
+C*15:124	G	WD	WD		WD						
+C*15:15	G	WD	WD			WD					
+C*15:16	G	I	WD			WD		I		I	
+C*15:17	G	I	WD			WD		I			
+C*15:22	G	C	WD	C						WD	
+C*15:23	G	WD	WD			WD					
+C*15:24	G	WD	WD			WD					
+C*15:25	G	WD	WD	WD			WD				
+C*15:26	G	WD	WD		WD						
+C*15:27	G	I	WD					I			
+C*15:30	G	WD	WD			WD	WD				
+C*15:32Q	G	I	WD		I						
+C*15:38	G	WD	WD			WD					
+C*15:40	G	WD	WD		WD						
+C*15:42	G	I	WD		I						
+C*15:52	G	WD	WD							WD	
+C*15:57	G	WD	WD		WD						
+C*15:58	G	I	WD		I						
+C*15:68	G	WD	WD		WD						
+C*15:72	G	WD	WD								
+C*15:85	G	WD	WD								
+C*16:01:01G	G	C	C	C	C	C	C	C	C	C	
+C*16:01:04	G	I	WD			WD		I		WD	
+C*16:01:15	G	WD	WD			WD					
+C*16:02:01G	G	C	C	C	C	C	C	C	C	C	
+C*16:02:04	G	WD	WD				WD				
+C*16:02:05	G	WD	WD				WD				
+C*16:04:01G	G	C	C	C	C	C	C	C	C	C	
+C*16:07:01	G	WD	WD			WD					
+C*16:07:02	G	WD	WD	WD							
+C*16:08	G	WD	WD	WD							
+C*16:09	G	I	WD					I			
+C*16:12	G	I	WD		I						
+C*16:13	G	WD	WD			WD					
+C*16:14	G	WD	WD			WD					
+C*16:15:01	G	C	WD			WD	C			WD	
+C*16:16Q	G	WD	WD			WD					
+C*16:18	G	WD	WD			WD					
+C*16:19	G	I	WD		I						
+C*16:21	G	WD	WD			WD					
+C*16:22	G	WD	WD	WD							
+C*16:24	G	WD	WD								
+C*16:25	G	WD	WD	WD		WD					
+C*16:26	G	WD	WD			WD					
+C*16:30N	G	I	WD		I						
+C*16:33	G	WD	WD							WD	
+C*16:37	G	WD	WD							WD	
+C*16:38	G	WD	WD			WD				WD	
+C*16:46	G	WD	WD	WD			WD				
+C*16:50	G	WD	WD	WD						WD	
+C*16:52	G	WD	WD			WD					
+C*16:74	G	WD	WD			WD					
+C*16:88	G	WD	WD		WD						
+C*17:01:01G	G	C	C	C	C	C	C	C	C	C	
+C*17:01:03	G	WD	WD			WD					
+C*17:01:04	G	WD	WD			WD	WD				
+C*17:04	G	I	WD	WD						I	
+C*17:07	G	WD	WD			WD					
+C*17:23	G	WD	WD								
+C*18:01:01G	G	C	C	C	I	C	C	C	C	C	
+C*18:03	G	WD	WD	WD						WD	
+C*18:04	G	WD	WD	WD							
+C*18:06	G	WD	WD	WD							
+DPB1*01:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*01:01:02G	G	C	C	C	I	C	C	C	C	C	
+DPB1*01:01:03	G	WD	WD			WD					
+DPB1*02:01:02G	G	C	C	C	C	C	C	C	C	C	
+DPB1*02:01:03	G	WD	WD			WD					
+DPB1*02:01:04	G	C	C	C	C	C	WD	C	C	C	
+DPB1*02:01:05	G	I	WD		I					WD	
+DPB1*02:01:06	G	I	WD	WD				I		WD	
+DPB1*02:01:07	G	WD	WD			WD	WD				
+DPB1*02:01:08	G	I	I			I					
+DPB1*02:01:09	G	I	WD			WD				I	
+DPB1*02:01:12	G	I	WD		I					WD	
+DPB1*02:01:13	G	I	WD		I						
+DPB1*02:01:15	G	WD	WD			WD					
+DPB1*02:01:18	G	WD	WD	WD							
+DPB1*02:02:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*03:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*03:01:03	G	WD	WD			WD					
+DPB1*03:01:04	G	WD	WD			WD					
+DPB1*03:01:06	G	WD	WD			WD					
+DPB1*04:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*04:01:03	G	I	I			I					
+DPB1*04:01:04G	G	C	I			I		C		I	
+DPB1*04:01:06	G	C	WD			WD		C		WD	
+DPB1*04:01:07	G	C	WD					I	C		
+DPB1*04:01:08	G	WD	WD			WD	WD				
+DPB1*04:01:09	G	WD	WD			WD					
+DPB1*04:01:11	G	WD	WD				WD				
+DPB1*04:01:12	G	WD	WD			WD					
+DPB1*04:01:13	G	WD	WD			WD					
+DPB1*04:01:14	G	WD	WD			WD					
+DPB1*04:01:15	G	WD	WD		WD						
+DPB1*04:01:16	G	WD	WD			WD					
+DPB1*04:01:19	G	WD	WD			WD					
+DPB1*04:01:20	G	WD	WD			WD					
+DPB1*04:01:21	G	WD	WD								
+DPB1*04:01:24	G	WD	WD			WD					
+DPB1*04:01:28	G	I	WD					I			
+DPB1*04:01:32	G	WD	WD		WD						
+DPB1*04:02:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*04:02:03	G	I	WD					I			
+DPB1*04:02:05	G	WD	WD			WD					
+DPB1*04:02:07	G	WD	WD					WD			
+DPB1*05:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*06:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*08:01	G	WD	WD			WD					
+DPB1*09:01:01	G	C	C	C	C	C	C	C	C	C	
+DPB1*09:01:02	G	C	I	WD	I	WD	WD	C	C	I	
+DPB1*09:01:03	G	WD	WD			WD					
+DPB1*100:01	G	I	I		I	WD		I		I	
+DPB1*102:01	G	WD	WD			WD					
+DPB1*103:01	G	WD	WD	WD		WD					
+DPB1*108:01	G	I	WD		WD	WD		I			
+DPB1*109:01	G	I	I			I				WD	
+DPB1*10:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*110:01	G	WD	WD			WD					
+DPB1*112:01	G	WD	WD			WD					
+DPB1*113:01	G	I	WD		I	WD	WD				
+DPB1*115:01	G	I	I			I				WD	
+DPB1*116:01	G	WD	WD			WD				WD	
+DPB1*11:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*11:01:02	G	C	I			WD		C		I	
+DPB1*11:01:03	G	WD	WD			WD					
+DPB1*120:01N	G	WD	WD			WD					
+DPB1*121:01	G	WD	WD			WD					
+DPB1*122:01	G	WD	WD	WD		WD					
+DPB1*123:01	G	WD	WD			WD					
+DPB1*125:01	G	I	WD		I	WD					
+DPB1*127:01	G	I	I			I					
+DPB1*128:01	G	I	I			I		I		I	
+DPB1*129:01	G	WD	WD			WD					
+DPB1*130:01	G	I	I			I				I	
+DPB1*132:01	G	I	WD		I	WD	WD	I		WD	
+DPB1*134:01	G	WD	WD			WD					
+DPB1*136:01	G	C	WD			WD	C				
+DPB1*137:01	G	WD	WD			WD				WD	
+DPB1*139:01	G	I	WD		I						
+DPB1*13:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*13:01:02	G	I	I			I					
+DPB1*142:01	G	WD	WD		WD						
+DPB1*143:01	G	WD	WD	WD							
+DPB1*144:01	G	WD	WD			WD					
+DPB1*145:01	G	I	WD		WD	WD				I	
+DPB1*146:01	G	WD	WD			WD					
+DPB1*147:01	G	WD	WD					WD			
+DPB1*149:01	G	I	WD			WD				I	
+DPB1*14:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*150:01	G	C	I		C	WD					
+DPB1*151:01	G	WD	WD			WD					
+DPB1*152:01	G	WD	WD			WD					
+DPB1*153:01	G	I	WD					I		WD	
+DPB1*154:01N	G	WD	WD			WD					
+DPB1*155:01:01	G	WD	WD								
+DPB1*155:01:02	G	WD	WD			WD					
+DPB1*156:01	G	I	WD			WD		I			
+DPB1*157:01	G	WD	WD			WD					
+DPB1*158:01	G	WD	WD			WD					
+DPB1*15:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*161:01N	G	WD	WD			WD					
+DPB1*163:01	G	WD	WD			WD					
+DPB1*164:01	G	WD	WD			WD					
+DPB1*165:01	G	WD	WD			WD					
+DPB1*166:01	G	I	WD		I						
+DPB1*16:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*16:01:02	G	WD	WD			WD					
+DPB1*170:01	G	WD	WD			WD					
+DPB1*172:01	G	WD	WD			WD		WD			
+DPB1*173:01	G	I	WD		I	WD	WD				
+DPB1*177:01	G	WD	WD			WD					
+DPB1*178:01	G	WD	WD			WD					
+DPB1*179:01	G	WD	WD			WD					
+DPB1*17:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*181:01	G	WD	WD				WD				
+DPB1*182:01	G	WD	WD		WD	WD					
+DPB1*184:01	G	I	WD			WD				I	
+DPB1*185:01	G	I	WD			WD				I	
+DPB1*186:01	G	WD	WD		WD						
+DPB1*187:01	G	WD	WD			WD					
+DPB1*188:01	G	WD	WD			WD					
+DPB1*189:01	G	WD	WD			WD	WD				
+DPB1*18:01	G	C	C	C	I	I	C	C	C	C	
+DPB1*190:01	G	I	I			I					
+DPB1*191:01	G	I	I			I					
+DPB1*192:01	G	I	WD		I						
+DPB1*199:01	G	WD	WD			WD					
+DPB1*19:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*200:01	G	WD	WD			WD					
+DPB1*201:01	G	WD	WD			WD	WD				
+DPB1*206:01	G	WD	WD			WD	WD				
+DPB1*207:01	G	WD	WD								
+DPB1*208:01	G	WD	WD			WD					
+DPB1*209:01	G	WD	WD			WD					
+DPB1*20:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*210:01	G	I	WD					I			
+DPB1*211:01	G	WD	WD			WD					
+DPB1*212:01	G	WD	WD								
+DPB1*214:01	G	WD	WD			WD					
+DPB1*215:01	G	I	WD		I	WD				WD	
+DPB1*218:01N	G	WD	WD			WD					
+DPB1*21:01	G	C	C	WD	C	I	WD	I	C	C	
+DPB1*220:01	G	WD	WD			WD					
+DPB1*221:01	G	WD	WD			WD					
+DPB1*222:01	G	I	WD			WD				I	
+DPB1*224:01	G	WD	WD			WD					
+DPB1*225:01	G	WD	WD			WD					
+DPB1*227:01	G	WD	WD			WD					
+DPB1*228:01	G	WD	WD			WD					
+DPB1*22:01	G	I	WD		I	WD					
+DPB1*233:01	G	WD	WD			WD		WD			
+DPB1*235:01	G	WD	WD			WD					
+DPB1*236:01:01	G	WD	WD			WD					
+DPB1*236:01:02	G	WD	WD		WD						
+DPB1*238:01	G	I	WD			WD				I	
+DPB1*23:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*23:01:02	G	WD	WD			WD					
+DPB1*240:01	G	I	WD					I			
+DPB1*242:01	G	I	WD		I						
+DPB1*244:01	G	WD	WD			WD	WD				
+DPB1*245:01	G	WD	WD			WD					
+DPB1*246:01	G	WD	WD			WD					
+DPB1*249:01	G	WD	WD	WD							
+DPB1*24:01	G	I	I			I	WD	I		I	
+DPB1*256:01	G	WD	WD							WD	
+DPB1*257:01	G	WD	WD			WD					
+DPB1*258:01	G	WD	WD								
+DPB1*259:01	G	WD	WD			WD					
+DPB1*25:01	G	I	I		I	I		I		I	
+DPB1*260:01	G	WD	WD			WD					
+DPB1*264:01	G	WD	WD			WD					
+DPB1*265:01	G	WD	WD			WD					
+DPB1*266:01	G	WD	WD			WD					
+DPB1*269:01	G	I	WD		I						
+DPB1*26:01:02	G	C	C	C	C	C	C	C	C	C	
+DPB1*270:01	G	WD	WD			WD					
+DPB1*271:01	G	I	WD			WD		I			
+DPB1*274:01	G	WD	WD			WD					
+DPB1*277:01	G	WD	WD			WD					
+DPB1*27:01	G	C	I	C		WD		C	C	C	
+DPB1*281:01	G	C	WD				C				
+DPB1*282:01	G	WD	WD			WD					
+DPB1*283:01	G	WD	WD			WD					
+DPB1*284:01	G	WD	WD			WD					
+DPB1*285:01	G	WD	WD			WD					
+DPB1*288:01	G	WD	WD								
+DPB1*28:01:01G	G	C	C	C	C	I	C	I	C	C	
+DPB1*290:01	G	WD	WD	WD		WD					
+DPB1*291:01	G	WD	WD			WD					
+DPB1*294:01	G	WD	WD			WD					
+DPB1*295:01	G	WD	WD			WD					
+DPB1*29:01	G	C	C	C	C	I	WD	C	C	C	
+DPB1*300:01	G	I	WD		I						
+DPB1*301:01	G	WD	WD			WD					
+DPB1*303:01	G	WD	WD								
+DPB1*305:01	G	WD	WD								
+DPB1*309:01	G	WD	WD			WD					
+DPB1*30:01:01G	G	C	C	C	I	C	C	C	C	C	
+DPB1*312:01	G	WD	WD			WD					
+DPB1*313:01	G	WD	WD			WD					
+DPB1*314:01	G	WD	WD								
+DPB1*318:01	G	WD	WD			WD					
+DPB1*319:01	G	WD	WD								
+DPB1*31:01	G	C	I		C	WD		I		C	
+DPB1*320:01	G	WD	WD			WD					
+DPB1*321:01	G	WD	WD	WD							
+DPB1*329:01	G	WD	WD								
+DPB1*333:01	G	WD	WD					WD			
+DPB1*339:01	G	WD	WD			WD					
+DPB1*33:01:01G	G	I	I		I	I	WD	I		I	
+DPB1*340:01	G	WD	WD			WD					
+DPB1*345:01	G	WD	WD			WD					
+DPB1*348:01:01	G	WD	WD			WD					
+DPB1*34:01:01G	G	C	C	C	C	C	C	C	C	C	
+DPB1*355:01	G	WD	WD			WD					
+DPB1*356:01	G	WD	WD		WD						
+DPB1*357:01N	G	WD	WD		WD						
+DPB1*358:01	G	WD	WD			WD					
+DPB1*35:01:01	G	C	C	C	WD	C	C	C	C	C	
+DPB1*363:01	G	WD	WD		WD						
+DPB1*36:01	G	C	I		C	I	C			I	
+DPB1*370:01	G	WD	WD								
+DPB1*374:01	G	WD	WD								
+DPB1*377:01	G	WD	WD			WD					
+DPB1*37:01	G	C	WD			WD	C				
+DPB1*38:01	G	C	I		C	WD				I	
+DPB1*391:01	G	WD	WD		WD						
+DPB1*393:01	G	WD	WD			WD					
+DPB1*394:01	G	WD	WD		WD						
+DPB1*396:01	G	WD	WD								
+DPB1*397:01	G	WD	WD			WD					
+DPB1*398:01	G	WD	WD			WD					
+DPB1*39:01:01G	G	C	C	C	I	I	WD	C	C	C	
+DPB1*40:01:01G	G	C	C	C	WD	I	WD	C	C	C	
+DPB1*412:01	G	WD	WD			WD					
+DPB1*413:01	G	WD	WD			WD					
+DPB1*41:01:01G	G	C	I		C	I	C	I		I	
+DPB1*422:01	G	WD	WD								
+DPB1*424:01	G	WD	WD								
+DPB1*433:01	G	WD	WD							WD	
+DPB1*441:01	G	WD	WD	WD							
+DPB1*445:01	G	I	WD		I						
+DPB1*448:01	G	WD	WD		WD						
+DPB1*454:01	G	WD	WD		WD						
+DPB1*45:01	G	C	C	WD	C	C	C	C	C	C	
+DPB1*46:01:01	G	C	I	C	C	I	WD	I		I	
+DPB1*474:01	G	WD	WD		WD						
+DPB1*47:01:01G	G	C	I	WD	C	I	C			I	
+DPB1*482:01	G	WD	WD								
+DPB1*486:01	G	WD	WD		WD						
+DPB1*48:01	G	C	I		C	WD	WD	I		I	
+DPB1*495:01	G	WD	WD	WD							
+DPB1*49:01:01G	G	C	I	C	WD	WD	WD	C	C	I	
+DPB1*501:01	G	WD	WD			WD	WD				
+DPB1*503:01	G	WD	WD								
+DPB1*50:01	G	C	I		WD	C	WD	I		C	
+DPB1*514:01	G	WD	WD			WD					
+DPB1*51:01	G	C	C	WD	C	C	C	I	C	C	
+DPB1*520:01	G	WD	WD		WD						
+DPB1*521:01	G	WD	WD								
+DPB1*526:01	G	I	WD		I						
+DPB1*52:01	G	I	I	WD	I	I				I	
+DPB1*53:01	G	C	WD	C				I	C	I	
+DPB1*54:01	G	WD	WD	WD		WD				WD	
+DPB1*559:01	G	WD	WD								
+DPB1*55:01:01G	G	C	I	C	I	WD	WD	C		I	
+DPB1*56:01	G	WD	WD			WD					
+DPB1*570:01N	G	WD	WD		WD						
+DPB1*57:01:01G	G	I	I	WD	I	I	WD	I		I	
+DPB1*59:01	G	C	I		WD	C		I		I	
+DPB1*60:01	G	WD	WD	WD							
+DPB1*61:01N	G	C	WD	C				I		I	
+DPB1*63:01	G	C	I	C	WD	I	C	C	C	C	
+DPB1*64:01N	G	I	WD			WD				I	
+DPB1*66:01	G	WD	WD			WD				WD	
+DPB1*67:01	G	C	WD			WD	C				
+DPB1*68:01	G	WD	WD			WD					
+DPB1*69:01:01G	G	WD	WD	WD		WD		WD			
+DPB1*70:01	G	I	WD		I	WD					
+DPB1*71:01:01	G	I	I	WD	I	WD					
+DPB1*72:01:01G	G	I	WD		I	WD	WD			I	
+DPB1*74:01	G	WD	WD	WD						WD	
+DPB1*75:01	G	WD	WD			WD	WD				
+DPB1*76:01	G	WD	WD			WD					
+DPB1*77:01	G	WD	WD			WD				WD	
+DPB1*78:01	G	I	I		I	I	WD	I		I	
+DPB1*79:01	G	I	WD			WD		I		WD	
+DPB1*80:01	G	C	I	C	I	I	WD	C	C	I	
+DPB1*81:01:01G	G	C	I	WD	I	I	C	I		I	
+DPB1*82:01	G	I	WD					I			
+DPB1*83:01	G	I	WD		I	WD					
+DPB1*85:01:01G	G	C	I	C		WD		I		I	
+DPB1*86:01	G	WD	WD	WD							
+DPB1*87:01	G	WD	WD			WD				WD	
+DPB1*88:01	G	C	I		WD	I	C	WD		I	
+DPB1*89:01	G	WD	WD			WD					
+DPB1*90:01:01	G	WD	WD			WD					
+DPB1*91:01:01G	G	C	I		C	WD	C			I	
+DPB1*92:01	G	I	WD		I	I					
+DPB1*93:01	G	C	I		C	WD		I		I	
+DPB1*95:01	G	WD	WD	WD							
+DPB1*96:01	G	WD	WD								
+DPB1*98:01	G	WD	WD	WD		WD					
+DPB1*99:01	G	I	WD			WD	WD	I		WD	
+DQB1*02:01:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*02:01:04	G	WD	WD			WD					
+DQB1*02:01:05	G	WD	WD								
+DQB1*02:01:06	G	WD	WD			WD					
+DQB1*02:01:07	G	WD	WD		WD						
+DQB1*02:01:10	G	I	I	WD		I		WD		I	
+DQB1*02:01:14	G	WD	WD								
+DQB1*02:01:19	G	WD	WD								
+DQB1*02:01:20	G	WD	WD			WD				WD	
+DQB1*02:03	G	C	I	C		WD		I	C	C	
+DQB1*02:05	G	WD	WD			WD				WD	
+DQB1*02:07:01	G	C	I		C					WD	
+DQB1*02:12	G	WD	WD			WD	WD			WD	
+DQB1*02:14:01	G	WD	WD			WD				WD	
+DQB1*02:14:02	G	WD	WD			WD					
+DQB1*02:16	G	WD	WD			WD					
+DQB1*02:17	G	WD	WD			WD					
+DQB1*02:18N	G	WD	WD			WD					
+DQB1*02:19	G	I	WD			WD	WD			I	
+DQB1*02:20N	G	WD	WD			WD					
+DQB1*02:21	G	WD	WD			WD					
+DQB1*02:23	G	WD	WD			WD					
+DQB1*02:24	G	WD	WD			WD					
+DQB1*02:26	G	I	WD			WD				I	
+DQB1*02:27	G	WD	WD			WD					
+DQB1*02:28	G	WD	WD			WD					
+DQB1*02:29	G	WD	WD			WD				WD	
+DQB1*02:30	G	WD	WD			WD					
+DQB1*02:33	G	WD	WD			WD					
+DQB1*02:46	G	WD	WD			WD					
+DQB1*02:53Q	G	I	I			I					
+DQB1*02:63	G	WD	WD			WD					
+DQB1*03:01:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*03:01:02	G	WD	WD			WD	WD				
+DQB1*03:01:03	G	I	I	WD		I		I		I	
+DQB1*03:01:08	G	I	WD	WD	I	WD					
+DQB1*03:01:13	G	WD	WD			WD					
+DQB1*03:01:14	G	I	WD			WD				I	
+DQB1*03:01:22	G	WD	WD			WD				WD	
+DQB1*03:01:27	G	WD	WD				WD				
+DQB1*03:01:30	G	WD	WD								
+DQB1*03:02:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*03:02:02	G	C	C	WD	I	C	WD	C	C	C	
+DQB1*03:02:03	G	C	I	WD		WD	WD	I	C	I	
+DQB1*03:02:06	G	I	WD		I	WD				I	
+DQB1*03:02:10	G	WD	WD			WD					
+DQB1*03:02:13	G	WD	WD			WD					
+DQB1*03:03:02G	G	C	C	C	C	C	C	C	C	C	
+DQB1*03:03:03	G	I	I			I				I	
+DQB1*03:03:07	G	WD	WD								
+DQB1*03:03:11	G	I	WD					I			
+DQB1*03:04:01G	G	C	C	C	I	C	C	C	C	C	
+DQB1*03:04:02	G	WD	WD								
+DQB1*03:05:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*03:05:02	G	WD	WD		WD	WD	WD				
+DQB1*03:05:03	G	I	I			I		I		I	
+DQB1*03:05:04	G	C	I		I	WD	C	WD	WD	I	
+DQB1*03:06	G	WD	WD								
+DQB1*03:08	G	I	WD			WD				I	
+DQB1*03:105	G	I	WD					I			
+DQB1*03:106	G	I	WD		WD			I			
+DQB1*03:109	G	WD	WD			WD					
+DQB1*03:10:01G	G	WD	WD			WD					
+DQB1*03:10:02G	G	WD	WD			WD					
+DQB1*03:11	G	C	I		C					WD	
+DQB1*03:114	G	WD	WD			WD					
+DQB1*03:118N	G	WD	WD		WD						
+DQB1*03:12	G	I	I			I				WD	
+DQB1*03:121	G	WD	WD								
+DQB1*03:126	G	WD	WD								
+DQB1*03:127	G	WD	WD								
+DQB1*03:13	G	C	I		C	WD				I	
+DQB1*03:130	G	WD	WD			WD					
+DQB1*03:132	G	I	WD					I			
+DQB1*03:134	G	WD	WD			WD					
+DQB1*03:136	G	WD	WD			WD				WD	
+DQB1*03:138	G	WD	WD			WD					
+DQB1*03:141	G	WD	WD			WD					
+DQB1*03:14:02	G	I	WD		I	WD		I			
+DQB1*03:16	G	C	WD	C						WD	
+DQB1*03:162	G	WD	WD			WD					
+DQB1*03:17:01	G	I	WD		I						
+DQB1*03:18	G	WD	WD			WD				WD	
+DQB1*03:197Q	G	WD	WD				WD				
+DQB1*03:20	G	WD	WD			WD					
+DQB1*03:201	G	WD	WD			WD					
+DQB1*03:205	G	WD	WD			WD					
+DQB1*03:207	G	WD	WD								
+DQB1*03:25:01	G	I	WD					I		WD	
+DQB1*03:26	G	I	WD		I						
+DQB1*03:30	G	WD	WD			WD					
+DQB1*03:36	G	WD	WD			WD					
+DQB1*03:37	G	I	WD			WD				I	
+DQB1*03:40	G	WD	WD			WD					
+DQB1*03:45	G	WD	WD			WD					
+DQB1*03:48	G	WD	WD			WD					
+DQB1*03:53	G	WD	WD				WD				
+DQB1*03:54	G	WD	WD								
+DQB1*03:55	G	WD	WD			WD				WD	
+DQB1*03:56	G	WD	WD			WD					
+DQB1*03:58	G	I	WD			WD				I	
+DQB1*03:59	G	WD	WD			WD					
+DQB1*03:62	G	WD	WD		WD						
+DQB1*03:63	G	WD	WD			WD					
+DQB1*03:64	G	WD	WD			WD					
+DQB1*03:65	G	WD	WD			WD					
+DQB1*03:67	G	WD	WD			WD				WD	
+DQB1*03:68	G	WD	WD			WD					
+DQB1*03:69	G	WD	WD								
+DQB1*03:70	G	I	WD					I			
+DQB1*03:72	G	I	WD					I		I	
+DQB1*03:76	G	WD	WD			WD					
+DQB1*03:78	G	WD	WD		WD						
+DQB1*03:81	G	WD	WD			WD					
+DQB1*04:01:01G	G	C	C	WD	C	I	C	C	C	C	
+DQB1*04:01:02	G	I	WD		I		WD				
+DQB1*04:02:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*04:02:02	G	WD	WD			WD					
+DQB1*04:02:03	G	I	WD		I	WD					
+DQB1*04:02:04	G	WD	WD								
+DQB1*04:02:07	G	WD	WD							WD	
+DQB1*04:03:01	G	WD	WD			WD					
+DQB1*04:03:02	G	WD	WD			WD					
+DQB1*04:04	G	WD	WD			WD					
+DQB1*04:11	G	WD	WD			WD					
+DQB1*04:12	G	I	WD		I						
+DQB1*04:22	G	WD	WD								
+DQB1*05:01:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*05:01:02	G	WD	WD			WD					
+DQB1*05:01:03	G	WD	WD								
+DQB1*05:01:05	G	WD	WD			WD				WD	
+DQB1*05:01:06	G	WD	WD								
+DQB1*05:01:07	G	WD	WD			WD					
+DQB1*05:01:08	G	WD	WD			WD				WD	
+DQB1*05:01:09	G	WD	WD								
+DQB1*05:01:12	G	WD	WD		WD						
+DQB1*05:02:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*05:02:02	G	I	WD		I						
+DQB1*05:02:04	G	WD	WD			WD					
+DQB1*05:03:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*05:03:02	G	WD	WD			WD					
+DQB1*05:03:08	G	I	WD		I						
+DQB1*05:03:11	G	WD	WD			WD					
+DQB1*05:03:12	G	WD	WD		WD						
+DQB1*05:03:13	G	WD	WD		WD						
+DQB1*05:04:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*05:05:01	G	WD	WD			WD	WD				
+DQB1*05:06:02	G	WD	WD								
+DQB1*05:09	G	WD	WD			WD					
+DQB1*05:11:01	G	WD	WD			WD					
+DQB1*05:11:02	G	WD	WD			WD					
+DQB1*05:12	G	WD	WD			WD					
+DQB1*05:20	G	WD	WD			WD					
+DQB1*05:23	G	C	I		C						
+DQB1*05:26	G	WD	WD		WD						
+DQB1*05:34	G	WD	WD								
+DQB1*05:44	G	WD	WD								
+DQB1*05:49	G	WD	WD			WD					
+DQB1*05:51	G	WD	WD			WD					
+DQB1*05:52	G	WD	WD			WD					
+DQB1*05:58	G	WD	WD	WD							
+DQB1*05:60	G	WD	WD			WD					
+DQB1*05:67	G	WD	WD		WD						
+DQB1*05:69	G	WD	WD			WD					
+DQB1*05:79	G	WD	WD			WD					
+DQB1*05:80	G	WD	WD								
+DQB1*05:88	G	WD	WD	WD							
+DQB1*06:01:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*06:01:08	G	I	WD		I	WD	WD			WD	
+DQB1*06:01:14	G	WD	WD		WD						
+DQB1*06:02:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*06:02:02	G	C	I		I	I	C	WD		I	
+DQB1*06:02:04	G	WD	WD			WD					
+DQB1*06:02:05	G	WD	WD								
+DQB1*06:02:06	G	WD	WD			WD					
+DQB1*06:02:07	G	WD	WD			WD					
+DQB1*06:02:08	G	WD	WD				WD				
+DQB1*06:02:14	G	WD	WD			WD				WD	
+DQB1*06:02:15	G	WD	WD			WD					
+DQB1*06:02:16	G	WD	WD			WD					
+DQB1*06:02:17	G	WD	WD			WD					
+DQB1*06:03:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*06:03:02	G	I	I			I		WD		I	
+DQB1*06:03:04	G	WD	WD			WD					
+DQB1*06:03:05	G	WD	WD					WD			
+DQB1*06:03:07	G	WD	WD			WD					
+DQB1*06:03:09	G	WD	WD			WD					
+DQB1*06:03:11	G	WD	WD			WD					
+DQB1*06:03:13	G	WD	WD			WD					
+DQB1*06:03:15	G	WD	WD			WD					
+DQB1*06:04:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*06:04:02	G	WD	WD			WD				WD	
+DQB1*06:04:03	G	WD	WD			WD					
+DQB1*06:04:06	G	WD	WD			WD					
+DQB1*06:07:01	G	I	I			I	WD			I	
+DQB1*06:07:02	G	WD	WD			WD					
+DQB1*06:08:01	G	C	C	C		WD	WD	C	C	C	
+DQB1*06:08:02	G	WD	WD			WD					
+DQB1*06:09:01G	G	C	C	C	C	C	C	C	C	C	
+DQB1*06:09:02	G	WD	WD			WD				WD	
+DQB1*06:09:03	G	WD	WD					WD		WD	
+DQB1*06:09:05	G	WD	WD								
+DQB1*06:10	G	C	I		C	WD				I	
+DQB1*06:118:02	G	WD	WD			WD					
+DQB1*06:11:01	G	C	I	C	I	I	WD	I	C	I	
+DQB1*06:11:02	G	WD	WD			WD				WD	
+DQB1*06:12	G	WD	WD		WD	WD					
+DQB1*06:122	G	WD	WD			WD					
+DQB1*06:125	G	WD	WD			WD					
+DQB1*06:126	G	WD	WD				WD				
+DQB1*06:135	G	WD	WD		WD						
+DQB1*06:136	G	WD	WD			WD					
+DQB1*06:13:01	G	I	I			I				WD	
+DQB1*06:140	G	I	WD		I						
+DQB1*06:142	G	WD	WD		WD						
+DQB1*06:144N	G	WD	WD		WD						
+DQB1*06:14:01	G	I	I	WD		I				I	
+DQB1*06:14:02	G	I	I			I	WD	WD		I	
+DQB1*06:153	G	WD	WD		WD		WD				
+DQB1*06:155	G	WD	WD			WD					
+DQB1*06:15:01	G	WD	WD			WD					
+DQB1*06:15:02	G	WD	WD			WD					
+DQB1*06:16	G	I	I	WD		I		I		I	
+DQB1*06:184	G	WD	WD		WD						
+DQB1*06:18:01	G	WD	WD	WD		WD					
+DQB1*06:20	G	WD	WD	WD		WD					
+DQB1*06:21	G	I	I			I					
+DQB1*06:22:01	G	WD	WD								
+DQB1*06:22:02	G	WD	WD								
+DQB1*06:22:03	G	WD	WD								
+DQB1*06:23	G	WD	WD			WD					
+DQB1*06:26N	G	I	WD	WD		WD				I	
+DQB1*06:27:01	G	WD	WD			WD				WD	
+DQB1*06:28	G	WD	WD			WD					
+DQB1*06:29	G	WD	WD			WD					
+DQB1*06:31	G	WD	WD			WD	WD				
+DQB1*06:32:01	G	WD	WD			WD					
+DQB1*06:33	G	I	I	WD		I				I	
+DQB1*06:40	G	WD	WD			WD					
+DQB1*06:46	G	WD	WD	WD		WD					
+DQB1*06:48	G	C	I		C	WD				WD	
+DQB1*06:49	G	C	WD	C						WD	
+DQB1*06:50	G	WD	WD	WD							
+DQB1*06:53:02	G	WD	WD		WD						
+DQB1*06:55	G	I	WD		I	WD					
+DQB1*06:57	G	I	WD		I						
+DQB1*06:58	G	WD	WD			WD					
+DQB1*06:62	G	WD	WD			WD					
+DQB1*06:68	G	WD	WD			WD					
+DQB1*06:73	G	WD	WD			WD					
+DQB1*06:74	G	I	WD		I					I	
+DQB1*06:75N	G	WD	WD			WD					
+DQB1*06:77N	G	I	WD		I						
+DQB1*06:78	G	WD	WD			WD					
+DQB1*06:79:01	G	WD	WD			WD					
+DQB1*06:81	G	I	WD			WD				I	
+DQB1*06:82	G	WD	WD			WD					
+DQB1*06:85	G	WD	WD	WD							
+DQB1*06:90	G	WD	WD			WD					
+DQB1*06:91	G	WD	WD		WD						
+DQB1*06:92	G	I	WD		I						
+DQB1*06:93	G	WD	WD								
+DRB1*01:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*01:01:02	G	C	I	C		WD		I		I	
+DRB1*01:01:04	G	WD	WD			WD					
+DRB1*01:01:05	G	I	WD			WD		I			
+DRB1*01:01:06	G	WD	WD			WD					
+DRB1*01:01:07	G	WD	WD			WD					
+DRB1*01:01:08	G	WD	WD			WD				WD	
+DRB1*01:01:10	G	WD	WD			WD					
+DRB1*01:01:12	G	WD	WD			WD					
+DRB1*01:01:16	G	WD	WD			WD					
+DRB1*01:01:17	G	WD	WD		WD						
+DRB1*01:01:19	G	WD	WD			WD					
+DRB1*01:01:25	G	WD	WD								
+DRB1*01:02:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*01:02:03	G	WD	WD			WD				WD	
+DRB1*01:02:06	G	I	WD		I	WD					
+DRB1*01:03:01	G	C	C	WD	WD	C	WD	C	C	C	
+DRB1*01:04	G	WD	WD								
+DRB1*01:07	G	I	I			I				WD	
+DRB1*01:10	G	WD	WD			WD					
+DRB1*01:11:01	G	WD	WD			WD					
+DRB1*01:16	G	WD	WD			WD					
+DRB1*01:20:01	G	WD	WD			WD					
+DRB1*01:22	G	WD	WD			WD					
+DRB1*01:24:02	G	WD	WD			WD					
+DRB1*01:26	G	WD	WD	WD							
+DRB1*01:27	G	WD	WD			WD					
+DRB1*03:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*03:01:02	G	C	I	WD	I	I	C	I		I	
+DRB1*03:01:04	G	WD	WD								
+DRB1*03:01:05	G	WD	WD					WD			
+DRB1*03:01:07	G	WD	WD			WD					
+DRB1*03:01:12	G	WD	WD			WD					
+DRB1*03:01:14	G	WD	WD			WD					
+DRB1*03:01:15	G	WD	WD			WD				WD	
+DRB1*03:01:17	G	WD	WD			WD					
+DRB1*03:01:20	G	WD	WD								
+DRB1*03:02:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*03:02:02	G	C	I	WD		WD		C	WD	I	
+DRB1*03:03	G	WD	WD	WD						WD	
+DRB1*03:04:01	G	C	C		WD	C		I		I	
+DRB1*03:05:01	G	I	I	WD	I	I				I	
+DRB1*03:05:02	G	WD	WD			WD					
+DRB1*03:05:03	G	WD	WD			WD					
+DRB1*03:06	G	I	I	WD	I	I				WD	
+DRB1*03:07	G	I	WD			WD	WD	I		WD	
+DRB1*03:08	G	WD	WD			WD					
+DRB1*03:11:01	G	WD	WD			WD					
+DRB1*03:13:01	G	I	WD			I				WD	
+DRB1*03:13:02	G	WD	WD			WD					
+DRB1*03:15:01	G	I	WD			WD		I		WD	
+DRB1*03:16	G	I	WD			WD		I			
+DRB1*03:17	G	WD	WD			WD					
+DRB1*03:19	G	WD	WD			WD					
+DRB1*03:22	G	WD	WD			WD					
+DRB1*03:23	G	I	I			I				WD	
+DRB1*03:24	G	WD	WD			WD					
+DRB1*03:25	G	WD	WD			WD					
+DRB1*03:27	G	WD	WD								
+DRB1*03:29	G	WD	WD	WD							
+DRB1*03:30	G	WD	WD			WD					
+DRB1*03:36	G	WD	WD			WD					
+DRB1*03:37	G	I	WD		WD	WD				I	
+DRB1*03:39	G	WD	WD			WD					
+DRB1*03:42	G	WD	WD			WD					
+DRB1*03:43	G	WD	WD			WD					
+DRB1*03:44	G	WD	WD			WD					
+DRB1*03:47	G	WD	WD			WD					
+DRB1*03:58	G	WD	WD			WD					
+DRB1*03:69	G	WD	WD			WD					
+DRB1*03:73	G	WD	WD			WD					
+DRB1*03:76	G	WD	WD			WD					
+DRB1*03:84	G	WD	WD			WD					
+DRB1*03:93	G	WD	WD			WD					
+DRB1*04:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*04:01:02	G	I	WD		I	WD					
+DRB1*04:01:03	G	WD	WD			WD				WD	
+DRB1*04:01:05	G	WD	WD			WD					
+DRB1*04:01:06	G	WD	WD			WD					
+DRB1*04:02:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*04:03:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*04:03:02	G	WD	WD			WD					
+DRB1*04:03:03	G	WD	WD			WD					
+DRB1*04:03:04	G	I	WD		I						
+DRB1*04:03:08	G	WD	WD		WD	WD					
+DRB1*04:04:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*04:04:04	G	WD	WD	WD							
+DRB1*04:05:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*04:05:03	G	WD	WD			WD				WD	
+DRB1*04:05:04	G	C	I	WD		WD		C	C	I	
+DRB1*04:05:05	G	I	WD		I						
+DRB1*04:05:09	G	I	WD					I			
+DRB1*04:06:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*04:07:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*04:07:02	G	WD	WD					WD			
+DRB1*04:07:03	G	C	I	WD		WD		C	C	C	
+DRB1*04:07:04	G	I	WD					I			
+DRB1*04:08:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*04:08:02	G	WD	WD								
+DRB1*04:09	G	I	I	WD	I	I		I		I	
+DRB1*04:101	G	WD	WD								
+DRB1*04:105:01	G	WD	WD								
+DRB1*04:105:02	G	I	WD		I						
+DRB1*04:10:01G	G	C	C	C	C	I	C	C	C	C	
+DRB1*04:11:01	G	C	C	C	I	I	WD	C	C	C	
+DRB1*04:11:03	G	WD	WD							WD	
+DRB1*04:127	G	WD	WD							WD	
+DRB1*04:13	G	C	I		I	I	C			I	
+DRB1*04:14	G	I	I			I				I	
+DRB1*04:15	G	WD	WD			WD				WD	
+DRB1*04:16	G	WD	WD			WD					
+DRB1*04:17:01	G	I	WD			WD		I		I	
+DRB1*04:17:02	G	C	I	WD		WD		C	C	I	
+DRB1*04:18	G	C	I		C					WD	
+DRB1*04:19	G	I	WD			WD		I			
+DRB1*04:21	G	WD	WD			WD					
+DRB1*04:23	G	I	WD			WD		I			
+DRB1*04:25	G	I	WD					I			
+DRB1*04:26	G	I	WD			WD				I	
+DRB1*04:27	G	WD	WD								
+DRB1*04:31	G	WD	WD			WD					
+DRB1*04:33	G	WD	WD			WD					
+DRB1*04:34	G	WD	WD			WD					
+DRB1*04:35	G	WD	WD			WD				WD	
+DRB1*04:36	G	WD	WD		WD						
+DRB1*04:37	G	I	WD			WD		I		WD	
+DRB1*04:38	G	I	I			I		WD		I	
+DRB1*04:39	G	WD	WD			WD					
+DRB1*04:40	G	WD	WD			WD				WD	
+DRB1*04:41	G	I	WD		I					I	
+DRB1*04:42	G	WD	WD		WD	WD					
+DRB1*04:43	G	WD	WD			WD					
+DRB1*04:50	G	I	WD			I				WD	
+DRB1*04:51	G	WD	WD		WD						
+DRB1*04:54	G	I	WD					I			
+DRB1*04:56:01	G	WD	WD			WD					
+DRB1*04:59	G	WD	WD			WD					
+DRB1*04:60	G	WD	WD			WD					
+DRB1*04:62	G	I	WD		I						
+DRB1*04:64	G	WD	WD			WD					
+DRB1*04:68	G	WD	WD					WD			
+DRB1*04:70	G	WD	WD			WD					
+DRB1*04:71	G	WD	WD			WD					
+DRB1*04:72:01	G	WD	WD			WD				WD	
+DRB1*04:76	G	WD	WD			WD					
+DRB1*04:79	G	WD	WD					WD			
+DRB1*04:83	G	WD	WD			WD					
+DRB1*04:88	G	I	WD		I	WD					
+DRB1*04:95:01	G	WD	WD								
+DRB1*04:96	G	WD	WD			WD	WD				
+DRB1*07:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*07:01:02	G	WD	WD			WD					
+DRB1*07:01:05	G	WD	WD			WD					
+DRB1*07:01:06	G	WD	WD								
+DRB1*07:01:08	G	WD	WD			WD					
+DRB1*07:01:09	G	WD	WD								
+DRB1*07:01:15	G	WD	WD								
+DRB1*07:03	G	C	I		C	WD	WD			I	
+DRB1*07:05	G	I	I			I		WD		I	
+DRB1*07:07	G	I	I			I				WD	
+DRB1*07:10N	G	WD	WD			WD					
+DRB1*07:11	G	I	WD			WD		I		WD	
+DRB1*07:13	G	I	WD		I						
+DRB1*07:15	G	WD	WD					WD			
+DRB1*07:16	G	I	WD			WD		I			
+DRB1*07:23	G	WD	WD			WD					
+DRB1*07:26N	G	WD	WD			WD					
+DRB1*07:29	G	WD	WD			WD					
+DRB1*07:30	G	WD	WD			WD					
+DRB1*07:32	G	WD	WD			WD					
+DRB1*07:39	G	WD	WD			WD					
+DRB1*07:61	G	WD	WD				WD			WD	
+DRB1*08:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*08:01:02	G	WD	WD			WD					
+DRB1*08:01:04	G	WD	WD							WD	
+DRB1*08:01:05	G	WD	WD			WD					
+DRB1*08:02:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*08:02:02	G	WD	WD					WD			
+DRB1*08:02:03	G	C	I			WD		C	C	I	
+DRB1*08:03:02G	G	C	C	C	C	C	C	C	C	C	
+DRB1*08:03:03	G	WD	WD			WD					
+DRB1*08:04:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*08:04:03	G	I	WD					I		WD	
+DRB1*08:04:04	G	C	I	WD	WD	WD		C	C	I	
+DRB1*08:04:05	G	WD	WD			WD					
+DRB1*08:05	G	I	WD			WD				I	
+DRB1*08:06	G	C	C	C	I	C	C	C	C	C	
+DRB1*08:07	G	C	C	WD		I		C	C	C	
+DRB1*08:08	G	C	WD	C			WD			I	
+DRB1*08:09	G	C	I		C	WD		WD		I	
+DRB1*08:10	G	C	I	WD	I	I	C	C	C	C	
+DRB1*08:11	G	C	I	C		I		C	C	C	
+DRB1*08:12	G	I	WD		I						
+DRB1*08:13	G	I	WD			WD		I		I	
+DRB1*08:14	G	I	WD		I						
+DRB1*08:16	G	WD	WD			WD					
+DRB1*08:17	G	I	I			I				WD	
+DRB1*08:18	G	I	I		I	WD		I		I	
+DRB1*08:19	G	I	WD		I						
+DRB1*08:20	G	WD	WD	WD							
+DRB1*08:22	G	WD	WD								
+DRB1*08:26	G	WD	WD			WD					
+DRB1*08:28	G	WD	WD			WD					
+DRB1*08:34	G	WD	WD			WD					
+DRB1*08:44	G	WD	WD			WD					
+DRB1*08:82	G	I	WD			WD		I		I	
+DRB1*09:01:02G	G	C	C	C	C	C	C	C	C	C	
+DRB1*09:01:06	G	WD	WD			WD					
+DRB1*09:02:02	G	WD	WD								
+DRB1*09:04	G	I	WD		I						
+DRB1*09:06	G	I	WD			WD		I		WD	
+DRB1*09:20	G	WD	WD			WD					
+DRB1*09:27	G	WD	WD		WD						
+DRB1*10:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*10:01:02	G	I	I			I				WD	
+DRB1*10:01:03	G	WD	WD			WD					
+DRB1*10:01:04	G	WD	WD			WD					
+DRB1*10:01:08	G	I	WD		I		WD				
+DRB1*10:02	G	I	WD		I	WD					
+DRB1*10:06	G	WD	WD		WD						
+DRB1*11:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*11:01:02	G	C	C	C	C	C	C	C	C	C	
+DRB1*11:01:03	G	WD	WD		WD	WD					
+DRB1*11:01:04	G	WD	WD			WD					
+DRB1*11:01:05	G	WD	WD		WD						
+DRB1*11:01:06	G	WD	WD			WD					
+DRB1*11:01:07	G	WD	WD			WD	WD			WD	
+DRB1*11:01:09	G	WD	WD				WD				
+DRB1*11:01:10	G	WD	WD			WD					
+DRB1*11:01:11	G	WD	WD	WD						WD	
+DRB1*11:01:13	G	WD	WD			WD					
+DRB1*11:01:16	G	WD	WD			WD					
+DRB1*11:02:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*11:02:02	G	WD	WD	WD							
+DRB1*11:03:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*11:04:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*11:04:02	G	C	C	C	WD	WD	WD	C	C	C	
+DRB1*11:04:03	G	WD	WD			WD					
+DRB1*11:04:05	G	WD	WD				WD				
+DRB1*11:05	G	I	WD		I					I	
+DRB1*11:06:01G	G	C	C	WD	C	I	C	I	C	C	
+DRB1*11:06:02	G	WD	WD	WD		WD				WD	
+DRB1*11:07:01	G	WD	WD			WD					
+DRB1*11:08:01	G	C	I		C	I	WD			I	
+DRB1*11:08:03	G	WD	WD		WD						
+DRB1*11:09	G	I	I			I	WD			I	
+DRB1*11:104	G	WD	WD			WD					
+DRB1*11:10:01	G	C	I	C		WD		I		I	
+DRB1*11:113	G	WD	WD			WD				WD	
+DRB1*11:11:01G	G	C	I	WD	C	I	WD	WD		I	
+DRB1*11:125	G	WD	WD			WD					
+DRB1*11:128	G	WD	WD			WD					
+DRB1*11:12:01	G	C	C	WD	I	C	C	I		I	
+DRB1*11:137	G	WD	WD			WD					
+DRB1*11:13:01G	G	I	I	WD		I	WD	I		I	
+DRB1*11:145	G	WD	WD				WD				
+DRB1*11:14:01	G	I	I		WD	I		I	WD	I	
+DRB1*11:14:02	G	WD	WD	WD		WD		WD			
+DRB1*11:15	G	C	C	WD	WD	C	C	C	C	C	
+DRB1*11:16	G	WD	WD			WD	WD				
+DRB1*11:17	G	C	I	C		WD		I	C	I	
+DRB1*11:179	G	WD	WD				WD				
+DRB1*11:18	G	I	I		I	WD		WD		I	
+DRB1*11:19:01	G	I	I		WD	I		I		I	
+DRB1*11:20	G	WD	WD			WD					
+DRB1*11:21	G	WD	WD			WD					
+DRB1*11:23:02	G	I	WD			WD				I	
+DRB1*11:24	G	I	I	WD		I	WD	WD		I	
+DRB1*11:25	G	WD	WD			WD					
+DRB1*11:26	G	WD	WD			WD				WD	
+DRB1*11:27:01	G	I	I		WD	I				WD	
+DRB1*11:27:02	G	WD	WD			WD					
+DRB1*11:27:03	G	I	WD					I			
+DRB1*11:28:01	G	I	I	WD	I	I		I		I	
+DRB1*11:28:02	G	WD	WD		WD						
+DRB1*11:29:01	G	I	I		I	I	WD			WD	
+DRB1*11:32	G	WD	WD			WD				WD	
+DRB1*11:33	G	WD	WD			WD					
+DRB1*11:34	G	I	I			I				WD	
+DRB1*11:35	G	WD	WD			WD	WD				
+DRB1*11:36	G	I	I		WD	I	WD			I	
+DRB1*11:37:01	G	WD	WD		WD	WD					
+DRB1*11:39	G	I	I			I				I	
+DRB1*11:41	G	WD	WD			WD					
+DRB1*11:43	G	I	I			I		I		I	
+DRB1*11:44	G	WD	WD			WD					
+DRB1*11:45	G	WD	WD					WD			
+DRB1*11:47	G	C	WD					I	C	WD	
+DRB1*11:48	G	WD	WD	WD							
+DRB1*11:49:01	G	WD	WD			WD					
+DRB1*11:51	G	WD	WD								
+DRB1*11:56	G	WD	WD			WD					
+DRB1*11:58:01	G	WD	WD			WD					
+DRB1*11:58:02	G	WD	WD			WD					
+DRB1*11:60	G	WD	WD								
+DRB1*11:61	G	WD	WD			WD					
+DRB1*11:62:01	G	WD	WD		WD						
+DRB1*11:65:01	G	WD	WD	WD							
+DRB1*11:66	G	C	I		C						
+DRB1*11:69	G	WD	WD			WD					
+DRB1*11:76	G	WD	WD			WD					
+DRB1*11:78	G	WD	WD			WD					
+DRB1*11:81	G	WD	WD				WD				
+DRB1*11:84:01	G	WD	WD			WD		WD			
+DRB1*11:84:02	G	WD	WD			WD					
+DRB1*11:88	G	WD	WD			WD					
+DRB1*11:93	G	WD	WD								
+DRB1*11:94	G	WD	WD			WD					
+DRB1*11:96	G	WD	WD								
+DRB1*11:99	G	WD	WD			WD					
+DRB1*12:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*12:01:02	G	WD	WD			WD					
+DRB1*12:01:03	G	WD	WD			WD					
+DRB1*12:02:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*12:02:02	G	C	I	C	WD	WD	WD	C	C	I	
+DRB1*12:03:02	G	I	WD			WD				I	
+DRB1*12:04	G	WD	WD	WD						WD	
+DRB1*12:05	G	WD	WD		WD	WD					
+DRB1*12:08	G	WD	WD		WD						
+DRB1*12:11	G	WD	WD			WD					
+DRB1*12:20	G	WD	WD		WD						
+DRB1*12:24N	G	WD	WD			WD				WD	
+DRB1*12:25	G	WD	WD	WD						WD	
+DRB1*12:48	G	WD	WD			WD					
+DRB1*13:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*13:01:03	G	C	I	C	C	WD				WD	
+DRB1*13:01:08	G	WD	WD								
+DRB1*13:01:10	G	WD	WD								
+DRB1*13:01:14	G	WD	WD		WD						
+DRB1*13:02:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*13:02:02	G	WD	WD			WD				WD	
+DRB1*13:02:05	G	WD	WD	WD			WD			WD	
+DRB1*13:03:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*13:03:02	G	C	WD	C		WD				WD	
+DRB1*13:04	G	C	C	C	I	I	WD	C	C	C	
+DRB1*13:05:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*13:05:02	G	WD	WD	WD						WD	
+DRB1*13:06	G	I	I			I		WD		I	
+DRB1*13:07:01	G	I	WD		I	WD	WD			WD	
+DRB1*13:07:02	G	WD	WD			WD					
+DRB1*13:08	G	I	WD		I	WD					
+DRB1*13:09	G	I	WD			WD		I			
+DRB1*13:10	G	I	I	WD		I	WD	I		I	
+DRB1*13:104	G	WD	WD			WD					
+DRB1*13:106	G	WD	WD			WD					
+DRB1*13:108	G	WD	WD			WD					
+DRB1*13:111	G	WD	WD			WD					
+DRB1*13:11:01	G	I	I		I	I	WD	I		I	
+DRB1*13:11:02	G	WD	WD			WD	WD			WD	
+DRB1*13:124	G	WD	WD			WD					
+DRB1*13:128	G	I	WD			WD		I			
+DRB1*13:12:01	G	C	C	WD	C	WD		I		C	
+DRB1*13:12:02	G	WD	WD								
+DRB1*13:13	G	WD	WD		WD						
+DRB1*13:14:01	G	I	I		I	I	WD			WD	
+DRB1*13:14:02	G	WD	WD			WD					
+DRB1*13:14:03	G	WD	WD	WD							
+DRB1*13:15	G	C	I			C	WD	WD		I	
+DRB1*13:150	G	WD	WD			WD					
+DRB1*13:155	G	WD	WD								
+DRB1*13:158	G	WD	WD			WD					
+DRB1*13:16	G	C	I	C		WD	WD	I	WD	I	
+DRB1*13:17	G	WD	WD			WD					
+DRB1*13:18	G	I	I			I	WD			I	
+DRB1*13:187	G	WD	WD			WD					
+DRB1*13:19	G	I	I		I	I	WD			WD	
+DRB1*13:20	G	WD	WD	WD		WD				WD	
+DRB1*13:21:01	G	I	I			I	WD	WD		WD	
+DRB1*13:21:02	G	WD	WD			WD					
+DRB1*13:22	G	I	I			I				WD	
+DRB1*13:23:01	G	WD	WD								
+DRB1*13:24	G	WD	WD			WD				WD	
+DRB1*13:25	G	WD	WD								
+DRB1*13:26:01	G	WD	WD			WD					
+DRB1*13:27	G	WD	WD	WD		WD					
+DRB1*13:28	G	WD	WD			WD					
+DRB1*13:29	G	WD	WD			WD				WD	
+DRB1*13:31	G	C	I	C		WD		I	WD	I	
+DRB1*13:32	G	WD	WD								
+DRB1*13:33:03	G	WD	WD			WD					
+DRB1*13:34	G	WD	WD								
+DRB1*13:36	G	WD	WD			WD				WD	
+DRB1*13:37	G	WD	WD	WD							
+DRB1*13:38	G	I	WD	WD		I					
+DRB1*13:39	G	WD	WD		WD	WD					
+DRB1*13:40	G	I	WD			WD		I	WD	WD	
+DRB1*13:41	G	WD	WD								
+DRB1*13:42	G	I	WD		WD	WD		I			
+DRB1*13:48	G	WD	WD			WD					
+DRB1*13:49	G	C	I		C	WD					
+DRB1*13:50:01	G	WD	WD		WD						
+DRB1*13:50:02	G	WD	WD			WD					
+DRB1*13:52	G	WD	WD			WD					
+DRB1*13:53	G	WD	WD			WD					
+DRB1*13:54	G	WD	WD			WD	WD				
+DRB1*13:56	G	I	WD			WD		I		WD	
+DRB1*13:59	G	C	WD			WD		C	C	I	
+DRB1*13:61:01	G	WD	WD		WD	WD					
+DRB1*13:61:02	G	WD	WD			WD					
+DRB1*13:62	G	WD	WD			WD					
+DRB1*13:63	G	WD	WD			WD					
+DRB1*13:65	G	WD	WD			WD					
+DRB1*13:67	G	WD	WD			WD					
+DRB1*13:69	G	WD	WD	WD							
+DRB1*13:70	G	WD	WD			WD					
+DRB1*13:75	G	WD	WD								
+DRB1*13:77	G	WD	WD								
+DRB1*13:79	G	WD	WD			WD				WD	
+DRB1*13:80	G	WD	WD			WD					
+DRB1*13:81	G	WD	WD								
+DRB1*13:82	G	I	WD		I						
+DRB1*13:87	G	WD	WD								
+DRB1*13:88	G	WD	WD			WD					
+DRB1*13:90	G	WD	WD			WD					
+DRB1*13:91	G	WD	WD			WD					
+DRB1*13:93	G	I	WD			WD				I	
+DRB1*13:95	G	WD	WD			WD					
+DRB1*13:96:02	G	WD	WD			WD					
+DRB1*14:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*14:01:02	G	WD	WD	WD		WD					
+DRB1*14:02:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*14:02:02	G	I	WD			WD		I		WD	
+DRB1*14:03:01	G	C	C		C	I	C	WD		C	
+DRB1*14:04:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*14:05:01G	G	C	C	WD	C	I	C	I		C	
+DRB1*14:06:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*14:06:02	G	I	WD			WD		I		I	
+DRB1*14:07:01	G	C	C	WD	C	C	C	C	C	C	
+DRB1*14:07:02	G	I	I			I				I	
+DRB1*14:08	G	C	I		C	WD				C	
+DRB1*14:09	G	I	WD		I						
+DRB1*14:10	G	C	I		C	WD			C	I	
+DRB1*14:101	G	WD	WD			WD					
+DRB1*14:106	G	WD	WD					WD			
+DRB1*14:109	G	WD	WD							WD	
+DRB1*14:11	G	C	I		C	WD	WD	WD		WD	
+DRB1*14:110	G	WD	WD				WD				
+DRB1*14:111	G	WD	WD			WD					
+DRB1*14:114	G	WD	WD	WD							
+DRB1*14:122	G	WD	WD								
+DRB1*14:126:01	G	I	WD		I						
+DRB1*14:12:01	G	C	I		I	WD	C			WD	
+DRB1*14:13	G	I	WD			WD		I		WD	
+DRB1*14:133	G	WD	WD								
+DRB1*14:141	G	WD	WD		WD						
+DRB1*14:15	G	C	C	WD	C	WD	WD		C	I	
+DRB1*14:16	G	I	I			I	WD			I	
+DRB1*14:17	G	C	I		WD	I	C	I		I	
+DRB1*14:18	G	C	I		C	WD				I	
+DRB1*14:19	G	C	I	WD	C	WD				WD	
+DRB1*14:20	G	WD	WD			WD				WD	
+DRB1*14:21	G	WD	WD			WD				WD	
+DRB1*14:22	G	I	WD		I					WD	
+DRB1*14:23:01	G	WD	WD			WD				WD	
+DRB1*14:24	G	C	I			WD		C	C	I	
+DRB1*14:25	G	I	WD		I	WD					
+DRB1*14:28	G	I	WD		I						
+DRB1*14:32:02	G	WD	WD			WD					
+DRB1*14:33	G	I	WD		I	WD	WD			WD	
+DRB1*14:35	G	WD	WD		WD	WD					
+DRB1*14:41	G	WD	WD					WD		WD	
+DRB1*14:44:01	G	WD	WD		WD						
+DRB1*14:46	G	WD	WD					WD			
+DRB1*14:47	G	WD	WD			WD					
+DRB1*14:48	G	C	WD			WD		C	WD	I	
+DRB1*14:50	G	WD	WD		WD				WD		
+DRB1*14:52	G	WD	WD					WD			
+DRB1*14:54:02	G	WD	WD								
+DRB1*14:58	G	WD	WD			WD					
+DRB1*14:60	G	WD	WD			WD					
+DRB1*14:61	G	I	WD		I						
+DRB1*14:68:01	G	WD	WD		WD						
+DRB1*14:69	G	I	WD		I						
+DRB1*14:70	G	WD	WD			WD				WD	
+DRB1*14:75	G	WD	WD			WD					
+DRB1*14:79	G	WD	WD								
+DRB1*14:86	G	WD	WD			WD					
+DRB1*14:87	G	WD	WD			WD					
+DRB1*14:90	G	WD	WD								
+DRB1*14:95	G	WD	WD			WD					
+DRB1*14:97	G	WD	WD			WD					
+DRB1*14:99	G	WD	WD			WD					
+DRB1*15:01:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*15:01:02	G	I	I			I				I	
+DRB1*15:01:03	G	WD	WD			WD					
+DRB1*15:01:04	G	WD	WD			WD				WD	
+DRB1*15:01:06	G	WD	WD								
+DRB1*15:01:07	G	I	WD		I						
+DRB1*15:01:08	G	WD	WD			WD				WD	
+DRB1*15:01:11	G	WD	WD			WD					
+DRB1*15:01:12	G	WD	WD			WD					
+DRB1*15:01:13	G	WD	WD			WD					
+DRB1*15:01:16	G	WD	WD				WD				
+DRB1*15:01:20	G	WD	WD			WD					
+DRB1*15:01:25	G	WD	WD			WD					
+DRB1*15:02:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*15:02:02	G	C	C	WD	C	I	C	I	C	C	
+DRB1*15:02:04	G	I	WD		I						
+DRB1*15:02:05	G	C	I		C	WD	WD			WD	
+DRB1*15:03:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*15:04	G	C	C	WD	C	I	WD	I	C	I	
+DRB1*15:05	G	WD	WD			WD					
+DRB1*15:06:01	G	C	C	WD	C	I	C	I	C	C	
+DRB1*15:06:02	G	WD	WD		WD						
+DRB1*15:07:01	G	I	I		WD	I	WD			WD	
+DRB1*15:10	G	WD	WD			WD					
+DRB1*15:11	G	I	WD		I	WD	WD			WD	
+DRB1*15:13	G	WD	WD			WD					
+DRB1*15:14	G	I	WD		I	WD				I	
+DRB1*15:18	G	I	I			I					
+DRB1*15:20	G	I	WD		I	WD					
+DRB1*15:22	G	WD	WD	WD		WD				WD	
+DRB1*15:23	G	WD	WD	WD							
+DRB1*15:24	G	I	WD			WD				I	
+DRB1*15:31	G	WD	WD		WD						
+DRB1*15:33	G	WD	WD			WD					
+DRB1*15:36	G	WD	WD			WD					
+DRB1*15:37:01	G	WD	WD			WD					
+DRB1*15:37:02	G	WD	WD			WD					
+DRB1*15:38	G	I	WD		I						
+DRB1*15:40	G	WD	WD			WD					
+DRB1*15:47	G	WD	WD		WD						
+DRB1*15:55	G	WD	WD			WD					
+DRB1*15:56	G	I	WD				WD			I	
+DRB1*15:57	G	WD	WD	WD							
+DRB1*15:61	G	WD	WD								
+DRB1*15:65	G	WD	WD			WD					
+DRB1*15:67	G	WD	WD			WD					
+DRB1*15:68	G	I	WD		I						
+DRB1*15:93	G	WD	WD			WD					
+DRB1*15:96	G	WD	WD			WD					
+DRB1*16:01:01	G	C	C	C	C	C	C	C	C	C	
+DRB1*16:01:02	G	WD	WD			WD					
+DRB1*16:01:08	G	WD	WD			WD					
+DRB1*16:01:10	G	WD	WD			WD					
+DRB1*16:02:01G	G	C	C	C	C	C	C	C	C	C	
+DRB1*16:05:01	G	C	I		I	I	C			I	
+DRB1*16:07	G	I	I			WD	WD	I		I	
+DRB1*16:08	G	I	WD							I	
+DRB1*16:09:01	G	WD	WD			WD	WD				
+DRB1*16:10	G	I	WD		I						
+DRB1*16:12	G	I	WD					I			
+DRB1*16:15	G	WD	WD			WD					
+DRB1*16:22	G	WD	WD					WD			

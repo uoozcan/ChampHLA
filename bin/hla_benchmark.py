@@ -1028,6 +1028,105 @@ def qualify_allele_for_gene(raw, gene):
     return value
 
 
+_CIWD_CATALOGUE = None
+
+
+def get_ciwd_catalogue():
+    """Lazily load the vendored CIWD 3.0.0 catalogue (assets/ciwd_3.0.0.tsv).
+
+    Standalone module bin/ciwd.py; loaded robustly whether hla_benchmark is executed as a script
+    (its dir is on sys.path) or imported via importlib in tests (dir is not). A missing table yields
+    an empty catalogue that classifies every allele as `unknown` — the stratification degrades
+    gracefully rather than failing the benchmark. See assets/README_CIWD.md."""
+    global _CIWD_CATALOGUE
+    if _CIWD_CATALOGUE is None:
+        bin_dir = str(Path(__file__).resolve().parent)
+        if bin_dir not in sys.path:
+            sys.path.insert(0, bin_dir)
+        import ciwd
+        _CIWD_CATALOGUE = ciwd.load_ciwd()
+    return _CIWD_CATALOGUE
+
+
+def annotate_ciwd(rows):
+    """Tag each benchmark row with the CIWD commonness of its truth genotype and typed call.
+
+    Additive: `truth_ciwd_stratum` (rarer of the two truth alleles — the genotype's difficulty),
+    per-allele truth categories, and `call_implausible` (1 = the call is not-CIWD/absent → candidate
+    error or novel allele). Rows are annotated in place and returned."""
+    cat = get_ciwd_catalogue()
+    for row in rows:
+        t1, t2 = row.get("truth_allele1", ""), row.get("truth_allele2", "")
+        row["truth_ciwd_1"] = cat.category(t1)
+        row["truth_ciwd_2"] = cat.category(t2)
+        row["truth_ciwd_stratum"] = cat.genotype_stratum(t1, t2)
+        callable_call = row.get("is_callable", "0") == "1"
+        implausible = callable_call and (
+            cat.is_implausible(row.get("allele1", "")) or cat.is_implausible(row.get("allele2", ""))
+        )
+        row["call_implausible"] = "1" if implausible else "0"
+    return rows
+
+
+def build_ciwd_stratified_summary(row_sets):
+    """Concordance stratified by CIWD commonness of the truth genotype.
+
+    `row_sets` is a list of (method_label, rows); each row needs truth_allele1/2, modality,
+    is_callable, is_correct. Aggregates by (method, modality, ciwd_stratum) — additive to the
+    existing overall metrics, answering "does accuracy hold on rare/well-documented alleles, not just
+    common ones?" """
+    cat = get_ciwd_catalogue()
+    agg = defaultdict(lambda: {"gene_rows": 0, "callable": 0, "correct": 0})
+    for method, rows in row_sets:
+        for row in rows:
+            stratum = cat.genotype_stratum(row.get("truth_allele1", ""), row.get("truth_allele2", ""))
+            bucket = agg[(method, row.get("modality", ""), stratum)]
+            bucket["gene_rows"] += 1
+            bucket["callable"] += 1 if row.get("is_callable", "0") == "1" else 0
+            bucket["correct"] += 1 if row.get("is_correct", "0") == "1" else 0
+    order = {name: i for i, name in enumerate(["common", "intermediate", "well_documented", "not_ciwd", "unknown"])}
+    out = []
+    for (method, modality, stratum), b in agg.items():
+        n = b["gene_rows"]
+        out.append({
+            "method": method,
+            "modality": modality,
+            "ciwd_stratum": stratum,
+            "gene_rows": n,
+            "callable_rate": round(b["callable"] / n, 4) if n else "",
+            "overall_correct_call_rate": round(b["correct"] / n, 4) if n else "",
+        })
+    return sorted(out, key=lambda r: (r["method"], modality_sort_key(r["modality"]), order.get(r["ciwd_stratum"], 99)))
+
+
+def build_ciwd_plausibility_summary(rows):
+    """Per-tool QC: how often a callable call is biologically implausible (not-CIWD/novel), and
+    whether such calls are enriched for errors — support for using CIWD as a plausibility flag."""
+    agg = defaultdict(lambda: {"callable": 0, "implausible": 0, "implausible_incorrect": 0})
+    for row in rows:
+        if row.get("is_callable", "0") != "1":
+            continue
+        b = agg[(row.get("tool", ""), row.get("modality", ""))]
+        b["callable"] += 1
+        if row.get("call_implausible", "0") == "1":
+            b["implausible"] += 1
+            if row.get("is_correct", "0") != "1":
+                b["implausible_incorrect"] += 1
+    out = []
+    for (tool, modality), b in agg.items():
+        n, imp = b["callable"], b["implausible"]
+        out.append({
+            "tool": tool,
+            "modality": modality,
+            "callable_calls": n,
+            "implausible_calls": imp,
+            "implausible_rate": round(imp / n, 4) if n else "",
+            "implausible_incorrect": b["implausible_incorrect"],
+            "implausible_error_rate": round(b["implausible_incorrect"] / imp, 4) if imp else "",
+        })
+    return sorted(out, key=lambda r: (modality_sort_key(r["modality"]), r["tool"]))
+
+
 def build_harmonized_rows(truth, runs, resolution=2, imgt_hla_version=""):
     rows = []
     for run in runs:
@@ -4397,6 +4496,7 @@ def main():
         raise SystemExit("No benchmark rows remained after applying the configured benchmark loci.")
     shared_genes = calculate_shared_genes(filtered_rows)
     main_rows = filtered_rows
+    annotate_ciwd(main_rows)
     attach_probabilistic_calibration(main_rows, mode, config)
     # Optionally annotate rows with superpopulation for ancestry-stratified analysis
     pop_map = {}
@@ -4548,7 +4648,7 @@ def main():
         "interpretation": " ".join(interpretation_parts),
     }
 
-    write_tsv(output_dir / "tables" / "harmonized_benchmark_rows.tsv", main_rows, ["sample", "superpopulation", "modality", "tool", "gene", "truth_allele1_raw", "truth_allele2_raw", "allele1_raw", "allele2_raw", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "correct_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "is_ambiguity_compatible", "is_resolution_compatible", "compatibility_grade", "match_grade", "imgt_hla_version", "runtime_hours", "max_ram_gb", "confidence_score", "confidence_source", "raw_confidence", "read_support", "raw_score_family", "raw_score_value", "calibrated_probability", "cv_calibrated_probability", "calibration_method", "source_file"])
+    write_tsv(output_dir / "tables" / "harmonized_benchmark_rows.tsv", main_rows, ["sample", "superpopulation", "modality", "tool", "gene", "truth_allele1_raw", "truth_allele2_raw", "allele1_raw", "allele2_raw", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "correct_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "is_ambiguity_compatible", "is_resolution_compatible", "compatibility_grade", "match_grade", "truth_ciwd_1", "truth_ciwd_2", "truth_ciwd_stratum", "call_implausible", "imgt_hla_version", "runtime_hours", "max_ram_gb", "confidence_score", "confidence_source", "raw_confidence", "read_support", "raw_score_family", "raw_score_value", "calibrated_probability", "cv_calibrated_probability", "calibration_method", "source_file"])
     write_tsv(output_dir / "tables" / "summary_full_cohort.tsv", sorted(summary.values(), key=lambda row: (modality_sort_key(row["modality"]), row["tool"])), ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi", "median_runtime_hours", "median_max_ram_gb"])
     write_tsv(output_dir / "tables" / "summary_per_gene.tsv", per_gene, ["tool", "modality", "gene", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi"])
     write_tsv(output_dir / "tables" / "summary_full_cohort_multiresolution.tsv", multi_resolution_tool_rows, ["tool", "modality", "sample_count", "gene_rows", "callable_rate", "exact_2field_rate", "exact_3field_rate", "g_group_match_rate", "p_group_match_rate", "ambiguity_compatible_rate"])
@@ -4593,6 +4693,16 @@ def main():
     write_tsv(output_dir / "tables" / "bimodal_wes_rna_consensus.tsv", bimodal_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_ambiguity_compatible", "is_resolution_compatible", "compatibility_grade", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "n_wes_tools", "n_rna_tools", "discordance_tag"])
     write_tsv(output_dir / "tables" / "bimodal_accuracy_comparison.tsv", bimodal_comparison_rows, ["comparison", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi"])
     write_tsv(output_dir / "tables" / "method_comparison.tsv", method_comparison_rows, ["method", "method_type", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi"])
+    # CIWD 3.0.0 auxiliary layer: concordance stratified by allele commonness, and a plausibility QC
+    # flag. CIWD is a classification catalogue, not a truth cohort — these are additive views over the
+    # existing ground-truth benchmark (see assets/README_CIWD.md, docs/NEW_HLA_BENCHMARK_DATASETS.md).
+    ciwd_stratified_rows = build_ciwd_stratified_summary(
+        [(tool, [r for r in main_rows if r["tool"] == tool]) for tool in sorted({r["tool"] for r in main_rows})]
+        + [("MajorityVote", majority_rows), ("WeightedConsensus", weighted_rows),
+           ("ChampionChallenger", champion_challenger_rows)]
+    )
+    write_tsv(output_dir / "tables" / "summary_ciwd_stratified.tsv", ciwd_stratified_rows, ["method", "modality", "ciwd_stratum", "gene_rows", "callable_rate", "overall_correct_call_rate"])
+    write_tsv(output_dir / "tables" / "summary_ciwd_plausibility.tsv", build_ciwd_plausibility_summary(main_rows), ["tool", "modality", "callable_calls", "implausible_calls", "implausible_rate", "implausible_incorrect", "implausible_error_rate"])
     write_tsv(output_dir / "tables" / "meta_method_comparison.tsv", [dict(row, method_type="ensemble") for row in meta_method_comparison_rows], ["method", "method_type", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi"])
     write_tsv(output_dir / "tables" / "champion_challenger_method_comparison.tsv", champion_challenger_method_rows, ["method", "method_type", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi"])
     write_tsv(output_dir / "tables" / "gated_method_comparison.tsv", gated_method_rows, ["method", "method_type", "modality", "sample_count", "gene_rows", "callable_rate", "accuracy_among_callable", "overall_correct_call_rate", "overall_correct_call_rate_ci_lo", "overall_correct_call_rate_ci_hi"])

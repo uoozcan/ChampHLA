@@ -13,6 +13,18 @@
 hlahd_db:      '/scratch/project_2008084/ozcanumu/hla_references/databases/hlahd_db'
 t1k_hlaidx:    '/scratch/project_2008084/hla_references/t1k_hlaidx'
 
+# Reference genome (needed by Locityper; the BAM must be aligned to this build)
+reference_fasta: '/scratch/project_2008084/hla_references/genomes/GRCh38_full_analysis_set_plus_decoy_hla.fa'
+
+# Locityper locus-pangenome DB (built by bin/build_locityper_db.sh, IPD-IMGT/HLA 3.64.0)
+locityper_db:  '/scratch/project_2008084/hla_references/locityper_db'
+
+# Immuannot reference bundle (Data-2024Feb02 from zenodo.org/records/10948964)
+# NOTE: Immuannot needs assembled contigs (--contigs_dir) to run, and the
+# nmdpbioinformatics/immuannot container ships annot.IPD.sh rather than the
+# Immuannot.sh the module calls — reconcile before enabling --tools immuannot.
+immuannot_refdata: '/scratch/project_2008084/hla_references/immuannot_refdata/Data-2024Feb02'
+
 # ── Samtools (host-side binary and wrapper) ──────────────────────────────────
 # samtools_bin_dir: directory containing the host samtools binary.
 #   Bound as: --bind ${samtools_bin_dir}/samtools:/usr/local/bin/samtools

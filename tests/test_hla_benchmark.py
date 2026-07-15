@@ -957,5 +957,81 @@ class ArbitrationTest(unittest.TestCase):
         self.assertIsNone(result)
 
 
+_ciwd_spec = importlib.util.spec_from_file_location("ciwd_module", str(REPO / "bin" / "ciwd.py"))
+ciwd = importlib.util.module_from_spec(_ciwd_spec)
+_ciwd_spec.loader.exec_module(ciwd)
+
+
+class CiwdCatalogueTest(unittest.TestCase):
+    def setUp(self):
+        self.cat = ciwd.load_ciwd()
+
+    def test_catalogue_loads(self):
+        self.assertGreater(len(self.cat), 3000)  # ~3249 two-field alleles in CIWD 3.0.0
+
+    def test_common_intermediate_wd_notciwd_categories(self):
+        # verified against the published CIWD 3.0.0 P-group table
+        self.assertEqual(self.cat.category("A*02:01"), "common")
+        self.assertEqual(self.cat.category("B*07:02"), "common")
+        self.assertEqual(self.cat.category("DRB1*15:01"), "common")
+        self.assertEqual(self.cat.category("A*01:04N"), "well_documented")
+        self.assertEqual(self.cat.category("A*02:25"), "not_ciwd")  # 'o' in source
+
+    def test_absent_allele_is_unknown(self):
+        self.assertEqual(self.cat.category("A*99:99"), "unknown")
+
+    def test_expression_suffix_normalised(self):
+        # a null-suffixed truth allele resolves to its two-field catalogue entry
+        self.assertEqual(self.cat.category("A*01:04"), self.cat.category("A*01:04N"))
+        self.assertEqual(self.cat.category("HLA-A*02:01:01"), "common")
+
+    def test_population_group_lookup(self):
+        self.assertEqual(self.cat.category("A*02:01", "EURO"), "common")
+
+    def test_genotype_stratum_is_rarer_allele(self):
+        self.assertEqual(self.cat.genotype_stratum("A*02:01", "A*01:01"), "common")
+        self.assertEqual(self.cat.genotype_stratum("A*02:01", "A*02:25"), "not_ciwd")
+        self.assertEqual(self.cat.genotype_stratum("A*02:01", "A*99:99"), "unknown")
+
+    def test_is_implausible_flags_rare_and_novel(self):
+        self.assertFalse(self.cat.is_implausible("A*02:01"))
+        self.assertTrue(self.cat.is_implausible("A*02:25"))
+        self.assertTrue(self.cat.is_implausible("A*99:99"))
+
+    def test_missing_table_degrades_to_unknown(self):
+        empty = ciwd.load_ciwd(path=REPO / "assets" / "does_not_exist.tsv")
+        self.assertEqual(len(empty), 0)
+        self.assertEqual(empty.category("A*02:01"), "unknown")
+
+
+class CiwdBenchmarkOutputTest(unittest.TestCase):
+    def test_stratified_and_plausibility_tables_written(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            outdir = Path(tmpdir) / "out"
+            config = FIXTURES / "benchmark_config.yaml"
+            subprocess.run(["python3", str(SCRIPT), "--config", str(config), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+
+            strat_path = outdir / "tables" / "summary_ciwd_stratified.tsv"
+            self.assertTrue(strat_path.exists())
+            with strat_path.open() as handle:
+                strat = list(csv.DictReader(handle, delimiter="\t"))
+            self.assertTrue(strat)
+            self.assertEqual(set(strat[0].keys()),
+                             {"method", "modality", "ciwd_stratum", "gene_rows", "callable_rate", "overall_correct_call_rate"})
+            # consensus methods are stratified alongside single tools
+            self.assertIn("MajorityVote", {r["method"] for r in strat})
+            # fixture uses common alleles -> stratum resolves to 'common'
+            self.assertIn("common", {r["ciwd_stratum"] for r in strat})
+
+            plaus_path = outdir / "tables" / "summary_ciwd_plausibility.tsv"
+            self.assertTrue(plaus_path.exists())
+
+            # harmonized rows carry the additive CIWD annotation columns
+            with (outdir / "tables" / "harmonized_benchmark_rows.tsv").open() as handle:
+                harmonized = list(csv.DictReader(handle, delimiter="\t"))
+            for col in ("truth_ciwd_stratum", "call_implausible"):
+                self.assertIn(col, harmonized[0])
+
+
 if __name__ == "__main__":
     unittest.main()
