@@ -575,42 +575,53 @@ def _get_best_row(df: pd.DataFrame, modality: str, methods: list[str]) -> dict:
 
 
 def build_figure_9_bimodal_robustness(context: dict, out_dir: Path) -> None:
-    method = context["tri"]["method_comparison"].copy()
-    bimodal = context["tri"]["bimodal_method_comparison"].copy()
-    if method.empty or bimodal.empty:
+    """Per-gene bimodal WES+RNA comparison: MajorityVote vs Champion-Challenger vs the
+    best single tool@modality, from the 10-fold nested-CV over the 106 matched subjects.
+    Shows that bimodal Champion-Challenger matches majority voting (net wash per gene)
+    and both beat the best single tool."""
+    pg_path = Path("/scratch/project_2008084/pihla-publish/analysis/nested_cv_champion_challenger/bimodal/nested_cv_per_gene.tsv")
+    pg = _maybe_read_tsv(pg_path)
+    if pg.empty:
         return
-    for df in (method, bimodal):
-        df["overall_correct_call_rate"] = pd.to_numeric(df["overall_correct_call_rate"], errors="coerce")
-    rows = [
-        _get_best_row(method, "wgs", ["OptiType", "ChampionChallenger"]),
-        _get_best_row(method, "wes", ["MajorityVote", "OptiType", "ChampionChallenger"]),
-        _get_best_row(method, "rnaseq", ["HLA-HD", "ChampionChallenger", "OptiType"]),
-        _get_best_row(bimodal, "wes+rnaseq", ["BimodalMajorityVote", "BimodalWeightedConsensus"]),
-    ]
-    labels = ["WGS", "WES", "RNA", "WES+RNA bimodal"]
-    values = [r["overall_correct_call_rate"] * 100.0 for r in rows]
-    methods = [r["method"] for r in rows]
-    colors = [PRIMARY, SECONDARY_WES, SECONDARY_RNA, "#1d4ed8"]
+    pg["overall_correct_call_rate"] = pd.to_numeric(pg["overall_correct_call_rate"], errors="coerce")
+    genes = ["A", "B", "C"]
 
-    fig, ax = plt.subplots(figsize=(8.8, 4.8))
-    x = np.arange(len(rows))
-    ax.bar(x, values, color=colors, edgecolor="white", linewidth=0.8)
-    for xpos, value, method_name in zip(x, values, methods):
-        ax.text(xpos, value + 1.2, f"{value:.1f}", ha="center", fontsize=8, color=SLATE)
-        ax.text(xpos, 3, method_name, ha="center", va="bottom", fontsize=7.2, color="white", fontweight="bold")
+    def _val(gene, method_prefix):
+        r = pg[(pg["gene"] == gene) & (pg["method"].str.startswith(method_prefix))]
+        return float(r["overall_correct_call_rate"].iloc[0]) * 100 if not r.empty else float("nan")
+
+    def _best(gene):
+        r = pg[(pg["gene"] == gene) & (pg["method"].str.startswith("BestSingleTool"))]
+        return float(r["overall_correct_call_rate"].iloc[0]) * 100 if not r.empty else float("nan")
+
+    mv = [_val(g, "MajorityVote") for g in genes]
+    cc = [_val(g, "ChampionChallenger") for g in genes]
+    bt = [_best(g) for g in genes]
+
+    fig, ax = plt.subplots(figsize=(9.0, 4.8))
+    x = np.arange(len(genes))
+    w = 0.27
+    ax.bar(x - w, mv, w, label="BimodalMajorityVote", color="#1d4ed8", edgecolor="white", zorder=3)
+    ax.bar(x, cc, w, label="BimodalChampionChallenger", color=METHOD_COLORS["ChampionChallenger"], edgecolor="white", zorder=3)
+    ax.bar(x + w, bt, w, label="Best single tool", color=LIGHT_SLATE, edgecolor="white", zorder=3)
+    for i in range(len(genes)):
+        for xi, v in ((x[i] - w, mv[i]), (x[i], cc[i]), (x[i] + w, bt[i])):
+            ax.text(xi, v + 0.6, f"{v:.1f}", ha="center", va="bottom", fontsize=6.6, color=SLATE)
     ax.set_xticks(x)
-    ax.set_xticklabels(labels)
-    ax.set_ylim(0, 104)
-    ax.set_ylabel("Overall correct-call rate (%)")
+    ax.set_xticklabels([f"HLA-{g}" for g in genes])
+    ax.set_ylim(88, 100)
+    ax.set_ylabel("Bimodal WES+RNA correct-call rate (%)")
     _figure_header(
         fig,
-        "Figure 9. Supplementary matched-subject robustness shows bimodal WES+RNA majority as the strongest multimodal result",
-        "Supplementary evidence · benchmark_trimodal_robustness",
+        "Figure 8. In the recommended bimodal WES+RNA configuration, Champion-Challenger matches majority voting and beats any single tool",
+        "Supplementary evidence · 106 matched subjects · 10-fold nested CV",
         SUPPLEMENTARY,
     )
-    ax.text(0.98, 0.96, "BimodalMajorityVote = 0.9623\nSupplementary robustness evidence", transform=ax.transAxes, ha="right", va="top", fontsize=7.5, color=SUPPLEMENTARY, bbox=dict(boxstyle="round,pad=0.35", facecolor="white", edgecolor="#d1d5db"))
-    _figure_footer(fig, "Transitional split family: Figure 9 carries the matched-subject unimodal plus bimodal half of the robustness interpretation.")
-    _finalize_layout(fig, right=0.98)
+    ax.text(0.98, 0.97, "Overall: BimodalCC 0.9623 = BimodalMV 0.9623\n(McNemar p=1.0); best tool 0.9423",
+            transform=ax.transAxes, ha="right", va="top", fontsize=7.3, color=SUPPLEMENTARY,
+            bbox=dict(boxstyle="round,pad=0.35", facecolor="white", edgecolor="#d1d5db"))
+    legend_outside(ax, loc="upper left", anchor=(1.02, 1.0), frameon=False, fontsize=7)
+    _finalize_layout(fig, right=0.78)
     _save(fig, out_dir, "figure_09_bimodal_per_gene")
 
 
