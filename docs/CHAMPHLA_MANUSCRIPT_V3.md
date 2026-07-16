@@ -279,8 +279,6 @@ In the WGS benchmark, wall-clock times were comparable to WES due to HLA-region 
 
 These profiles inform deployment planning: environments with fewer than 16 GB RAM can comfortably run OptiType, ArcasHLA, HLA-HD, POLYSOLVER, and SpecHLA across all applicable modalities. Kourami (5.9 GB WGS), T1K (10.0 GB RNA), and HLA-HD in RNA mode (8.7 GB) have the highest peak RAM demands. For time-constrained workflows, the OptiType+ArcasHLA+HLA-HD panel delivers ensemble consensus at reduced wall-clock overhead. Full per-tool resource profiles across all modalities and metrics are shown in **Supplementary Figure S14**.
 
-**Supplementary Figure S14.** *Computational resource requirements per HLA typing tool across sequencing modalities.* Three-panel figure showing peak RAM (GB), CPU utilisation (%), and wall-clock time (hours). Within each panel, grouped bars show median resource values per tool for WGS (orange), WES (blue), and RNA-seq (green) from 1000 Genomes Project samples (n=30 per modality for WGS and WES; RNA-seq: T1K and Seq2HLA n=30, ArcasHLA/HLA-HD/SpecHLA n=29, OptiType n=26 due to four samples exceeding the 8 h wall-clock limit). Error whiskers indicate P25–P75 interquartile range. Tools not applicable to a given modality are shown with hatched bars. All values measured from Nextflow execution traces (`realtime`, `peak_rss`, `%cpu` fields) from dedicated n=30 benchmark runs. *(Source: `figures_final/figure_8_computational_performance`)*
-
 ### 3. Result Concordance and Heterogeneity Across Tools
 
 A central motivation for ChampHLA is that different HLA typing tools frequently predict different allele pairs for the same sample. To quantify this heterogeneity, ChampHLA computes structured discordance labels for every gene-locus pair and writes them to `discordance_summary.tsv` (**Supplementary Figure S12**; **Table 6**). Across the three modalities the discordance burden tracks exactly the ordering in which Champion-Challenger helps: it is highest in WGS, where the ensemble delivers a large accuracy gain, and lowest in RNA-seq, where the ensemble is neutral.
@@ -290,8 +288,6 @@ WGS is by a wide margin the most discordant modality: **174 discordance events a
 RNA-seq, in contrast, is the **least** discordant modality: only 13 `low_evidence_conflict` events across 321 gene-locus pairs (4.0%), because the strong RNA tools (HLA-HD, OptiType, ArcasHLA at 0.92–0.95) largely agree. Where intra-RNA disagreement does occur it is consistent with allele-specific expression at heterozygous loci—one allele expressed at lower read depth is resolved differently by tools with different sensitivity thresholds—but at this low rate there is little for an ensemble to correct, consistent with Champion-Challenger matching majority voting on RNA-seq.
 
 WES sits between the two: 27 `low_evidence_conflict` events across 390 gene-locus pairs (6.9%). Under nested cross-validation the Champion-Challenger override gate acted on a small number of these discordant loci and was net corrective (Results §1); every override is preserved in the audit trail (`champion_challenger_method_comparison.tsv`) for post-hoc review without altering the primary accuracy statistics.
-
-**Supplementary Figure S12.** *Discordance taxonomy counts by modality.* Bar charts show the number of discordance events per category (`low_evidence_conflict`, `no_evidence`, `possible_expression_bias`, `technical_conflict`) for the WGS (n=411 loci), WES (n=390), and RNA-seq (n=321) benchmarks. WGS carries by far the highest discordance (42.3%, dominated by `low_evidence_conflict` from the wide spread of per-tool WGS accuracy), WES is intermediate (6.9%), and RNA-seq the lowest (4.0%), where the strong tools largely agree. The discordance ordering matches the modality ordering in which Champion-Challenger improves over majority voting. *(Source: `figures_final/figure_6_discordance_taxonomy`)*
 
 **Table 6.** *Discordance summary by modality and category (10-fold nested-CV cohorts)*
 
@@ -349,10 +345,6 @@ Two tools passed the guardrail: T1K (Brier=0.312, ECE=0.297), which retained a p
 
 **Figure 4.** *Confidence calibration curves and guardrail outcomes by tool.* Calibration plots (reliability diagrams) show mean predicted confidence (x-axis) versus observed accuracy (y-axis) in 10 equal-frequency bins for each tool with a non-null confidence signal. The diagonal represents perfect calibration. OptiType, HLA-HD, and Kourami cluster near the top-right corner (mean confidence ≈ 1.0 regardless of accuracy), indicating severe proxy saturation. T1K and ArcasHLA fall near the diagonal, indicating usable calibration. Blocked tools are highlighted with a red border; passing tools with a green border. *(Source: `figures_final/figure_4_confidence_calibration`)*
 
-**Supplementary Figure S8.** *Abstention–accuracy tradeoff curves across modalities.* Line plots show overall correct-call rate (y-axis) against callable rate (x-axis) as the WeightedConsensus support threshold varies from 0 (always call) to 1 (always abstain), for WGS, WES, and RNA-seq benchmarks. Each point represents one threshold setting; the operating point selected out of fold under nested cross-validation is marked. This abstention behaviour is a secondary reliability property of the weighting-only consensus and is not part of the primary Champion-Challenger accuracy comparison. The WES and RNA-seq curves show a clear tradeoff: accepting a modest callable-rate reduction (from 1.0 to 0.93 in WES, 0.96 in RNA-seq) yields accuracy-among-callable estimates above MajorityVote accuracy. *(Source: `figures_final/figure_5_abstention_tradeoff`)*
-
-**Supplementary Figure S13.** *Benchmark-derived reliability weights by tool and modality.* Horizontal bar charts show the final blended weight (`final_weight = 0.7 × base_reliability + 0.3 × effective_confidence`) for each tool in the WGS, WES, and RNA-seq modalities. Tool-level weights are shown separately for HLA-A, HLA-B, and HLA-C where gene-level variation exists. Guardrail status is encoded by bar fill (solid = confidence boost applied; hatched = blocked). OptiType dominates WGS weighting; HLA-HD and OptiType lead in RNA-seq; POLYSOLVER and OptiType lead in WES. ArcasHLA's near-zero WGS weight and near-average RNA-seq weight illustrate why modality-specific weight learning is essential. *(Source: `figures_final/figure_7_confidence_weights`)*
-
 ### 5. Resolution Analysis
 
 Secondary resolution metrics—three-field exact match rate (exact_3field), G-group compatibility rate, P-group compatibility rate, and ambiguity-compatible rate—were evaluated for all tools across the WGS (n=137) and WES truth-backed benchmarks using `method_comparison_multiresolution.tsv` and `summary_full_cohort_multiresolution.tsv`. Four key findings emerge.
@@ -408,8 +400,6 @@ Two factors explain the gap between the 94.4% pilot and the 81.1% 30-sample conc
 | IPD-IMGT/HLA alleles | 30 | shared | 0.333 | 0.550 | 0.500 | 0.461 | 0.506 |
 | IPD-IMGT/HLA alleles | 3 (pilot) | per-sample | 0.333 | 0.833 | 0.500 | 0.556 | 0.556 |
 
-**Supplementary Figure S16.** *Orthogonal silver-standard truth validation against 1000 Genomes gold truth.* (A) Allele-level concordance per locus (HLA-A, -B, -C) and overall, at two-field and G-group resolution, for a Locityper genotyping database built from the HPRC v1.1 Minigraph-Cactus pangenome versus a control database built from IPD-IMGT/HLA alleles, on 30 samples (shared depth profile) and a three-sample per-sample-depth pilot. The HPRC pangenome database nearly doubles concordance (overall two-field 0.811 versus 0.461 at 30 samples; 0.944 versus 0.556 in the pilot). (B) Confidence calibration: concordance as a function of Locityper genotype-quality threshold for the 30-sample run. Concordance increases monotonically with quality under the HPRC database (0.811→0.905) but is uninformative under the IMGT-allele database (0.461→0.432), demonstrating that genotype confidence is well-calibrated only with an adequate pangenome reference and motivating the agreement-gated silver-truth design. *(Source: `figures_final/figure_12_silver_truth_hprc`)*
-
 ### 7. Cross-Modality Robustness: Bimodal and Trimodal Analysis
 
 The supplementary 106-sample matched-subject trimodal robustness analysis tested whether combining HLA evidence across WGS, WES, and RNA-seq improves ensemble accuracy over any single modality on the same subjects. The results were unambiguous: bimodal WES+RNA majority voting achieved the best multimodal result at **0.9623** overall correct-call rate (callable rate=0.9937; 95% CI: 0.935–0.978; **Figure 5**), outperforming all unimodal methods. At the per-gene level, bimodal MajorityVote achieved 0.9717 (HLA-A), 0.9623 (HLA-B), and 0.9528 (HLA-C), with near-complete callable coverage at all three loci. These results confirm that WES and RNA-seq are mutually reinforcing modalities for ensemble HLA typing. Applying the Champion-Challenger consensus to the same bimodal call set under 10-fold nested cross-validation reproduced the majority-voting result exactly (0.9623 vs 0.9623; exact McNemar p=1.0, two discordant loci each way) while exceeding the best single tool (HLA-HD RNA-seq, 0.9423; Table 4): in the recommended bimodal configuration Champion-Challenger therefore matches majority voting without regression and beats any individual tool, so it can serve as the default consensus—providing calibration-guarded, auditable calls at no accuracy cost—rather than being reserved for the discordant WGS modality where it produces a significant gain.
@@ -417,8 +407,6 @@ The supplementary 106-sample matched-subject trimodal robustness analysis tested
 Adding WGS as a third modality did not improve the bimodal headline: TrimodalMajorityVote achieved **0.9591** overall correct-call rate (callable rate=0.9906; **Supplementary Figure S15**), 3.2 percentage points below the bimodal WES+RNA result. Per-gene trimodal accuracy (A=0.9717, B=0.9623, C=0.9434) is largely unchanged from the bimodal result at HLA-A and HLA-B but shows a marginal improvement at HLA-C (+0.9 percentage points) that does not offset the overall dilution. This negative result for WGS addition is itself informative: it demonstrates that short-read WGS HLA typing in its current form adds more noise than signal when combined with an already-strong WES+RNA bimodal ensemble. The most accurate multimodal strategy for HLA typing with current short-read technology is therefore WES+RNA bimodal consensus, with WGS reserved for cases where WES and RNA-seq data are unavailable.
 
 **Figure 5.** *Bimodal WES+RNA per-gene comparison (n=106 matched subjects; 10-fold nested cross-validation).* Grouped bars show overall correct-call rate at HLA-A, HLA-B, and HLA-C for bimodal MajorityVote, bimodal Champion-Challenger, and the best single tool (per gene, across WES and RNA-seq callers). Overall, bimodal Champion-Challenger matches bimodal majority voting exactly (0.9623 vs 0.9623; exact McNemar p=1.0) and both exceed the best single tool (0.9423); per gene the two consensus methods trade the lead—majority voting at HLA-A and -B, Champion-Challenger at HLA-C—a net wash. In the recommended bimodal configuration Champion-Challenger can therefore serve as the default consensus at no accuracy cost while adding calibration-guarded, auditable calls. *(Source: `figures_final/figure_09_bimodal_per_gene`)*
-
-**Supplementary Figure S15.** *Trimodal WGS+WES+RNA robustness analysis (n=106 matched subjects; supplementary robustness benchmark).* Two-panel comparison of trimodal and bimodal ensemble methods. Panel A: accuracy among callable loci for bimodal MajorityVote, bimodal WeightedConsensus, trimodal MajorityVote, and trimodal WeightedConsensus, with exact percentage annotations and Wilson score 95% confidence intervals. Panel B: callable rate (fraction of loci with a call) for the same four methods, showing the coverage cost of adding WGS. Hatched bars indicate trimodal methods. Adding WGS as a third modality does not improve over bimodal WES+RNA and reduces overall accuracy slightly, confirming that short-read WGS adds noise rather than signal to an already-strong WES+RNA ensemble. This finding is specific to the current benchmark cohort and tool set; it does not constitute a general recommendation to exclude WGS from all HLA typing workflows, but identifies WGS single-tool quality improvement as the most impactful open problem for WGS-equipped HLA typing pipelines. *(Source: `figures_final/figure_10_trimodal_comparison`)*
 
 **Figure 6.** *How the Champion-Challenger consensus works and how it differs from majority voting.* **(A)** Mechanism schematic: for each HLA gene a benchmark-designated champion (selected per gene and modality — e.g. OptiType for HLA-A/-B and T1K for HLA-C in WGS) provides the default call, while a reliability- and confidence-weighted ensemble (`final_weight = 0.7 × base_reliability + 0.3 × effective_confidence`, gated by a Brier/ECE < 0.35 calibration guardrail) may override the champion only when all four gates pass simultaneously — a minimum challenger support fraction, weight margin, number of supporting tools (thresholds selected strictly out of fold), and an unambiguous challenger allele — producing one of three audited decision-trace outcomes (`challenger_override`, `champion_retained`, `champion_missing` fallback). Majority voting, by contrast, treats every callable tool as one equal vote and returns `no_call` on ties, with no champion, reliability weights, or calibration. **(B)** Under 10-fold nested cross-validation, Champion-Challenger's advantage over majority voting scales with inter-tool discordance: it is decisive in WGS (0.5012 vs 0.3844; +11.7 percentage points; exact McNemar p<0.0001), where per-gene champion routing recovers the single-tool ceiling that symmetric voting dilutes, and neutral in the high-accuracy WES (0.9436 vs 0.9359) and RNA-seq (0.9408 vs 0.9502) modalities where the strong tools already agree. All values are pooled over held-out folds. *(Source: `figures_final/figure_11_champion_challenger_combined`; alternate layouts `figure_11a_cc_mechanism`, `figure_11b_mv_vs_cc`)*
 
@@ -450,8 +438,6 @@ On the **IHWG MHC-reference cells** (study-verified WGS of the homozygous typing
 | IHWG MHC-reference cells | germline LCL | WGS | 4 / 12 | 0.833 | 0.917 | IPD-IMGT/HLA IHIW multi-lab |
 
 Two points temper interpretation. First, at these sample sizes the confidence intervals are wide and the ChampHLA–majority-voting differences are not individually significant; the value of the external test lies in the *direction and mechanism* of the effect rather than the absolute gap. Second, NCI-60 are tumour lines, so loss of heterozygosity inflates apparent homozygosity at some loci—indeed the gate's corrective HLA-A overrides recover exactly such constitutional homozygous genotypes, which OptiType had mis-split. Taken together, the external validation supports the claim that the Champion-Challenger framework generalises out of distribution—matching majority voting on both WES and RNA-seq (within overlapping confidence intervals) with an active, mostly-corrective override gate—and that where it trails majority voting the cause is a *frozen* modality-specific choice rather than a failure of the consensus design: on WES a too-strict supporting-tools floor (recoverable, below), and on RNA a frozen HLA-B/-C champion (ArcasHLA) that is strong on 1000G but weak on NCI-60. Both are addressable by transparent, modality-specific recalibration rather than by abandoning the design. This reading is reinforced across the full set of six external arms and all three modalities (Table 9): in every arm ChampHLA matches majority voting within overlapping confidence intervals, and the two arms where it trails—NCI-60 RNA-seq and the IHWG WGS reference cells—share the identical mechanism, a single frozen modality-specific *champion* (ArcasHLA and T1K respectively) that is strong on 1000G but weak out of distribution while the remaining champions perform well. Conversely, on the cleanest arm—the germline, LOH-free, clinical-gold-truth GIAB trio—ChampHLA is perfect on WES and near-perfect on RNA-seq, and it recovers the HG002 whole-genome anchor exactly. The consistent conclusion is that the Champion-Challenger consensus design transfers out of distribution, with any residual shortfall traceable to a frozen champion choice rather than to the consensus logic, and recoverable by modality-specific re-selection.
-
-**Supplementary Figure S17.** *External validation on an independent non-1000G cohort (NCI-60).* The frozen 1000G-derived Champion-Challenger policy is applied without re-learning to NCI-60 RNA-seq and WES, scored against Adams (2005) sequence-based typing (HLA-A/-B/-C, two-field). **(A)** Overall correct-call rate with Wilson 95% confidence intervals for the best single tool, majority voting, and ChampHLA, by modality (RNA-seq *n*=42, WES *n*=42); on WES ChampHLA (0.842) matches majority voting and exceeds OptiType (0.817), and on RNA-seq ChampHLA (0.793) tracks just below majority voting (0.817) with a predominantly corrective gate (15 of 20 overrides corrective). **(B)** Per-locus correct-call rate (HLA-A/-B/-C) for ChampHLA and majority voting in each modality. **(C)** WES override-gate behaviour at the deployed support=0.35/margin=0.00 as the supporting-tools floor varies: the deployed floor of ≥1 tool gives 0.842 (three corrective, one harmful, three neutral overrides, equal to majority voting); raising it to ≥2 removes all harmful/neutral overrides and yields the optimum (0.854, three corrective / zero harmful, above the majority-voting reference 0.842); ≥3 suppresses all overrides (0.817, equal to OptiType). *(Source: `figures_final_candidate/figure_13_external_validation_nci60`)*
 
 ### 9. Orthogonal Flow-Cytometry HLA-A2 Validation in a Clinical AML Cohort
 
@@ -600,99 +586,9 @@ We anticipate that ChampHLA will be most immediately useful to research groups c
 
 ---
 
-## Supplementary Section (Outline)
+## Supplementary Materials
 
-*Supplementary Figures.* In addition to Supplementary Figures S1–S3 and S8, six figures reporting secondary analyses were moved out of the main set during revision and are captioned inline with their relevant Results subsection: **S12** discordance taxonomy by modality (§3), **S13** benchmark-derived reliability weights (§4), **S14** computational resource requirements (§2), **S15** trimodal WGS+WES+RNA robustness (§7), **S16** orthogonal silver-standard truth validation (§6), and **S17** external validation on NCI-60 (§8). (Numbers S12–S17 are assigned to avoid collision with existing Supplementary Tables S9–S11.)
-
-### S1. Full HPC Usage Guide
-
-Detailed SLURM configuration with example `nextflow.config` overrides, Singularity SIF cache setup instructions, CSC Puhti-specific parameter file, resource sizing guide by cohort size and sequencing modality, and annotated example commands for WGS, WES, and RNA-seq cohort runs.
-
-### S2. Full Local Computer Usage Guide
-
-Docker installation prerequisites, per-tool resource profiles (RAM, CPU, disk), recommended tool subsets for memory-constrained environments (< 16 GB RAM, < 32 GB RAM), Docker Compose alternative for multi-sample parallelisation, and expected runtimes on consumer hardware.
-
-### S3. Full Scenario Walkthroughs
-
-Step-by-step walkthroughs for all four user scenarios described in the Recommendations section, including: (S3.1) SLURM WES cohort run with full eight-tool panel and Champion-Challenger output; (S3.2) local Docker RNA-seq run with HLA-HD+ArcasHLA+OptiType+T1K panel; (S3.3) samplesheet CSV preparation and validation; (S3.4) custom benchmark YAML configuration for a new cohort with user-provided truth data.
-
-### S4. Extended Resolution and Ambiguity Analysis
-
-Extended per-locus resolution analysis for the WGS (n=137) and WES truth-backed benchmarks, including per-gene breakdowns of exact_3field, ambiguity_compatible, g_group, and p_group match rates for all eight tools. Supplements the summary findings in Results §5 (main text Table 7 and Supplementary Figure S3). Includes discussion of the 2014 truth-set ambiguity ceiling and its implications for interpreting apparent WGS accuracy gaps.
-
-### S5. Extended Limitations and ChampHLA v2 Roadmap
-
-Full discussion of each limitation identified in the main text, including: training-split size and its effect on weight uncertainty; proxy-based confidence representation and its limitations relative to calibrated probability models; single-champion-per-gene design and its implications for population-stratified cohorts; truth-set ceiling at two-field resolution; and WGS tool-limitation as the central barrier to WGS ensemble accuracy improvement. Planned features for version 2.1 include: DRB1/DQB1 five-locus evaluation with complementary truth resources; per-population weight stratification; allele-frequency priors in override policy; isotonic regression confidence calibration to replace proxy-based Platt scaling; graph-aware and long-read backends via T1K; and integration hooks for neoantigen prediction and transplant compatibility scoring downstream tools.
-
-### S6. Champion-Challenger Sweep Surface
-
-Description of the sweep TSV file format, how to read the accuracy-override tradeoff table, and guidance for selecting a custom operating point for institution-specific precision requirements. **The sweep surface is an in-sample tuning aid for choosing a production operating point, not a held-out performance estimate:** its accuracies are computed on the full benchmark cohort without a train/test split, so the accuracy at any swept point is optimistically biased and must not be read as the method's expected accuracy. All accuracy figures reported in this manuscript instead come from the nested cross-validation path (Methods §2), in which the operating point is selected strictly out of fold; the sweep is provided only so users can trade correct-call rate against override aggressiveness for their own precision requirements.
-
-### S7. FIMM Clinical HLA Typing and Loss of Heterozygosity Analysis
-
-#### S7.1 Cross-Modality HLA Concordance (FIMM AML/MDS Cohort)
-
-To assess ChampHLA's clinical utility on real-world cancer samples, we applied the pipeline to a cohort of AML and MDS patients from the Institute for Molecular Medicine Finland (FIMM). HLA typing was performed across three sequencing modalities—single-cell RNA-seq (scRNA-seq), bulk RNA-seq, and whole-exome sequencing (WES)—using ChampHLA tools available for each modality (OptiType, ArcasHLA, and SpecHLA for WES and bulk RNA; OptiType and ArcasHLA for scRNA). Cross-modality concordance rates were computed for each HLA gene (A, B, C) by comparing allele calls between all modality pairs (**Figure S4**).
-
-Concordance was highest between bulk RNA and WES across all three genes, consistent with the strong complementarity of these modalities observed in the 1000 Genomes benchmark (Results §7). scRNA vs WES concordance was lower, particularly at HLA-C, reflecting the reduced read depth at HLA loci typical of droplet-based scRNA-seq protocols. These cross-modality patterns are consistent with the benchmark finding that bimodal WES+RNA consensus produces the highest ensemble accuracy.
-
-#### S7.2 HLA Allele Dropout and Homozygosity QC
-
-Before interpreting allele-level results, we characterised allele dropout patterns across tools and modalities using the 1000 Genomes truth-backed benchmarks (**Figure S5**). The false duplicate rate (fraction of heterozygous truth loci called as homozygous) varied substantially by tool and modality. ArcasHLA exhibited the highest false duplicate rate in RNA-seq (1.0 at HLA-A and HLA-B), consistent with its tendency to call a single allele when the minor allele falls below its detection threshold under allele-specific expression. In contrast, WES showed near-zero false duplicate rates for most tools, supporting the use of WES-based allele calls as the primary input for downstream analyses such as LOH classification and HED computation.
-
-#### S7.3 FIMM WES LOH Candidate Classification
-
-Loss of heterozygosity (LOH) at HLA loci is a tumour immune escape mechanism in haematological malignancies. Using SpecHLA WES allele frequency outputs from the FIMM cohort, we classified each patient–gene pair into four categories (**Figure S6**): candidate LOH (major allele fraction ≥ 0.80 with ≥ 20 heterozygous variant sites), allelic imbalance requiring review, balanced heterozygous, or insufficient evidence. These classifications are exploratory: WES allele frequencies reflect exon-capture read depth at HLA loci rather than genome-wide allele balance, and thresholds calibrated for WGS may not transfer reliably to WES data. WGS confirmation is required before drawing clinical conclusions from candidate LOH events identified in WES data.
-
-#### S7.4 Overall Survival and HLA Evolutionary Divergence
-
-In a subset of 28 FIMM patients with available survival follow-up, we computed HLA Evolutionary Divergence (HED)—the mean Grantham amino acid distance at antigen-binding groove positions—from WES consensus allele calls at HLA-A, -B, and -C. Kaplan–Meier survival curves were stratified by diagnosis group (AML, MDS, MDS→AML) and by median HED total (**Figure S7**). The analysis is exploratory given the small cohort size (n ≈ 14 per arm for the HED split), which provides approximately 25% power to detect a hazard ratio of 2.0. Results should be interpreted as hypothesis-generating for future larger-scale studies investigating the relationship between HLA diversity and outcomes in haematological malignancies.
-
-### S8. Abstention–Accuracy Tradeoff (weighting-only consensus)
-
-**Supplementary Figure S8** shows the abstention–accuracy tradeoff for the weighting-only WeightedConsensus across modalities: as the support threshold rises, callable rate falls and accuracy among called loci rises. This is a secondary reliability property (a "defer rather than err" option) of the weighting scheme and is not part of the primary Champion-Challenger accuracy comparison; the overall correct-call rate of WeightedConsensus remains below majority voting in every modality (Table 3, ablation row).
-
-### S9. Accuracy by Allele Commonness (CIWD 3.0.0)
-
-Held-out nested-CV correct-call rate stratified by the commonness of the rarer truth allele (CIWD 3.0.0; `analysis/nested_cv_champion_challenger/*/nested_cv_by_ciwd.tsv`). The common stratum dominates every cohort; intermediate/well-documented strata carry too few loci (n ≤ 3) for inference and are omitted here. The WGS Champion-Challenger gain is retained within the common stratum, confirming it is not a rare-allele artefact.
-
-| Modality | Stratum | n loci | MajorityVote | ChampHLA (CC) |
-|---|---|---|---|---|
-| WGS | common | 397 | 0.390 | **0.504** |
-| WES | common | 377 | 0.952 | 0.955 |
-| RNA-seq | common | 312 | 0.955 | 0.946 |
-
-### S10. Accuracy by Continental Ancestry
-
-Held-out nested-CV correct-call rate stratified by 1000 Genomes superpopulation mapped to continental ancestry (EUR = CEU/FIN/GBR/TSI; AFR = YRI; `analysis/nested_cv_champion_challenger/*/nested_cv_by_ancestry.tsv`). Champion-Challenger is greater than or equal to majority voting in every ancestry stratum and modality; the African-ancestry and unlabelled strata carry small n and wide intervals, so per-population weight learning (Limitations) remains a valuable extension.
-
-| Modality | Ancestry | n loci | MajorityVote | ChampHLA (CC) |
-|---|---|---|---|---|
-| WGS | AFR | 21 | 0.476 | **0.571** |
-| WGS | EUR | 93 | 0.430 | 0.441 |
-| WGS | unlabelled | 297 | 0.364 | **0.515** |
-| WES | AFR | 21 | 0.905 | **1.000** |
-| WES | EUR | 93 | 0.968 | 0.968 |
-| WES | unlabelled | 276 | 0.928 | 0.931 |
-| RNA-seq | AFR | 21 | 0.952 | 0.905 |
-| RNA-seq | EUR | 93 | 0.979 | 0.979 |
-| RNA-seq | unlabelled | 207 | 0.937 | 0.928 |
-
-### S11. Attempted External-Validation Cohorts Excluded on Integrity Grounds
-
-Beyond the external cohorts reported in Results §8 (NCI-60, GIAB trio, HG002, IHWG), we scouted five further non-1000G candidates and rejected each after Phase-0 provenance verification, before any benchmarking. We report them here because the exclusion criteria—experimental (not in-silico) per-sample truth, independence from the 1000 Genomes calibration cohort, and matched open short reads—are the same standards that make an external validation meaningful, and because published per-sample HLA tables are frequently in-silico tool output rather than orthogonal truth (verified twice here). Per-cohort Phase-0 records are in `analysis/{swehla,pcrsbt,conshla,getrm}_benchmark/PHASE0_STATUS.md`.
-
-| Candidate cohort (reference) | Material / modality | Reason excluded | Standard upheld |
-|---|---|---|---|
-| SweHLA / SweGen (Nabais Sá et al., *EJHG* 2020) | germline WGS | Truth is access-gated: the open DOI record (10.17044/NBIS/G000009) is metadata-only with zero downloadable files; per-sample SweHLA genotypes require NBIS/SciLifeLab (swefreq) registration | Truth must be obtainable |
-| PCR-SBT 829-WES (Yu et al. 2022, PMC9679531) | germline WES | The 829 WES samples **are** 1000 Genomes Phase 3 → circular with our primary 1000G truth; not an independent cohort | Independence from the calibration cohort |
-| PCR-SBT 652-RNA (Mangul Lab, PMC10827116) | bulk / single-cell RNA | Every diploid class-I subset is 1000G/HapMap (Geuvadis, Montgomery); the genuinely independent subsets are class-II-only, artificial mono-allelic (B721.221), 10× scRNA, or unreleased | Independent diploid class-I bulk reads |
-| consHLA / ZERO Childhood Cancer (*BMC Bioinformatics* 2025, PMC12363109) | WGS + RNA | Published per-sample "truth" is consHLA's own in-silico HLA-HD calls; the experimental clinical truth (10 patients) is aggregate-only with no per-sample genotypes and no deposited reads | Truth must be experimental and per-sample, not in-silico |
-| GeT-RM (Bettinotti et al., *J Mol Diagn* 2018, PMC6939753) | Coriell reference DNA | Integrity-clean three-field PCR-SSO/SBT truth was built for all 108 lines, but only 2/108 have usable public short reads (NA12273 RNA-seq, NA17221 WGS) → n=2, not a benchmark; the truth table is retained for future use | Truth needs matched open short reads |
-
-This discipline—rejecting a self-referential in-silico "truth", catching two cohorts that are covertly the 1000 Genomes resource we calibrate on, and declining an access-gated or read-less panel—is why the external-validation cohorts we do report (Results §8) are independent, experimentally-truthed, and openly reproducible.
-
----
+All supplementary items are provided in a separate document, **ChampHLA — Supplementary Materials** (`docs/CHAMPHLA_MANUSCRIPT_V3_SUPPLEMENTARY.md` / `.docx`): Supplementary Figures S1–S8 and S12–S17, Supplementary Tables S9–S11, and Supplementary Notes S1–S11. Each supplementary figure is embedded there with its source stem under `analysis/figures_final/`.
 
 ## Acknowledgements
 

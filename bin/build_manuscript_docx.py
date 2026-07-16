@@ -142,7 +142,7 @@ def build(md_path, docx_path, analysis_dir):
 
         # figure caption paragraph with a (Source: `...`) ref
         m = SOURCE_RE.search(stripped)
-        if m and stripped.startswith("**Figure"):
+        if m and (stripped.startswith("**Figure") or stripped.startswith("**Supplementary Figure")):
             source_path = m.group(1)
             # strip the trailing *(Source: ...)* provenance note from the caption
             caption = re.sub(r"\s*\*?\(Source:.*?\)\*?\s*$", "", stripped)
