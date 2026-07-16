@@ -46,8 +46,9 @@ TOOLS_GRID = [1, 2, 3]
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--harmonized", required=True, help="harmonized_benchmark_rows.tsv from an existing run")
-    p.add_argument("--weights", required=True, help="consensus_runtime_weights.json from the same run")
-    p.add_argument("--modality", required=True, help="modality label as it appears in the rows (e.g. wes, rnaseq, wgs)")
+    p.add_argument("--weights", help="consensus_runtime_weights.json from the same run (not needed with --bimodal)")
+    p.add_argument("--modality", default="", help="modality label as it appears in the rows (e.g. wes, rnaseq, wgs); ignored with --bimodal")
+    p.add_argument("--bimodal", action="store_true", help="pool WES+RNA calls per matched subject/gene (tool identity = tool@modality) and score the joint bimodal consensus")
     p.add_argument("--genes", default="A,B,C")
     p.add_argument("--folds", type=int, default=10)
     p.add_argument("--seed", type=int, default=42)
@@ -73,6 +74,59 @@ def load_rows(path, genes, modality):
         r["gene"] = g
         keep.append(r)
     return keep
+
+
+def load_bimodal_rows(path, genes):
+    """Pool WES + RNA-seq tool calls per matched subject and gene into a single joint
+    call set. Only (subject, gene) keys that are callable in BOTH modalities are kept
+    (matched-subject bimodal eligibility, matching build_bimodal_consensus_rows). Each
+    kept row is relabelled tool -> 'tool@modality' and modality -> 'bimodal', so the
+    unchanged nested-CV machinery treats each tool@modality as a distinct voter."""
+    rows = hb.read_table(Path(path))
+    gene_set = set(genes)
+    kept = []
+    for r in rows:
+        g = hb.normalize_gene(r.get("gene", ""))
+        m = hb.clean_token(r.get("modality", "")).lower()
+        if g not in gene_set or m not in ("wes", "rnaseq"):
+            continue
+        if not hb.clean_token(r.get("truth_allele1", "")):
+            continue
+        r["gene"] = g
+        r["_mod"] = m
+        kept.append(r)
+    # bimodal eligibility: >=1 callable call in each modality for the (sample, gene)
+    callable_mods = defaultdict(set)
+    for r in kept:
+        if r.get("is_callable") == "1":
+            callable_mods[(r["sample"], r["gene"])].add(r["_mod"])
+    eligible = {k for k, mods in callable_mods.items() if "wes" in mods and "rnaseq" in mods}
+    out = []
+    for r in kept:
+        if (r["sample"], r["gene"]) not in eligible:
+            continue
+        r["tool"] = "%s@%s" % (hb.clean_token(r.get("tool", "")), r["_mod"])
+        r["modality"] = "bimodal"
+        out.append(r)
+    return out
+
+
+def build_bimodal_weights(rows):
+    """Reliability weight payload for the bimodal set: per tool@modality, final_weight =
+    fraction of callable calls that are 2-field-correct (base reliability). Weights do not
+    drive accuracy (ablation); the per-fold champion is the accuracy mechanism."""
+    stats = defaultdict(lambda: [0, 0])  # tool -> [correct, callable]
+    for r in rows:
+        if r.get("is_callable") != "1":
+            continue
+        s = stats[r["tool"]]
+        s[1] += 1
+        if r.get("is_correct") == "1":
+            s[0] += 1
+    tool_weights = {}
+    for tool, (k, n) in stats.items():
+        tool_weights[tool] = {"bimodal": {"final_weight": round(k / n, 4) if n else 0.0}}
+    return {"tool_weights": tool_weights, "gene_weights": {}}
 
 
 def stratified_folds(samples_by_pop, n_folds, seed):
@@ -209,8 +263,15 @@ def main():
     args = parse_args()
     genes = [hb.normalize_gene(g) for g in args.genes.split(",") if g.strip()]
     mode = "probabilistic_recalibrated"
-    rows = load_rows(args.harmonized, genes, args.modality)
-    weights = json.loads(Path(args.weights).read_text(encoding="utf-8"))
+    if args.bimodal:
+        args.modality = "bimodal"
+        rows = load_bimodal_rows(args.harmonized, genes)
+        weights = build_bimodal_weights(rows)
+    else:
+        if not args.modality or not args.weights:
+            raise SystemExit("--modality and --weights are required unless --bimodal is set")
+        rows = load_rows(args.harmonized, genes, args.modality)
+        weights = json.loads(Path(args.weights).read_text(encoding="utf-8"))
     if not rows:
         raise SystemExit("No scorable truth-backed rows for modality=%s genes=%s" % (args.modality, genes))
 
