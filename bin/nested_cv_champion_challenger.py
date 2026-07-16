@@ -338,6 +338,11 @@ def main():
 
     mcnemar_cc_mv = mcnemar_exact(correct_map(pooled_cc), correct_map(pooled_mv))
 
+    # paired CC-vs-best-single-tool over shared callable loci (untuned reference)
+    best_tool_map = {(r["sample"], r["gene"]): (r.get("is_correct") == "1")
+                     for r in rows if hb.clean_token(r.get("tool", "")) == best_tool}
+    mcnemar_cc_bt = mcnemar_exact(correct_map(pooled_cc), best_tool_map)
+
     out = Path(args.out)
     (out).mkdir(parents=True, exist_ok=True)
 
@@ -376,6 +381,14 @@ def main():
     hb.write_tsv(out / "nested_cv_mcnemar.tsv", [mcnemar_row],
                  ["comparison", "modality", "cc_overall", "mv_overall", "delta_cc_minus_mv",
                   "b", "c", "n_discordant", "p_value"])
+    bt_row = dict(mcnemar_cc_bt)
+    bt_row.update({"comparison": "ChampionChallenger_vs_BestSingleTool(%s)" % best_tool,
+                   "modality": args.modality, "cc_overall": round(cc_m["overall"], 4),
+                   "best_tool_overall": round(best_tool_acc, 4),
+                   "delta_cc_minus_best_tool": round(cc_m["overall"] - best_tool_acc, 4)})
+    hb.write_tsv(out / "nested_cv_mcnemar_vs_best_tool.tsv", [bt_row],
+                 ["comparison", "modality", "cc_overall", "best_tool_overall",
+                  "delta_cc_minus_best_tool", "b", "c", "n_discordant", "p_value"])
 
     # ---- per-gene held-out metrics (for Table 4 and Figure 3) ----
     per_gene_rows, per_gene_mcnemar, per_gene_gain = [], [], []
@@ -474,6 +487,9 @@ def main():
     print("  MajorityVote           overall = %.4f  [%.3f, %.3f]" % (mv_m["overall"], *wilson(mv_m["correct"], mv_m["n"])))
     print("  ChampionChallenger(CV) overall = %.4f  [%.3f, %.3f]" % (cc_m["overall"], *wilson(cc_m["correct"], cc_m["n"])))
     print("  BestSingleTool(%s)     overall = %.4f" % (best_tool, best_tool_acc))
+    print("  CC vs BestSingleTool: b=%d c=%d n=%d p=%s (delta %+.4f)" % (
+        mcnemar_cc_bt["b"], mcnemar_cc_bt["c"], mcnemar_cc_bt["n_discordant"],
+        mcnemar_cc_bt["p_value"], cc_m["overall"] - best_tool_acc))
     print("  delta (CC - MV) = %+.4f | McNemar b=%d c=%d p=%.4f" % (
         cc_m["overall"] - mv_m["overall"], mcnemar_cc_mv["b"], mcnemar_cc_mv["c"], mcnemar_cc_mv["p_value"]))
     print("  wrote:", out / "nested_cv_method_comparison.tsv")
