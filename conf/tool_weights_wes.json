@@ -1,8 +1,9 @@
 {
-  "ArcasHLA": 0.0711,
-  "HLA-HD": 0.8519,
-  "OptiType": 0.9279,
-  "POLYSOLVER": 0.9012,
-  "SpecHLA": 0.716,
-  "T1K": 0.8255
+  "ArcasHLA": 0.1363,
+  "HLA-HD": 0.7816,
+  "Kourami": 0.7053,
+  "OptiType": 0.923,
+  "POLYSOLVER": 0.9154,
+  "SpecHLA": 0.7846,
+  "T1K": 0.8296
 }

@@ -1,8 +1,8 @@
 {
-  "ArcasHLA": 0.8778,
-  "HLA-HD": 0.9224,
-  "OptiType": 0.9031,
-  "Seq2HLA": 0.4,
-  "SpecHLA": 0.0222,
-  "T1K": 0.8732
+  "ArcasHLA": 0.9185,
+  "HLA-HD": 0.9442,
+  "OptiType": 0.9392,
+  "Seq2HLA": 0.5806,
+  "SpecHLA": 0.0349,
+  "T1K": 0.8794
 }

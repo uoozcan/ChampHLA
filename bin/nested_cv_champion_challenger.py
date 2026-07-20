@@ -398,20 +398,22 @@ def main():
         if not cc_g or not mv_g:
             continue
         cc_gm, mv_gm = accuracy(cc_g), accuracy(mv_g)
-        # best single tool for this gene (untuned reference)
-        g_tool = defaultdict(lambda: [0, 0])
+        # best single tool for this gene, scored on the SAME held-out denominator as
+        # the pooled consensus rows (samples for which a tool emitted no row count as
+        # incorrect), so the comparison is apples-to-apples with the CC/MV rows rather
+        # than each tool being scored only over the subset it happened to call.
+        bt_n = cc_gm["n"]
+        g_correct = defaultdict(int)
         for r in rows:
             if r.get("gene") != g:
                 continue
-            t = hb.clean_token(r.get("tool", ""))
-            g_tool[t][1] += 1
             if r.get("is_correct") == "1":
-                g_tool[t][0] += 1
-        bt, bt_acc, bt_k, bt_n = "", 0.0, 0, 0
-        for t, (k, n) in g_tool.items():
-            a = k / n if n else 0.0
-            if a > bt_acc:
-                bt, bt_acc, bt_k, bt_n = t, a, k, n
+                g_correct[hb.clean_token(r.get("tool", ""))] += 1
+        bt, bt_k = "", -1
+        for t, k in g_correct.items():
+            if k > bt_k:
+                bt, bt_k = t, k
+        bt_acc = bt_k / bt_n if bt_n else 0.0
         for name, m in [("MajorityVote", mv_gm), ("ChampionChallenger_nestedCV", cc_gm)]:
             lo, hi = wilson(m["correct"], m["n"])
             per_gene_rows.append({
