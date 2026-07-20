@@ -54,6 +54,13 @@ def parse_args():
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--min-support", type=float, default=0.55, help="weighted-consensus fallback support threshold")
     p.add_argument("--min-margin", type=float, default=0.15, help="weighted-consensus fallback margin threshold")
+    p.add_argument("--equal-weights", action="store_true",
+                   help="sensitivity control: give every tool an identical weight (uniform), keeping the "
+                        "same champion selection and override policy — shows the reported accuracy is not "
+                        "inflated by the fixed full-cohort weights")
+    p.add_argument("--no-override", action="store_true",
+                   help="sensitivity control: disable the challenger override gate entirely (champion "
+                        "routing only), so the result is pure per-gene champion routing")
     p.add_argument("--out", required=True, help="output directory for nested-CV tables")
     return p.parse_args()
 
@@ -209,6 +216,24 @@ def cc_calls(rows, weights, config, genes, mode):
     return call_rows
 
 
+def cc_calls_with_trace(rows, weights, config, genes, mode):
+    call_rows, trace_rows, *_ = hb.build_champion_challenger_outputs(rows, weights, config, mode, genes)
+    return call_rows, trace_rows
+
+
+def uniformize_weights(weights, modality):
+    """Sensitivity control: set every tool's final_weight to the same value (1.0) for
+    this modality, and drop any per-gene weight overrides, so all tools are weighted
+    equally. Champion selection (accuracy-based) and the override policy are unchanged."""
+    tw = weights.get("tool_weights", {})
+    for tool, by_mod in tw.items():
+        entry = by_mod.get(modality)
+        if isinstance(entry, dict):
+            entry["final_weight"] = 1.0
+    weights["gene_weights"] = {}
+    return weights
+
+
 def choose_policy(train_rows, weights, champions, genes, min_support, min_margin, mode):
     """Argmax over the grid on the TRAINING fold. Tie-breaks favour a more
     conservative gate (higher support, higher margin, fewer overrides)."""
@@ -272,6 +297,8 @@ def main():
             raise SystemExit("--modality and --weights are required unless --bimodal is set")
         rows = load_rows(args.harmonized, genes, args.modality)
         weights = json.loads(Path(args.weights).read_text(encoding="utf-8"))
+        if args.equal_weights:
+            weights = uniformize_weights(weights, args.modality)
     if not rows:
         raise SystemExit("No scorable truth-backed rows for modality=%s genes=%s" % (args.modality, genes))
 
@@ -286,7 +313,7 @@ def main():
     for r in rows:
         by_sample[r["sample"]].append(r)
 
-    pooled_cc, pooled_mv = [], []
+    pooled_cc, pooled_mv, pooled_trace = [], [], []
     fold_records = []
     for fold in range(n_folds):
         test_samples = [s for s in all_samples if fold_of.get(s, 0) == fold]
@@ -298,12 +325,15 @@ def main():
 
         champions = learn_champions(train_rows, genes)
         policy = choose_policy(train_rows, weights, champions, genes, args.min_support, args.min_margin, mode)
+        if args.no_override:
+            policy = (1.01, 1.0, 999)  # impossible gate: champion routing only, no overrides
 
         cfg = make_config(champions, policy, args.min_support, args.min_margin, mode)
-        cc = cc_calls(test_rows, weights, cfg, genes, mode)
+        cc, cc_trace = cc_calls_with_trace(test_rows, weights, cfg, genes, mode)
         mv = hb.build_majority_vote_rows(test_rows)
         pooled_cc.extend(cc)
         pooled_mv.extend(mv)
+        pooled_trace.extend(cc_trace)
         overrides = sum(1 for r in cc if r.get("override_triggered") == "1")
         fold_records.append({
             "fold": fold,
@@ -389,6 +419,18 @@ def main():
     hb.write_tsv(out / "nested_cv_mcnemar_vs_best_tool.tsv", [bt_row],
                  ["comparison", "modality", "cc_overall", "best_tool_overall",
                   "delta_cc_minus_best_tool", "b", "c", "n_discordant", "p_value"])
+
+    # ---- held-out override audit (corrective / harmful / neutral) ----
+    truth_index = {(r["sample"], r.get("modality", args.modality), r["gene"]):
+                   (r.get("truth_allele1", ""), r.get("truth_allele2", "")) for r in rows}
+    audit = hb.summarize_override_effects(pooled_trace, truth_index)
+    audit_row = {"modality": args.modality,
+                 "weighting": "equal" if args.equal_weights else "benchmark",
+                 "override_gate": "off" if args.no_override else "on",
+                 "n_holdout_loci": len(pooled_cc), **audit}
+    hb.write_tsv(out / "nested_cv_override_audit.tsv", [audit_row],
+                 ["modality", "weighting", "override_gate", "n_holdout_loci", "override_count",
+                  "corrective_override_count", "harmful_override_count", "neutral_override_count"])
 
     # ---- per-gene held-out metrics (for Table 4 and Figure 3) ----
     per_gene_rows, per_gene_mcnemar, per_gene_gain = [], [], []
@@ -485,7 +527,13 @@ def main():
         hb.write_tsv(out / fname, strat_rows,
                      [colname, "method", "modality", "n", "overall_correct_call_rate", "ci_lo", "ci_hi"])
 
-    print("== Nested-CV held-out results (%s, %d folds, n=%d samples) ==" % (args.modality, n_folds, len(all_samples)))
+    _mode = "weights=%s, override_gate=%s" % ("equal" if args.equal_weights else "benchmark",
+                                              "off" if args.no_override else "on")
+    print("== Nested-CV held-out results (%s, %d folds, n=%d samples | %s) ==" % (
+        args.modality, n_folds, len(all_samples), _mode))
+    print("  override audit: n=%d corrective=%d harmful=%d neutral=%d" % (
+        audit["override_count"], audit["corrective_override_count"],
+        audit["harmful_override_count"], audit["neutral_override_count"]))
     print("  MajorityVote           overall = %.4f  [%.3f, %.3f]" % (mv_m["overall"], *wilson(mv_m["correct"], mv_m["n"])))
     print("  ChampionChallenger(CV) overall = %.4f  [%.3f, %.3f]" % (cc_m["overall"], *wilson(cc_m["correct"], cc_m["n"])))
     print("  BestSingleTool(%s)     overall = %.4f" % (best_tool, best_tool_acc))

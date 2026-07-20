@@ -30,6 +30,19 @@ for pair in wgs:wgs wes:wes rna:rnaseq; do
     --weights    "$D/consensus_runtime_weights.json" \
     --modality "$mod" --genes A,B,C --folds 10 --seed 42 \
     --out "$NCV/$lbl"
+  # Weighting sensitivity control (Table 3, sensitivity + override-audit panels):
+  # equal-weights and champion-routing-only should leave the significant WGS result
+  # unchanged (0 overrides) and move WES/RNA only within their confidence intervals.
+  python3 bin/nested_cv_champion_challenger.py \
+    --harmonized "$D/harmonized_benchmark_rows.tsv" \
+    --weights    "$D/consensus_runtime_weights.json" \
+    --modality "$mod" --genes A,B,C --folds 10 --seed 42 \
+    --equal-weights --out "$NCV/${lbl}_equalw"
+  python3 bin/nested_cv_champion_challenger.py \
+    --harmonized "$D/harmonized_benchmark_rows.tsv" \
+    --weights    "$D/consensus_runtime_weights.json" \
+    --modality "$mod" --genes A,B,C --folds 10 --seed 42 \
+    --no-override --out "$NCV/${lbl}_nooverride"
 done
 
 echo "[2/4] Populate champion_challenger_* stubs from the nested-CV outputs ..."
