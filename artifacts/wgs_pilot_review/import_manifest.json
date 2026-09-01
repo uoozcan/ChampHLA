@@ -1,0 +1,16 @@
+{
+  "schema_version": "compact-wgs-pilot-import-1",
+  "source_root": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot",
+  "imported_on": "2026-09-01",
+  "truth_used_for_review": false,
+  "files": {
+    "HG00096_wgs_audit.tsv": "3bb96100d42ad0fb7db864f8837a8725f9ee8ba72113e046bd9dc492d895de4e",
+    "collection_summary.json": "4897bbb100387e64f01981f23dbb2744c76ff0c67fa31d4f9896ff303defe23f",
+    "finalize_HG00097_984079.out": "6e96bd4dc4557a83526f7a2e40defd3b303328269269905e5f622ad4a9a83fbf",
+    "freeze_validation.json": "1c06ae9251d70f8878560c7322cead8c860b29f0840a16c2d996477b1ae69a65",
+    "harmonized_calls.tsv": "0f5fb496f765fb997b3b20d20cbc9df2de041c4d6bda1eac6aecb9bcdd3cf836",
+    "generated_audit/wgs_audit.tsv": "ff58a90a662be1583b186d2d66faf7260d077a83270dfb87c526d59de379b13c",
+    "generated_audit/wgs_manual_review.tsv": "a48398949a83482bc4cc6d94beab48e4d1d43c47bd662a1c928d570fd9bc8a40",
+    "generated_audit/wgs_audit_summary.json": "b3cef68f0b09d9c01623a4145b26a445cab9ca227e3e2e41e1a5e86b1b55e8f4"
+  }
+}

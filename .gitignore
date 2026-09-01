@@ -2,10 +2,11 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
+.venv_py39_failed_*/
+.cache/
 build/
 dist/
 *.egg-info/
 runtime_data/
 truth_sealed/
 runs/
-

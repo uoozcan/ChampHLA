@@ -1,0 +1,84 @@
+{
+  "callable_records": 30,
+  "caller_files": [
+    {
+      "caller": "HLA-HD",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00096/results/HG00096/hlahd/HG00096_hlahd.txt",
+      "sample": "HG00096",
+      "sha256": "7c08bf078c9af099290bb834d426c211484b6c39d3d384de50c0a91672162727"
+    },
+    {
+      "caller": "Kourami",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00096/results/kourami_repair/HG00096_kourami.txt",
+      "sample": "HG00096",
+      "sha256": "a1c768840ef9ede82877b89bb61f4bddc30b5c58453c3d02303d8e8109a00418"
+    },
+    {
+      "caller": "OptiType",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00096/results/HG00096/optitype/HG00096_optitype.txt",
+      "sample": "HG00096",
+      "sha256": "eb97d4b509fb66d85e314497e66d25dc4362e1bd242e0c0b6678c944973d43e3"
+    },
+    {
+      "caller": "SpecHLA",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00096/results/HG00096/spechla/HG00096_spechla.txt",
+      "sample": "HG00096",
+      "sha256": "f3576c1527210111ae63b8d55a4e19007e8d4cf2b628ff649077d92926e8c25d"
+    },
+    {
+      "caller": "T1K",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00096/results/HG00096/t1k/HG00096_t1k.txt",
+      "sample": "HG00096",
+      "sha256": "e48db0b5e3588d473e303cd2f196147eeed193f175464d6c414ca7ca899d9504"
+    },
+    {
+      "caller": "HLA-HD",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00097/results/HG00097/hlahd/HG00097_hlahd.txt",
+      "sample": "HG00097",
+      "sha256": "17c7402b500a54b592c9e46f6177a0255d26f5b75f2f8564d992288749d72758"
+    },
+    {
+      "caller": "Kourami",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00097/results/kourami_repair/HG00097_kourami.txt",
+      "sample": "HG00097",
+      "sha256": "b6996a683d8eb835c5c9dd035836572c896e9a690672debad488827f10118370"
+    },
+    {
+      "caller": "OptiType",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00097/results/HG00097/optitype/HG00097_optitype.txt",
+      "sample": "HG00097",
+      "sha256": "667c9809ba511f52ba833257dbb44fe38a741272978b5331676bd44e77e154e1"
+    },
+    {
+      "caller": "SpecHLA",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00097/results/HG00097/spechla/HG00097_spechla.txt",
+      "sample": "HG00097",
+      "sha256": "bb410c3d1170d71143f006ef9d0ce9bbb501d239e2649432fedba6acd228ad9c"
+    },
+    {
+      "caller": "T1K",
+      "path": "/scratch/project_2008084/champhla_cc_confirmation/runs/full_cram_wgs_pilot/caller_outputs/HG00097/results/HG00097/t1k/HG00097_t1k.txt",
+      "sample": "HG00097",
+      "sha256": "6c919d0d30876d732a15109fef47c14648ff63f8267649189310cfa7a75fe538"
+    }
+  ],
+  "callers": [
+    "HLA-HD",
+    "Kourami",
+    "OptiType",
+    "SpecHLA",
+    "T1K"
+  ],
+  "expected_locus_caller_records": 30,
+  "explicit_status_for_every_record": true,
+  "manifest_sha256": "639638316c7a2ebd3d7157fbce49574b3708bca0727621ec29cc8c864ffad356",
+  "observed_locus_caller_records": 30,
+  "output_sha256": "0f5fb496f765fb997b3b20d20cbc9df2de041c4d6bda1eac6aecb9bcdd3cf836",
+  "samples": [
+    "HG00096",
+    "HG00097"
+  ],
+  "schema_version": "full-cram-wgs-pilot-collection-1",
+  "truth_blind": true,
+  "truth_or_correctness_used": false
+}

@@ -1,0 +1,23 @@
+{
+  "audit_status_counts": {
+    "pass": 30
+  },
+  "automated_passed": true,
+  "eligible_panel": [
+    "HLA-HD",
+    "Kourami",
+    "OptiType",
+    "SpecHLA",
+    "T1K"
+  ],
+  "failure_policy": "fail closed until every expected record, caller-native source, raw/parsed pair, checksum, and 50-record manual review passes",
+  "locus_caller_records": 30,
+  "manual_review_complete": false,
+  "manual_review_counts": {
+    "pending": 30
+  },
+  "passed": false,
+  "schema_version": "wgs-input-audit-1",
+  "source_harmonized": "/scratch/project_2008084/champhla_publication_candidate/artifacts/wgs_pilot_review/harmonized_calls.tsv",
+  "source_harmonized_sha256": "0f5fb496f765fb997b3b20d20cbc9df2de041c4d6bda1eac6aecb9bcdd3cf836"
+}

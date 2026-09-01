@@ -38,3 +38,18 @@ python -m champhla_recovery.cli audit-manuscript-claims \
 
 Truth-bearing files must remain outside runtime prediction inputs. The sealed
 truth directory is ignored by Git; only its checksum manifest is releasable.
+
+## Roihu CPU environment
+
+The CSC module stack changes the active Python only after `samtools/1.21` is
+loaded. Use the checked setup script rather than creating a virtual environment
+from the login-shell Python:
+
+```bash
+bash scripts/setup_roihu_test_env.sh
+.venv/bin/python -m pytest -q
+```
+
+The script requires Python 3.11.15, installs the package and pinned test extra
+inside `.venv`, and never changes the system Python. GPU RefFormer training is
+not part of this release route.

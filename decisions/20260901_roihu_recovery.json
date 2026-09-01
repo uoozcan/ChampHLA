@@ -1,0 +1,31 @@
+{
+  "schema_version": "champhla-decision-1",
+  "date": "2026-09-01",
+  "decision": "roihu_preflight_passed_wgs_expansion_still_blocked",
+  "repository_commit_before_status_update": "b9770d6ae00317932ecad244882a3fb873c5bf47",
+  "roihu_preflight": {
+    "passed": true,
+    "python": "3.11.15",
+    "samtools": "1.21",
+    "nextflow": "25.10.2",
+    "apptainer": "1.4.5",
+    "release_tests_at_pre_update_commit": "43 passed",
+    "release_tests_after_environment_and_artifact_regressions": "45 passed"
+  },
+  "bounded_wgs_pilot": {
+    "subjects": ["HG00096", "HG00097"],
+    "expected_records": 30,
+    "automated_parser_records_passed": 30,
+    "assistant_source_line_reviewed": 30,
+    "named_human_signoff": "pending",
+    "production_manual_review_target": 50,
+    "production_gate_passed": false,
+    "truth_blind_freeze_valid": true,
+    "capacity_gate_passed": false
+  },
+  "authorization": {
+    "new_wgs_accuracy_claim": false,
+    "wgs_roster_expansion": false,
+    "reason": "Human sign-off and 50-record production audit are incomplete; the two-subject capacity gate is insufficient for confirmation."
+  }
+}
