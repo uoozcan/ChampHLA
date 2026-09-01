@@ -1,0 +1,9 @@
+{
+  "schema_version": "publication-route-1",
+  "active_manuscript": "benchmark",
+  "method_manuscript_status": "blocked_pending_frozen_confirmation",
+  "external_validation_complete": false,
+  "rna_locked_minimum_met": false,
+  "historical_wgs_valid": false,
+  "abstract_numeric_performance_allowed": false
+}

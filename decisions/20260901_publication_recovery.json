@@ -1,0 +1,28 @@
+{
+  "schema_version": "publication-recovery-decision-1",
+  "date": "2026-09-01",
+  "supersedes": [
+    "external/external_feasibility_decision.json",
+    "historical manuscript MV-floor headline"
+  ],
+  "default_route": "benchmark_software_manuscript",
+  "conditional_route": "two_thirds_guarded_cc_method_manuscript",
+  "conditional_activation": {
+    "all_three_1000g_modalities_positive": true,
+    "all_three_holm_adjusted_p_below_0_05": true,
+    "all_three_cluster_ci_lower_bounds_above_zero": true,
+    "plurality_nonregression_within_2_points": true,
+    "no_holm_significant_gene_harm": true,
+    "hprc_wgs_excludes_regression_worse_than_2_points": true
+  },
+  "current_status": "benchmark_route_active_method_route_blocked",
+  "strict_1000g_feasibility": {
+    "wgs": {"eligible": 354, "selected": 120, "minimum_met": true},
+    "wes": {"eligible": 373, "selected": 89, "minimum_met": true},
+    "rnaseq": {"eligible": 99, "selected": 99, "minimum_met": false}
+  },
+  "three_modality_confirmation_available": false,
+  "invalid_primary_evidence": ["legacy_WGS_slice"],
+  "negative_ablations": ["RefFormer", "EvidenceGatedCC"],
+  "manuscript_original_policy": "read_only"
+}

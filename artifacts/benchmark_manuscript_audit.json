@@ -1,0 +1,18 @@
+{
+  "draft_route": "benchmark",
+  "failures": [],
+  "manuscript": "/mnt/d/Users/uonur/Downloads/champhla_publication_candidate_stage/manuscripts/benchmark/manuscript.md",
+  "manuscript_sha256": "62b16580ac94e51b8f1b9d4f471d94e5a919b0df7c3444f8adaf18366ec80715",
+  "result_references": [
+    "DEV_TT_RNA_BASE",
+    "DEV_TT_RNA_GCC",
+    "DEV_TT_WES_BASE",
+    "DEV_TT_WES_GCC",
+    "EGCC_GATE",
+    "REFFORMER_GATE"
+  ],
+  "schema_version": "manuscript-claim-audit-1",
+  "submission_ready": true,
+  "warnings": [],
+  "word_count": 570
+}

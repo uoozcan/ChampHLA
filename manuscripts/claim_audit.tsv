@@ -1,0 +1,12 @@
+claim_id	draft	section	claim	status	evidence_result_id	action
+SRC-001	source_original	Abstract	MV-floor improves WGS from 0.399 to 0.494.	remove	DEV_WGS_LEGACY_BASE	Remove because the WGS input is invalid.
+SRC-002	source_original	Abstract	MV-floor is the reported operating method.	remove		Replace with the benchmark route unless confirmation activates Guarded CC.
+SRC-003	source_original	Methods	Population stratification key requires author confirmation.	remove		Resolve from machine-readable fold assignments.
+SRC-004	source_original	Supplement	FIMM survival and HED support the main method.	remove		Keep outside the main manuscript as exploratory work.
+BM-001	benchmark	Abstract	ChampHLA provides auditable multi-caller class-I integration.	supported		Retain as the software/benchmark headline.
+BM-002	benchmark	Results	Guarded CC resolves two-thirds consensus failures in internal WES.	exploratory	DEV_TT_WES_GCC	Label as development evidence and report callability.
+BM-003	benchmark	Results	Guarded CC resolves two-thirds consensus failures in internal RNA-seq.	exploratory	DEV_TT_RNA_GCC	Label as development evidence and report callability.
+BM-004	benchmark	Ablations	RefFormer failed its prespecified gate.	supported	REFFORMER_GATE	Retain as a transparent negative ablation.
+BM-005	benchmark	Ablations	EvidenceGatedCC failed its prespecified gate.	supported	EGCC_GATE	Retain as a transparent negative ablation.
+METHOD-001	method	Status	Three-modality Guarded CC superiority is not yet confirmed.	pending		Activate only after all frozen confirmation gates pass.
+

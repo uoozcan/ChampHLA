@@ -1,0 +1,22 @@
+{
+  "failures": [],
+  "observed": {
+    "rnaseq": {
+      "baseline_correct": 296,
+      "guarded_correct": 306,
+      "loci": 321,
+      "plurality_correct": 306,
+      "subjects": 107
+    },
+    "wes": {
+      "baseline_correct": 328,
+      "guarded_correct": 369,
+      "loci": 390,
+      "plurality_correct": 365,
+      "subjects": 130
+    }
+  },
+  "passed": true,
+  "schema_version": "discovery-reproduction-1",
+  "wgs_status": "excluded_invalid_historical_input"
+}

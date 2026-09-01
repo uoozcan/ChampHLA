@@ -1,0 +1,15 @@
+{
+  "counts": {
+    "rnaseq": 462,
+    "wes": 2692,
+    "wgs": 2504
+  },
+  "output_sha256": "b6ec490d0e1a905a7f66cbdb95e408335559fe66eb5403101da31a5af180e53b",
+  "schema_version": "official-1000g-assay-manifest-1",
+  "source_sha256": {
+    "rnaseq": "7d3a28e06a1fc815ef79533dded53fcbc96c9cc785acfe0fd06452a6b3bb0fff",
+    "wes": "7b11c1d8ac4cddb7f0577439e39596d3d6650a943bb780da7b4c5135a870c5c5",
+    "wgs": "0ac5fdda0b60b6575b1867827f53e39d723f915b325b10bf023b2dc3d71c08f2"
+  },
+  "truth_blind": true
+}

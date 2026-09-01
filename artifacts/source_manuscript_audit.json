@@ -1,0 +1,14 @@
+{
+  "draft_route": "source_original",
+  "failures": [
+    "manuscript contains 8 placeholder marker(s)",
+    "manuscript contains a historical invalid-WGS performance number"
+  ],
+  "manuscript": "/mnt/d/Users/uonur/Downloads/champhla_publication_candidate_stage/manuscripts/source_original/ChatGPT_Bioinformatics_ChampHLA_Manuscript_V5x_reviewfix.docx",
+  "manuscript_sha256": "ac7162465c5b15d182bdc98025ea99635278bde8ecd166a7033205962bfe5ce6",
+  "result_references": [],
+  "schema_version": "manuscript-claim-audit-1",
+  "submission_ready": false,
+  "warnings": [],
+  "word_count": 15420
+}

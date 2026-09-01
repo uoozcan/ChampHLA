@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "champhla-publication-candidate"
+version = "0.1.0"
+description = "Frozen ChampHLA publication and confirmation candidate"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest==8.3.5"]
+refformer-cpu = ["numpy==1.26.4", "torch==2.6.0"]
+
+[project.scripts]
+build_subject_exposure_ledger = "champhla_recovery.cli:build_subject_exposure_ledger_main"
+prepare_locked_1000g_truth = "champhla_recovery.cli:prepare_locked_1000g_truth_main"
+freeze_extension_rosters = "champhla_recovery.cli:freeze_extension_rosters_main"
+audit_native_caller_outputs = "champhla_confirmation.cli:audit_wgs_inputs_main"
+run_truth_blind_predictions = "champhla_confirmation.cli:run_truth_blind_predictions_main"
+freeze_release_bundle = "champhla_recovery.cli:freeze_release_bundle_main"
+join_truth_once = "champhla_confirmation.cli:join_external_truth_main"
+evaluate_confirmation = "champhla_confirmation.cli:evaluate_confirmation_main"
+render_manuscript_tables = "champhla_recovery.cli:render_manuscript_tables_main"
+audit_manuscript_claims = "champhla_recovery.cli:audit_manuscript_claims_main"
+build_originals_manifest = "champhla_recovery.cli:build_originals_manifest_main"
+extract_source_manuscript = "champhla_recovery.cli:extract_source_manuscript_main"
+build_1000g_assay_manifest = "champhla_recovery.cli:build_1000g_assay_manifest_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "--strict-markers"

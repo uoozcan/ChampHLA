@@ -1,0 +1,73 @@
+{
+  "all_minimums_met": false,
+  "input_sha256": {
+    "assay_manifest": "b6ec490d0e1a905a7f66cbdb95e408335559fe66eb5403101da31a5af180e53b",
+    "config": "5ca3eb3b634bbd8d48274d0bba5733fb771fd2ced32258b90fb0b37e1da3b095",
+    "exposure": "3535775181969bf5095862123c89093824b12e6c3f4bc3243de75f9db575a263",
+    "registry": "0285dc76ceb1ccb03a5bef1c32d126396ba9c33234697a51b203aabbf2d63d58"
+  },
+  "modalities": {
+    "rnaseq": {
+      "eligible": 99,
+      "minimum_met": false,
+      "population_allocation": {
+        "British": 22,
+        "Finland": 11,
+        "Tuscan": 18,
+        "Utah": 27,
+        "Yoruba": 21
+      },
+      "selected": 99,
+      "status": "infeasible_minimum_not_met",
+      "target": 130
+    },
+    "wes": {
+      "eligible": 373,
+      "minimum_met": true,
+      "population_allocation": {
+        "ASW": 7,
+        "CEU": 7,
+        "CHB": 9,
+        "CHS": 4,
+        "CLM": 6,
+        "FIN": 2,
+        "GBR": 6,
+        "JPT": 14,
+        "LWK": 12,
+        "MXL": 6,
+        "PUR": 5,
+        "TSI": 5,
+        "YRI": 6
+      },
+      "selected": 89,
+      "status": "roster_frozen",
+      "target": 89
+    },
+    "wgs": {
+      "eligible": 354,
+      "minimum_met": true,
+      "population_allocation": {
+        "ASW": 8,
+        "CEU": 10,
+        "CHB": 13,
+        "CHS": 5,
+        "CLM": 8,
+        "FIN": 4,
+        "GBR": 8,
+        "JPT": 20,
+        "LWK": 15,
+        "MXL": 7,
+        "PUR": 7,
+        "TSI": 7,
+        "YRI": 8
+      },
+      "selected": 120,
+      "status": "roster_frozen",
+      "target": 120
+    }
+  },
+  "output_sha256": "c54a2edaf7225f2bee886ab6e55569878e00fd0040a6e1598da7016a4d399c34",
+  "schema_version": "frozen-extension-rosters-1",
+  "selection_seed": "ChampHLA-CC-expansion-20260901",
+  "truth_blind": true
+}

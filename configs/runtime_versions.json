@@ -1,0 +1,15 @@
+{
+  "schema_version": "champhla-runtime-1",
+  "python": "3.10",
+  "pytest": "8.3.5",
+  "samtools": "1.21",
+  "nextflow": "25.10.2-standalone",
+  "csc_module_stack": "bio-apps/v202603",
+  "ipd_imgt_hla": "3.59.0",
+  "wgs_reference": "GRCh38_full_analysis_set_plus_decoy_hla / GRCh38DH",
+  "wes_reference": "GRCh38DH",
+  "rnaseq_reference": "GRCh37 for the frozen Geuvadis BAM workflow",
+  "container_policy": "sha256 digest required before confirmation",
+  "refformer_status": "negative_ablation_no_gpu_training"
+}
+

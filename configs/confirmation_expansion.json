@@ -1,0 +1,19 @@
+{
+  "schema_version": "champhla-expansion-1",
+  "selection_seed": "ChampHLA-CC-expansion-20260901",
+  "initial_targets": {"wgs": 120, "wes": 89, "rnaseq": 130},
+  "maximum_targets": {"wgs": 180, "wes": 120, "rnaseq": 200},
+  "genes": ["A", "B", "C"],
+  "primary_truth": "2014_1000G_laboratory_HLA_typing",
+  "independent_wgs_validation": "HPRC_release2_phased_assembly",
+  "capacity_gate": {
+    "minimum_discordant_subjects_each_modality": 6,
+    "minimum_discordant_subjects_in_two_modalities": 7
+  },
+  "power_gate": 0.8,
+  "truth_join_policy": "join_once_after_prediction_freeze",
+  "primary_family": ["wgs", "wes", "rnaseq"],
+  "secondary_cohorts": ["NCI60", "E-MTAB-197"],
+  "prohibited_primary_truth": ["2018_1000G_exome_inferred_HLA"]
+}
+

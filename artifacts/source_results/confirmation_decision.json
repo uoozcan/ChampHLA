@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "resolution of two-thirds consensus failures at fixed denominator",
+  "cohort_subjects": {
+    "rnaseq": 107,
+    "wes": 130,
+    "wgs": 137
+  },
+  "external_prerequisites_pass": false,
+  "headline_retained": false,
+  "input_sha256": "2fb9a5fdd7d36c1426a4064da8630f8ff5ca1bf36a7a19faefb57f4a183e7e54",
+  "minimum_subjects": {
+    "rnaseq": 130,
+    "wes": 89,
+    "wgs": 120
+  },
+  "mode": "discovery",
+  "per_gene_harm_pass": true,
+  "plurality_retention_pass": true,
+  "primary_pass": true,
+  "sample_size_pass": false,
+  "schema_version": "three-modality-confirmation-evaluation-1",
+  "status": "discovery_only",
+  "wgs_audit_pass": false
+}

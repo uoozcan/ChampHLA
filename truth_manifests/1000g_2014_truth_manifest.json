@@ -1,0 +1,13 @@
+{
+  "duplicate_conflicts": 0,
+  "eligible_any_exact_locus_subjects": 602,
+  "eligible_complete_subjects": 250,
+  "inferred_2018_truth_allowed": false,
+  "primary_truth": true,
+  "registry_output_sha256": "0285dc76ceb1ccb03a5bef1c32d126396ba9c33234697a51b203aabbf2d63d58",
+  "schema_version": "locked-1000g-truth-1",
+  "source_sha256": "0455d0302ac12a29ab87091cab5e3e557416f6301e89fb122eef8d49cd5644ec",
+  "source_subjects": 1267,
+  "truth_output_sha256": "e297233c59e5e786c3e2060031d6f40f3ce16bd96f929befa6e754a2b7517b40",
+  "truth_rows": 3624
+}

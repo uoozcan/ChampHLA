@@ -1,0 +1,13 @@
+{
+  "draft_route": "method",
+  "failures": [],
+  "manuscript": "/mnt/d/Users/uonur/Downloads/champhla_publication_candidate_stage/manuscripts/method_conditional/manuscript.md",
+  "manuscript_sha256": "0fd05aebe60e0b90bad29e6039f12c72d5547595daeda3f54f2118189fab4959",
+  "result_references": [],
+  "schema_version": "manuscript-claim-audit-1",
+  "submission_ready": false,
+  "warnings": [
+    "pending claim: METHOD-001"
+  ],
+  "word_count": 261
+}

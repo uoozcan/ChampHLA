@@ -1,0 +1,131 @@
+{
+  "schema_version": "egcc-final-internal-decision-1",
+  "decision_date": "2026-08-31",
+  "method": "EvidenceGatedCC",
+  "scope": ["HLA-A", "HLA-B", "HLA-C"],
+  "modalities": ["wes", "rnaseq"],
+  "decision": "stop_method_development_and_use_benchmark_software_route",
+  "method_headline_retained": false,
+  "production_interface_changed": false,
+  "manuscript_changed": false,
+  "sealed_holdout_opened": false,
+  "external_validation_started": false,
+  "reason": "The corrected read-evidence challenger rescued 0 of 23 development-set WES MajorityVote errors and 0 of 9 RNA-seq errors. The best subject-separated modality/gene-weighted consensus rescued two WES loci without harm (+0.725 percentage points; McNemar p=0.50) and no RNA-seq loci, below the prespecified two-point method gate.",
+  "development_results": {
+    "wes": {
+      "n_loci": 276,
+      "majority_vote_correct": 253,
+      "weighted_consensus_correct": 255,
+      "weighted_consensus_rescues": 2,
+      "weighted_consensus_harms": 0,
+      "weighted_consensus_delta_points": 0.725,
+      "weighted_consensus_mcnemar_p": 0.5,
+      "mv_wrong_loci": 23,
+      "read_evidence_top1_rescues": 0,
+      "expanded_candidate_oracle_correct": 275
+    },
+    "rnaseq": {
+      "n_loci": 231,
+      "majority_vote_correct": 222,
+      "weighted_consensus_correct": 222,
+      "weighted_consensus_rescues": 0,
+      "weighted_consensus_harms": 0,
+      "weighted_consensus_delta_points": 0.0,
+      "weighted_consensus_mcnemar_p": 1.0,
+      "mv_wrong_loci": 9,
+      "read_evidence_top1_rescues": 0,
+      "expanded_candidate_oracle_correct": 230,
+      "caller_pair_oracle_correct": 222
+    }
+  },
+  "truth_blind_diagnostics": {
+    "configuration": "IMGT 3.59.0, corrected assembly-specific regions, canonical 31-mers, v4 alpha=4",
+    "cross_modality_top1_concordance": 0.2982,
+    "majority_vote_cross_modality_concordance_reference": 0.971,
+    "mv_in_read_ranker_top5": {"wes": 0.4239, "rnaseq": 0.7403}
+  },
+  "verification": {
+    "tests_passed": 29,
+    "tests_failed": 0,
+    "wes_read_shards": 130,
+    "rnaseq_read_shards": 106,
+    "large_artifacts_location": "/scratch/project_2008084/champhla_egcc_pilot",
+    "compact_artifacts_location": "D:\\projects\\project_2008084\\champhla_egcc_pilot"
+  },
+  "simple_consensus_baseline": {
+    "SimplePluralityLex": {
+      "interpretation": "truth-free unweighted exact-pair plurality with lexicographic ties",
+      "different_calls_from_locked_majority_vote": 0,
+      "loci_compared": 711
+    },
+    "SimpleStrictMajority": {
+      "interpretation": "truth-free consensus that emits only when one exact pair has more than half of callable-tool votes",
+      "wes": {"callable": 376, "n": 390, "correct_fixed_denominator": 359,
+              "called_only_accuracy": 0.9547872340425532,
+              "champion_challenger_correct": 365,
+              "champion_challenger_correct_on_same_376_loci": 359,
+              "champion_challenger_correct_on_14_no_consensus_loci": 6},
+      "rnaseq": {"callable": 308, "n": 321, "correct_fixed_denominator": 296,
+                 "called_only_accuracy": 0.961038961038961,
+                 "champion_challenger_correct": 304,
+                 "champion_challenger_correct_on_same_308_loci": 296,
+                 "champion_challenger_correct_on_13_no_consensus_loci": 8},
+      "publication_caveat": "The fixed-denominator gain demonstrates added callability on no-consensus loci; it is not higher accuracy at matched coverage. Strong MajorityVote and other comparators must remain in the paper."
+    },
+    "summary_sha256": "3ae83b9c86085f3ec63c3df2184b4d2e882a7b09b3b2351464eebe157fe517a8"
+  },
+  "agreement_threshold_followup": {
+    "status": "internal_discovery_significant_external_validation_required",
+    "frozen_policy": "SimpleTwoThirdsConsensus",
+    "wes_delta_points": 9.487179487179487,
+    "wes_holm_adjusted_subject_cluster_p": 2.60770320892334e-08,
+    "rnaseq_delta_points": 2.4922118380062304,
+    "rnaseq_holm_adjusted_subject_cluster_p": 0.0390625,
+    "claim_boundary": "coverage-resolution versus an abstaining simple consensus, not superiority over always-call MajorityVote",
+    "gate_artifact": "artifacts/simple_consensus_significance_gate.json"
+  },
+  "guarded_cc_followup": {
+    "status": "frozen_for_external_validation",
+    "method": "TwoThirdsGuardedCC",
+    "protected_two_thirds_loci": 647,
+    "cc_resolved_disagreement_loci": 64,
+    "same_as_raw_cc_loci": 711,
+    "significantly_better_callers_after_holm": ["wes:HLA-HD", "wes:SpecHLA", "wes:T1K", "rnaseq:T1K"],
+    "gate_artifact": "artifacts/cc_vs_callers_significance.json"
+  },
+  "single_primary_comparison": {
+    "baseline": "SimpleConsensusBaseline",
+    "endpoint": "pooled WES/RNA fixed-denominator exact unordered two-field correctness",
+    "baseline_correct": 624,
+    "champion_challenger_correct": 669,
+    "n": 711,
+    "delta_points": 6.329113924050633,
+    "subject_cluster_bootstrap_ci_points": [4.471544715447155, 8.370044052863436],
+    "exact_subject_cluster_signflip_p": 2.9103830456733704e-11,
+    "status": "internal_discovery_significant_external_confirmation_required",
+    "result_artifact": "runs/primary_cc_vs_simple/primary_result.json"
+  },
+  "interpretation": {
+    "publishable_as_new_accuracy_method": false,
+    "publishable_direction": "benchmark/software paper with EvidenceGatedCC and modality-specific weighting as transparent negative/exploratory ablations",
+    "claims_not_supported": [
+      "EvidenceGatedCC beats MajorityVote",
+      "read-level IMGT evidence improves exact two-field accuracy",
+      "WGS performance from the current WGS table",
+      "external generalization"
+    ],
+    "claims_supported": [
+      "MajorityVote is saturated in low-disagreement WES/RNA caller panels",
+      "RNA-seq caller-only reweighting has zero headroom in the development partition",
+      "modality/gene reliability weighting yields a small non-significant harm-free WES gain",
+      "independent read evidence requires strict assembly and provenance checks",
+      "negative method results can be reproduced with auditable artifacts"
+    ]
+  },
+  "source_sha256": {
+    "consensus_summary": "feb039d300e26b13ea7d346ef1bebdb7ac56bfb071a8894a574a62634c31f386",
+    "corrected_scorer_diagnostics": "dc1d272c34ed8948b9752646efc464ccaa2199a9e2f63c2c8046acb1a5f94a65",
+    "sealed_holdout_manifest": "3eec5a6eb1b0de15904fbd74eb3b22e754ff465d3404e7eb1d35adab07b4deb7",
+    "findings": "f9045d90dfd840dce8531a2fb9a9a726758dca81866d3356b4d22fcf2ba7b7d2"
+  }
+}

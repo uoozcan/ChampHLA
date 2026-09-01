@@ -1,0 +1,58 @@
+{
+  "ledger_rows": 1092,
+  "output_sha256": "3535775181969bf5095862123c89093824b12e6c3f4bc3243de75f9db575a263",
+  "schema_version": "subject-exposure-ledger-1",
+  "sources": [
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_cc_confirmation/configs/full_cram_wgs_pilot.tsv",
+      "sha256": "639638316c7a2ebd3d7157fbce49574b3708bca0727621ec29cc8c864ffad356",
+      "subjects": 2
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_cc_confirmation/discovery/joined.tsv",
+      "sha256": "155701a7da12e6c54833a39cee45795291cd15e97540c04be52d8da07877f345",
+      "subjects": 138
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_cc_confirmation/discovery/predictions.tsv",
+      "sha256": "0a54db8183a37ed5c02ab18927ecc7fdc7b8fffacdf60bfa2a042f2ce891293a",
+      "subjects": 138
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_egcc_pilot/inputs/evaluation_labels.tsv",
+      "sha256": "fe99b18ac272f29bbad16d91cdd07049ebc1c95e8b3efd70d2bf971aa41e642c",
+      "subjects": 131
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_egcc_pilot/inputs/fold_assignments.tsv",
+      "sha256": "9c7da1b8d16cadd198b97ec1c338a35db33ae4d2af7d21d5a2b9abd8712f5132",
+      "subjects": 138
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_egcc_pilot/runs/sealed_holdout/development_subjects.tsv",
+      "sha256": "73adf453a2163162132c8893b30615b40a5ff4fd6ba17dccbb4d5d86550088d0",
+      "subjects": 93
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_egcc_pilot/runs/sealed_holdout/holdout_subjects.tsv",
+      "sha256": "49f804a052aa86156f1f410ca4b86dd11a8ffe1314f9feb440bd06c370adf540",
+      "subjects": 38
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_refformer/inputs/public_input_manifest.tsv",
+      "sha256": "230aaf6f34e43c19717d53d980ccd0e96e9f0ddd75f701b64cf9b39aa246c82a",
+      "subjects": 138
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_refformer/inputs/real_training_folds.tsv",
+      "sha256": "d5bd39e81d63c876ccf2d632443fb47f4669008806bd3311e119e42aeb59effc",
+      "subjects": 138
+    },
+    {
+      "path": "/mnt/d/projects/project_2008084/champhla_refformer/inputs/real_training_labels.tsv",
+      "sha256": "74b26a6a5f9b3799098e340128b68d27e5b6c30f10fa5d6a23d311fb1b916f1c",
+      "subjects": 138
+    }
+  ],
+  "unique_subjects": 138
+}

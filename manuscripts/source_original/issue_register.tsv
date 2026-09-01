@@ -1,0 +1,10 @@
+issue_id	category	severity	evidence	required_action
+MS-001	structure	high	Draft contains 15420 words.	Replace with journal-length main text and move tutorials/exploratory work out of the main narrative.
+MS-002	placeholder	high	Author-confirmation or verification markers remain.	Resolve every marker before submission.
+MS-003	invalid_result	critical	Abstract/body contains performance from the invalid historical WGS slice.	Remove from performance claims; retain only as a QC lesson.
+MS-004	obsolete_headline	critical	MV-floor is presented as the reported operating method.	Use the benchmark route by default; keep MV-floor as a comparator/ablation.
+MS-005	scope	medium	Unvalidated long-read support occupies the main narrative.	Move long-read implementation to software documentation or limitations.
+MS-006	exploratory_scope	high	FIMM, LOH/HED, and survival analyses are embedded in the draft.	Remove from the main manuscripts and retain only in a clearly exploratory archive.
+MS-007	claim_consistency	critical	Multiple source reports recommend incompatible headlines.	Generate all result prose and tables from the authoritative result registry.
+MS-008	validation	critical	Qualifying three-modality confirmation is incomplete.	Keep method manuscript conditional until frozen unseen-subject and HPRC gates pass.
+MS-009	comparison	high	The selected abstaining baseline can exaggerate fixed-denominator gain if callability is hidden.	Report callability/called-only accuracy and always-call comparators beside it.

@@ -1,0 +1,1689 @@
+{
+  "candidate_reranker_gate": {
+    "decision": "activate_standalone_reference_ranker_fallback",
+    "external_truth_changed_policy": false,
+    "gate_name": "ChampHLA-RefFormer nested candidate-reranker kill test",
+    "modalities": [
+      {
+        "baseline_accuracy": 0.559610705596107,
+        "delta": -0.029197080291970767,
+        "delta_ci_hi": -0.004866180048661801,
+        "delta_ci_lo": -0.05596107055961071,
+        "imgt_delta": -0.007299270072992692,
+        "imgt_modality_nonregression": 1,
+        "meaningful_improvement": 0,
+        "modality": "wgs",
+        "no_imgt_accuracy": 0.537712895377129,
+        "refformer_accuracy": 0.5304136253041363,
+        "significant_gene_harm": 0,
+        "strongest_baseline": "MetaConsensus",
+        "within_2pp_nonregression": 0
+      },
+      {
+        "baseline_accuracy": 0.9358974358974359,
+        "delta": 0.0,
+        "delta_ci_hi": 0.01282051282051282,
+        "delta_ci_lo": -0.015384615384615385,
+        "imgt_delta": -0.00512820512820511,
+        "imgt_modality_nonregression": 1,
+        "meaningful_improvement": 0,
+        "modality": "wes",
+        "no_imgt_accuracy": 0.941025641025641,
+        "refformer_accuracy": 0.9358974358974359,
+        "significant_gene_harm": 0,
+        "strongest_baseline": "MVFlooredCC",
+        "within_2pp_nonregression": 1
+      },
+      {
+        "baseline_accuracy": 0.9532710280373832,
+        "delta": -0.006230529595015577,
+        "delta_ci_hi": 0.006230529595015576,
+        "delta_ci_lo": -0.021806853582554516,
+        "imgt_delta": -0.0031152647975077885,
+        "imgt_modality_nonregression": 1,
+        "meaningful_improvement": 0,
+        "modality": "rnaseq",
+        "no_imgt_accuracy": 0.9501557632398754,
+        "refformer_accuracy": 0.9470404984423676,
+        "significant_gene_harm": 0,
+        "strongest_baseline": "MVFlooredCC",
+        "within_2pp_nonregression": 1
+      }
+    ],
+    "passed": false,
+    "pooled_imgt_delta_vs_no_imgt": -0.005347593582887722,
+    "runtime_default_changed": false
+  },
+  "decision": {
+    "candidate_reranker_passed_prespecified_gate": false,
+    "full_three_modality_pilots_complete": true,
+    "metaconsensus_passed_internal_gate": true,
+    "metaconsensus_supplemental_external_improvement": false,
+    "metaconsensus_supplemental_external_nonregression": false,
+    "recommendation": "benchmark_software_paper; report_refformer_and_metaconsensus_as_ablations",
+    "retain_metaconsensus_as_method_headline": false,
+    "retain_metaconsensus_for_frozen_external_validation": false,
+    "retain_refformer_as_method_headline": false,
+    "scale_to_ten_outer_by_five_inner_folds": false,
+    "standalone_real_feasibility_passed": false,
+    "submission_ready_method_claim": false,
+    "synthetic_alignment_pilot_at_or_above_random": false
+  },
+  "existing_external_pilots": {
+    "giab_trio_rnaseq_pilot": {
+      "files": {
+        "tables/benchmark_metadata.json": "e55b64968ca20802a28bcb9c68497ff0851695b3e3228eb50fddb0b0c7402295",
+        "tables/cohort_overview.tsv": "f5e1aed92d6fba54a005ae3f6a233f6be7bec7066261f84f400a32be8b4147d7",
+        "tables/method_comparison.tsv": "bceadeec5545d59df83ea5596d38245e84e06ca8e84492f7a456826d58e40e0a"
+      },
+      "metadata": {
+        "ambiguity_evaluation": {
+          "group_levels": [
+            "G",
+            "P"
+          ],
+          "notes": "G-group and P-group rates are only reported for rows where both truth and call include comparable group-suffixed alleles.",
+          "primary_resolution": 2,
+          "secondary_resolutions": [
+            2,
+            3
+          ]
+        },
+        "analysis_tools_by_modality": {
+          "rnaseq": [
+            "ArcasHLA",
+            "HLA-HD",
+            "OptiType",
+            "Seq2HLA",
+            "SpecHLA",
+            "T1K"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "available_tools_by_modality": {
+          "rnaseq": [
+            "ArcasHLA",
+            "HLA-HD",
+            "OptiType",
+            "Seq2HLA",
+            "T1K"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "confidence_weighting": {
+          "bayesian_shrinkage": {
+            "alpha": 1.0,
+            "beta": 1.0
+          },
+          "benchmark_mode": "legacy_heuristic",
+          "default_target_reads": 50.0,
+          "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+          "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
+          "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+          "guardrail": {
+            "enabled": true,
+            "guardrail_steepness": 0,
+            "max_brier_score_for_boost": 0.35,
+            "max_expected_calibration_error_for_boost": 0.35,
+            "min_confidence_coverage_for_boost": 0.5
+          },
+          "harmonized_rows_with_calibrated_probability": 0,
+          "harmonized_rows_with_confidence": 35,
+          "parser_coverage": {
+            "ArcasHLA": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/arcashla/*/*.genes.json",
+                "confidence_parser": "arcashla_genes_confidence"
+              }
+            },
+            "HLA-HD": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/hlahd/*/*/result/*_*.read.txt",
+                "confidence_parser": "hlahd_read_confidence"
+              }
+            },
+            "OptiType": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/optitype/*/*_result.tsv",
+                "confidence_parser": "optitype_result_objective"
+              }
+            },
+            "Seq2HLA": {
+              "rnaseq": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "SpecHLA": {
+              "rnaseq": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "T1K": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/t1k/t1k_out/*_genotype.tsv",
+                "confidence_parser": "t1k_genotype_confidence"
+              }
+            }
+          },
+          "probabilistic_calibration": {
+            "cv_strategy": "loo",
+            "method": "platt",
+            "min_rows_for_isotonic": 20
+          },
+          "tool_weight_count": 5,
+          "weight_version": "read_confidence_v2"
+        },
+        "configured_benchmark_genes": [
+          "A",
+          "B",
+          "C"
+        ],
+        "excluded_sample_counts_by_reason": {},
+        "final_tri_modal_cohort_size": 3,
+        "imgt_hla_version": "3.59.0",
+        "modalities": [
+          "rnaseq"
+        ],
+        "not_available_tools_by_modality": {
+          "rnaseq": [
+            "SpecHLA"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "per_modality_sample_counts": {
+          "after_filtering": {
+            "rnaseq": 3,
+            "wes": 0,
+            "wgs": 0
+          },
+          "before_filtering": {
+            "rnaseq": 3,
+            "wes": 0,
+            "wgs": 0
+          }
+        },
+        "population_counts": {
+          "unknown": 3
+        },
+        "resolution": 2,
+        "resolution_asymmetry_warning": true,
+        "shared_genes_main": [
+          "A",
+          "C"
+        ],
+        "success_definition": "correct call only at configured primary resolution",
+        "supported_loci": [
+          "A",
+          "B",
+          "C"
+        ],
+        "tool_coverage_policy": "phase_gated",
+        "tools": [
+          "ArcasHLA",
+          "OptiType",
+          "Seq2HLA",
+          "T1K",
+          "HLA-HD",
+          "SpecHLA"
+        ],
+        "truth_acquisition_date": "2005-03-04",
+        "truth_hierarchy": [
+          "orthogonal_clinical_typing",
+          "targeted_hla_ngs",
+          "public_reference_truth"
+        ],
+        "truth_panel_date": "2005-03-04",
+        "truth_panel_name": "1000G public HLA truth",
+        "truth_path": "/tmp/ozcanumu/35347467/tmpkosq_oko/all_truth.tsv",
+        "truth_resolution_limit": "2-field",
+        "truth_source": "Adams et al. 2005, J Transl Med 3:11 (PMC555742), Table 2 (SBT class I)"
+      },
+      "method_rows": 7,
+      "modalities": [
+        "rnaseq"
+      ],
+      "path": "/scratch/project_2008084/pihla-publish/analysis/giab_trio_benchmark/rna",
+      "sample_count": 3
+    },
+    "giab_trio_wes_pilot": {
+      "files": {
+        "tables/benchmark_metadata.json": "4748bbcef465e9f3a999a2b13e7366e6d70e1ae79c67b966c168a6c1a4cc927b",
+        "tables/cohort_overview.tsv": "da5862bdc05caf2d7ac659b43fac93a377fe8eb5094b33f0699c269dff711680",
+        "tables/method_comparison.tsv": "32ad99637768419f725eb2b83906d42882c2b66d85cf70e6c5238d4b5bfe3ed4"
+      },
+      "metadata": {
+        "ambiguity_evaluation": {
+          "group_levels": [
+            "G",
+            "P"
+          ],
+          "notes": "G-group and P-group rates are only reported for rows where both truth and call include comparable group-suffixed alleles.",
+          "primary_resolution": 2,
+          "secondary_resolutions": [
+            2,
+            3
+          ]
+        },
+        "analysis_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [
+            "HLA-HD",
+            "OptiType",
+            "SpecHLA",
+            "T1K"
+          ],
+          "wgs": []
+        },
+        "available_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [
+            "HLA-HD",
+            "OptiType",
+            "SpecHLA",
+            "T1K"
+          ],
+          "wgs": []
+        },
+        "confidence_weighting": {
+          "bayesian_shrinkage": {
+            "alpha": 1.0,
+            "beta": 1.0
+          },
+          "benchmark_mode": "legacy_heuristic",
+          "default_target_reads": 50.0,
+          "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+          "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
+          "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+          "guardrail": {
+            "enabled": true,
+            "guardrail_steepness": 0,
+            "max_brier_score_for_boost": 0.35,
+            "max_expected_calibration_error_for_boost": 0.35,
+            "min_confidence_coverage_for_boost": 0.5
+          },
+          "harmonized_rows_with_calibrated_probability": 0,
+          "harmonized_rows_with_confidence": 27,
+          "parser_coverage": {
+            "HLA-HD": {
+              "wes": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/giab_trio/wes/results/**/hlahd/*/*/result/*_*.read.txt",
+                "confidence_parser": "hlahd_read_confidence"
+              }
+            },
+            "OptiType": {
+              "wes": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/giab_trio/wes/results/**/optitype/*/*_result.tsv",
+                "confidence_parser": "optitype_result_objective"
+              }
+            },
+            "SpecHLA": {
+              "wes": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "T1K": {
+              "wes": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/giab_trio/wes/results/**/t1k/t1k_out/*_genotype.tsv",
+                "confidence_parser": "t1k_genotype_confidence"
+              }
+            }
+          },
+          "probabilistic_calibration": {
+            "cv_strategy": "loo",
+            "method": "platt",
+            "min_rows_for_isotonic": 20
+          },
+          "tool_weight_count": 4,
+          "weight_version": "read_confidence_v2"
+        },
+        "configured_benchmark_genes": [
+          "A",
+          "B",
+          "C"
+        ],
+        "excluded_sample_counts_by_reason": {},
+        "final_tri_modal_cohort_size": 3,
+        "imgt_hla_version": "3.59.0",
+        "modalities": [
+          "wes"
+        ],
+        "not_available_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [],
+          "wgs": []
+        },
+        "per_modality_sample_counts": {
+          "after_filtering": {
+            "rnaseq": 0,
+            "wes": 3,
+            "wgs": 0
+          },
+          "before_filtering": {
+            "rnaseq": 0,
+            "wes": 3,
+            "wgs": 0
+          }
+        },
+        "population_counts": {
+          "unknown": 3
+        },
+        "resolution": 2,
+        "resolution_asymmetry_warning": true,
+        "shared_genes_main": [
+          "A",
+          "B",
+          "C"
+        ],
+        "success_definition": "correct call only at configured primary resolution",
+        "supported_loci": [
+          "A",
+          "B",
+          "C"
+        ],
+        "tool_coverage_policy": "phase_gated",
+        "tools": [
+          "OptiType",
+          "T1K",
+          "SpecHLA",
+          "HLA-HD"
+        ],
+        "truth_acquisition_date": "2005-03-04",
+        "truth_hierarchy": [
+          "orthogonal_clinical_typing",
+          "targeted_hla_ngs",
+          "public_reference_truth"
+        ],
+        "truth_panel_date": "2005-03-04",
+        "truth_panel_name": "1000G public HLA truth",
+        "truth_path": "/tmp/ozcanumu/35347467/tmp4_3hhqig/all_truth.tsv",
+        "truth_resolution_limit": "2-field",
+        "truth_source": "Adams et al. 2005, J Transl Med 3:11 (PMC555742), Table 2 (SBT class I)"
+      },
+      "method_rows": 6,
+      "modalities": [
+        "wes"
+      ],
+      "path": "/scratch/project_2008084/pihla-publish/analysis/giab_trio_benchmark/wes",
+      "sample_count": 3
+    },
+    "hprc_wgs_pilot": {
+      "files": {
+        "tables/benchmark_metadata.json": "583532f0437449c9b9d8e17a0d0054fbecfbe4d184a697fdace25dbcb87b968c",
+        "tables/cohort_overview.tsv": "dc9a30afd0056c8e91757a0d400f84e976ce4be88051afeea41d3dba8c5e6619",
+        "tables/method_comparison.tsv": "0c20861567aac9b56323281d7c5709042b1eb53b1c9ac5a47e42b4df1a0f5737"
+      },
+      "metadata": {
+        "ambiguity_evaluation": {
+          "group_levels": [
+            "G",
+            "P"
+          ],
+          "notes": "G-group and P-group rates are only reported for rows where both truth and call include comparable group-suffixed alleles.",
+          "primary_resolution": 2,
+          "secondary_resolutions": [
+            2,
+            3
+          ]
+        },
+        "analysis_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [],
+          "wgs": [
+            "HLA-HD",
+            "OptiType",
+            "SpecHLA",
+            "T1K"
+          ]
+        },
+        "available_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [],
+          "wgs": [
+            "HLA-HD",
+            "OptiType",
+            "SpecHLA",
+            "T1K"
+          ]
+        },
+        "confidence_weighting": {
+          "bayesian_shrinkage": {
+            "alpha": 1.0,
+            "beta": 1.0
+          },
+          "benchmark_mode": "legacy_heuristic",
+          "default_target_reads": 50.0,
+          "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+          "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
+          "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+          "guardrail": {
+            "enabled": true,
+            "guardrail_steepness": 0,
+            "max_brier_score_for_boost": 0.35,
+            "max_expected_calibration_error_for_boost": 0.35,
+            "min_confidence_coverage_for_boost": 0.5
+          },
+          "harmonized_rows_with_calibrated_probability": 0,
+          "harmonized_rows_with_confidence": 9,
+          "parser_coverage": {
+            "HLA-HD": {
+              "wgs": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/hprc/wgs/results/**/hlahd/*/*/result/*_*.read.txt",
+                "confidence_parser": "hlahd_read_confidence"
+              }
+            },
+            "OptiType": {
+              "wgs": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/hprc/wgs/results/**/optitype/*/*_result.tsv",
+                "confidence_parser": "optitype_result_objective"
+              }
+            },
+            "SpecHLA": {
+              "wgs": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "T1K": {
+              "wgs": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/hprc/wgs/results/**/t1k/t1k_out/*_genotype.tsv",
+                "confidence_parser": "t1k_genotype_confidence"
+              }
+            }
+          },
+          "probabilistic_calibration": {
+            "cv_strategy": "loo",
+            "method": "platt",
+            "min_rows_for_isotonic": 20
+          },
+          "tool_weight_count": 4,
+          "weight_version": "read_confidence_v2"
+        },
+        "configured_benchmark_genes": [
+          "A",
+          "B",
+          "C"
+        ],
+        "excluded_sample_counts_by_reason": {},
+        "final_tri_modal_cohort_size": 1,
+        "imgt_hla_version": "3.59.0",
+        "modalities": [
+          "wgs"
+        ],
+        "not_available_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [],
+          "wgs": []
+        },
+        "per_modality_sample_counts": {
+          "after_filtering": {
+            "rnaseq": 0,
+            "wes": 0,
+            "wgs": 1
+          },
+          "before_filtering": {
+            "rnaseq": 0,
+            "wes": 0,
+            "wgs": 6
+          }
+        },
+        "population_counts": {
+          "unknown": 1
+        },
+        "resolution": 2,
+        "resolution_asymmetry_warning": true,
+        "shared_genes_main": [
+          "A",
+          "B",
+          "C"
+        ],
+        "success_definition": "correct call only at configured primary resolution",
+        "supported_loci": [
+          "A",
+          "B",
+          "C"
+        ],
+        "tool_coverage_policy": "phase_gated",
+        "tools": [
+          "OptiType",
+          "T1K",
+          "SpecHLA",
+          "HLA-HD"
+        ],
+        "truth_acquisition_date": "",
+        "truth_hierarchy": [
+          "orthogonal_clinical_typing",
+          "targeted_hla_ngs",
+          "public_reference_truth"
+        ],
+        "truth_panel_date": "",
+        "truth_panel_name": "1000G public HLA truth",
+        "truth_path": "/tmp/ozcanumu/35307873/tmp1yig09n2/all_truth.tsv",
+        "truth_resolution_limit": "2-field",
+        "truth_source": "HG002 clinical SBT (Chin 2020 PMC7508831); HG005/parents Immuannot (IPD-IMGT/HLA)"
+      },
+      "method_rows": 6,
+      "modalities": [
+        "wgs"
+      ],
+      "path": "/scratch/project_2008084/pihla-publish/analysis/hprc_benchmark",
+      "sample_count": 1
+    },
+    "ihwg_rna_pilot": {
+      "files": {
+        "tables/benchmark_metadata.json": "2e6e0994bbbc55822169cacd5e0226415c2da9f3ff3cb4b1739fb68a06a356c0",
+        "tables/cohort_overview.tsv": "1768e23b301f390fe8345d64cc08eb4e80b066e69bd79a4e575489bf2f05d510",
+        "tables/method_comparison.tsv": "04f144dec241b907025254ed67a1a1ffc1e3afb4510d6fbc042e3f4e277fa7ef"
+      },
+      "metadata": {
+        "ambiguity_evaluation": {
+          "group_levels": [
+            "G",
+            "P"
+          ],
+          "notes": "G-group and P-group rates are only reported for rows where both truth and call include comparable group-suffixed alleles.",
+          "primary_resolution": 2,
+          "secondary_resolutions": [
+            2,
+            3
+          ]
+        },
+        "analysis_tools_by_modality": {
+          "rnaseq": [
+            "ArcasHLA",
+            "HLA-HD",
+            "OptiType",
+            "Seq2HLA",
+            "SpecHLA",
+            "T1K"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "available_tools_by_modality": {
+          "rnaseq": [
+            "ArcasHLA",
+            "HLA-HD",
+            "OptiType",
+            "Seq2HLA",
+            "T1K"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "confidence_weighting": {
+          "bayesian_shrinkage": {
+            "alpha": 1.0,
+            "beta": 1.0
+          },
+          "benchmark_mode": "legacy_heuristic",
+          "default_target_reads": 50.0,
+          "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+          "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
+          "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+          "guardrail": {
+            "enabled": true,
+            "guardrail_steepness": 0,
+            "max_brier_score_for_boost": 0.35,
+            "max_expected_calibration_error_for_boost": 0.35,
+            "min_confidence_coverage_for_boost": 0.5
+          },
+          "harmonized_rows_with_calibrated_probability": 0,
+          "harmonized_rows_with_confidence": 57,
+          "parser_coverage": {
+            "ArcasHLA": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/ihwg/rna/results/**/arcashla/*/*.genes.json",
+                "confidence_parser": "arcashla_genes_confidence"
+              }
+            },
+            "HLA-HD": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/ihwg/rna/results/**/hlahd/*/*/result/*_*.read.txt",
+                "confidence_parser": "hlahd_read_confidence"
+              }
+            },
+            "OptiType": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/ihwg/rna/results/**/optitype/*/*_result.tsv",
+                "confidence_parser": "optitype_result_objective"
+              }
+            },
+            "Seq2HLA": {
+              "rnaseq": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "SpecHLA": {
+              "rnaseq": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "T1K": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/ihwg/rna/results/**/t1k/t1k_out/*_genotype.tsv",
+                "confidence_parser": "t1k_genotype_confidence"
+              }
+            }
+          },
+          "probabilistic_calibration": {
+            "cv_strategy": "loo",
+            "method": "platt",
+            "min_rows_for_isotonic": 20
+          },
+          "tool_weight_count": 5,
+          "weight_version": "read_confidence_v2"
+        },
+        "configured_benchmark_genes": [
+          "A",
+          "B",
+          "C"
+        ],
+        "excluded_sample_counts_by_reason": {
+          "missing_modality:rnaseq": 353
+        },
+        "final_tri_modal_cohort_size": 5,
+        "imgt_hla_version": "3.59.0",
+        "modalities": [
+          "rnaseq"
+        ],
+        "not_available_tools_by_modality": {
+          "rnaseq": [
+            "Seq2HLA",
+            "SpecHLA"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "per_modality_sample_counts": {
+          "after_filtering": {
+            "rnaseq": 5,
+            "wes": 0,
+            "wgs": 0
+          },
+          "before_filtering": {
+            "rnaseq": 5,
+            "wes": 0,
+            "wgs": 0
+          }
+        },
+        "population_counts": {
+          "unknown": 5
+        },
+        "resolution": 2,
+        "resolution_asymmetry_warning": true,
+        "shared_genes_main": [
+          "A",
+          "C"
+        ],
+        "success_definition": "correct call only at configured primary resolution",
+        "supported_loci": [
+          "A",
+          "B",
+          "C"
+        ],
+        "tool_coverage_policy": "phase_gated",
+        "tools": [
+          "ArcasHLA",
+          "OptiType",
+          "Seq2HLA",
+          "T1K",
+          "HLA-HD",
+          "SpecHLA"
+        ],
+        "truth_acquisition_date": "2005-03-04",
+        "truth_hierarchy": [
+          "orthogonal_clinical_typing",
+          "targeted_hla_ngs",
+          "public_reference_truth"
+        ],
+        "truth_panel_date": "2005-03-04",
+        "truth_panel_name": "1000G public HLA truth",
+        "truth_path": "/tmp/ozcanumu/35336349/tmp86rz2_x0/all_truth.tsv",
+        "truth_resolution_limit": "2-field",
+        "truth_source": "Adams et al. 2005, J Transl Med 3:11 (PMC555742), Table 2 (SBT class I)"
+      },
+      "method_rows": 7,
+      "modalities": [
+        "rnaseq"
+      ],
+      "path": "/scratch/project_2008084/pihla-publish/analysis/ihwg_benchmark/rna",
+      "sample_count": 5
+    },
+    "ihwg_wgs_pilot": {
+      "files": {
+        "tables/benchmark_metadata.json": "0c6ae0b72bdadebbd783c6ac05db71af5ba20e5e4cf76d464ddace446ac242e4",
+        "tables/cohort_overview.tsv": "4e0ecaeb10c21a8f5150d87c5339d60e8918263569f797960e3f825ad31052d7",
+        "tables/method_comparison.tsv": "4067dd96863c1359c84ad735266b9189f7b072a6f6d6190835c535b1fcee380d"
+      },
+      "metadata": {
+        "ambiguity_evaluation": {
+          "group_levels": [
+            "G",
+            "P"
+          ],
+          "notes": "G-group and P-group rates are only reported for rows where both truth and call include comparable group-suffixed alleles.",
+          "primary_resolution": 2,
+          "secondary_resolutions": [
+            2,
+            3
+          ]
+        },
+        "confidence_weighting": {
+          "bayesian_shrinkage": {
+            "alpha": 1.0,
+            "beta": 1.0
+          },
+          "benchmark_mode": "legacy_heuristic",
+          "default_target_reads": 50.0,
+          "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+          "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
+          "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+          "guardrail": {
+            "enabled": true,
+            "guardrail_steepness": 0,
+            "max_brier_score_for_boost": 0.35,
+            "max_expected_calibration_error_for_boost": 0.35,
+            "min_confidence_coverage_for_boost": 0.5
+          },
+          "harmonized_rows_with_calibrated_probability": 0,
+          "harmonized_rows_with_confidence": 34,
+          "parser_coverage": {
+            "HLA-HD": {
+              "wgs": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/hlahd/*/*/result/*_*.read.txt",
+                "confidence_parser": "hlahd_read_confidence"
+              }
+            },
+            "OptiType": {
+              "wgs": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/optitype/*/*_result.tsv",
+                "confidence_parser": "optitype_result_objective"
+              }
+            },
+            "SpecHLA": {
+              "wgs": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "T1K": {
+              "wgs": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/t1k/t1k_out/*_genotype.tsv",
+                "confidence_parser": "t1k_genotype_confidence"
+              }
+            }
+          },
+          "probabilistic_calibration": {
+            "cv_strategy": "loo",
+            "method": "platt",
+            "min_rows_for_isotonic": 20
+          },
+          "tool_weight_count": 4,
+          "weight_version": "read_confidence_v2"
+        },
+        "configured_benchmark_genes": [
+          "A",
+          "B",
+          "C"
+        ],
+        "imgt_hla_version": "3.59.0",
+        "modalities": [
+          "wgs"
+        ],
+        "resolution": 2,
+        "resolution_asymmetry_warning": true,
+        "shared_genes_main": [
+          "A",
+          "B",
+          "C"
+        ],
+        "success_definition": "correct call only at configured primary resolution",
+        "tools": [
+          "OptiType",
+          "T1K",
+          "SpecHLA",
+          "HLA-HD"
+        ],
+        "truth_hierarchy": [
+          "orthogonal_clinical_typing",
+          "targeted_hla_ngs",
+          "public_reference_truth"
+        ],
+        "truth_panel_date": "",
+        "truth_panel_name": "1000G public HLA truth",
+        "truth_path": "/tmp/ozcanumu/35336349/tmp2xghox7l/all_truth.tsv",
+        "truth_resolution_limit": "2-field",
+        "truth_source": "HG002 clinical SBT (Chin 2020 PMC7508831); HG005/parents Immuannot (IPD-IMGT/HLA)"
+      },
+      "method_rows": 6,
+      "modalities": [
+        "wgs"
+      ],
+      "path": "/scratch/project_2008084/pihla-publish/analysis/ihwg_benchmark/wgs",
+      "sample_count": 4
+    },
+    "nci60_rnaseq_external": {
+      "files": {
+        "tables/benchmark_metadata.json": "1a15c1e6816eec3e9fa6c217eb29eddf528fffce129e14b5b09ace9f23b8d639",
+        "tables/cohort_overview.tsv": "ebe70b5c5e719e748b157cd4440e9ef5586837ede0a4e7fde0b54183de850541",
+        "tables/method_comparison.tsv": "51b874abb6b7dd20e4d5313cbff48c6f48b0cdeb45d404104c345964fec9ae0a"
+      },
+      "metadata": {
+        "ambiguity_evaluation": {
+          "group_levels": [
+            "G",
+            "P"
+          ],
+          "notes": "G-group and P-group rates are only reported for rows where both truth and call include comparable group-suffixed alleles.",
+          "primary_resolution": 2,
+          "secondary_resolutions": [
+            2,
+            3
+          ]
+        },
+        "analysis_tools_by_modality": {
+          "rnaseq": [
+            "ArcasHLA",
+            "HLA-HD",
+            "OptiType",
+            "Seq2HLA",
+            "SpecHLA",
+            "T1K"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "available_tools_by_modality": {
+          "rnaseq": [
+            "ArcasHLA",
+            "HLA-HD",
+            "OptiType",
+            "Seq2HLA",
+            "SpecHLA",
+            "T1K"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "confidence_weighting": {
+          "bayesian_shrinkage": {
+            "alpha": 1.0,
+            "beta": 1.0
+          },
+          "benchmark_mode": "legacy_heuristic",
+          "default_target_reads": 50.0,
+          "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+          "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
+          "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+          "guardrail": {
+            "enabled": true,
+            "guardrail_steepness": 0,
+            "max_brier_score_for_boost": 0.35,
+            "max_expected_calibration_error_for_boost": 0.35,
+            "min_confidence_coverage_for_boost": 0.5
+          },
+          "harmonized_rows_with_calibrated_probability": 0,
+          "harmonized_rows_with_confidence": 324,
+          "parser_coverage": {
+            "ArcasHLA": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/nci60/rna/results/**/arcashla/*/*.genes.json",
+                "confidence_parser": "arcashla_genes_confidence"
+              }
+            },
+            "HLA-HD": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/nci60/rna/results/**/hlahd/*/*/result/*_*.read.txt",
+                "confidence_parser": "hlahd_read_confidence"
+              }
+            },
+            "OptiType": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/nci60/rna/results/**/optitype/*/*_result.tsv",
+                "confidence_parser": "optitype_result_objective"
+              }
+            },
+            "Seq2HLA": {
+              "rnaseq": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "SpecHLA": {
+              "rnaseq": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "T1K": {
+              "rnaseq": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/nci60/rna/results/**/t1k/t1k_out/*_genotype.tsv",
+                "confidence_parser": "t1k_genotype_confidence"
+              }
+            }
+          },
+          "probabilistic_calibration": {
+            "cv_strategy": "loo",
+            "method": "platt",
+            "min_rows_for_isotonic": 20
+          },
+          "tool_weight_count": 6,
+          "weight_version": "read_confidence_v2"
+        },
+        "configured_benchmark_genes": [
+          "A",
+          "B",
+          "C"
+        ],
+        "excluded_sample_counts_by_reason": {
+          "missing_modality:rnaseq": 1
+        },
+        "final_tri_modal_cohort_size": 42,
+        "imgt_hla_version": "3.59.0",
+        "modalities": [
+          "rnaseq"
+        ],
+        "not_available_tools_by_modality": {
+          "rnaseq": [
+            "ArcasHLA",
+            "Seq2HLA",
+            "SpecHLA"
+          ],
+          "wes": [],
+          "wgs": []
+        },
+        "per_modality_sample_counts": {
+          "after_filtering": {
+            "rnaseq": 42,
+            "wes": 0,
+            "wgs": 0
+          },
+          "before_filtering": {
+            "rnaseq": 42,
+            "wes": 0,
+            "wgs": 0
+          }
+        },
+        "population_counts": {
+          "unknown": 42
+        },
+        "resolution": 2,
+        "resolution_asymmetry_warning": true,
+        "shared_genes_main": [
+          "A",
+          "B",
+          "C"
+        ],
+        "success_definition": "correct call only at configured primary resolution",
+        "supported_loci": [
+          "A",
+          "B",
+          "C"
+        ],
+        "tool_coverage_policy": "phase_gated",
+        "tools": [
+          "ArcasHLA",
+          "OptiType",
+          "Seq2HLA",
+          "T1K",
+          "HLA-HD",
+          "SpecHLA"
+        ],
+        "truth_acquisition_date": "2005-03-04",
+        "truth_hierarchy": [
+          "orthogonal_clinical_typing",
+          "targeted_hla_ngs",
+          "public_reference_truth"
+        ],
+        "truth_panel_date": "2005-03-04",
+        "truth_panel_name": "1000G public HLA truth",
+        "truth_path": "/tmp/ozcanumu/35336349/tmp0fhvf3ho/all_truth.tsv",
+        "truth_resolution_limit": "2-field",
+        "truth_source": "Adams et al. 2005, J Transl Med 3:11 (PMC555742), Table 2 (SBT class I)"
+      },
+      "method_rows": 8,
+      "modalities": [
+        "rnaseq"
+      ],
+      "path": "/scratch/project_2008084/pihla-publish/analysis/nci60_benchmark",
+      "sample_count": 42
+    },
+    "nci60_wes_external": {
+      "files": {
+        "tables/benchmark_metadata.json": "2c473ad9c1ff17189d9833dec1e58e441b713de4be33492cf2b917d4a7889e6e",
+        "tables/cohort_overview.tsv": "df9aee526f792dbddeda5477e7b25baf24c8c682142af375e2d8d56cba136511",
+        "tables/method_comparison.tsv": "ac443085d511305cd694ef3f0339c58b165fda8a888810a470b2981840eb31fc"
+      },
+      "metadata": {
+        "ambiguity_evaluation": {
+          "group_levels": [
+            "G",
+            "P"
+          ],
+          "notes": "G-group and P-group rates are only reported for rows where both truth and call include comparable group-suffixed alleles.",
+          "primary_resolution": 2,
+          "secondary_resolutions": [
+            2,
+            3
+          ]
+        },
+        "analysis_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [
+            "HLA-HD",
+            "OptiType",
+            "SpecHLA",
+            "T1K"
+          ],
+          "wgs": []
+        },
+        "available_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [
+            "HLA-HD",
+            "OptiType",
+            "SpecHLA",
+            "T1K"
+          ],
+          "wgs": []
+        },
+        "confidence_weighting": {
+          "bayesian_shrinkage": {
+            "alpha": 1.0,
+            "beta": 1.0
+          },
+          "benchmark_mode": "legacy_heuristic",
+          "default_target_reads": 50.0,
+          "effective_confidence_score": "base_reliability + shrink_factor * (mean_confidence_score - base_reliability)",
+          "fallback": "overall_correct_call_rate when confidence is missing or blocked by guardrail",
+          "formula": "0.7 * overall_correct_call_rate + 0.3 * effective_confidence_score",
+          "guardrail": {
+            "enabled": true,
+            "guardrail_steepness": 0,
+            "max_brier_score_for_boost": 0.35,
+            "max_expected_calibration_error_for_boost": 0.35,
+            "min_confidence_coverage_for_boost": 0.5
+          },
+          "harmonized_rows_with_calibrated_probability": 0,
+          "harmonized_rows_with_confidence": 243,
+          "parser_coverage": {
+            "HLA-HD": {
+              "wes": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/nci60/wes/results/**/hlahd/*/*/result/*_*.read.txt",
+                "confidence_parser": "hlahd_read_confidence"
+              }
+            },
+            "OptiType": {
+              "wes": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/nci60/wes/results/**/optitype/*/*_result.tsv",
+                "confidence_parser": "optitype_result_objective"
+              }
+            },
+            "SpecHLA": {
+              "wes": {
+                "confidence_glob": "",
+                "confidence_parser": ""
+              }
+            },
+            "T1K": {
+              "wes": {
+                "confidence_glob": "/scratch/project_2008084/hla_calibration/nci60/wes/results/**/t1k/t1k_out/*_genotype.tsv",
+                "confidence_parser": "t1k_genotype_confidence"
+              }
+            }
+          },
+          "probabilistic_calibration": {
+            "cv_strategy": "loo",
+            "method": "platt",
+            "min_rows_for_isotonic": 20
+          },
+          "tool_weight_count": 4,
+          "weight_version": "read_confidence_v2"
+        },
+        "configured_benchmark_genes": [
+          "A",
+          "B",
+          "C"
+        ],
+        "excluded_sample_counts_by_reason": {
+          "missing_modality:wes": 1
+        },
+        "final_tri_modal_cohort_size": 42,
+        "imgt_hla_version": "3.59.0",
+        "modalities": [
+          "wes"
+        ],
+        "not_available_tools_by_modality": {
+          "rnaseq": [],
+          "wes": [],
+          "wgs": []
+        },
+        "per_modality_sample_counts": {
+          "after_filtering": {
+            "rnaseq": 0,
+            "wes": 42,
+            "wgs": 0
+          },
+          "before_filtering": {
+            "rnaseq": 0,
+            "wes": 42,
+            "wgs": 0
+          }
+        },
+        "population_counts": {
+          "unknown": 42
+        },
+        "resolution": 2,
+        "resolution_asymmetry_warning": true,
+        "shared_genes_main": [
+          "A",
+          "B",
+          "C"
+        ],
+        "success_definition": "correct call only at configured primary resolution",
+        "supported_loci": [
+          "A",
+          "B",
+          "C"
+        ],
+        "tool_coverage_policy": "phase_gated",
+        "tools": [
+          "OptiType",
+          "T1K",
+          "SpecHLA",
+          "HLA-HD"
+        ],
+        "truth_acquisition_date": "2005-03-04",
+        "truth_hierarchy": [
+          "orthogonal_clinical_typing",
+          "targeted_hla_ngs",
+          "public_reference_truth"
+        ],
+        "truth_panel_date": "2005-03-04",
+        "truth_panel_name": "1000G public HLA truth",
+        "truth_path": "/tmp/ozcanumu/35300489/tmpn48mj3bl/all_truth.tsv",
+        "truth_resolution_limit": "2-field",
+        "truth_source": "Adams et al. 2005, J Transl Med 3:11 (PMC555742), Table 2 (SBT class I)"
+      },
+      "method_rows": 6,
+      "modalities": [
+        "wes"
+      ],
+      "path": "/scratch/project_2008084/pihla-publish/analysis/nci60_wes_benchmark",
+      "sample_count": 42
+    }
+  },
+  "external_cohort_feasibility": {
+    "e_mtab_197": {
+      "development_overlap_count": 26,
+      "development_overlap_ids": [
+        "NA06985",
+        "NA06986",
+        "NA06994",
+        "NA07000",
+        "NA07037",
+        "NA07051",
+        "NA07347",
+        "NA07357",
+        "NA10847",
+        "NA10851",
+        "NA11829",
+        "NA11830",
+        "NA11831",
+        "NA11832",
+        "NA11840",
+        "NA11894",
+        "NA11920",
+        "NA12004",
+        "NA12044",
+        "NA12154",
+        "NA12234",
+        "NA12489",
+        "NA12751",
+        "NA12763",
+        "NA12812",
+        "NA19238"
+      ],
+      "identified_subjects": 61,
+      "manifest_sha256": "11fe1bce41c630e50292bc0336466ea6baa1c81298ecaacbc881c27acd7b7d7d",
+      "nonoverlap_count": 35,
+      "official_manifest": "/scratch/project_2008084/champhla_refformer/inputs/public_manifests/E-MTAB-197.sdrf.txt",
+      "status": "not_independent_at_target_size",
+      "target": 50
+    },
+    "hprc": {
+      "existing_qualifying_wgs_subjects": 1,
+      "status": "assembly_truth_and_short_read_panel_incomplete",
+      "target": 40
+    },
+    "ihwg": {
+      "manifest_sha256": {
+        "/scratch/project_2008084/pihla-publish/analysis/ihwg_benchmark/index/rna_confirmed_runs.tsv": "2e878a7d7b90e011e4c86314bec18ef905b75e560990b0680e8613434f1c619d",
+        "/scratch/project_2008084/pihla-publish/analysis/ihwg_benchmark/index/wes_confirmed_runs.tsv": "e9e44bfe3ec8d396ee2a161d7d8e2436dac9b94459035e79f8c8494c7d30fdec",
+        "/scratch/project_2008084/pihla-publish/analysis/ihwg_benchmark/index/wgs_confirmed_runs.tsv": "3ec968bc6b55050c6dfe822134c5b4ab02495d1c6b11361e21be3be09d534e1e"
+      },
+      "status": "target_not_supported_by_verified_public_read_manifests",
+      "target_wes_subjects": 89,
+      "verified_read_subjects_by_modality": {
+        "rna": 20,
+        "wes": 2,
+        "wgs": 6
+      }
+    }
+  },
+  "generated_at_utc": "2026-08-29T18:52:30.108036+00:00",
+  "isolation": {
+    "existing_external_results_read_only": true,
+    "manuscripts_modified": false,
+    "originals_verification": {
+      "failures": [],
+      "manifest": "/mnt/d/projects/project_2008084/champhla_refformer/ORIGINALS_MANIFEST.json",
+      "passed": true,
+      "records_checked": 243
+    }
+  },
+  "metaconsensus_internal_gate": {
+    "decision": "retain_method_for_external_validation",
+    "gate_name": "MetaConsensus existing-data kill test",
+    "modalities": [
+      {
+        "baseline_accuracy": 0.5012165450121655,
+        "delta": 0.03406326034063256,
+        "delta_ci_hi": 0.058394160583941604,
+        "delta_ci_lo": 0.009732360097323601,
+        "meaningful_improvement": 1,
+        "meta_accuracy": 0.5352798053527981,
+        "modality": "wgs",
+        "significant_gene_harm": 0,
+        "strongest_baseline": "ChampionChallenger",
+        "within_2pp_nonregression": 1
+      },
+      {
+        "baseline_accuracy": 0.9358974358974359,
+        "delta": -0.002564102564102555,
+        "delta_ci_hi": 0.01282051282051282,
+        "delta_ci_lo": -0.017948717948717947,
+        "meaningful_improvement": 0,
+        "meta_accuracy": 0.9333333333333333,
+        "modality": "wes",
+        "significant_gene_harm": 0,
+        "strongest_baseline": "ChampionChallenger",
+        "within_2pp_nonregression": 1
+      },
+      {
+        "baseline_accuracy": 0.9532710280373832,
+        "delta": -0.0031152647975077885,
+        "delta_ci_hi": 0.0,
+        "delta_ci_lo": -0.009345794392523364,
+        "meaningful_improvement": 0,
+        "meta_accuracy": 0.9501557632398754,
+        "modality": "rnaseq",
+        "significant_gene_harm": 0,
+        "strongest_baseline": "MVFlooredCC",
+        "within_2pp_nonregression": 1
+      }
+    ],
+    "passed": true,
+    "required_gene_safety": "no Holm-adjusted significant per-gene harm",
+    "required_improvement": "delta >= 0.02 with subject-cluster 95% CI above zero in >=1 modality",
+    "required_nonregression": "point delta >= -0.02 in every other modality"
+  },
+  "metaconsensus_supplemental_external": {
+    "nci60_rna": {
+      "available": true,
+      "path": "/scratch/project_2008084/champhla_refformer/runs/metaconsensus_external/nci60_rna/external_evaluation.json",
+      "report": {
+        "baseline_accuracy": 0.8170731707317073,
+        "cohort": "NCI60_RNA",
+        "delta": -0.024390243902439025,
+        "delta_cluster_ci_hi": 0.0,
+        "delta_cluster_ci_lo": -0.06097560975609756,
+        "development_subject_overlap": [],
+        "external_truth_changed_policy": false,
+        "input_sha256": {
+          "champion": "9f1f0a92d439e81f6bcd2064a3f0b3675a661078460b1fb8cdc771165597f1c6",
+          "development_calls": "3fe5176e8e42ae03489097959066bffd42ff23e75726f93d0165a843347ae38c",
+          "harmonized": "bb7ce415bf4db2c73fb7e9c380318c08931fcb8a8d2a57d881f95ef64b132b86",
+          "majority": "1e22550eb69f9a28dda08c4f742aaa09e8e8d33b1dc2723b6f0bad175b209667",
+          "model_file": "705743ca650cc503b1c10fc09c1474954e06394e69e87ebb1dfd409466df7a83"
+        },
+        "interpretation": "supplemental independent external evidence; does not replace the planned external gate",
+        "loci": 82,
+        "meta_accuracy": 0.7926829268292683,
+        "modality": [
+          "rnaseq"
+        ],
+        "model_sha256": "5978e02ab01549bd1447095d5c094c1a6de4c36c1d13cfd1860323cfe4ef59f9",
+        "no_holm_significant_gene_harm": true,
+        "per_gene": [
+          {
+            "baseline_accuracy": 0.8157894736842105,
+            "delta": -0.05263157894736836,
+            "gene": "A",
+            "holm_p": 1.0,
+            "loci": 38,
+            "meta_accuracy": 0.7631578947368421,
+            "meta_losses": 2,
+            "meta_wins": 0,
+            "p_value": 0.5
+          },
+          {
+            "baseline_accuracy": 0.9230769230769231,
+            "delta": 0.0,
+            "gene": "B",
+            "holm_p": 1.0,
+            "loci": 26,
+            "meta_accuracy": 0.9230769230769231,
+            "meta_losses": 0,
+            "meta_wins": 0,
+            "p_value": 1.0
+          },
+          {
+            "baseline_accuracy": 0.6666666666666666,
+            "delta": 0.0,
+            "gene": "C",
+            "holm_p": 1.0,
+            "loci": 18,
+            "meta_accuracy": 0.6666666666666666,
+            "meta_losses": 0,
+            "meta_wins": 0,
+            "p_value": 1.0
+          }
+        ],
+        "prespecified_primary_external_cohort": false,
+        "strongest_available_baseline": "MajorityVote",
+        "subjects": 42,
+        "truth_fields_present_at_prediction": false,
+        "within_2pp_nonregression": false
+      },
+      "sha256": "ec7b5bb7e88424cfdb9bb1840055e3712259f4e9cee383d9a7efcbf02203b3f6"
+    },
+    "nci60_wes": {
+      "available": true,
+      "path": "/scratch/project_2008084/champhla_refformer/runs/metaconsensus_external/nci60_wes/external_evaluation.json",
+      "report": {
+        "baseline_accuracy": 0.8414634146341463,
+        "cohort": "NCI60_WES",
+        "delta": -0.024390243902439025,
+        "delta_cluster_ci_hi": 0.03529411764705882,
+        "delta_cluster_ci_lo": -0.08235294117647059,
+        "development_subject_overlap": [],
+        "external_truth_changed_policy": false,
+        "input_sha256": {
+          "champion": "b555b18efb304592e87f46c60f6d91692b9c8fce64b4315519c08e09a96b7d9c",
+          "development_calls": "3fe5176e8e42ae03489097959066bffd42ff23e75726f93d0165a843347ae38c",
+          "harmonized": "ba4fe3ddf80d8369f7691859d6844ec2d12730c732ad782747dacebe77745c16",
+          "majority": "2da69340bc401f5ea0a8f2e37c152d9b88aafd208011403ab74a933a65df65b1",
+          "model_file": "705743ca650cc503b1c10fc09c1474954e06394e69e87ebb1dfd409466df7a83"
+        },
+        "interpretation": "supplemental independent external evidence; does not replace the planned external gate",
+        "loci": 82,
+        "meta_accuracy": 0.8170731707317073,
+        "modality": [
+          "wes"
+        ],
+        "model_sha256": "5978e02ab01549bd1447095d5c094c1a6de4c36c1d13cfd1860323cfe4ef59f9",
+        "no_holm_significant_gene_harm": true,
+        "per_gene": [
+          {
+            "baseline_accuracy": 0.8421052631578947,
+            "delta": -0.10526315789473684,
+            "gene": "A",
+            "holm_p": 0.375,
+            "loci": 38,
+            "meta_accuracy": 0.7368421052631579,
+            "meta_losses": 4,
+            "meta_wins": 0,
+            "p_value": 0.125
+          },
+          {
+            "baseline_accuracy": 0.8846153846153846,
+            "delta": 0.07692307692307698,
+            "gene": "B",
+            "holm_p": 1.0,
+            "loci": 26,
+            "meta_accuracy": 0.9615384615384616,
+            "meta_losses": 0,
+            "meta_wins": 2,
+            "p_value": 0.5
+          },
+          {
+            "baseline_accuracy": 0.7777777777777778,
+            "delta": 0.0,
+            "gene": "C",
+            "holm_p": 1.0,
+            "loci": 18,
+            "meta_accuracy": 0.7777777777777778,
+            "meta_losses": 0,
+            "meta_wins": 0,
+            "p_value": 1.0
+          }
+        ],
+        "prespecified_primary_external_cohort": false,
+        "strongest_available_baseline": "MajorityVote",
+        "subjects": 42,
+        "truth_fields_present_at_prediction": false,
+        "within_2pp_nonregression": false
+      },
+      "sha256": "1c96aea86c77fe320cfb96bf1de73d5ba02be34f0858e348bd9e2733cf9834c7"
+    }
+  },
+  "planned_external_validation": {
+    "complete": false,
+    "currently_qualifying_subjects": {
+      "e_mtab_197_rnaseq": 0,
+      "hprc_wgs": 1,
+      "ihwg_wes": 0
+    },
+    "interpretation": "Existing outputs are pilot evidence and cannot satisfy the frozen external gate.",
+    "target_subjects": {
+      "e_mtab_197_rnaseq": 50,
+      "hprc_wgs": 40,
+      "ihwg_wes": 89
+    }
+  },
+  "public_training_inputs": {
+    "alignment_manifest_contains_truth": false,
+    "hprc_exclusion_count": 47,
+    "locus_labels": 1119,
+    "output_sha256": {
+      "folds": "d5bd39e81d63c876ccf2d632443fb47f4669008806bd3311e119e42aeb59effc",
+      "labels": "74b26a6a5f9b3799098e340128b68d27e5b6c30f10fa5d6a23d311fb1b916f1c",
+      "manifest": "230aaf6f34e43c19717d53d980ccd0e96e9f0ddd75f701b64cf9b39aa246c82a"
+    },
+    "schema_version": 1,
+    "source_sha256": {
+      "folds": "cce550983a5939b2a2c923a2f0789c9be62e317d736e029775dcd3f62dfe7669",
+      "geuvadis_sdrf": "6c508986014751faae928875aa84626b9a9144b9df19e9afa9742a2b3a71c1b4",
+      "harmonized": "53743d66a21d4c7f5f2672de595e4aff97214b075371309e8eb6bdc3048f2b1c",
+      "hprc_exclusions": "661fb26a4354708b8da1477645f5a8c07c7bc09e0655d7de4eccb768bf30beb6",
+      "wes_index": "7b11c1d8ac4cddb7f0577439e39596d3d6650a943bb780da7b4c5135a870c5c5",
+      "wgs_index": "0ac5fdda0b60b6575b1867827f53e39d723f915b325b10bf023b2dc3d71c08f2"
+    },
+    "subjects": {
+      "rnaseq": 106,
+      "wes": 130,
+      "wgs": 137
+    },
+    "unavailable": [
+      {
+        "modality": "rnaseq",
+        "reason": "qc_failed_or_no_public_mrna_bam",
+        "sample_id": "NA07000"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "scope": "research-only HLA-A/B/C exact unordered two-field typing",
+  "standalone_real_fold0": {
+    "imgt": {
+      "available": true,
+      "checkpoint_sha256": "30f1d2464fdaafa284b71c7ea5ae21c6c1f1863506c8c7b165606337dd5828b9",
+      "external_truth_used": false,
+      "missing_tensor_count": 0,
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "partition_loci": {
+        "test": 129,
+        "train": 822,
+        "validation": 168
+      },
+      "path": "/scratch/project_2008084/champhla_refformer/runs/real_ranker_pilot/imgt/fold0/metrics.json",
+      "sha256": "ae75c3ea019d944b236786ee2690cfd2071e68ea7f4068dd64a2785af8ce0da2",
+      "subject_overlap": {
+        "train_test": 0,
+        "train_validation": 0,
+        "validation_test": 0
+      },
+      "test": {
+        "accuracy": 0.007751937984496124,
+        "loci": 129,
+        "loss": 7.855552200199098,
+        "top5_recall": 0.023255813953488372
+      },
+      "validation": {
+        "accuracy": 0.06547619047619048,
+        "loci": 168,
+        "loss": 7.37250600542341,
+        "top5_recall": 0.08928571428571429
+      }
+    },
+    "no_imgt": {
+      "available": true,
+      "checkpoint_sha256": "f04e37c84814c0578518f9fc55ad517fd5f46be39b4d1fb98b3d28493817e5f0",
+      "external_truth_used": false,
+      "missing_tensor_count": 0,
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "partition_loci": {
+        "test": 129,
+        "train": 822,
+        "validation": 168
+      },
+      "path": "/scratch/project_2008084/champhla_refformer/runs/real_ranker_pilot/no_imgt/fold0/metrics.json",
+      "sha256": "652364b649d854bf8344444776418f340abb4eef67539e7d1b737423b7a218c5",
+      "subject_overlap": {
+        "train_test": 0,
+        "train_validation": 0,
+        "validation_test": 0
+      },
+      "test": {
+        "accuracy": 0.0,
+        "loci": 129,
+        "loss": 6.896273709082788,
+        "top5_recall": 0.007751937984496124
+      },
+      "validation": {
+        "accuracy": 0.05357142857142857,
+        "loci": 168,
+        "loss": 6.302811486380441,
+        "top5_recall": 0.1488095238095238
+      }
+    }
+  },
+  "standalone_synthetic_gate": {
+    "aligned_reference": {
+      "build_job_id": "936149",
+      "cached_two_field_groups": 675,
+      "groups": 17115,
+      "index_sha256": "61720992b194ed021055e34fbbcfdf1b14f00382c0e17349a985a225afbedef0",
+      "reference_encoder_sha256": "9b3354d017b08f4fa3646e55fa1c235a2d573e26c5e70a251a093436e94b5939",
+      "release": "IPD-IMGT/HLA 3.59.0"
+    },
+    "data_readiness": {
+      "external_truth_used_for_training": false,
+      "real_finetune_ready": false,
+      "staged_rnaseq_fastq_subjects": 1,
+      "subject_separated_wgs_wes_rnaseq_manifest_found": false,
+      "usable_local_wgs_alignment_subjects": 1,
+      "usable_wes_alignment_subjects": 0
+    },
+    "isolation_policy": {
+      "manuscripts_modified": false,
+      "original_projects_modified": false,
+      "project": "D:\\projects\\project_2008084\\champhla_refformer"
+    },
+    "next_gate": "obtain or generate a multi-subject, subject-separated WGS/WES/RNA alignment manifest before real fine-tuning",
+    "phase": "standalone_reference_ranker",
+    "real_pileup_smoke": {
+      "genes": {
+        "A": {
+          "covered_positions": 3783,
+          "sha256": "763e17e46de65e627536aa7806f3be7adabcbe179c487b2de8adc03de9119fdc",
+          "shape": [
+            5503,
+            44
+          ]
+        },
+        "B": {
+          "covered_positions": 3784,
+          "sha256": "c8ea0ab337ff40aa7f3c3f9b42db2554d496e3ef7e0ad1ef78960f542f3fc3ee",
+          "shape": [
+            6081,
+            44
+          ]
+        },
+        "C": {
+          "covered_positions": 3962,
+          "sha256": "815671988aa387d3d6718596f9278141d7c5d1c5af70d0ac3fad953ce9eae338",
+          "shape": [
+            6304,
+            44
+          ]
+        }
+      },
+      "job_id": "936252",
+      "modality": "wgs",
+      "passed": true,
+      "sample": "HG00733",
+      "training_use_allowed": false
+    },
+    "recorded_date": "2026-08-29",
+    "status": "input_pipeline_validated_real_finetune_blocked",
+    "synthetic_pretraining": {
+      "alignment_aware_pilot": {
+        "best_validation_accuracy": 0.07017543859649122,
+        "checkpoint_sha256": "5807d330a6e0b8f02aa293cc706424e63546a6e2008758af841e2bdf6be8e882",
+        "job_id": "936150",
+        "random_eight_candidate_expectation": 0.125
+      },
+      "decision": "do_not_scale_synthetic_pretraining",
+      "deliberate_overfit": {
+        "accuracy": 1.0,
+        "checkpoint_sha256": "35a31b8022074dd7ba82f233f1c30483f318f28cf6b290d4167ec2af1eb140c1",
+        "examples": 6,
+        "job_id": "936036",
+        "passed": true
+      },
+      "position_similarity_pilot": {
+        "best_validation_accuracy": 0.05263157894736842,
+        "checkpoint_sha256": "1161a1eb3391503f0fc401622618d45f2a644c10692efc4c9f65c9e72446f99e",
+        "job_id": "936051"
+      },
+      "reason": "held-out allele-pair ranking remained below random expectation despite training improvement",
+      "unaligned_pilot": {
+        "best_validation_accuracy": 0.14285714285714285,
+        "final_validation_accuracy": 0.0,
+        "job_id": "936044"
+      }
+    },
+    "trigger": {
+      "decision": "activate_standalone_reference_ranker_fallback",
+      "reranker_gate_passed": false
+    }
+  }
+}

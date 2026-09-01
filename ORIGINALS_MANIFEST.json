@@ -1,0 +1,140 @@
+{
+  "failures": [],
+  "passed": true,
+  "policy": "read_only_sources_and_manuscript",
+  "records": [
+    {
+      "copied_path": "manuscripts/source_original/ChatGPT_Bioinformatics_ChampHLA_Manuscript_V5x_reviewfix.docx",
+      "copied_sha256": "ac7162465c5b15d182bdc98025ea99635278bde8ecd166a7033205962bfe5ce6",
+      "hashes_match": true,
+      "original_bytes": 8340162,
+      "original_mtime_ns": 1787824606385013100,
+      "original_path": "/mnt/d/Users/uonur/Downloads/ChatGPT_Bioinformatics_ChampHLA_Manuscript_V5x_reviewfix.docx",
+      "original_sha256": "ac7162465c5b15d182bdc98025ea99635278bde8ecd166a7033205962bfe5ce6",
+      "source_git_state": "not_version_controlled",
+      "source_role": "source_manuscript"
+    },
+    {
+      "copied_path": "provenance/source_reports/confirmation_implementation_status.md",
+      "copied_sha256": "01c05e174709370d22b491a2a3d26c67b8cbf2e92ff93ed12c530235859e6f6d",
+      "hashes_match": true,
+      "original_bytes": 6500,
+      "original_mtime_ns": 1788250716000000000,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_cc_confirmation/IMPLEMENTATION_STATUS.md",
+      "original_sha256": "01c05e174709370d22b491a2a3d26c67b8cbf2e92ff93ed12c530235859e6f6d",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "confirmation_status"
+    },
+    {
+      "copied_path": "provenance/source_reports/egcc_final_report.md",
+      "copied_sha256": "11a0d0ed2554b6cc26d9948cdd1f30503b04e59399fd6b7ab5a36caca620da7a",
+      "hashes_match": true,
+      "original_bytes": 6021,
+      "original_mtime_ns": 1788181935695792600,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_egcc_pilot/FINAL_REPORT.md",
+      "original_sha256": "11a0d0ed2554b6cc26d9948cdd1f30503b04e59399fd6b7ab5a36caca620da7a",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "egcc_report"
+    },
+    {
+      "copied_path": "provenance/source_reports/simple_consensus_publication_note.md",
+      "copied_sha256": "e686fcf090c692708e0cdcb252a1d6a6672735d5a9988ad1ddc66f9657819c48",
+      "hashes_match": true,
+      "original_bytes": 2629,
+      "original_mtime_ns": 1788178146173004800,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_egcc_pilot/SIMPLE_CONSENSUS_PUBLICATION_NOTE.md",
+      "original_sha256": "e686fcf090c692708e0cdcb252a1d6a6672735d5a9988ad1ddc66f9657819c48",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "simple_consensus_report"
+    },
+    {
+      "copied_path": "provenance/source_reports/refformer_publication_assessment.md",
+      "copied_sha256": "af6ac18774a80384541e26f33852bb6b95b65cf937f1ec8cab5500d1a666d7ad",
+      "hashes_match": true,
+      "original_bytes": 2169,
+      "original_mtime_ns": 1788029566193701600,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_refformer/artifacts/publication_assessment/publication_assessment.md",
+      "original_sha256": "af6ac18774a80384541e26f33852bb6b95b65cf937f1ec8cab5500d1a666d7ad",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "refformer_report"
+    },
+    {
+      "copied_path": "provenance/source_reports/baseline_ladder_findings.md",
+      "copied_sha256": "5dcce5abbb5e130a184719c8649af40bcce0ded5e632c88e9e82d8e706b37df8",
+      "hashes_match": true,
+      "original_bytes": 4108,
+      "original_mtime_ns": 1788176930476023800,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_baseline_ladder/outputs/LADDER_FINDINGS.md",
+      "original_sha256": "5dcce5abbb5e130a184719c8649af40bcce0ded5e632c88e9e82d8e706b37df8",
+      "source_git_state": "dirty_preserved",
+      "source_role": "baseline_ladder_findings"
+    },
+    {
+      "copied_path": "provenance/source_reports/baseline_ladder_significant_result.md",
+      "copied_sha256": "7511b4cb83eeef832cae397c287d7b9592eaf220eb9566668bae7bd72df7db2e",
+      "hashes_match": true,
+      "original_bytes": 3782,
+      "original_mtime_ns": 1788178515657286800,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_baseline_ladder/outputs/SIGNIFICANT_RESULT.md",
+      "original_sha256": "7511b4cb83eeef832cae397c287d7b9592eaf220eb9566668bae7bd72df7db2e",
+      "source_git_state": "dirty_preserved",
+      "source_role": "baseline_ladder_result"
+    },
+    {
+      "copied_path": "artifacts/source_results/primary_modality_results.tsv",
+      "copied_sha256": "edfaf9bcda5f4207a68692275a587eb7c43fcee1eeae512821693d91189793e7",
+      "hashes_match": true,
+      "original_bytes": 920,
+      "original_mtime_ns": 1788204098000000000,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_cc_confirmation/discovery/final_policy_check/evaluation/primary_modality_results.tsv",
+      "original_sha256": "edfaf9bcda5f4207a68692275a587eb7c43fcee1eeae512821693d91189793e7",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "primary_results"
+    },
+    {
+      "copied_path": "artifacts/source_results/confirmation_decision.json",
+      "copied_sha256": "48442b594967505f447254cbbdf156722a5901e2e042b4ad3ade6ed3889fdf50",
+      "hashes_match": true,
+      "original_bytes": 666,
+      "original_mtime_ns": 1788204098000000000,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_cc_confirmation/discovery/final_policy_check/evaluation/confirmation_decision.json",
+      "original_sha256": "48442b594967505f447254cbbdf156722a5901e2e042b4ad3ade6ed3889fdf50",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "confirmation_decision"
+    },
+    {
+      "copied_path": "artifacts/source_results/final_internal_decision.json",
+      "copied_sha256": "64ec94e43fd3b88a032e4fefbdcc3b8318547dd63f12dad4334e0238deecae53",
+      "hashes_match": true,
+      "original_bytes": 6547,
+      "original_mtime_ns": 1788181935673301300,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_egcc_pilot/artifacts/final_internal_decision.json",
+      "original_sha256": "64ec94e43fd3b88a032e4fefbdcc3b8318547dd63f12dad4334e0238deecae53",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "egcc_decision"
+    },
+    {
+      "copied_path": "artifacts/source_results/metaconsensus_decision_gate.json",
+      "copied_sha256": "82cb41137cecac94b2c4538a44135f6d235208d004d714a70464a5ce8f874699",
+      "hashes_match": true,
+      "original_bytes": 1600,
+      "original_mtime_ns": 1788028859686812300,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_refformer/runs/metaconsensus_population_stratified/decision_gate.json",
+      "original_sha256": "82cb41137cecac94b2c4538a44135f6d235208d004d714a70464a5ce8f874699",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "metaconsensus_decision"
+    },
+    {
+      "copied_path": "artifacts/source_results/publication_assessment.json",
+      "copied_sha256": "73f256c7f7e4c9e5a6e5d7d4a2835b93845955723d324eef515ff37b042263e7",
+      "hashes_match": true,
+      "original_bytes": 57208,
+      "original_mtime_ns": 1788029565525106500,
+      "original_path": "/mnt/d/projects/project_2008084/champhla_refformer/artifacts/publication_assessment/publication_assessment.json",
+      "original_sha256": "73f256c7f7e4c9e5a6e5d7d4a2835b93845955723d324eef515ff37b042263e7",
+      "source_git_state": "not_a_git_repository",
+      "source_role": "publication_assessment"
+    }
+  ],
+  "schema_version": "champhla-publication-originals-1"
+}
