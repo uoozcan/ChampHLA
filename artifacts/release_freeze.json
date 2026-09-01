@@ -1,0 +1,580 @@
+{
+  "file_count": 114,
+  "files": [
+    {
+      "bytes": 105,
+      "path": ".gitignore",
+      "sha256": "c6d8d499eaadb45eac8d860fd2cd409750417c4724a8bb079cac880b93dfb44c"
+    },
+    {
+      "bytes": 7395,
+      "path": "ORIGINALS_MANIFEST.json",
+      "sha256": "035981273018af405b527325f0d903e0675c7cef07ce751cb6821a91717677be"
+    },
+    {
+      "bytes": 1797,
+      "path": "README.md",
+      "sha256": "bdee3820e97bd51c2201395554da8e238810cdd0a6283b6bcbb322d935f5b95e"
+    },
+    {
+      "bytes": 1655,
+      "path": "RECOVERY_STATUS.md",
+      "sha256": "e6a3292e4454b8bf6a22b9bc1310421d96af129441c5e1ffb8fffff37553658d"
+    },
+    {
+      "bytes": 500,
+      "path": "ablations/refformer/configs/refformer.json",
+      "sha256": "4c27d8a3edec3055bc67837c5a1bfd3f4d91793927492b8bb66f00c09a9a9d9f"
+    },
+    {
+      "bytes": 405,
+      "path": "ablations/refformer/pyproject.toml",
+      "sha256": "d6108c806b1670d41f046927e4a29020bec25b8ff1e0d13e49a215d1d5aa18f3"
+    },
+    {
+      "bytes": 200,
+      "path": "ablations/refformer/src/champhla_refformer/__init__.py",
+      "sha256": "7a7e55420880a77d03be31441b243642668021cd300d659ffe93ea5d9a8c1606"
+    },
+    {
+      "bytes": 1867,
+      "path": "ablations/refformer/src/champhla_refformer/alleles.py",
+      "sha256": "737f55880099d7a43b5311cab232272ae15f9e7b1611b9c92977f3fc50604a03"
+    },
+    {
+      "bytes": 596,
+      "path": "ablations/refformer/src/champhla_refformer/cli.py",
+      "sha256": "51422d6bebc281abe79d5ee7b77255a9e3c170e4048e6f28edfd0367c4cfd6ce"
+    },
+    {
+      "bytes": 9979,
+      "path": "ablations/refformer/src/champhla_refformer/data.py",
+      "sha256": "e5e4b4c98f2a6e05b9aa3daafc6e441777dfe19146fa00f58e795791b6711480"
+    },
+    {
+      "bytes": 17954,
+      "path": "ablations/refformer/src/champhla_refformer/evaluation.py",
+      "sha256": "a040274a001a695b2d92ebeabb1edaee995e81b44d19a1ef94cf85dc4f021899"
+    },
+    {
+      "bytes": 8032,
+      "path": "ablations/refformer/src/champhla_refformer/fallback.py",
+      "sha256": "f18a2c9c92b1ce0456dcf8afe1bf4acf406da8139afb6f2af515ec5982a6dbb9"
+    },
+    {
+      "bytes": 8434,
+      "path": "ablations/refformer/src/champhla_refformer/model.py",
+      "sha256": "a941e5552465c7e95be8e88ff9054b5739261887d9c6154119b0052d77f5798b"
+    },
+    {
+      "bytes": 6596,
+      "path": "ablations/refformer/src/champhla_refformer/real_ranker.py",
+      "sha256": "2f0f0fc1524c3353a617314ffef2463ae55bf5d068d9e1b80ee4e4d77f43e1f2"
+    },
+    {
+      "bytes": 10647,
+      "path": "ablations/refformer/src/champhla_refformer/reference.py",
+      "sha256": "2a5ad2e75e7ea56a48dceb724f6fcc41a439d40e6d4c39fc9e8fb94261833837"
+    },
+    {
+      "bytes": 5565,
+      "path": "ablations/refformer/src/champhla_refformer/synthetic.py",
+      "sha256": "1ec9f99192b36b67d706cdbc05581fd7c851ae29c1a3484de7efc59fd239a27f"
+    },
+    {
+      "bytes": 1630,
+      "path": "ablations/refformer/src/champhla_refformer/tokenizer.py",
+      "sha256": "38d08c7655e2e20d0a177064017480ab1f427157cbe29875ca0a367a284d421c"
+    },
+    {
+      "bytes": 11794,
+      "path": "ablations/refformer/src/champhla_refformer/training.py",
+      "sha256": "0a384aaecc5e18bc7dce3b07e8bee3a1db996a2801eb503d2c9bead80ca13166"
+    },
+    {
+      "bytes": 1427,
+      "path": "ablations/refformer/tests/test_public_pileup.py",
+      "sha256": "b37529628b6cb0a497443b471adb149cabab2d9e8c2710d2e845d05e6b133c7d"
+    },
+    {
+      "bytes": 3343,
+      "path": "ablations/refformer/tests/test_publication_assessment.py",
+      "sha256": "58a8fe7e665b236a373b769da225b119595e02dca159a59bb2ecde5608fa7de8"
+    },
+    {
+      "bytes": 998,
+      "path": "ablations/refformer/tests/test_real_evaluation.py",
+      "sha256": "74fdf424ba5ac0e44ca28220f1d9f8cf74071c292513425ff6f8c40c5de4f71a"
+    },
+    {
+      "bytes": 597,
+      "path": "ablations/refformer/tests/test_real_ranker.py",
+      "sha256": "9c494a6bd6e176e6b9687b7564ddeb186d933d2520027cdd2c07e27ed55f8e27"
+    },
+    {
+      "bytes": 17608,
+      "path": "ablations/refformer/tests/test_refformer.py",
+      "sha256": "838ce6743d12f6b4355346ab7002c73827241b96fcff4b306e92ff32aa6c52b3"
+    },
+    {
+      "bytes": 536,
+      "path": "artifacts/benchmark_manuscript_audit.json",
+      "sha256": "4c30c5c7c3d66b3e6c76685aa48458a7a8e0d82bec15210fb1a437aa98be664e"
+    },
+    {
+      "bytes": 447,
+      "path": "artifacts/method_manuscript_audit.json",
+      "sha256": "5d9cdc4c868d0525a807fe05018b2ec25946e8cdf3977bf55abbe63d1c40069d"
+    },
+    {
+      "bytes": 592,
+      "path": "artifacts/source_manuscript_audit.json",
+      "sha256": "0cc9c38dfc92f94ab26585388d43e1e1c5bdab824860b4d554ead91a152ec0eb"
+    },
+    {
+      "bytes": 666,
+      "path": "artifacts/source_results/confirmation_decision.json",
+      "sha256": "48442b594967505f447254cbbdf156722a5901e2e042b4ad3ade6ed3889fdf50"
+    },
+    {
+      "bytes": 6547,
+      "path": "artifacts/source_results/final_internal_decision.json",
+      "sha256": "64ec94e43fd3b88a032e4fefbdcc3b8318547dd63f12dad4334e0238deecae53"
+    },
+    {
+      "bytes": 1600,
+      "path": "artifacts/source_results/metaconsensus_decision_gate.json",
+      "sha256": "82cb41137cecac94b2c4538a44135f6d235208d004d714a70464a5ce8f874699"
+    },
+    {
+      "bytes": 920,
+      "path": "artifacts/source_results/primary_modality_results.tsv",
+      "sha256": "edfaf9bcda5f4207a68692275a587eb7c43fcee1eeae512821693d91189793e7"
+    },
+    {
+      "bytes": 57208,
+      "path": "artifacts/source_results/publication_assessment.json",
+      "sha256": "73f256c7f7e4c9e5a6e5d7d4a2835b93845955723d324eef515ff37b042263e7"
+    },
+    {
+      "bytes": 471,
+      "path": "artifacts/verification/discovery_reproduction.json",
+      "sha256": "644df4035848461c10c6a2408253bc748942ad50f0afe306872f2a40ccfe83a6"
+    },
+    {
+      "bytes": 1790,
+      "path": "cohorts/frozen_initial_rosters.json",
+      "sha256": "ffe7c88048afb295111f8e7adbd6bc038573afd83f60766e62425ced30645b91"
+    },
+    {
+      "bytes": 101347,
+      "path": "cohorts/frozen_initial_rosters.tsv",
+      "sha256": "c54a2edaf7225f2bee886ab6e55569878e00fd0040a6e1598da7016a4d399c34"
+    },
+    {
+      "bytes": 504,
+      "path": "cohorts/official_1000g_assay_manifest.json",
+      "sha256": "7064a0a0de3705fe621dace82c6783bc85cba516dffaa4603d01b053d819b995"
+    },
+    {
+      "bytes": 1992756,
+      "path": "cohorts/official_1000g_assay_manifest.tsv",
+      "sha256": "b6ec490d0e1a905a7f66cbdb95e408335559fe66eb5403101da31a5af180e53b"
+    },
+    {
+      "bytes": 200478,
+      "path": "cohorts/subject_exposure_ledger.tsv",
+      "sha256": "3535775181969bf5095862123c89093824b12e6c3f4bc3243de75f9db575a263"
+    },
+    {
+      "bytes": 2413,
+      "path": "cohorts/subject_exposure_summary.json",
+      "sha256": "6920795966be9dac5f81a6ff834f56d251c399cc6de47293edc667282afb4be7"
+    },
+    {
+      "bytes": 746,
+      "path": "configs/confirmation_expansion.json",
+      "sha256": "5ca3eb3b634bbd8d48274d0bba5733fb771fd2ced32258b90fb0b37e1da3b095"
+    },
+    {
+      "bytes": 1837,
+      "path": "configs/confirmation_protocol.json",
+      "sha256": "77ed250716987a5e2f0c4d02c79579967234e725dbe51d0f9d163126515cdc43"
+    },
+    {
+      "bytes": 42,
+      "path": "configs/refformer_cpu_requirements.txt",
+      "sha256": "77b28f148dba11efc4efc996b42a11507a17bbedeebf9419b5de9766e264c54c"
+    },
+    {
+      "bytes": 515,
+      "path": "configs/runtime_versions.json",
+      "sha256": "8514ae7549519d2b3b6584241c7badf5445ff170b0e58934860a5f7b361b4e85"
+    },
+    {
+      "bytes": 386,
+      "path": "configs/wgs_pilot_resource_fix.config",
+      "sha256": "af6f6a891c2a836cdf3c54a5781b53944164d243ebf2635205c5ceb3f57ff32c"
+    },
+    {
+      "bytes": 1182,
+      "path": "decisions/20260901_publication_recovery.json",
+      "sha256": "bc3b2aa8365c3354010230fe2266800dfc4f9e6f69f579b99350bf853af1e56f"
+    },
+    {
+      "bytes": 309,
+      "path": "decisions/publication_route.json",
+      "sha256": "1da371d5ffbefad3855e264d9b73a9d399184b77f67c329b1c0c645beeb48b43"
+    },
+    {
+      "bytes": 4463,
+      "path": "manuscripts/benchmark/manuscript.md",
+      "sha256": "62b16580ac94e51b8f1b9d4f471d94e5a919b0df7c3444f8adaf18366ec80715"
+    },
+    {
+      "bytes": 1571,
+      "path": "manuscripts/claim_audit.tsv",
+      "sha256": "11d0dd3cfb78ffc1aefdd8150ec152a1e8a550dd57d0302ba1f65866c4a843d7"
+    },
+    {
+      "bytes": 1887,
+      "path": "manuscripts/method_conditional/manuscript.md",
+      "sha256": "0fd05aebe60e0b90bad29e6039f12c72d5547595daeda3f54f2118189fab4959"
+    },
+    {
+      "bytes": 1416,
+      "path": "manuscripts/shared/generated_results.md",
+      "sha256": "5a5c96fb3a936a05c5d1b07d9d26d943933b210ea893122d8e1f103c1dff9340"
+    },
+    {
+      "bytes": 1590,
+      "path": "manuscripts/shared/shared_methods.md",
+      "sha256": "b3104a62645f7e43b0c1ac6c1ee6f58726a72484cae77ab357c4fdd899d18ddc"
+    },
+    {
+      "bytes": 8340162,
+      "path": "manuscripts/source_original/ChatGPT_Bioinformatics_ChampHLA_Manuscript_V5x_reviewfix.docx",
+      "sha256": "ac7162465c5b15d182bdc98025ea99635278bde8ecd166a7033205962bfe5ce6"
+    },
+    {
+      "bytes": 1511,
+      "path": "manuscripts/source_original/issue_register.tsv",
+      "sha256": "a682e45d94049f22f986724cf935f3164ef8f9547c909db81faadc251ea3d74e"
+    },
+    {
+      "bytes": 203,
+      "path": "manuscripts/source_original/issue_summary.json",
+      "sha256": "fd27d6094f842d84c8593860bbfd08e22df9b9f99b86346aec0d74c64f1af07a"
+    },
+    {
+      "bytes": 113540,
+      "path": "manuscripts/source_original/source_text.txt",
+      "sha256": "4dcd9c6ba9c81359aab79650f585b9b173ba5b6fe291ffb0a583effd13b946e0"
+    },
+    {
+      "bytes": 2426,
+      "path": "provenance/source_map.tsv",
+      "sha256": "00d0f426574febe6a4a087b24a576b1262cb6e546d4068c61394e2b08e77d00d"
+    },
+    {
+      "bytes": 4108,
+      "path": "provenance/source_reports/baseline_ladder_findings.md",
+      "sha256": "5dcce5abbb5e130a184719c8649af40bcce0ded5e632c88e9e82d8e706b37df8"
+    },
+    {
+      "bytes": 3782,
+      "path": "provenance/source_reports/baseline_ladder_significant_result.md",
+      "sha256": "7511b4cb83eeef832cae397c287d7b9592eaf220eb9566668bae7bd72df7db2e"
+    },
+    {
+      "bytes": 6500,
+      "path": "provenance/source_reports/confirmation_implementation_status.md",
+      "sha256": "01c05e174709370d22b491a2a3d26c67b8cbf2e92ff93ed12c530235859e6f6d"
+    },
+    {
+      "bytes": 6021,
+      "path": "provenance/source_reports/egcc_final_report.md",
+      "sha256": "11a0d0ed2554b6cc26d9948cdd1f30503b04e59399fd6b7ab5a36caca620da7a"
+    },
+    {
+      "bytes": 2169,
+      "path": "provenance/source_reports/refformer_publication_assessment.md",
+      "sha256": "af6ac18774a80384541e26f33852bb6b95b65cf937f1ec8cab5500d1a666d7ad"
+    },
+    {
+      "bytes": 2629,
+      "path": "provenance/source_reports/simple_consensus_publication_note.md",
+      "sha256": "e686fcf090c692708e0cdcb252a1d6a6672735d5a9988ad1ddc66f9657819c48"
+    },
+    {
+      "bytes": 1607,
+      "path": "pyproject.toml",
+      "sha256": "5823f08ad0f12d537430bd9e30c10535901fe0a11e3f87e2723e6321e7eb3987"
+    },
+    {
+      "bytes": 3100,
+      "path": "result_registry.tsv",
+      "sha256": "af617156764362b7f08f179cd81e2070d8f2bbc76f257c7dbd5678a6fc88d0ce"
+    },
+    {
+      "bytes": 793,
+      "path": "scripts/roihu_preflight.sh",
+      "sha256": "a5bc42e31d297020e802b35b494052f00cc0e5f2ef0e5452b0b4f5828e6311c0"
+    },
+    {
+      "bytes": 3578,
+      "path": "scripts/roihu_prepare_full_cram_wgs_pilot.sbatch",
+      "sha256": "db0487379ac5d5c72869f178677cbe72439e2d21694374f70768d09ff92db345"
+    },
+    {
+      "bytes": 3876,
+      "path": "scripts/roihu_repair_kourami_full_bam.sbatch",
+      "sha256": "68f703c88c597c406cbdd5c4cce3f8a94984351109cf7f0a8edcb53a856fb0e3"
+    },
+    {
+      "bytes": 5133,
+      "path": "scripts/roihu_run_full_cram_wgs_pilot.sbatch",
+      "sha256": "2b9563643dddb271aa863596252b18fe5e5a9704c387508c7a7c883471656fe5"
+    },
+    {
+      "bytes": 851,
+      "path": "scripts/run_local_verification.sh",
+      "sha256": "db6bd77fbe0eca98ed265a46e927b733897c4203de363b7234c43081b4918e19"
+    },
+    {
+      "bytes": 247,
+      "path": "scripts/run_refformer_cpu_tests.sh",
+      "sha256": "78dcad713498eec4c9112cb47a86413fad32403f02ecc2e6e1f325f1998dca68"
+    },
+    {
+      "bytes": 1604,
+      "path": "scripts/verify_discovery_reproduction.py",
+      "sha256": "2ebf727f6f17fb5553a9f52689a9c064fe9e3ab8eb164f67e228582747a5965b"
+    },
+    {
+      "bytes": 84,
+      "path": "src/champhla_confirmation/__init__.py",
+      "sha256": "1e49cd6887be0db72a8bdea51d102674fe77a49ccbc0afcff6d1c0e433aa287e"
+    },
+    {
+      "bytes": 9461,
+      "path": "src/champhla_confirmation/audit.py",
+      "sha256": "811f245d8580293119168476d0a2ac9e59f4ae648df316d8e6e4bedd5f36ade9"
+    },
+    {
+      "bytes": 16256,
+      "path": "src/champhla_confirmation/cli.py",
+      "sha256": "6a335bc76bc19b6c3c9a7aa90cdb13c1f652188142c87e8928e9e51be4786537"
+    },
+    {
+      "bytes": 2170,
+      "path": "src/champhla_confirmation/cohorts.py",
+      "sha256": "df1b6fb17d5090d092be844e1d8f015cfc8dae467560d9c3d81370f6f787393b"
+    },
+    {
+      "bytes": 6714,
+      "path": "src/champhla_confirmation/consensus.py",
+      "sha256": "626a0e4f639e55bbc383bfc466217d659b15452ebc9ddc961a4051f2a167b9fd"
+    },
+    {
+      "bytes": 16257,
+      "path": "src/champhla_confirmation/evaluation.py",
+      "sha256": "128436dc71c53959cab4c7d871b9ebd672e4c9029f6bba1e6a83f619d192c952"
+    },
+    {
+      "bytes": 10156,
+      "path": "src/champhla_confirmation/external.py",
+      "sha256": "b10664dbf0a29b8f4e788fa3b9bbcfe0491336af2361f1b88991837b79108a87"
+    },
+    {
+      "bytes": 2913,
+      "path": "src/champhla_confirmation/freeze.py",
+      "sha256": "27072b50a8cc9af4295d57ed52574860127e90a9370f603ad5cb26820200dae1"
+    },
+    {
+      "bytes": 4471,
+      "path": "src/champhla_confirmation/io.py",
+      "sha256": "3c5d4f1abf0c636d8285bbd6d37e911eef79daa315607974f96b625e4ad8aea0"
+    },
+    {
+      "bytes": 464,
+      "path": "src/champhla_confirmation/panels.py",
+      "sha256": "877a3ae3998b0598ba99503dd6d1f1b01062134991f6e802cab6aa1b3e28606b"
+    },
+    {
+      "bytes": 2265,
+      "path": "src/champhla_confirmation/parsers.py",
+      "sha256": "affb182ffa90fa51f11fd3e54e7ecf7587d243bc29f16e8f3445e8491ec7c182"
+    },
+    {
+      "bytes": 2438,
+      "path": "src/champhla_confirmation/power.py",
+      "sha256": "2a4be7379345c2287e6372d6c07a94666c17cbba8f61a76e139e759690e9adbe"
+    },
+    {
+      "bytes": 12075,
+      "path": "src/champhla_confirmation/public_reads.py",
+      "sha256": "393e723fe09c495326fe865258ea7b227e6e588ea5d6552f119d18c88b8247a8"
+    },
+    {
+      "bytes": 10151,
+      "path": "src/champhla_confirmation/raw_cc.py",
+      "sha256": "f4574b0f2e8f43a6dd58599dbb92a61a381447f9954de04a19643f27b0dc7a5d"
+    },
+    {
+      "bytes": 3956,
+      "path": "src/champhla_confirmation/schema.py",
+      "sha256": "0761a7158243bdbe6c1145d04ddd38a8beab019ba06edd8f8f47162068d9d6f1"
+    },
+    {
+      "bytes": 2835,
+      "path": "src/champhla_confirmation/statistics.py",
+      "sha256": "e77c8fe9e46f298d7b030c944913cd8946f21a710c77a73b56c9581d724463d5"
+    },
+    {
+      "bytes": 4404,
+      "path": "src/champhla_confirmation/wgs_pilot.py",
+      "sha256": "db4ab23e982461e90dbf009382aba57c901376d55e3143483c8f1e4a7239c817"
+    },
+    {
+      "bytes": 96,
+      "path": "src/champhla_recovery/__init__.py",
+      "sha256": "375b91ac5f8649be30d428fe9a1a665a9d69e6374d5412e6c4a6d569c20662d8"
+    },
+    {
+      "bytes": 3761,
+      "path": "src/champhla_recovery/assays.py",
+      "sha256": "94b04d37d5870561099ad155d9c4e3997c4f7b4ca1a9551f5fd0025a564a85ab"
+    },
+    {
+      "bytes": 6565,
+      "path": "src/champhla_recovery/cli.py",
+      "sha256": "2bc7e0a1ab1a2426b5a45d1572c7bb77f70fbcbdd0f1320b6ba9eaba5eeaf0af"
+    },
+    {
+      "bytes": 2029,
+      "path": "src/champhla_recovery/exposure.py",
+      "sha256": "71b608e1b797b15aa2744809b0dc8aa2bd5d97e8fad9262a0a42d7c7b2fd1667"
+    },
+    {
+      "bytes": 1538,
+      "path": "src/champhla_recovery/io.py",
+      "sha256": "d5273f9e31dbf91cb984cb513c2c839c7ee2dad83defc9f71cffbf175f44f93c"
+    },
+    {
+      "bytes": 7140,
+      "path": "src/champhla_recovery/manuscript.py",
+      "sha256": "0b7fc37e269fa650ddfd6f8e9f2601d4f05ce098d84486b179c8f3e2db2a6646"
+    },
+    {
+      "bytes": 1624,
+      "path": "src/champhla_recovery/provenance.py",
+      "sha256": "f277415a9753a1010182d4f04fd7befe08b1f9eb4885e139fed15e8837397534"
+    },
+    {
+      "bytes": 2362,
+      "path": "src/champhla_recovery/registry.py",
+      "sha256": "bc15f92c9fe8ebee5ccc0cc4de078ee9eebc24472618d8c26e5df47f246db471"
+    },
+    {
+      "bytes": 1501,
+      "path": "src/champhla_recovery/release.py",
+      "sha256": "ac34c7fe93f52ec1c1a8ebd78b8615be6da85023c19ea6ee03ccfbf266d51901"
+    },
+    {
+      "bytes": 4930,
+      "path": "src/champhla_recovery/rosters.py",
+      "sha256": "23975db1ec1bfd840462395a95a6a4f5d5417d2ea1782f16102dd379bc770a39"
+    },
+    {
+      "bytes": 4595,
+      "path": "src/champhla_recovery/truth.py",
+      "sha256": "6e4b966f6f55f02878aa6dbe7ba999405dfb504ea8c4ac2bfada0aa9cfe223fb"
+    },
+    {
+      "bytes": 4283,
+      "path": "tests/test_consensus.py",
+      "sha256": "ec293f05eaa8456e274fbd97817c25e3559b72233321fa1b946eec7f956e9c98"
+    },
+    {
+      "bytes": 4670,
+      "path": "tests/test_external.py",
+      "sha256": "589394229922a6f1e6d227140bb24e2336289604aac58c41e95ff6f4970e7f5a"
+    },
+    {
+      "bytes": 5416,
+      "path": "tests/test_firewall_evaluation.py",
+      "sha256": "ea73ee63b6d43ff742b1c5f10c3ba53204c3caf90423854d1741309579d961ae"
+    },
+    {
+      "bytes": 1206,
+      "path": "tests/test_io_statistics.py",
+      "sha256": "19b5a5dff7e1ecc969aa547c0775f778484f086c3017d9dbb949fe4c4fdb0182"
+    },
+    {
+      "bytes": 4284,
+      "path": "tests/test_overlap_audit.py",
+      "sha256": "404713024271a19c2fba3bf9b319be45934494b1768a9bddc51e2615d2c39c23"
+    },
+    {
+      "bytes": 1458,
+      "path": "tests/test_parsers.py",
+      "sha256": "e44c3372fb1a685a0284c941e1c8ef515f6805b39d8a6503d4572928ff50d969"
+    },
+    {
+      "bytes": 3656,
+      "path": "tests/test_public_reads.py",
+      "sha256": "f41a3a56da367354c779b48d2e4d856a7b7ddac720d31a6395edfa506c043033"
+    },
+    {
+      "bytes": 2780,
+      "path": "tests/test_raw_cc.py",
+      "sha256": "35678f1ab07080ac2212c2bf9cf0577df1767336a0d4d44277daeb691d357251"
+    },
+    {
+      "bytes": 1223,
+      "path": "tests/test_recovery_assays.py",
+      "sha256": "612fd45ce042d64b575020174cd65c0344d58776fb3076636265d609a08a4d7f"
+    },
+    {
+      "bytes": 925,
+      "path": "tests/test_recovery_exposure.py",
+      "sha256": "711630850748e0c22bd2d0d3ab42ad10278901449949a5194195ae7443828909"
+    },
+    {
+      "bytes": 2692,
+      "path": "tests/test_recovery_manuscript.py",
+      "sha256": "7290af647f639e2e65fe1632ba8e9bf5522b6460772bd32f68b6c4d5adff7134"
+    },
+    {
+      "bytes": 2660,
+      "path": "tests/test_recovery_rosters.py",
+      "sha256": "3dcb7fb2a279ba55b3f0585a9d3068cc4b45870e42efa5e09cc661aee78df4f2"
+    },
+    {
+      "bytes": 1942,
+      "path": "tests/test_recovery_truth.py",
+      "sha256": "79b1932f2fccb4ebd9f4e0c052e783857abc5e58e8c3a502343762b0e773688f"
+    },
+    {
+      "bytes": 2015,
+      "path": "tests/test_wgs_pilot.py",
+      "sha256": "8bb2593448d6901ddab3ea6e5450f94a44880cff705e240bc23cb8e844b77a79"
+    },
+    {
+      "bytes": 125229,
+      "path": "truth_manifests/1000g_2014_truth_free_registry.tsv",
+      "sha256": "0285dc76ceb1ccb03a5bef1c32d126396ba9c33234697a51b203aabbf2d63d58"
+    },
+    {
+      "bytes": 546,
+      "path": "truth_manifests/1000g_2014_truth_manifest.json",
+      "sha256": "5fdf9aaf57a32496ba93c4168283cdaa21ec5b15e0fe9135cc7cb97bff539f79"
+    }
+  ],
+  "git_commit": "9191846cc23ff586fafbd5e75e2f18d0a76fc476",
+  "git_dirty": false,
+  "project_root": "/mnt/d/Users/uonur/Downloads/champhla_publication_candidate_stage",
+  "schema_version": "champhla-release-freeze-1",
+  "truth_data_included": false
+}
