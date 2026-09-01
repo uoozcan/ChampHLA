@@ -1,10 +1,10 @@
 {
-  "file_count": 114,
+  "file_count": 127,
   "files": [
     {
-      "bytes": 105,
+      "bytes": 133,
       "path": ".gitignore",
-      "sha256": "c6d8d499eaadb45eac8d860fd2cd409750417c4724a8bb079cac880b93dfb44c"
+      "sha256": "deb0465fcff772e51a9d7ecd86a883257fe7be9e57ce993384f66e078921eb99"
     },
     {
       "bytes": 7395,
@@ -12,14 +12,14 @@
       "sha256": "035981273018af405b527325f0d903e0675c7cef07ce751cb6821a91717677be"
     },
     {
-      "bytes": 1797,
+      "bytes": 2281,
       "path": "README.md",
-      "sha256": "bdee3820e97bd51c2201395554da8e238810cdd0a6283b6bcbb322d935f5b95e"
+      "sha256": "0ad82c70828ac979c5edb1c38b490581fb896b5cfd848c9acbc4aed4469655e8"
     },
     {
-      "bytes": 1655,
+      "bytes": 3288,
       "path": "RECOVERY_STATUS.md",
-      "sha256": "e6a3292e4454b8bf6a22b9bc1310421d96af129441c5e1ffb8fffff37553658d"
+      "sha256": "b5499c43f166006be8ee898e2672ef7175a3623bd318cdf6eb65e529090d6dad"
     },
     {
       "bytes": 500,
@@ -162,6 +162,56 @@
       "sha256": "644df4035848461c10c6a2408253bc748942ad50f0afe306872f2a40ccfe83a6"
     },
     {
+      "bytes": 5043,
+      "path": "artifacts/wgs_pilot_review/HG00096_wgs_audit.tsv",
+      "sha256": "3bb96100d42ad0fb7db864f8837a8725f9ee8ba72113e046bd9dc492d895de4e"
+    },
+    {
+      "bytes": 1211,
+      "path": "artifacts/wgs_pilot_review/REVIEW_STATUS.md",
+      "sha256": "64eab287ffc3a268887951b6dc6680ba6d8aa28d2243748c774a1551c3827e06"
+    },
+    {
+      "bytes": 3667,
+      "path": "artifacts/wgs_pilot_review/collection_summary.json",
+      "sha256": "4897bbb100387e64f01981f23dbb2744c76ff0c67fa31d4f9896ff303defe23f"
+    },
+    {
+      "bytes": 265,
+      "path": "artifacts/wgs_pilot_review/finalize_HG00097_984079.out",
+      "sha256": "6e96bd4dc4557a83526f7a2e40defd3b303328269269905e5f622ad4a9a83fbf"
+    },
+    {
+      "bytes": 93,
+      "path": "artifacts/wgs_pilot_review/freeze_validation.json",
+      "sha256": "1c06ae9251d70f8878560c7322cead8c860b29f0840a16c2d996477b1ae69a65"
+    },
+    {
+      "bytes": 9804,
+      "path": "artifacts/wgs_pilot_review/generated_audit/wgs_audit.tsv",
+      "sha256": "ff58a90a662be1583b186d2d66faf7260d077a83270dfb87c526d59de379b13c"
+    },
+    {
+      "bytes": 727,
+      "path": "artifacts/wgs_pilot_review/generated_audit/wgs_audit_summary.json",
+      "sha256": "b3cef68f0b09d9c01623a4145b26a445cab9ca227e3e2e41e1a5e86b1b55e8f4"
+    },
+    {
+      "bytes": 6470,
+      "path": "artifacts/wgs_pilot_review/generated_audit/wgs_manual_review.tsv",
+      "sha256": "a48398949a83482bc4cc6d94beab48e4d1d43c47bd662a1c928d570fd9bc8a40"
+    },
+    {
+      "bytes": 9559,
+      "path": "artifacts/wgs_pilot_review/harmonized_calls.tsv",
+      "sha256": "0f5fb496f765fb997b3b20d20cbc9df2de041c4d6bda1eac6aecb9bcdd3cf836"
+    },
+    {
+      "bytes": 1055,
+      "path": "artifacts/wgs_pilot_review/import_manifest.json",
+      "sha256": "0a309bde4bb1b2e377c6578193b3f346e6e5450899d1fa65bfb30d373614df52"
+    },
+    {
       "bytes": 1790,
       "path": "cohorts/frozen_initial_rosters.json",
       "sha256": "ffe7c88048afb295111f8e7adbd6bc038573afd83f60766e62425ced30645b91"
@@ -207,9 +257,9 @@
       "sha256": "77b28f148dba11efc4efc996b42a11507a17bbedeebf9419b5de9766e264c54c"
     },
     {
-      "bytes": 515,
+      "bytes": 562,
       "path": "configs/runtime_versions.json",
-      "sha256": "8514ae7549519d2b3b6584241c7badf5445ff170b0e58934860a5f7b361b4e85"
+      "sha256": "570765c63093f1efecdc79d01a9e1a44343c221646b69fe96f28c704515c8871"
     },
     {
       "bytes": 386,
@@ -220,6 +270,11 @@
       "bytes": 1182,
       "path": "decisions/20260901_publication_recovery.json",
       "sha256": "bc3b2aa8365c3354010230fe2266800dfc4f9e6f69f579b99350bf853af1e56f"
+    },
+    {
+      "bytes": 1284,
+      "path": "decisions/20260901_roihu_recovery.json",
+      "sha256": "1401e6b489ade010a8a4512cbabaf93297502a3189b7322f904b1a157609706b"
     },
     {
       "bytes": 309,
@@ -317,9 +372,9 @@
       "sha256": "af617156764362b7f08f179cd81e2070d8f2bbc76f257c7dbd5678a6fc88d0ce"
     },
     {
-      "bytes": 793,
+      "bytes": 798,
       "path": "scripts/roihu_preflight.sh",
-      "sha256": "a5bc42e31d297020e802b35b494052f00cc0e5f2ef0e5452b0b4f5828e6311c0"
+      "sha256": "3b31dc547fa5e98c9e4b19362e1dc076b5864c646ae66614f423792a5f9d1864"
     },
     {
       "bytes": 3578,
@@ -345,6 +400,11 @@
       "bytes": 247,
       "path": "scripts/run_refformer_cpu_tests.sh",
       "sha256": "78dcad713498eec4c9112cb47a86413fad32403f02ecc2e6e1f325f1998dca68"
+    },
+    {
+      "bytes": 1066,
+      "path": "scripts/setup_roihu_test_env.sh",
+      "sha256": "110549acf3496cd48caeb22b6b72c3ce0c3560f22f55874e7ff1aabaee352759"
     },
     {
       "bytes": 1604,
@@ -557,6 +617,11 @@
       "sha256": "79b1932f2fccb4ebd9f4e0c052e783857abc5e58e8c3a502343762b0e773688f"
     },
     {
+      "bytes": 1435,
+      "path": "tests/test_roihu_scripts.py",
+      "sha256": "66f072c5de783797134a56a4721c23a820edbe822be80d58978407ccb7608363"
+    },
+    {
       "bytes": 2015,
       "path": "tests/test_wgs_pilot.py",
       "sha256": "8bb2593448d6901ddab3ea6e5450f94a44880cff705e240bc23cb8e844b77a79"
@@ -572,8 +637,8 @@
       "sha256": "5fdf9aaf57a32496ba93c4168283cdaa21ec5b15e0fe9135cc7cb97bff539f79"
     }
   ],
-  "git_commit": "9191846cc23ff586fafbd5e75e2f18d0a76fc476",
-  "git_dirty": false,
+  "git_commit": "5c54c54ce36c5f9ca86b05b7f0e3bfc27883cf79",
+  "git_dirty": true,
   "project_root": "/mnt/d/Users/uonur/Downloads/champhla_publication_candidate_stage",
   "schema_version": "champhla-release-freeze-1",
   "truth_data_included": false

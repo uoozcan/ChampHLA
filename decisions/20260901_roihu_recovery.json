@@ -26,6 +26,7 @@
   "authorization": {
     "new_wgs_accuracy_claim": false,
     "wgs_roster_expansion": false,
-    "reason": "Human sign-off and 50-record production audit are incomplete; the two-subject capacity gate is insufficient for confirmation."
+    "wes_roster_execution": false,
+    "reason": "Human sign-off and 50-record production audit are incomplete; the two-subject capacity gate is insufficient for confirmation. The discovered WES/RNA workflow is a dirty legacy tree with permissive failure handling and is not a frozen confirmation runner."
   }
 }

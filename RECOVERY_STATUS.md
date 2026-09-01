@@ -35,6 +35,10 @@
   all 30 pilot caller/locus records. Independent source-line review also found
   exact agreement for all 30; named human sign-off and the locked 50-record
   production review gate remain incomplete.
+- The only discovered general WES/RNA Nextflow runner is in the dirty,
+  read-only `pihla-publish` tree and uses a permissive task-failure policy.
+  It has not been copied or run for confirmation; a fail-closed runner must be
+  isolated and stub/integration-tested before the frozen WES roster is started.
 
 ## Roihu gates
 
