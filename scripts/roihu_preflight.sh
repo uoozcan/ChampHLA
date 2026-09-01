@@ -1,11 +1,12 @@
 #!/bin/bash
-set -euo pipefail
+set -eo pipefail
 
 ROOT=/scratch/project_2008084/champhla_publication_candidate
 REFERENCE=/scratch/project_2008084/hla_references/genomes/GRCh38_full_analysis_set_plus_decoy_hla.fa
 
 export CSC_ENV_INIT_NON_INTERACTIVE=yes
 source /etc/profile.d/zz-csc-env.sh
+set -u
 module load bio-apps/v202603
 module load samtools/1.21
 module load nextflow/25.10.2-standalone
@@ -25,4 +26,3 @@ done
 
 sha256sum "${ROOT}/configs/confirmation_protocol.json" \
   "${ROOT}/configs/runtime_versions.json"
-
