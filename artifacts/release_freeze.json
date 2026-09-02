@@ -1,5 +1,5 @@
 {
-  "file_count": 127,
+  "file_count": 130,
   "files": [
     {
       "bytes": 133,
@@ -367,6 +367,21 @@
       "sha256": "5823f08ad0f12d537430bd9e30c10535901fe0a11e3f87e2723e6321e7eb3987"
     },
     {
+      "bytes": 44384,
+      "path": "reports/ChampHLA_Supervisor_Project_and_Method_Report_2026-09-02.docx",
+      "sha256": "f64b3b0a38f7c635e2c224017f0dd168f287c3428a7f186acff9829171dbd8a4"
+    },
+    {
+      "bytes": 16829,
+      "path": "reports/SUPERVISOR_PROJECT_AND_METHOD_REPORT_2026-09-02.md",
+      "sha256": "65c1f934b5550337e233950d54052e175e3b04cc80c84436d352e5dba2708fb5"
+    },
+    {
+      "bytes": 589,
+      "path": "reports/report_manifest.json",
+      "sha256": "6de105c7a830a381e480a79ce242f6dc76c6e0a1d17007efd297d63b7bd2c106"
+    },
+    {
       "bytes": 3100,
       "path": "result_registry.tsv",
       "sha256": "af617156764362b7f08f179cd81e2070d8f2bbc76f257c7dbd5678a6fc88d0ce"
@@ -637,7 +652,7 @@
       "sha256": "5fdf9aaf57a32496ba93c4168283cdaa21ec5b15e0fe9135cc7cb97bff539f79"
     }
   ],
-  "git_commit": "631f10b1bf9f2c74a0c921d2493c8f1ecb6b34e9",
+  "git_commit": "814bbbed4bd652e227b0741d6f0a548e68016c32",
   "git_dirty": false,
   "project_root": "/mnt/d/Users/uonur/Downloads/champhla_publication_candidate_stage",
   "schema_version": "champhla-release-freeze-1",
