@@ -1,0 +1,14 @@
+{
+  "schema_version": "supervisor-report-1",
+  "date": "2026-09-02",
+  "markdown": {
+    "path": "reports/SUPERVISOR_PROJECT_AND_METHOD_REPORT_2026-09-02.md",
+    "sha256": "65c1f934b5550337e233950d54052e175e3b04cc80c84436d352e5dba2708fb5"
+  },
+  "word": {
+    "path": "reports/ChampHLA_Supervisor_Project_and_Method_Report_2026-09-02.docx",
+    "sha256": "f64b3b0a38f7c635e2c224017f0dd168f287c3428a7f186acff9829171dbd8a4"
+  },
+  "evidence_boundary": "Development and secondary evidence only; no confirmed abstract-level method-performance claim.",
+  "source_manuscript_modified": false
+}
