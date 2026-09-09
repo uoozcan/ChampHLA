@@ -24,6 +24,7 @@ def test_roihu_environment_loads_samtools_before_creating_venv():
     text = (ROOT / "scripts/setup_roihu_test_env.sh").read_text(encoding="utf-8")
     assert text.index("module load samtools/1.21") < text.index("python3 -m venv")
     assert "EXPECTED_PYTHON=3.11.15" in text
+    assert '"${ROOT}/.venv/bin/pytest" -q' in text
     assert '"${ROOT}/.venv/bin/python" -m pytest' in text
 
 

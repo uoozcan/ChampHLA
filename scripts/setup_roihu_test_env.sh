@@ -33,4 +33,5 @@ fi
 
 export PIP_CACHE_DIR="${ROOT}/.cache/pip"
 "${ROOT}/.venv/bin/python" -m pip install --disable-pip-version-check -e "${ROOT}[test]"
+"${ROOT}/.venv/bin/pytest" -q "${ROOT}/tests"
 "${ROOT}/.venv/bin/python" -m pytest -q "${ROOT}/tests"
