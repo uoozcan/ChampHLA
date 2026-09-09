@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import hashlib
 from datetime import datetime, timezone
+import time
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -206,13 +207,18 @@ def initialize_run_ledger(manifest_path: str | Path, output: str | Path,
 def transition_run_sample(ledger_path: str | Path, cohort: str, sample_id: str,
                           modality: str, new_state: str, **updates: str) -> list[dict[str, str]]:
     """Atomically transition every caller for one array sample on Roihu."""
-    import fcntl
-
     path = Path(ledger_path)
-    lock_path = path.with_suffix(path.suffix + ".lock")
-    lock_path.parent.mkdir(parents=True, exist_ok=True)
-    with lock_path.open("w", encoding="utf-8") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+    lock_path = path.with_suffix(path.suffix + ".lockdir")
+    deadline = time.monotonic() + 30
+    while True:
+        try:
+            lock_path.mkdir()
+            break
+        except FileExistsError:
+            if time.monotonic() >= deadline:
+                raise TimeoutError(f"timed out acquiring run-ledger lock: {lock_path}")
+            time.sleep(0.05)
+    try:
         rows = read_tsv(path)
         matched = 0
         now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -231,6 +237,8 @@ def transition_run_sample(ledger_path: str | Path, cohort: str, sample_id: str,
         write_tsv(temporary, rows, list(RUN_LEDGER_FIELDS))
         os.replace(temporary, path)
         return rows
+    finally:
+        lock_path.rmdir()
 
 
 def transition_run_record(row: dict[str, str], new_state: str, **updates: str) -> dict[str, str]:

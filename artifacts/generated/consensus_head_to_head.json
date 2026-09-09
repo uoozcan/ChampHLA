@@ -5,5 +5,5 @@
   "integration_method_count": 7,
   "output": "artifacts/generated/consensus_head_to_head.md",
   "schema_version": "plurality-head-to-head-render-1",
-  "source": "existing_evaluation"
+  "source": "fresh_evaluation"
 }

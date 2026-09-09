@@ -83,10 +83,9 @@ reads, alignments, containers, reference bundles, AGC assemblies, or Nextflow
 work directories; `.gitignore` enforces those classes. Only compact text,
 figures, logs, checksums, tests, and release archives return to the laptop.
 
-The live preflight is currently blocked because the CSC SSH certificate expired
-on 2026-09-02. After the author renews it, install this exact reviewed commit at
-`/scratch/project_2008084/champhla_plurality`, create the external roots defined
-in `configs/roihu_paths.env`, and run:
+CSC access was renewed and verified on 2026-09-09. Install the exact reviewed
+commit at `/scratch/project_2008084/champhla_plurality`, create the external
+roots defined in `configs/roihu_paths.env`, and run:
 
 ```bash
 bash scripts/roihu_preflight.sh

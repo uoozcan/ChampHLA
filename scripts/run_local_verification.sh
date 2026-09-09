@@ -27,12 +27,14 @@ python3 -m champhla_recovery.cli render-manuscript-tables \
   --root "${ROOT}" \
   --output manuscripts/shared/generated_results.md
 
+RENDER_CHECK=$(mktemp -d)
+trap 'rm -rf -- "${RENDER_CHECK}"' EXIT
 python3 scripts/consensus_head_to_head.py \
   --registry result_registry.tsv \
   --comparators configs/comparator_manifest.json \
   --evaluation-dir artifacts/generated/development_evaluation \
-  --output artifacts/generated/consensus_head_to_head.md \
-  --summary artifacts/generated/consensus_head_to_head.json
+  --output "${RENDER_CHECK}/consensus_head_to_head.md" \
+  --summary "${RENDER_CHECK}/consensus_head_to_head.json"
 
 expect_blocked python3 -c \
   'from champhla_confirmation.cli import audit_dataset_discovery_registry_main; raise SystemExit(audit_dataset_discovery_registry_main())' \

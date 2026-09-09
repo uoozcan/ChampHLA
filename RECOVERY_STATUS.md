@@ -56,10 +56,13 @@ Status date: 2026-09-09.
   counts, and remote/CI attestations for this revision do not yet exist.
 - The benchmark claim audit and release audit remain fail closed until the
   prospective outcome selects the predeclared wording.
-- The `roihu-cpu` SSH certificate expired on 2026-09-02, so no current Roihu
-  inventory, transfer, or job submission can be performed yet.
-- This checkout has no GitHub remote. Cross-platform CI cannot be triggered
-  until the author supplies the existing repository URL.
+- CSC SSH access was renewed and verified on 2026-09-09. A live read-only
+  inventory found the expected reference and caller-container roots and ample
+  filesystem free space; project quota and artifact hashes remain preflight
+  gates.
+- The GitHub remote is configured at `uoozcan/ChampHLA`, and the dated branch
+  is published. Cross-platform CI is active; its first run exposed portability
+  defects that are being corrected before production.
 - HLA-ASM and Immuannot remain intentionally `PREPARED_NOT_FROZEN`; their Roihu
   versions and artifact hashes must be verified before HPRC truth jobs.
 - Independent public WES (minimum 89 donors) and RNA (minimum 130 donors)
@@ -67,8 +70,8 @@ Status date: 2026-09-09.
 
 ## Next authorized execution sequence
 
-1. Renew the CSC certificate, supply the existing GitHub remote, and confirm
-   local/GitHub/Roihu commit and tracked-tree hashes.
+1. Obtain a green GitHub matrix, install the identical branch in the new Roihu
+   checkout, and confirm local/GitHub/Roihu commit and tracked-tree hashes.
 2. Obtain the author signature and freeze all comparator artifact/version
    metadata from the live Roihu inventory.
 3. Execute the corrected truth-blind runs using
