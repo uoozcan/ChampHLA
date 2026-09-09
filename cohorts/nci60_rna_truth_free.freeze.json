@@ -1,0 +1,18 @@
+{
+  "expected_caller_locus_records": 132,
+  "expected_plurality_rows": 33,
+  "expected_samples_by_modality": {
+    "rnaseq": 11
+  },
+  "failures": [],
+  "frozen": true,
+  "passed": true,
+  "path": "nci60_rna_truth_free.tsv",
+  "rows": 11,
+  "samples_by_modality": {
+    "rnaseq": 11
+  },
+  "schema_version": "champhla-truth-free-run-manifest-freeze-1",
+  "source_sha256": "6845b7c580505c82af7ebce702290ae788a55c372ec564b08bf25df9bfcb51b4",
+  "truth_blind": true
+}

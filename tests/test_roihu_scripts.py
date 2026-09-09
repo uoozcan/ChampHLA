@@ -45,3 +45,36 @@ def test_supported_python_and_cross_platform_ci_are_pinned():
     assert 'python-version: ["3.10", "3.11"]' in workflow
     assert "pytest -q" in workflow
     assert "python -m pytest -q" in workflow
+
+
+def test_canonical_workflow_is_fail_closed_and_submission_validates_lock():
+    workflow_root = ROOT / "workflow"
+    production_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in sorted(workflow_root.rglob("*"))
+        if path.is_file() and path.suffix in {".nf", ".config"}
+    )
+    for forbidden in ("errorStrategy 'ignore'", "? 'retry' : 'ignore'", "|| true",
+                      "No results generated", "(STUB)", "stub:"):
+        assert forbidden not in production_text
+    submit = (ROOT / "scripts/roihu_submit_wave.sh").read_text(encoding="utf-8")
+    runner = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert "validate_workflow_lock" in submit
+    assert "validate_comparator_manifest" in submit
+    assert "configs/roihu_workflow_lock.json" in runner
+    assert "placeholder|stub|no results generated" in runner
+    stage = (ROOT / "scripts" / "roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
+    assert ".staging.${SLURM_JOB_ID}" in stage
+    assert "quarantine/staging" in stage
+    assert "mv \"${stage_root}\" \"${sample_root}\"" in stage
+    assert "sequential_low_storage" in submit
+    assert 'afterok:${previous_job}' in submit
+    assert "pilot_retained" not in submit
+    retry = (ROOT / "scripts" / "roihu_retry_sample.sh").read_text(encoding="utf-8")
+    assert "--hold" in retry
+    assert "supersedes-job-id" in retry
+    assert "scontrol release" in retry
+    prune = (ROOT / "scripts" / "roihu_prune_sample_work.sh").read_text(encoding="utf-8")
+    assert "CALLERS_COMPLETE" in prune
+    assert "caller_output_validation.tsv" in prune
+    assert "find \"${work_root}\" -depth -type f -delete" in prune

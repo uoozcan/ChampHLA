@@ -3,7 +3,8 @@ from __future__ import annotations
 import random
 import unittest
 
-from champhla_confirmation.consensus import build_consensus, build_guarded_cc
+from champhla_confirmation.consensus import build_consensus, build_guarded_cc, build_mv_floored_cc
+from champhla_confirmation.io import write_json
 from champhla_confirmation.schema import (
     normalize_caller_row,
     normalize_method_row,
@@ -148,6 +149,25 @@ class ConsensusTests(unittest.TestCase):
         validate_production_caller_matrix(rows)
         with self.assertRaisesRegex(ValueError, "incomplete production caller matrix"):
             validate_production_caller_matrix(rows[:-1])
+
+    def test_mv_floor_applies_frozen_truth_free_routes(self):
+        import tempfile
+        from pathlib import Path
+
+        callers = [call("S", "HLA-HD", self.p1), call("S", "Kourami", self.p1),
+                   call("S", "OptiType", self.p2), call("S", "SpecHLA", self.p2),
+                   call("S", "T1K", ("A*11:01", "A*26:01"))]
+        policy = {"default_route": "mv", "policy": {
+            "wgs": {"unanimous": "mv", "clear_majority": "cc",
+                    "split": "cc", "single_tool": "mv"}}}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "policy.json"
+            write_json(path, policy)
+            result = build_mv_floored_cc(callers, [cc("S", self.p2)], path)[0]
+        self.assertEqual(self.p2, (result["allele1"], result["allele2"]))
+        self.assertEqual("split", result["vote_stratum"])
+        self.assertEqual("cc", result["selected_route"])
+        self.assertNotIn("truth", "".join(result))
 
 
 if __name__ == "__main__":

@@ -5,10 +5,18 @@
   "samtools": "1.21",
   "nextflow": "25.10.2-standalone",
   "csc_module_stack": "bio-apps/v202603",
-  "ipd_imgt_hla": "3.59.0",
+  "caller_database_releases": {
+    "HLA-HD": "UNRESOLVED_ACTIVE_BUNDLE",
+    "Kourami": "3.24.0",
+    "OptiType": "UNRESOLVED_BUNDLED_REFERENCE",
+    "POLYSOLVER": "UNRESOLVED_FILENAME_SUGGESTS_3.10.0",
+    "SpecHLA": "UNRESOLVED_MIXED_COMPONENT_RELEASES",
+    "T1K": "3.63.0",
+    "ArcasHLA": "3.40.0"
+  },
   "wgs_reference": "GRCh38_full_analysis_set_plus_decoy_hla / GRCh38DH",
   "wes_reference": "GRCh38DH",
-  "rnaseq_reference": "GRCh37 for the frozen Geuvadis BAM workflow",
-  "container_policy": "sha256 digest required before confirmation",
+  "rnaseq_reference": "GRCh37 source design; paired submitted FASTQs; caller-specific HLA databases; no runtime genome FASTA",
+  "container_policy": "exact container SHA-256 plus active caller-database component hashes required before production",
   "refformer_status": "negative_ablation_no_gpu_training"
 }

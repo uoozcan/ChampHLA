@@ -40,7 +40,7 @@ ledger_transition() {
     --ledger "${ledger}" --cohort "${cohort}" --sample "${sample_id}" \
     --modality "${modality}" "$@"
 }
-ledger_transition --state running
+ledger_transition --state running --job-id "${SLURM_JOB_ID}"
 on_failure() {
   local code=$?
   ledger_transition --state failed --exit-code "${code}" || true
@@ -61,22 +61,18 @@ case "${modality}" in
     input_type_effective=bam
     printf 'sample_id,bam_path\n%s,%s\n' "${sample_id}" "${input_root}/${sample_id}.mate_aware_hla.bam" > "${sample_root}/samplesheet.csv"
     extra=(--spechla_exon_only 0 --extract_hla_region false)
+    callers=(SpecHLA HLA-HD OptiType Kourami T1K)
     suffixes=(spechla hlahd optitype kourami t1k)
     ;;
   wes)
     tools=hlahd,optitype,polysolver,spechla,t1k
     seq_type=wes
-    if [[ "${input_type}" == fastq_pair ]]; then
-      input_type_effective=fastq
-      printf 'sample_id,fastq_1,fastq_2\n%s,%s,%s\n' "${sample_id}" \
-        "${input_root}/${sample_id}_R1.fastq.gz" "${input_root}/${sample_id}_R2.fastq.gz" \
-        > "${sample_root}/samplesheet.csv"
-    else
-      input_type_effective=${input_type}
-      printf 'sample_id,%s_path\n%s,%s\n' "${input_type}" "${sample_id}" \
-        "${input_root}/${sample_id}.${input_type}" > "${sample_root}/samplesheet.csv"
-    fi
+    [[ "${input_type}" == bam || "${input_type}" == cram ]]
+    input_type_effective=${input_type}
+    printf 'sample_id,%s_path\n%s,%s\n' "${input_type}" "${sample_id}" \
+      "${input_root}/${sample_id}.${input_type}" > "${sample_root}/samplesheet.csv"
     extra=(--spechla_exon_only 1 --extract_hla_region false)
+    callers=(HLA-HD OptiType POLYSOLVER SpecHLA T1K)
     suffixes=(hlahd optitype polysolver spechla t1k)
     ;;
   rnaseq)
@@ -85,6 +81,7 @@ case "${modality}" in
     input_type_effective=fastq
     printf 'sample_id,fastq_1,fastq_2\n%s,%s,%s\n' "${sample_id}" "${input_root}/${sample_id}_R1.fastq.gz" "${input_root}/${sample_id}_R2.fastq.gz" > "${sample_root}/samplesheet.csv"
     extra=(--optitype_seq_type rna --extract_hla_region false)
+    callers=(ArcasHLA HLA-HD OptiType T1K)
     suffixes=(arcashla hlahd optitype t1k)
     ;;
   *) echo "Unsupported modality: ${modality}" >&2; exit 2 ;;
@@ -94,6 +91,7 @@ sha256sum "${sample_root}/samplesheet.csv" "${manifest}" \
   "${CHAMPHLA_RUN_ROOT}/environment_inventory.json" \
   "${CHAMPHLA_CODE_ROOT}/configs/comparator_manifest.json" \
   "${CHAMPHLA_CODE_ROOT}/configs/rerun_protocol.json" \
+  "${CHAMPHLA_CODE_ROOT}/configs/roihu_workflow_lock.json" \
   "${CHAMPHLA_PIPELINE_ROOT}/main.nf" > "${sample_root}/pre_run_sha256.txt"
 cd "${sample_root}/launch"
 /usr/bin/time -f 'elapsed_seconds=%e\npeak_memory_kbytes=%M' \
@@ -109,11 +107,21 @@ cd "${sample_root}/launch"
 
 validation=${sample_root}/caller_output_validation.tsv
 printf 'caller\tnative_summary\tsha256\n' > "${validation}"
-for suffix in "${suffixes[@]}"; do
+for index in "${!suffixes[@]}"; do
+  suffix=${suffixes[$index]}
+  caller=${callers[$index]}
   mapfile -t matches < <(find "${sample_root}/results" -type f -name "${sample_id}_${suffix}.txt" -size +0c -print)
   [[ ${#matches[@]} -eq 1 ]]
-  ! grep -q '^# No results generated\|^# WARNING:.*no output' "${matches[0]}"
-  grep -Eq '(^|[^[:alnum:]])(HLA-)?[ABC]\*[0-9A-Za-z]+:[0-9A-Za-z]+' "${matches[0]}"
+  ! grep -Eqi 'placeholder|stub|no results generated|warning:.*no output' "${matches[0]}"
+  python3 - "${caller}" "${matches[0]}" <<'PY'
+import sys
+from champhla_confirmation.parsers import parse_caller_call
+caller, path = sys.argv[1:]
+native = open(path, encoding="utf-8", errors="strict").read()
+for gene in ("A", "B", "C"):
+    call = parse_caller_call(caller, native, gene)
+    assert call["call_status"] in {"callable", "partial", "missing"}
+PY
   printf '%s\t%s\t%s\n' "${suffix}" "${matches[0]}" "$(sha256sum "${matches[0]}" | cut -d ' ' -f 1)" >> "${validation}"
 done
 find "${sample_root}/results" -type f -print0 | sort -z | xargs -0 sha256sum > "${sample_root}/prediction_files_sha256.txt"
@@ -121,10 +129,16 @@ touch "${sample_root}/CALLERS_COMPLETE"
 runtime=$(awk -F= '$1=="elapsed_seconds"{print $2}' "${sample_root}/resource_usage.txt")
 peak_kb=$(awk -F= '$1=="peak_memory_kbytes"{print $2}' "${sample_root}/resource_usage.txt")
 peak_memory=$((peak_kb * 1024))
-peak_disk=$(du -sb "${sample_root}" "${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}" | awk '{sum+=$1} END{print sum}')
+peak_disk=$(du -sb "${input_root}" "${sample_root}" "${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}" | awk '{sum+=$1} END{print sum}')
+retained_disk=$(du -sb "${input_root}" "${sample_root}" | awk '{sum+=$1} END{print sum}')
 output_hash=$(sha256sum "${sample_root}/prediction_files_sha256.txt" | cut -d ' ' -f 1)
 ledger_transition --state succeeded --exit-code 0 --runtime-seconds "${runtime}" \
   --peak-memory-bytes "${peak_memory}" --peak-disk-bytes "${peak_disk}" \
+  --retained-disk-bytes "${retained_disk}" \
   --output-sha256 "${output_hash}"
 ledger_transition --state validated
+if [[ "${CHAMPHLA_EXECUTION_MODE:-full_scale}" == sequential_low_storage ]]; then
+  "${CHAMPHLA_CODE_ROOT}/scripts/roihu_prune_sample_work.sh" \
+    "${CHAMPHLA_RUN_ROOT}" "${modality}" "${sample_id}"
+fi
 trap - ERR

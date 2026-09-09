@@ -1,0 +1,27 @@
+{
+  "training_source": "1000G eligible-panel out-of-fold predictions only",
+  "minimum_paired_loci": 20,
+  "test": "exact McNemar",
+  "alpha": 0.05,
+  "default_route": "mv",
+  "policy": {
+    "wgs": {
+      "unanimous": "mv",
+      "clear_majority": "cc",
+      "split": "cc",
+      "single_tool": "mv"
+    },
+    "wes": {
+      "unanimous": "mv",
+      "clear_majority": "mv",
+      "split": "mv",
+      "single_tool": "mv"
+    },
+    "rnaseq": {
+      "unanimous": "mv",
+      "clear_majority": "mv",
+      "split": "mv",
+      "single_tool": "mv"
+    }
+  }
+}

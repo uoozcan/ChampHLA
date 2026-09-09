@@ -1,0 +1,9 @@
+{
+  "schema_version": "champhla-compact-artifact-import-1",
+  "imported_at_utc": "2026-09-09T12:01:35Z",
+  "artifact": "models/frozen_raw_cc_policy.json",
+  "source": "/mnt/d/Users/uonur/Downloads/champhla_cc_confirmation_stage/models/frozen_raw_cc_policy.json",
+  "source_sha256": "2e4091488921c7ccf6b94c6fc47686397b15662ca9d52048a87f56b86f576a5d",
+  "destination_sha256": "2e4091488921c7ccf6b94c6fc47686397b15662ca9d52048a87f56b86f576a5d",
+  "truth_boundary": "development-only fitted policy; not independent-validation truth"
+}

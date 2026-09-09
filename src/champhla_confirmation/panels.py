@@ -12,6 +12,7 @@ METHOD_BASELINE = "SimpleTwoThirdsConsensus"
 METHOD_PLURALITY = "SimplePluralityLex"
 METHOD_RAW_CC = "ChampionChallenger"
 METHOD_GUARDED_CC = "TwoThirdsGuardedCC"
+METHOD_MV_FLOOR = "MVFlooredCC"
 
 PRIMARY_METHOD = METHOD_PLURALITY
 PLURALITY_METHOD_VERSION = "pair-plurality-v2"

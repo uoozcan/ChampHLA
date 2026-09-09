@@ -1,0 +1,64 @@
+# CSC Roihu HPC — site-specific parameter overrides for PIHLA / champHLA
+#
+# Usage:
+#   nextflow run main.nf -profile roihu,singularity -params-file conf/roihu_params.yaml [other args]
+#
+# These values are specific to the CSC Roihu environment at project_2008084.
+# Paths are identical to the Puhti layout because the same /scratch and /projappl
+# directory scheme was reproduced on Roihu during migration. The host bind paths
+# (/appl, /usr/lib64/libncursesw.so.6, /usr/lib64/libtinfo.so.6) were verified to
+# exist on Roihu (2026-07-07).
+
+# ── Tool database / index paths ──────────────────────────────────────────────
+hlahd_db:      '/app/hlahd.1.4.0'
+t1k_hlaidx:    '/scratch/project_2008084/hla_references/t1k_hlaidx'
+
+# Reference genome (needed by Locityper; the BAM must be aligned to this build)
+reference_fasta: '/scratch/project_2008084/hla_references/genomes/GRCh38_full_analysis_set_plus_decoy_hla.fa'
+
+# Locityper locus-pangenome DB (built by bin/build_locityper_db.sh, IPD-IMGT/HLA 3.64.0)
+locityper_db:  '/scratch/project_2008084/hla_references/locityper_db'
+
+# Immuannot reference bundle (Data-2024Feb02 from zenodo.org/records/10948964)
+# NOTE: Immuannot needs assembled contigs (--contigs_dir) to run, and the
+# nmdpbioinformatics/immuannot container ships annot.IPD.sh rather than the
+# Immuannot.sh the module calls — reconcile before enabling --tools immuannot.
+immuannot_refdata: '/scratch/project_2008084/hla_references/immuannot_refdata/Data-2024Feb02'
+
+# ── Samtools (host-side binary and wrapper) ──────────────────────────────────
+# samtools_bin_dir: directory containing the host samtools binary.
+#   Bound as: --bind ${samtools_bin_dir}/samtools:/usr/local/bin/samtools
+#   inside HLA-HD and ArcasHLA containers.
+samtools_bin_dir:  '/projappl/project_2008084/bin'
+
+# samtools_wrapper: full path to a samtools wrapper script (Kourami).
+samtools_wrapper:  '/scratch/project_2008084/hla_tools/bin/samtools_wrapper.sh'
+
+# ── Singularity container cache ──────────────────────────────────────────────
+singularity_cache_dir: '/scratch/project_2008084/hla_references/singularity_cache/containers'
+
+# ── Site-specific container bind-mount extras ────────────────────────────────
+# ArcasHLA: bind a writable /tmp inside the container.
+arcashla_container_opts_extra: '--bind /scratch/project_2008084/tmp:/tmp'
+
+# Kourami: bind /appl (CSC module tree) and host ncurses/tinfo shared libraries
+# required by the Kourami container on the RHEL base OS.
+kourami_container_opts_extra: >-
+  --bind /appl:/appl
+  --bind /usr/lib64/libncursesw.so.6:/usr/lib/x86_64-linux-gnu/libncursesw.so.6
+  --bind /usr/lib64/libtinfo.so.6:/usr/lib/x86_64-linux-gnu/libtinfo.so.6
+
+# ── SLURM ────────────────────────────────────────────────────────────────────
+slurm_account:    'project_2008084'
+slurm_partition:  'small'
+
+# The deployed SpecHLA environment is native and separately checksum-pinned.
+use_local_spechla: true
+spechla_path: '/projappl/project_2008084/SpecHLAx'
+
+# Source-data design labels are provenance, not runtime FASTA requirements.
+# RNA callers consume paired FASTQs and their own pinned HLA databases.
+source_designs:
+  wgs: 'GRCh38DH'
+  wes: 'GRCh38DH'
+  rnaseq: 'GRCh37'

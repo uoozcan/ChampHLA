@@ -6,14 +6,17 @@ import re
 import shutil
 import subprocess
 import hashlib
+from collections import defaultdict
 from datetime import datetime, timezone
 import time
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.request import urlopen
 
 from .io import read_json, read_tsv, reject_truth_columns, sha256, write_json, write_tsv
 from .panels import PANELS
 from .parsers import parse_caller_call
+from .manifests import validate_caller_reference_attestation
 
 
 RUN_MANIFEST_FIELDS = (
@@ -29,11 +32,19 @@ INDEPENDENCE_STRATA = {"new_library_overlap", "donor_independent", "not_applicab
 EXPECTED_REFERENCE = {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"}
 HEX64 = re.compile(r"^[0-9a-fA-F]{64}$")
 HEX32 = re.compile(r"^[0-9a-fA-F]{32}$")
+WORKFLOW_FORBIDDEN = (
+    "errorStrategy 'ignore'",
+    "? 'retry' : 'ignore'",
+    "|| true",
+    "No results generated",
+    "(STUB)",
+    "stub:",
+)
 
 RUN_LEDGER_FIELDS = (
     "cohort", "sample_id", "donor_id", "modality", "caller", "state", "job_id",
     "git_commit", "manifest_sha256", "exit_code", "runtime_seconds",
-    "peak_memory_bytes", "peak_disk_bytes", "output_sha256", "attempt",
+    "peak_memory_bytes", "peak_disk_bytes", "retained_disk_bytes", "output_sha256", "attempt",
     "supersedes_job_id", "updated_at_utc",
 )
 STATE_TRANSITIONS = {
@@ -196,7 +207,7 @@ def initialize_run_ledger(manifest_path: str | Path, output: str | Path,
                 "git_commit": commit,
                 "manifest_sha256": audit["source_sha256"], "exit_code": "",
                 "runtime_seconds": "", "peak_memory_bytes": "", "peak_disk_bytes": "",
-                "output_sha256": "", "attempt": "1", "supersedes_job_id": "",
+                "retained_disk_bytes": "", "output_sha256": "", "attempt": "1", "supersedes_job_id": "",
                 "updated_at_utc": "",
             })
     rows.sort(key=lambda row: (row["cohort"], row["modality"], row["sample_id"], row["caller"]))
@@ -262,31 +273,76 @@ def _nearest_rank(values: list[int], quantile: float) -> int:
 
 
 def assess_storage(pilot_ledger: str | Path, targets: dict[str, int],
-                   available_bytes: int, output: str | Path | None = None) -> dict:
+                   available_bytes: int, output: str | Path | None = None,
+                   availability_source: str = "project_allocation",
+                   environment_inventory_sha256: str = "") -> dict:
     rows = read_tsv(pilot_ledger)
     by_modality: dict[str, list[int]] = {}
+    retained_by_modality: dict[str, list[int]] = {}
     for row in rows:
         if row.get("state") not in {"validated", "frozen"}:
             continue
         value = int(row.get("peak_disk_bytes", "0") or 0)
         if value > 0:
             by_modality.setdefault(row["modality"], []).append(value)
-    missing = sorted(modality for modality in targets if not by_modality.get(modality))
+        retained = int(row.get("retained_disk_bytes", "0") or 0)
+        if retained > 0:
+            retained_by_modality.setdefault(row["modality"], []).append(retained)
+    missing = sorted(
+        modality for modality in targets
+        if not by_modality.get(modality) or not retained_by_modality.get(modality)
+    )
     p95 = {modality: _nearest_rank(values, 0.95) for modality, values in by_modality.items()}
+    retained_p95 = {
+        modality: _nearest_rank(values, 0.95)
+        for modality, values in retained_by_modality.items()
+    }
     projected = sum(p95.get(modality, 0) * int(count) for modality, count in targets.items())
+    retained_projected = sum(
+        retained_p95.get(modality, 0) * int(count) for modality, count in targets.items()
+    )
     reserve = 100 * 1024 ** 3
     required = math.ceil(1.25 * projected) + reserve
+    transient_p95 = {
+        modality: max(0, p95.get(modality, 0) - retained_p95.get(modality, 0))
+        for modality in targets
+    }
+    sequential_required = (
+        retained_projected + math.ceil(1.25 * max(transient_p95.values(), default=0)) + reserve
+    )
+    source_valid = availability_source == "project_allocation"
+    full_scale_passed = source_valid and not missing and int(available_bytes) >= required
+    sequential_passed = (
+        source_valid and not missing and int(available_bytes) >= sequential_required
+    )
+    execution_mode = (
+        "full_scale" if full_scale_passed
+        else "sequential_low_storage" if sequential_passed
+        else "blocked"
+    )
     result = {
-        "schema_version": "champhla-roihu-storage-gate-1",
-        "passed": not missing and int(available_bytes) >= required,
+        "schema_version": "champhla-roihu-storage-gate-2",
+        "passed": full_scale_passed or sequential_passed,
+        "full_scale_passed": full_scale_passed,
+        "sequential_low_storage_passed": sequential_passed,
+        "execution_mode": execution_mode,
         "pilot_p95_bytes_by_modality": p95,
+        "pilot_retained_p95_bytes_by_modality": retained_p95,
+        "pilot_transient_p95_bytes_by_modality": transient_p95,
         "targets": targets,
         "projected_peak_bytes": projected,
         "reserve_bytes": reserve,
         "required_available_bytes": required,
+        "sequential_required_available_bytes": sequential_required,
         "observed_available_bytes": int(available_bytes),
+        "availability_source": availability_source,
+        "environment_inventory_sha256": environment_inventory_sha256,
         "missing_pilot_modalities": missing,
-        "policy": "available >= 1.25 * projected peak + 100 GiB reserve",
+        "failures": ([] if source_valid else ["availability must come from project allocation"]),
+        "policy": (
+            "full scale: available >= 1.25 * summed peak + 100 GiB; "
+            "sequential: available >= projected retained + 1.25 * largest transient + 100 GiB"
+        ),
     }
     if output:
         write_json(output, result)
@@ -327,6 +383,115 @@ def build_cleanup_plan(run_root: str | Path, freeze_validation: str | Path,
     return result
 
 
+def directory_tree_identity(path: str | Path) -> dict:
+    """Hash a directory deterministically using POSIX relative paths and file hashes."""
+    root = Path(path).resolve()
+    if not root.is_dir():
+        return {"present": False, "path": root.as_posix(), "files": 0,
+                "bytes": 0, "tree_sha256": "", "failures": ["directory missing"]}
+    digest = hashlib.sha256()
+    total = 0
+    count = 0
+    failures = []
+    for item in sorted(root.rglob("*"), key=lambda value: value.relative_to(root).as_posix()):
+        relative = item.relative_to(root).as_posix()
+        if item.is_symlink():
+            failures.append(f"symlink not permitted in frozen directory: {relative}")
+            continue
+        if not item.is_file():
+            continue
+        file_hash = sha256(item)
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(bytes.fromhex(file_hash))
+        total += item.stat().st_size
+        count += 1
+    return {
+        "present": True, "path": root.as_posix(), "files": count, "bytes": total,
+        "tree_sha256": digest.hexdigest(), "failures": failures,
+    }
+
+
+def validate_workflow_lock(lock_path: str | Path, project_root: str | Path) -> dict:
+    """Validate every vendored execution file and reject masked-success constructs."""
+    path = Path(lock_path)
+    project = Path(project_root).resolve()
+    failures = []
+    if not path.is_file():
+        return {"schema_version": "champhla-workflow-lock-audit-1", "passed": False,
+                "failures": ["workflow lock missing"], "files": 0}
+    lock = read_json(path)
+    if lock.get("schema_version") != "champhla-workflow-lock-1":
+        failures.append("unsupported workflow lock schema")
+    if lock.get("status") != "FROZEN":
+        failures.append("workflow lock is not FROZEN")
+    files = lock.get("files", {})
+    if not isinstance(files, dict) or not files:
+        failures.append("workflow lock has no files")
+        files = {}
+    for relative, expected in sorted(files.items()):
+        candidate = Path(relative)
+        if candidate.is_absolute() or ".." in candidate.parts:
+            failures.append(f"unsafe workflow path: {relative}")
+            continue
+        source = (project / candidate).resolve()
+        try:
+            source.relative_to(project)
+        except ValueError:
+            failures.append(f"workflow path escapes project: {relative}")
+            continue
+        if not source.is_file():
+            failures.append(f"workflow file missing: {relative}")
+            continue
+        observed = sha256(source)
+        if not HEX64.fullmatch(str(expected)) or observed != expected:
+            failures.append(f"workflow hash mismatch: {relative}")
+        if source.suffix in {".nf", ".config"}:
+            content = source.read_text(encoding="utf-8", errors="strict")
+            for token in WORKFLOW_FORBIDDEN:
+                if token in content:
+                    failures.append(f"workflow forbidden token {token!r}: {relative}")
+    required = {
+        "workflow/main.nf", "workflow/nextflow.config", "workflow/conf/roihu_params.yaml",
+        *{f"workflow/modules/{name}.nf" for name in (
+            "arcashla", "bam_to_fastq", "hlahd", "kourami", "optitype",
+            "polysolver", "spechla", "t1k",
+        )},
+    }
+    missing_required = sorted(required - set(files))
+    if missing_required:
+        failures.append(f"required workflow files absent from lock: {missing_required}")
+    return {
+        "schema_version": "champhla-workflow-lock-audit-1",
+        "passed": not failures, "lock_sha256": sha256(path),
+        "files": len(files), "failures": failures,
+    }
+
+
+def freeze_workflow_lock(project_root: str | Path, workflow_root: str | Path,
+                         output: str | Path) -> dict:
+    """Create the immutable lock for the compact, repository-owned workflow."""
+    project = Path(project_root).resolve()
+    workflow = Path(workflow_root).resolve()
+    workflow.relative_to(project)
+    selected = sorted(
+        item for item in workflow.rglob("*")
+        if item.is_file() and item.suffix in {".nf", ".config", ".yaml", ".py"}
+    )
+    files = {item.relative_to(project).as_posix(): sha256(item) for item in selected}
+    payload = {
+        "schema_version": "champhla-workflow-lock-1", "status": "FROZEN",
+        "workflow_root": workflow.relative_to(project).as_posix(), "files": files,
+        "policy": "exact files; POSIX paths; masked-success constructs forbidden",
+    }
+    write_json(output, payload)
+    result = validate_workflow_lock(output, project)
+    if not result["passed"]:
+        Path(output).unlink(missing_ok=True)
+        raise ValueError(f"workflow cannot be frozen: {result['failures']}")
+    return payload
+
+
 def _version(command: str, args: list[str]) -> str:
     path = shutil.which(command)
     if not path:
@@ -334,6 +499,15 @@ def _version(command: str, args: list[str]) -> str:
     completed = subprocess.run([path, *args], capture_output=True, text=True, check=False)
     text = (completed.stdout or completed.stderr).strip().splitlines()
     return text[0] if text else f"exit={completed.returncode}"
+
+
+def _du_bytes(path: Path) -> int:
+    completed = subprocess.run(
+        ["du", "-s", "-B1", str(path)], capture_output=True, text=True, check=False,
+    )
+    if completed.returncode != 0 or not completed.stdout.strip():
+        raise RuntimeError(f"project allocation usage unavailable: {completed.stderr.strip()}")
+    return int(completed.stdout.split()[0])
 
 
 def _repository_identity(project_root: Path) -> dict:
@@ -386,7 +560,29 @@ def inventory_environment(site_config: str | Path, output: str | Path) -> dict:
             }
             if not present:
                 failures.append(f"{group}:{name}:missing")
-    usage = shutil.disk_usage(roots["run_root"] if roots["run_root"].exists() else roots["project_root"])
+    files["reference_directories"] = {}
+    for name, raw_path in config.get("reference_directories", {}).items():
+        record = directory_tree_identity(raw_path)
+        files["reference_directories"][name] = record
+        failures.extend(f"reference_directories:{name}:{failure}"
+                        for failure in record["failures"])
+        if not record["present"]:
+            failures.append(f"reference_directories:{name}:missing")
+    project_storage_config = config.get("project_storage", {})
+    allocation_root = Path(project_storage_config.get("allocation_root", "")).resolve()
+    allocation_bytes = int(project_storage_config.get("allocation_bytes", 0) or 0)
+    try:
+        project_used = _du_bytes(allocation_root) if allocation_root.is_dir() else 0
+    except RuntimeError as error:
+        project_used = 0
+        failures.append(str(error))
+    if not allocation_root.is_dir():
+        failures.append("project_storage:allocation_root_missing")
+    if allocation_bytes <= 0:
+        failures.append("project_storage:allocation_bytes_missing")
+    if project_used > allocation_bytes:
+        failures.append("project_storage:usage_exceeds_declared_allocation")
+    project_free = max(0, allocation_bytes - project_used)
     tools = {
         "python": _version("python3", ["--version"]),
         "samtools": _version("samtools", ["--version"]),
@@ -400,6 +596,11 @@ def inventory_environment(site_config: str | Path, output: str | Path) -> dict:
         wgs_artifacts[caller] = files.get(group, {}).get(caller, {}).get("sha256", "")
     reference_record = files.get("references", {}).get("GRCh38DH", {})
     repository = _repository_identity(roots["project_root"])
+    workflow_lock = validate_workflow_lock(
+        config.get("workflow_lock", ""), roots["project_root"],
+    )
+    if not workflow_lock["passed"]:
+        failures.extend(f"workflow_lock:{failure}" for failure in workflow_lock["failures"])
     for name, version in tools.items():
         if version == "MISSING" or version.startswith("exit="):
             failures.append(f"tool:{name}:missing_or_unusable")
@@ -408,8 +609,22 @@ def inventory_environment(site_config: str | Path, output: str | Path) -> dict:
         failures.append(f"python:expected_{expected_python}:observed_{tools['python']}")
     if not repository["clean"] or repository["missing_tracked_files"]:
         failures.append("repository:not_clean_or_complete")
-    if not config.get("imgt_hla_version"):
-        failures.append("imgt_hla_version:missing")
+    attestation_path = config.get("caller_reference_attestation", "")
+    if not Path(attestation_path).is_file():
+        caller_reference_failures = ["caller-reference attestation missing"]
+    else:
+        caller_reference_failures = validate_caller_reference_attestation(
+            attestation_path, require_ready=True,
+        )
+    failures.extend(f"caller_reference:{failure}" for failure in caller_reference_failures)
+    designs = config.get("reference_designs", {})
+    for modality, expected in EXPECTED_REFERENCE.items():
+        design = designs.get(modality, {})
+        if design.get("source_build") != expected:
+            failures.append(f"reference_design:{modality}:expected_{expected}")
+        runtime_name = design.get("runtime_fasta")
+        if runtime_name and not files.get("references", {}).get(runtime_name, {}).get("present"):
+            failures.append(f"reference_design:{modality}:runtime_fasta_missing")
     result = {
         "schema_version": "champhla-roihu-environment-inventory-1",
         "passed": not failures,
@@ -417,14 +632,28 @@ def inventory_environment(site_config: str | Path, output: str | Path) -> dict:
         "tools": tools,
         "roots": {name: path.as_posix() for name, path in roots.items()},
         "repository": repository,
-        "storage": {"total_bytes": usage.total, "used_bytes": usage.used, "free_bytes": usage.free},
+        "project_storage": {
+            "allocation_root": allocation_root.as_posix(),
+            "allocation_bytes": allocation_bytes,
+            "used_bytes": project_used,
+            "free_bytes": project_free,
+            "accounting": project_storage_config.get("accounting", ""),
+            "filesystem_global_space_ignored": True,
+        },
         "artifacts": files,
         "reference_build": "GRCh38DH",
         "reference_sha256": reference_record.get("sha256", ""),
-        "imgt_hla_version": config.get("imgt_hla_version", ""),
+        "caller_reference_attestation": {
+            "path": str(attestation_path),
+            "sha256": sha256(attestation_path) if Path(attestation_path).is_file() else "",
+            "passed": not caller_reference_failures,
+            "failures": caller_reference_failures,
+        },
         "python_version": tools["python"],
         "samtools_version": tools["samtools"],
         "caller_artifacts": wgs_artifacts,
+        "reference_designs": designs,
+        "workflow_lock": workflow_lock,
         "failures": failures,
     }
     write_json(output, result)
@@ -539,6 +768,129 @@ def build_nci60_run_manifest(pilot_path: str | Path, ena_report_path: str | Path
     audit = audit_run_manifest(output)
     if not audit["passed"]:
         raise ValueError(f"generated NCI-60 manifest failed: {audit['failures']}")
+    return audit
+
+
+def resolve_same_resource_index_checksums(roster_path: str | Path,
+                                          assay_manifest_path: str | Path,
+                                          output: str | Path) -> dict:
+    """Stream only missing public CRAI files and freeze both MD5 and SHA-256."""
+    roster = read_tsv(roster_path)
+    reject_truth_columns(roster, "same-resource truth-free roster")
+    keys = {(row.get("subject", ""), row.get("modality", "").lower()) for row in roster}
+    records = []
+    for row in read_tsv(assay_manifest_path):
+        key = (row.get("sample_id", ""), row.get("modality", "").lower())
+        if key not in keys or key[1] == "rnaseq" or row.get("index_md5", ""):
+            continue
+        uri = row.get("index_url", "")
+        if not uri:
+            raise ValueError(f"{key}: missing public index URI")
+        md5 = hashlib.md5()
+        sha = hashlib.sha256()
+        total = 0
+        with urlopen(uri, timeout=120) as response:
+            while True:
+                chunk = response.read(1024 * 1024)
+                if not chunk:
+                    break
+                md5.update(chunk)
+                sha.update(chunk)
+                total += len(chunk)
+        if total == 0:
+            raise ValueError(f"{key}: empty public index response")
+        records.append({
+            "sample_id": key[0], "modality": key[1], "index_uri": uri,
+            "bytes": total, "md5": md5.hexdigest(), "sha256": sha.hexdigest(),
+        })
+    records.sort(key=lambda row: (row["modality"], row["sample_id"]))
+    write_tsv(output, records, ["sample_id", "modality", "index_uri", "bytes", "md5", "sha256"])
+    return {"records": len(records), "output_sha256": sha256(output), "truth_blind": True}
+
+
+def build_same_resource_run_manifest(roster_path: str | Path, assay_manifest_path: str | Path,
+                                     ena_report_path: str | Path,
+                                     index_checksums_path: str | Path, output: str | Path) -> dict:
+    """Build the exact corrected 1000G run manifest without reading joined truth."""
+    roster = read_tsv(roster_path)
+    reject_truth_columns(roster, "same-resource truth-free roster")
+    expected = {"wgs": 137, "wes": 130, "rnaseq": 107}
+    observed = {
+        modality: len({row.get("subject", "") for row in roster
+                       if row.get("modality", "").lower() == modality})
+        for modality in expected
+    }
+    if observed != expected:
+        raise ValueError(f"same-resource roster counts differ: expected {expected}, observed {observed}")
+    roster_keys = [(row.get("subject", ""), row.get("modality", "").lower()) for row in roster]
+    if len(roster_keys) != len(set(roster_keys)):
+        raise ValueError("same-resource roster contains duplicate subject/modality rows")
+
+    assay_by_key: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
+    for row in read_tsv(assay_manifest_path):
+        assay_by_key[(row.get("sample_id", ""), row.get("modality", "").lower())].append(row)
+    ena_by_run = {row.get("run_accession", ""): row for row in read_tsv(ena_report_path)}
+    ena_by_subject: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in ena_by_run.values():
+        uris = _split(row.get("submitted_ftp", ""))
+        if uris:
+            basename = Path(urlparse(uris[0]).path).name
+            ena_by_subject[basename.split(".", 1)[0]].append(row)
+    index_checksums = {
+        (row.get("sample_id", ""), row.get("modality", "").lower()): row
+        for row in read_tsv(index_checksums_path)
+    }
+    rows = []
+    for source in sorted(roster, key=lambda row: (row["modality"], row["subject"])):
+        subject = source["subject"]
+        modality = source["modality"].lower()
+        candidates = assay_by_key.get((subject, modality), [])
+        if modality != "rnaseq" and len(candidates) != 1:
+            raise ValueError(f"{subject}:{modality}: expected one official assay record, observed {len(candidates)}")
+        assay = candidates[0] if candidates else {}
+        if modality == "rnaseq":
+            accession = assay.get("source_record", "")
+            ena = ena_by_run.get(accession) if accession else None
+            if not ena:
+                subject_runs = ena_by_subject.get(subject, [])
+                if len(subject_runs) != 1:
+                    raise ValueError(f"{subject}: expected one ENA RNA run, observed {len(subject_runs)}")
+                ena = subject_runs[0]
+            uris = _split(ena.get("submitted_ftp", ""))
+            checksums = _split(ena.get("submitted_md5", ""))
+            if len(uris) != 2 or len(checksums) != 2:
+                raise ValueError(f"{subject}: ENA submitted FASTQ pair/checksums incomplete")
+            input_type = "fastq_pair"
+            input_uri = ";".join(uri if "://" in uri else f"https://{uri}" for uri in uris)
+            source_checksum = ";".join(f"md5:{value}" for value in checksums)
+            index_uri = index_checksum = ""
+        else:
+            if assay.get("format", "").lower() != "cram":
+                raise ValueError(f"{subject}:{modality}: expected full CRAM source")
+            input_type = "cram"
+            input_uri = assay.get("input_url", "")
+            index_uri = assay.get("index_url", "")
+            source_checksum = f"md5:{assay.get('input_md5', '')}"
+            index_md5 = assay.get("index_md5", "")
+            if not index_md5:
+                resolved = index_checksums.get((subject, modality), {})
+                if resolved.get("index_uri") != index_uri:
+                    raise ValueError(f"{subject}:{modality}: frozen index checksum missing or URI differs")
+                index_md5 = resolved.get("md5", "")
+            index_checksum = f"md5:{index_md5}"
+        rows.append({
+            "cohort": "1000G_SAME_RESOURCE", "sample_id": subject, "donor_id": subject,
+            "modality": modality, "input_type": input_type, "input_uri": input_uri,
+            "index_uri": index_uri, "index_checksum": index_checksum,
+            "source_checksum": source_checksum,
+            "reference_build": EXPECTED_REFERENCE[modality], "read_layout": "paired",
+            "independence_stratum": "new_library_overlap",
+            "evidence_role": "same_resource_confirmation",
+        })
+    write_tsv(output, rows, list(RUN_MANIFEST_FIELDS))
+    audit = audit_run_manifest(output)
+    if not audit["passed"]:
+        raise ValueError(f"generated same-resource manifest failed: {audit['failures']}")
     return audit
 
 

@@ -3,6 +3,10 @@
   "paths": {
     "amendment": "decisions/20260908_consensus_primary_amendment.json",
     "comparator_manifest": "configs/comparator_manifest.json",
+    "caller_reference_attestation": "configs/roihu_caller_reference_attestation.json",
+    "workflow_lock": "configs/roihu_workflow_lock.json",
+    "same_resource_manifest_freeze": "cohorts/same_resource_truth_free.freeze.json",
+    "nci60_manifest_freeze": "cohorts/nci60_rna_truth_free.freeze.json",
     "corrected_evaluation": "artifacts/corrected/evaluation/confirmation_decision.json",
     "independent_evaluation": "artifacts/independent/evaluation/confirmation_decision.json",
     "wgs_audit": "artifacts/corrected/wgs_audit/wgs_audit_summary.json",

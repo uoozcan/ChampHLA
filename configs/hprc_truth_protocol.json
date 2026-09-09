@@ -1,15 +1,34 @@
 {
-  "schema_version": "champhla-hprc-assembly-truth-protocol-1",
+  "schema_version": "champhla-hprc-assembly-truth-protocol-2",
   "status": "PREPARED_NOT_FROZEN",
   "target_subjects": 120,
   "assembly_access": {
     "format": "AGC",
-    "official_archive": "https://s3-us-west-2.amazonaws.com/human-pangenomics/index.html?prefix=working/HPRC/HPRC-Release2/",
+    "official_archive": "https://s3-us-west-2.amazonaws.com/human-pangenomics/working/HPRC/HPRC-Release2/assemblies/",
+    "archive_artifact_sha256": "REQUIRED_BEFORE_EXECUTION",
     "storage_policy": "extract one subject's two haplotypes at a time; retain source archive checksum and per-haplotype hashes"
   },
   "methods": [
-    {"method": "HLA-ASM", "version": "VERIFY_ON_ROIHU", "artifact_sha256": "REQUIRED_BEFORE_EXECUTION"},
-    {"method": "Immuannot", "version": "VERIFY_ON_ROIHU", "artifact_sha256": "REQUIRED_BEFORE_EXECUTION"}
+    {
+      "method": "HLA-ASM",
+      "version": "VERIFY_ON_ROIHU",
+      "source_commit": "REQUIRED_BEFORE_EXECUTION",
+      "artifact_sha256": "REQUIRED_BEFORE_EXECUTION",
+      "wrapper_sha256": "REQUIRED_BEFORE_EXECUTION",
+      "reference_artifacts": [
+        {"artifact_id": "HLA-ASM graph/database bundle", "sha256": "REQUIRED_BEFORE_EXECUTION"}
+      ]
+    },
+    {
+      "method": "Immuannot",
+      "version": "VERIFY_ON_ROIHU",
+      "source_commit": "REQUIRED_BEFORE_EXECUTION",
+      "artifact_sha256": "REQUIRED_BEFORE_EXECUTION",
+      "wrapper_sha256": "REQUIRED_BEFORE_EXECUTION",
+      "reference_artifacts": [
+        {"artifact_id": "Immuannot HLA reference bundle", "sha256": "REQUIRED_BEFORE_EXECUTION"}
+      ]
+    }
   ],
   "acceptance": {
     "required_haplotypes": ["1", "2"],
@@ -20,5 +39,5 @@
     "equally_supported_conflict_allowed": false
   },
   "firewall": "assembly outputs and truth remain unreadable to the short-read prediction workflow until its freeze validates",
-  "execution_gate": "Do not submit assembly typing until both methods and the AGC archive are checksum-pinned and status is FROZEN."
+  "execution_gate": "Submission validates exact method, wrapper, reference, and AGC hashes and requires status FROZEN."
 }

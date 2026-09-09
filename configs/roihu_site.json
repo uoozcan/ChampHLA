@@ -1,7 +1,7 @@
 {
   "schema_version": "champhla-roihu-site-1",
   "account": "project_2008084",
-  "imgt_hla_version": "3.59.0",
+  "caller_reference_attestation": "/scratch/project_2008084/champhla_plurality/configs/roihu_caller_reference_attestation.json",
   "roots": {
     "project_root": "/scratch/project_2008084/champhla_plurality",
     "run_root": "/scratch/project_2008084/champhla_plurality_runs",
@@ -9,10 +9,24 @@
     "truth_root": "/scratch/project_2008084/champhla_plurality_truth",
     "reference_root": "/scratch/project_2008084/hla_references",
     "container_root": "/scratch/project_2008084/hla_references/singularity_cache/containers",
-    "pipeline_root": "/scratch/project_2008084/pihla-publish"
+    "pipeline_root": "/scratch/project_2008084/champhla_plurality/workflow"
+  },
+  "project_storage": {
+    "allocation_root": "/scratch/project_2008084",
+    "allocation_bytes": 268435456000,
+    "accounting": "declared_project_allocation_minus_du_bytes",
+    "note": "250 GiB CSC project allocation; filesystem-global free space is never used for scaling"
   },
   "references": {
     "GRCh38DH": "/scratch/project_2008084/hla_references/genomes/GRCh38_full_analysis_set_plus_decoy_hla.fa"
+  },
+  "reference_directories": {
+    "T1K_HLA_INDEX": "/scratch/project_2008084/hla_references/t1k_hlaidx"
+  },
+  "reference_designs": {
+    "wgs": {"source_build": "GRCh38DH", "runtime_fasta": "GRCh38DH"},
+    "wes": {"source_build": "GRCh38DH", "runtime_fasta": "GRCh38DH"},
+    "rnaseq": {"source_build": "GRCh37", "runtime_fasta": null}
   },
   "containers": {
     "HLA-HD": "/scratch/project_2008084/hla_references/singularity_cache/containers/hlahd.sif",
@@ -23,9 +37,10 @@
     "arcasHLA": "/scratch/project_2008084/hla_references/singularity_cache/containers/arcashla.sif"
   },
   "software": {
-    "pipeline": "/scratch/project_2008084/pihla-publish/main.nf",
+    "pipeline": "/scratch/project_2008084/champhla_plurality/workflow/main.nf",
     "SpecHLA": "/projappl/project_2008084/SpecHLAx/script/whole/SpecHLA.sh"
   },
+  "workflow_lock": "/scratch/project_2008084/champhla_plurality/configs/roihu_workflow_lock.json",
   "modules": ["bio-apps/v202603", "samtools/1.21", "nextflow/25.10.2-standalone"],
   "production_python": "3.11.15",
   "public_data_only": true

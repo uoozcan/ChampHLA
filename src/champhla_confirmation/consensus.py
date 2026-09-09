@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from pathlib import Path
 
-from .io import canonical_pair, is_callable, normalize_gene, normalize_modality, reject_truth_columns
+from .io import (
+    canonical_pair, is_callable, normalize_gene, normalize_modality, read_json,
+    reject_truth_columns, sha256,
+)
 from .panels import (
     METHOD_BASELINE,
     METHOD_GUARDED_CC,
+    METHOD_MV_FLOOR,
     METHOD_PLURALITY,
     METHOD_RAW_CC,
     PANELS,
@@ -167,3 +172,78 @@ def build_guarded_cc(caller_rows: list[dict[str, str]], raw_cc_rows: list[dict[s
             "raw_cc_same_call": int(cc_pair == pair) if cc_pair and pair else 0,
         })
     return consensus_rows + output
+
+
+def build_mv_floored_cc(caller_rows: list[dict[str, str]], raw_cc_rows: list[dict[str, str]],
+                        policy_path: str | Path) -> list[dict]:
+    """Apply the frozen MV-floor routing policy without reading truth.
+
+    The historical policy chooses between raw Champion–Challenger and plurality
+    within a vote stratum. Missing raw-CC output always falls back to plurality;
+    it never creates a synthetic success or an inferred genotype.
+    """
+    reject_truth_columns(caller_rows, "MV-floor caller input")
+    reject_truth_columns(raw_cc_rows, "MV-floor raw method input")
+    policy = read_json(policy_path)
+    routes = policy.get("policy", {})
+    if policy.get("default_route") not in {"mv", "cc"}:
+        raise ValueError("MV-floor policy has no valid default_route")
+
+    consensus_rows = build_consensus(caller_rows)
+    plurality = {_key(row): row for row in consensus_rows if row["method"] == METHOD_PLURALITY}
+    raw = {}
+    for row in raw_cc_rows:
+        if row.get("method", METHOD_RAW_CC) != METHOD_RAW_CC:
+            continue
+        key = _key(row)
+        if key in raw:
+            raise ValueError(f"duplicate raw CC row at {key}")
+        raw[key] = row
+    unknown = set(raw) - set(plurality)
+    if unknown:
+        raise ValueError(f"raw CC contains {len(unknown)} loci absent from caller universe")
+
+    output = []
+    audit_fields = (
+        "cohort", "subject", "superpopulation", "modality", "gene", "callable_tools",
+        "complete_tools", "partial_tools", "missing_tools", "partial_callers",
+        "top_support", "support_fraction", "supporting_callers", "tie_at_top",
+        "tied_pairs", "source_hashes",
+    )
+    for key in sorted(plurality):
+        top = plurality[key]
+        complete = int(top["complete_tools"])
+        support = int(top["top_support"])
+        if complete <= 1:
+            stratum = "single_tool"
+        elif support == complete:
+            stratum = "unanimous"
+        elif int(top["tie_at_top"]):
+            stratum = "split"
+        elif support * 2 > complete:
+            stratum = "clear_majority"
+        else:
+            stratum = "split"
+        route = routes.get(key[2], {}).get(stratum, policy["default_route"])
+        if route not in {"mv", "cc"}:
+            raise ValueError(f"invalid MV-floor route {route!r} for {key[2]}:{stratum}")
+        cc = raw.get(key)
+        cc_callable = bool(cc and is_callable(cc))
+        selected = cc if route == "cc" and cc_callable else top
+        callable_selected = is_callable(selected)
+        output.append({
+            **{field: top[field] for field in audit_fields},
+            "method": METHOD_MV_FLOOR,
+            "method_version": "mv-floor-frozen-policy-v1",
+            "policy_sha256": sha256(policy_path),
+            "allele1": selected["allele1"] if callable_selected else "",
+            "allele2": selected["allele2"] if callable_selected else "",
+            "call_status": "callable" if callable_selected else "no_evidence",
+            "vote_stratum": stratum,
+            "selected_route": route if route == "mv" or cc_callable else "mv_fallback",
+            "decision_reason": (
+                f"frozen_policy_{route}_{stratum}" if route == "mv" or cc_callable
+                else f"raw_cc_missing_plurality_fallback_{stratum}"
+            ),
+        })
+    return output

@@ -5,7 +5,11 @@ from pathlib import Path
 
 from champhla_confirmation.freeze import validate_freeze
 from champhla_confirmation.io import read_json
-from champhla_confirmation.manifests import validate_comparator_manifest
+from champhla_confirmation.manifests import (
+    validate_caller_reference_attestation,
+    validate_comparator_manifest,
+)
+from champhla_confirmation.roihu import validate_workflow_lock
 
 from .registry import validate_registry
 from .io import write_json
@@ -37,6 +41,41 @@ def audit_release_readiness(root: str, config_path: str, output: str) -> dict:
         "passed": not comparator_failures,
         "evidence": paths["comparator_manifest"],
         "failures": comparator_failures,
+    }
+
+    caller_reference_path = project / paths["caller_reference_attestation"]
+    caller_reference_failures = (
+        validate_caller_reference_attestation(str(caller_reference_path), True)
+        if caller_reference_path.is_file() else ["attestation missing"]
+    )
+    gates["caller_reference_provenance"] = {
+        "passed": not caller_reference_failures,
+        "evidence": paths["caller_reference_attestation"],
+        "failures": caller_reference_failures,
+    }
+
+    workflow_path = project / paths["workflow_lock"]
+    workflow = (validate_workflow_lock(workflow_path, project)
+                if workflow_path.is_file() else {"passed": False, "failures": ["lock missing"]})
+    gates["frozen_workflow"] = {
+        "passed": bool(workflow["passed"]), "evidence": paths["workflow_lock"],
+        "failures": workflow["failures"],
+    }
+
+    run_manifest = _json(project, paths["same_resource_manifest_freeze"])
+    gates["frozen_same_resource_manifest"] = {
+        "passed": bool(run_manifest.get("frozen")) and bool(run_manifest.get("passed"))
+        and run_manifest.get("expected_samples_by_modality") == {"wgs": 137, "wes": 130, "rnaseq": 107}
+        and run_manifest.get("expected_caller_locus_records") == 5289
+        and run_manifest.get("expected_plurality_rows") == 1122,
+        "evidence": paths["same_resource_manifest_freeze"],
+    }
+
+    nci60 = _json(project, paths["nci60_manifest_freeze"])
+    gates["frozen_nci60_exploratory_manifest"] = {
+        "passed": bool(nci60.get("frozen")) and nci60.get("expected_samples_by_modality") == {"rnaseq": 11},
+        "evidence": paths["nci60_manifest_freeze"],
+        "required_for_benchmark_release": False,
     }
 
     evaluation = _json(project, paths["corrected_evaluation"])
@@ -112,7 +151,8 @@ def audit_release_readiness(root: str, config_path: str, output: str) -> dict:
     gates["clean_git_state"] = {"passed": not dirty, "evidence": "git status --porcelain"}
 
     benchmark_gate_names = {
-        "signed_amendment", "frozen_comparators", "corrected_three_modality_evaluation",
+        "signed_amendment", "frozen_comparators", "caller_reference_provenance",
+        "frozen_workflow", "frozen_same_resource_manifest", "corrected_three_modality_evaluation",
         "wgs_technical_and_human_review", "truth_blind_prediction_freeze",
         "one_time_truth_join", "registry_row_validation", "count_reconciliation",
         "main_claim_audit", "supplement_claim_audit", "clean_git_state",

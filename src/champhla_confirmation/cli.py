@@ -6,14 +6,14 @@ from pathlib import Path
 
 from .audit import audit_wgs
 from .cohorts import build_overlap_crosswalk
-from .consensus import build_consensus, build_guarded_cc
+from .consensus import build_consensus, build_guarded_cc, build_mv_floored_cc
 from .dataset_discovery import audit_dataset_discovery_registry
 from .evaluation import capacity, evaluate, join_truth
 from .external import build_hprc_release2_candidates, select_hprc_confirmation_roster
 from .freeze import freeze_bundle, validate_freeze
 from .hprc_truth import build_hprc_assembly_truth
 from .io import read_json, read_tsv, reject_truth_columns, sha256, write_json, write_tsv
-from .manifests import validate_comparator_manifest
+from .manifests import validate_comparator_manifest, validate_hprc_truth_protocol
 from .panels import (
     METHOD_GUARDED_CC,
     METHOD_PLURALITY,
@@ -36,11 +36,15 @@ from .roihu import (
     build_cleanup_plan,
     build_hprc_run_manifest,
     build_nci60_run_manifest,
+    build_same_resource_run_manifest,
+    resolve_same_resource_index_checksums,
     collect_run_outputs,
+    freeze_workflow_lock,
     freeze_run_manifest,
     initialize_run_ledger,
     inventory_environment,
     transition_run_sample,
+    validate_workflow_lock,
 )
 from .schema import (
     explode_candidate_rows,
@@ -73,6 +77,7 @@ def run_truth_blind_predictions_main() -> int:
     raw_group.add_argument("--raw-cc")
     raw_group.add_argument("--raw-cc-policy")
     parser.add_argument("--secondary")
+    parser.add_argument("--mvfloor-policy", help="frozen truth-free MV-floor routing policy")
     parser.add_argument("--predictions", required=True)
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--cohort-default", default="")
@@ -95,6 +100,10 @@ def run_truth_blind_predictions_main() -> int:
     predictions = build_guarded_cc(calls, raw_cc) if raw_cc else build_consensus(calls)
     if raw_cc:
         predictions.extend(raw_cc)
+        if args.mvfloor_policy:
+            predictions.extend(build_mv_floored_cc(calls, raw_cc, args.mvfloor_policy))
+    elif args.mvfloor_policy:
+        raise ValueError("--mvfloor-policy requires --raw-cc or --raw-cc-policy")
     for row in calls:
         predictions.append({
             "cohort": row["cohort"], "subject": row["subject"],
@@ -133,6 +142,8 @@ def run_truth_blind_predictions_main() -> int:
         "plurality_rows": len(plurality_rows),
         "plurality_no_evidence_loci": sum(row["call_status"] != "callable" for row in plurality_rows),
         "raw_cc_included": bool(raw_cc),
+        "mvfloor_included": bool(raw_cc and args.mvfloor_policy),
+        "mvfloor_policy_sha256": sha256(args.mvfloor_policy) if args.mvfloor_policy else "",
         "always_emit_guarded_cc": bool(guarded_rows) and all(row["call_status"] == "callable" for row in guarded_rows),
         "guarded_no_evidence_loci": sum(row["call_status"] != "callable" for row in guarded_rows),
         "homozygosity_guard_primary": False,
@@ -442,13 +453,21 @@ def transition_run_ledger_main() -> int:
     parser.add_argument("--runtime-seconds", default="")
     parser.add_argument("--peak-memory-bytes", default="")
     parser.add_argument("--peak-disk-bytes", default="")
+    parser.add_argument("--retained-disk-bytes", default="")
     parser.add_argument("--output-sha256", default="")
+    parser.add_argument("--job-id", default="")
+    parser.add_argument("--attempt", default="")
+    parser.add_argument("--supersedes-job-id", default="")
     args = parser.parse_args()
     updates = {
         key: value for key, value in {
             "exit_code": args.exit_code, "runtime_seconds": args.runtime_seconds,
             "peak_memory_bytes": args.peak_memory_bytes,
-            "peak_disk_bytes": args.peak_disk_bytes, "output_sha256": args.output_sha256,
+            "peak_disk_bytes": args.peak_disk_bytes,
+            "retained_disk_bytes": args.retained_disk_bytes,
+            "output_sha256": args.output_sha256,
+            "job_id": args.job_id, "attempt": args.attempt,
+            "supersedes_job_id": args.supersedes_job_id,
         }.items() if value != ""
     }
     transition_run_sample(
@@ -467,15 +486,46 @@ def audit_roihu_environment_main() -> int:
     return 0 if result["passed"] else 2
 
 
+def freeze_workflow_lock_main() -> int:
+    parser = argparse.ArgumentParser(description="Freeze the repository-owned Roihu workflow")
+    parser.add_argument("--project-root", required=True)
+    parser.add_argument("--workflow-root", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = freeze_workflow_lock(args.project_root, args.workflow_root, args.output)
+    print(f"workflow lock frozen files={len(result['files'])}")
+    return 0
+
+
+def validate_workflow_lock_main() -> int:
+    parser = argparse.ArgumentParser(description="Validate the frozen Roihu workflow lock")
+    parser.add_argument("--project-root", required=True)
+    parser.add_argument("--lock", required=True)
+    parser.add_argument("--output")
+    args = parser.parse_args()
+    result = validate_workflow_lock(args.lock, args.project_root)
+    if args.output:
+        write_json(args.output, result)
+    print(f"workflow lock passed={result['passed']} files={result['files']}")
+    return 0 if result["passed"] else 2
+
+
 def assess_roihu_storage_main() -> int:
     parser = argparse.ArgumentParser(description="Apply the pilot-derived Roihu storage gate")
     parser.add_argument("--pilot-ledger", required=True)
     parser.add_argument("--targets", required=True, help="JSON mapping modality to sample count")
-    parser.add_argument("--available-bytes", required=True, type=int)
+    parser.add_argument("--environment-inventory", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
+    inventory = read_json(args.environment_inventory)
+    if not inventory.get("passed"):
+        raise ValueError("storage gate requires a passed environment inventory")
+    project_storage = inventory.get("project_storage", {})
+    if not project_storage.get("filesystem_global_space_ignored"):
+        raise ValueError("environment inventory does not contain project-allocation accounting")
     result = assess_storage(
-        args.pilot_ledger, read_json(args.targets), args.available_bytes, args.output,
+        args.pilot_ledger, read_json(args.targets), project_storage.get("free_bytes", 0),
+        args.output, "project_allocation", sha256(args.environment_inventory),
     )
     print(f"storage gate passed={result['passed']} required={result['required_available_bytes']}")
     return 0 if result["passed"] else 2
@@ -526,6 +576,34 @@ def build_nci60_run_manifest_main() -> int:
     return 0
 
 
+def build_same_resource_run_manifest_main() -> int:
+    parser = argparse.ArgumentParser(description="Build the exact truth-free 1000G rerun manifest")
+    parser.add_argument("--roster", required=True)
+    parser.add_argument("--assay-manifest", required=True)
+    parser.add_argument("--ena-report", required=True)
+    parser.add_argument("--index-checksums", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = build_same_resource_run_manifest(
+        args.roster, args.assay_manifest, args.ena_report, args.index_checksums, args.output,
+    )
+    print(f"same-resource run manifest passed={result['passed']} rows={result['rows']}")
+    return 0
+
+
+def resolve_same_resource_index_checksums_main() -> int:
+    parser = argparse.ArgumentParser(description="Stream and hash missing same-resource CRAI files")
+    parser.add_argument("--roster", required=True)
+    parser.add_argument("--assay-manifest", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = resolve_same_resource_index_checksums(
+        args.roster, args.assay_manifest, args.output,
+    )
+    print(f"resolved public index checksums={result['records']}")
+    return 0
+
+
 def build_hprc_run_manifest_main() -> int:
     parser = argparse.ArgumentParser(description="Build the frozen 120-subject HPRC WGS manifest")
     parser.add_argument("--roster", required=True)
@@ -534,3 +612,17 @@ def build_hprc_run_manifest_main() -> int:
     result = build_hprc_run_manifest(args.roster, args.output)
     print(f"HPRC run manifest passed={result['passed']} rows={result['rows']}")
     return 0
+
+
+def validate_hprc_truth_protocol_main() -> int:
+    parser = argparse.ArgumentParser(description="Validate pinned HPRC assembly-truth execution inputs")
+    parser.add_argument("--protocol", required=True)
+    parser.add_argument("--allow-draft", action="store_true")
+    parser.add_argument("--output")
+    args = parser.parse_args()
+    failures = validate_hprc_truth_protocol(args.protocol, not args.allow_draft)
+    result = {"passed": not failures, "failures": failures, "protocol_sha256": sha256(args.protocol)}
+    if args.output:
+        write_json(args.output, result)
+    print(f"HPRC truth protocol passed={not failures} failures={len(failures)}")
+    return 0 if not failures else 2

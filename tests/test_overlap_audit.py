@@ -16,7 +16,7 @@ class OverlapAuditTests(unittest.TestCase):
         path = root / "environment.json"
         write_json(path, {
             "reference_build": "GRCh38DH", "reference_sha256": "fixture",
-            "imgt_hla_version": "3.59.0", "python_version": "3.11.15",
+            "caller_reference_attestation": {"passed": True}, "python_version": "3.11.15",
             "samtools_version": "1.21",
             "caller_artifacts": {caller: f"sha256:{caller}" for caller in PANELS["wgs"]},
         })

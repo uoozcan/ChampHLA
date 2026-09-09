@@ -13,10 +13,14 @@ from champhla_confirmation.roihu import (
     assess_storage,
     build_cleanup_plan,
     build_nci60_run_manifest,
+    build_same_resource_run_manifest,
+    directory_tree_identity,
+    freeze_workflow_lock,
     initialize_run_ledger,
     freeze_run_manifest,
     transition_run_record,
     transition_run_sample,
+    validate_workflow_lock,
 )
 from champhla_recovery.recount import independent_recount
 
@@ -56,6 +60,15 @@ def test_truth_free_manifest_and_ledger(tmp_path: Path):
         running, "succeeded", exit_code="0", output_sha256="c" * 64,
     )
     assert transition_run_record(succeeded, "validated")["state"] == "validated"
+
+    failed = transition_run_record(running, "failed", exit_code="1")
+    with pytest.raises(ValueError, match="supersedes_job_id"):
+        transition_run_record(failed, "resubmitted", job_id="2", attempt="2")
+    retried = transition_run_record(
+        failed, "resubmitted", job_id="2", attempt="2", supersedes_job_id="1",
+    )
+    assert retried["attempt"] == "2"
+    assert retried["supersedes_job_id"] == "1"
     frozen = freeze_run_manifest(manifest, tmp_path / "freeze.json", {"wes": 1})
     assert frozen["expected_caller_locus_records"] == 15
     assert frozen["expected_plurality_rows"] == 3
@@ -93,11 +106,28 @@ def test_storage_and_cleanup_are_fail_closed(tmp_path: Path):
     rows = []
     for modality in ("wgs", "wes", "rnaseq"):
         row = {field: "" for field in RUN_LEDGER_FIELDS}
-        row.update({"modality": modality, "state": "validated", "peak_disk_bytes": "1000"})
+        row.update({
+            "modality": modality, "state": "validated",
+            "peak_disk_bytes": "1000", "retained_disk_bytes": "500",
+        })
         rows.append(row)
     write_tsv(ledger, rows, list(RUN_LEDGER_FIELDS))
     result = assess_storage(ledger, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3)
     assert result["passed"] is True
+    assert result["execution_mode"] == "full_scale"
+    assert result["availability_source"] == "project_allocation"
+    rejected = assess_storage(
+        ledger, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3,
+        availability_source="filesystem_global",
+    )
+    assert rejected["passed"] is False
+    low_space = assess_storage(
+        ledger, {"wgs": 1_000_000, "wes": 1, "rnaseq": 1},
+        100 * 1024 ** 3 + 600_000_000,
+    )
+    assert low_space["full_scale_passed"] is False
+    assert low_space["sequential_low_storage_passed"] is True
+    assert low_space["execution_mode"] == "sequential_low_storage"
     run_root = tmp_path / "run"
     (run_root / "work").mkdir(parents=True)
     (run_root / "work" / "temporary").write_text("x")
@@ -176,3 +206,77 @@ def test_nci60_builder_requires_exact_ready_roster_and_checksums(tmp_path: Path)
     assert result["passed"] is True
     assert result["samples_by_modality"] == {"rnaseq": 11}
     assert all(row["evidence_role"] == "exploratory" for row in read_tsv(output))
+
+
+def test_same_resource_builder_has_exact_truth_free_production_matrix(tmp_path: Path):
+    root = Path(__file__).resolve().parents[1]
+    output = tmp_path / "same_resource.tsv"
+    roster_keys = {
+        (row["subject"], row["modality"]) for row in read_tsv(
+            root / "cohorts" / "same_resource_truth_free_roster.tsv"
+        )
+    }
+    index_rows = [
+        {"sample_id": row["sample_id"], "modality": row["modality"],
+         "index_uri": row["index_url"], "bytes": "1", "md5": "c" * 32,
+         "sha256": "d" * 64}
+        for row in read_tsv(root / "cohorts" / "official_1000g_assay_manifest.tsv")
+        if (row["sample_id"], row["modality"]) in roster_keys
+        and row["modality"] != "rnaseq" and not row["index_md5"]
+    ]
+    index_registry = tmp_path / "index_checksums.tsv"
+    write_tsv(index_registry, index_rows)
+    result = build_same_resource_run_manifest(
+        root / "cohorts" / "same_resource_truth_free_roster.tsv",
+        root / "cohorts" / "official_1000g_assay_manifest.tsv",
+        root / "cohorts" / "sources" / "geuvadis_ena_fastq_report.tsv",
+        index_registry,
+        output,
+    )
+    assert result["passed"] is True
+    assert result["samples_by_modality"] == {"wgs": 137, "wes": 130, "rnaseq": 107}
+    frozen = freeze_run_manifest(
+        output, tmp_path / "same_resource.freeze.json",
+        {"wgs": 137, "wes": 130, "rnaseq": 107},
+    )
+    assert frozen["expected_caller_locus_records"] == 5289
+    assert frozen["expected_plurality_rows"] == 1122
+    assert all(row["evidence_role"] == "same_resource_confirmation" for row in read_tsv(output))
+
+
+def test_directory_tree_hash_uses_posix_relative_paths(tmp_path: Path):
+    root = tmp_path / "reference"
+    (root / "nested").mkdir(parents=True)
+    (root / "nested" / "a.txt").write_text("A\n", encoding="utf-8")
+    first = directory_tree_identity(root)
+    assert first["present"] is True
+    assert first["files"] == 1
+    assert len(first["tree_sha256"]) == 64
+    (root / "nested" / "a.txt").write_text("B\n", encoding="utf-8")
+    assert directory_tree_identity(root)["tree_sha256"] != first["tree_sha256"]
+
+
+def test_workflow_lock_detects_changes_and_masked_success(tmp_path: Path):
+    project = tmp_path / "project"
+    workflow = project / "workflow"
+    (workflow / "modules").mkdir(parents=True)
+    (workflow / "conf").mkdir()
+    required = {
+        "main.nf": "nextflow.enable.dsl = 2\n",
+        "nextflow.config": "process.errorStrategy = 'terminate'\n",
+        "conf/roihu_params.yaml": "hlahd_db: /app/hlahd.1.4.0\n",
+    }
+    for module in ("arcashla", "bam_to_fastq", "hlahd", "kourami", "optitype",
+                   "polysolver", "spechla", "t1k"):
+        required[f"modules/{module}.nf"] = f"process {module.upper()} {{ script: 'exit 0' }}\n"
+    for relative, content in required.items():
+        target = workflow / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content, encoding="utf-8")
+    lock = project / "lock.json"
+    freeze_workflow_lock(project, workflow, lock)
+    assert validate_workflow_lock(lock, project)["passed"] is True
+    (workflow / "modules" / "t1k.nf").write_text("errorStrategy 'ignore'\n", encoding="utf-8")
+    failures = validate_workflow_lock(lock, project)["failures"]
+    assert any("hash mismatch" in failure for failure in failures)
+    assert any("forbidden token" in failure for failure in failures)

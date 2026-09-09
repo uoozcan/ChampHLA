@@ -1,24 +1,538 @@
 {
-  "schema_version": "champhla-comparator-manifest-1",
-  "status": "DRAFT_UNTIL_ALL_VERSION_HASHES_VERIFIED",
-  "selection_policy": "Include every assay-compatible method present in the frozen rerun design. Performance is never an inclusion or exclusion criterion.",
+  "schema_version": "champhla-comparator-manifest-2",
+  "status": "DRAFT_BLOCKED_UNRESOLVED_CALLER_DATABASE_RELEASES",
+  "selection_policy": "Include every assay-compatible method in the frozen rerun design. Performance is never an inclusion or exclusion criterion. The oracle and nondeployable historical analyses are outside modality-local Holm families.",
+  "provenance_attestation": "configs/roihu_caller_reference_attestation.json",
+  "blocking_methods": [
+    "Caller:HLA-HD",
+    "Caller:OptiType",
+    "Caller:POLYSOLVER",
+    "Caller:SpecHLA"
+  ],
   "comparators": [
-    {"method_id": "Caller:HLA-HD", "kind": "caller", "modalities": ["wgs", "wes", "rnaseq"], "version": "1.4.0", "artifact_pin": "container_sha256_required", "reference_build": {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"}, "imgt_hla_version": "3.59.0", "configuration": "configs/rerun_protocol.json#HLA-HD", "deployable": true, "primary_family": true, "disposition_reason": "included in each compatible frozen intended-use panel"},
-    {"method_id": "Caller:Kourami", "kind": "caller", "modalities": ["wgs"], "version": "0.9.6", "artifact_pin": "container_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "configs/rerun_protocol.json#Kourami", "deployable": true, "primary_family": true, "disposition_reason": "included in the compatible frozen WGS panel"},
-    {"method_id": "Caller:OptiType", "kind": "caller", "modalities": ["wgs", "wes", "rnaseq"], "version": "VERIFY_FROM_CONTAINER", "artifact_pin": "container_sha256_required", "reference_build": {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"}, "imgt_hla_version": "3.59.0", "configuration": "configs/rerun_protocol.json#OptiType", "deployable": true, "primary_family": true, "disposition_reason": "included in each compatible frozen intended-use panel"},
-    {"method_id": "Caller:POLYSOLVER", "kind": "caller", "modalities": ["wes"], "version": "VERIFY_FROM_CONTAINER", "artifact_pin": "container_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "configs/rerun_protocol.json#POLYSOLVER", "deployable": true, "primary_family": true, "disposition_reason": "included in the compatible frozen WES panel"},
-    {"method_id": "Caller:SpecHLA", "kind": "caller", "modalities": ["wgs", "wes"], "version": "VERIFY_FROM_GIT", "artifact_pin": "git_commit_and_wrapper_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "configs/rerun_protocol.json#SpecHLA", "deployable": true, "primary_family": true, "disposition_reason": "included in each compatible frozen DNA panel"},
-    {"method_id": "Caller:T1K", "kind": "caller", "modalities": ["wgs", "wes", "rnaseq"], "version": "1.0.9", "artifact_pin": "container_sha256_required", "reference_build": {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"}, "imgt_hla_version": "3.59.0", "configuration": "configs/rerun_protocol.json#T1K", "deployable": true, "primary_family": true, "disposition_reason": "included in each compatible frozen intended-use panel"},
-    {"method_id": "Caller:ArcasHLA", "kind": "caller", "modalities": ["rnaseq"], "version": "VERIFY_FROM_CONTAINER", "artifact_pin": "container_sha256_required", "reference_build": "GRCh37", "imgt_hla_version": "3.59.0", "configuration": "configs/rerun_protocol.json#ArcasHLA", "deployable": true, "primary_family": true, "disposition_reason": "included in the compatible frozen RNA-seq panel"},
-    {"method_id": "ChampionChallenger", "kind": "integration", "modalities": ["wgs", "wes", "rnaseq"], "version": "frozen-policy-sha256-required", "artifact_pin": "policy_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "models/frozen_raw_cc_policy.json", "deployable": true, "primary_family": true, "disposition_reason": "historical operating method retained neutrally"},
-    {"method_id": "TwoThirdsGuardedCC", "kind": "integration", "modalities": ["wgs", "wes", "rnaseq"], "version": "guarded-cc-v1", "artifact_pin": "source_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "archived read-only v1 adapter", "deployable": true, "primary_family": true, "disposition_reason": "superseded primary method retained as a comparator"},
-    {"method_id": "MVFlooredCC", "kind": "integration", "modalities": ["wgs", "wes", "rnaseq"], "version": "historical-frozen", "artifact_pin": "prediction_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "archived prediction bundle", "deployable": true, "primary_family": true, "disposition_reason": "historical operating method retained neutrally"},
-    {"method_id": "BestSingleTool_nestedCV", "kind": "selection", "modalities": ["wgs", "wes", "rnaseq"], "version": "nested-cv-v1", "artifact_pin": "fold_and_prediction_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "frozen nested-CV folds", "deployable": true, "primary_family": true, "disposition_reason": "tests learned caller selection against selection-free consensus"},
-    {"method_id": "MetaConsensus", "kind": "integration", "modalities": ["wgs", "wes", "rnaseq"], "version": "frozen-logistic-v1", "artifact_pin": "model_and_prediction_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "frozen MetaConsensus model", "deployable": true, "primary_family": true, "disposition_reason": "frozen learned integration comparator"},
-    {"method_id": "SimpleTwoThirdsConsensus", "kind": "abstaining_baseline", "modalities": ["wgs", "wes", "rnaseq"], "version": "two-thirds-v1", "artifact_pin": "source_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "equal complete-pair votes; two-thirds threshold", "deployable": true, "primary_family": false, "disposition_reason": "included for coverage-accuracy sensitivity outside the primary family"},
-    {"method_id": "WeightedConsensus", "kind": "historical_ablation", "modalities": ["wes", "rnaseq"], "version": "artifact-only", "artifact_pin": "prediction_bundle_not_imported", "reference_build": "GRCh38DH", "imgt_hla_version": "historical release recorded in source report", "configuration": "historical artifact", "deployable": false, "primary_family": false, "disposition_reason": "preserved as a supplemental ablation; no canonical frozen inference bundle"},
-    {"method_id": "RefFormer", "kind": "historical_ablation", "modalities": ["wgs", "wes", "rnaseq"], "version": "artifact-only", "artifact_pin": "ablation_artifacts", "reference_build": "GRCh38DH", "imgt_hla_version": "historical release recorded in source report", "configuration": "ablations/refformer", "deployable": false, "primary_family": false, "disposition_reason": "preserved as a negative supplemental ablation, not an operating method"},
-    {"method_id": "EvidenceGatedCC", "kind": "historical_ablation", "modalities": ["wes", "rnaseq"], "version": "artifact-only", "artifact_pin": "prediction_bundle_not_imported", "reference_build": "GRCh38DH", "imgt_hla_version": "historical release recorded in source report", "configuration": "historical artifact", "deployable": false, "primary_family": false, "disposition_reason": "preserved as a supplemental ablation; no canonical frozen inference bundle"},
-    {"method_id": "CandidateSetOracle", "kind": "oracle", "modalities": ["wgs", "wes", "rnaseq"], "version": "analysis-only", "artifact_pin": "evaluation_code_sha256_required", "reference_build": "GRCh38DH", "imgt_hla_version": "3.59.0", "configuration": "truth-aware analysis only", "deployable": false, "primary_family": false, "disposition_reason": "reported separately as a candidate-generation ceiling"}
+    {
+      "method_id": "Caller:HLA-HD",
+      "kind": "caller",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "1.4.0",
+      "artifact_pin": "container-sha256",
+      "reference_build": {
+        "wgs": "GRCh38DH",
+        "wes": "GRCh38DH",
+        "rnaseq": "GRCh37-source-design"
+      },
+      "imgt_hla_version": "UNRESOLVED_ACTIVE_BUNDLE",
+      "configuration": "workflow/modules/hlahd.nf",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "included in each compatible intended-use panel; production blocked until the active bundled database release is established",
+      "command": "/app/hlahd.1.4.0/bin/hlahd.sh -t {threads} -m {min_tag} -c 0.95 -f /app/hlahd.1.4.0/freq_data R1.fastq R2.fastq /app/hlahd.1.4.0/HLA_gene.split.txt /app/hlahd.1.4.0/dictionary {sample} {sample}",
+      "threads": 4,
+      "memory": "process_high; Slurm sample envelope 180 GiB",
+      "artifact_sha256": "8fb9fa5ec3392c282f02374e1a42a51cc30e1adb3cc7e7a6d96791b0bc593810",
+      "source_sha256": "eaf561d22ded19d919d8ea9528953a5eaed186aa704b2cce61f6d16238fd64e9",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "reference_artifacts": [
+        {
+          "artifact_id": "HLA_gene.split.txt",
+          "sha256": "5c9712e8c4f29db855eccb2ba239b5dc3add00ededcdbdde5fc99211e9948a77"
+        },
+        {
+          "artifact_id": "dictionary/allele.list",
+          "sha256": "ae48e1fccefb629cdde9be8b7715850d133928d0acbfcec9fb704dbf1a4bda6c"
+        }
+      ]
+    },
+    {
+      "method_id": "Caller:Kourami",
+      "kind": "caller",
+      "modalities": [
+        "wgs"
+      ],
+      "version": "0.9.6",
+      "artifact_pin": "container-sha256",
+      "reference_build": "GRCh38DH",
+      "imgt_hla_version": "3.24.0",
+      "configuration": "workflow/modules/kourami.nf",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "included in the compatible WGS panel",
+      "command": "bwa mem -t {threads} {db}/All_FINAL_with_Decoy.fa.gz R1.fq.gz R2.fq.gz; java -Xmx10g -jar {jar} -d {db} panel.bam -o {sample}.kourami",
+      "threads": 4,
+      "memory": "process_high; Java 10 GiB; Slurm sample envelope 180 GiB",
+      "artifact_sha256": "c267052e9621579b569110b07c64fc916a968b1a9fa0776681c8dd31fe44d3c9",
+      "source_sha256": "d46ca2941c0ef4df3c5ae04c63f349eb4d5c3c6a2c598083854f5d84d26a7f74",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "reference_artifacts": [
+        {
+          "artifact_id": "db/VERSION.txt",
+          "sha256": "1e9b5e05585d09acba4aeb2c66ff615e2f76f4a5dca1b3d1bf0b80e87fb2ac62"
+        },
+        {
+          "artifact_id": "db/All_FINAL_with_Decoy.fa.gz",
+          "sha256": "81e2181111e0d465d266c3ed300060511143466382638697f532990380df33df"
+        }
+      ]
+    },
+    {
+      "method_id": "Caller:OptiType",
+      "kind": "caller",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "1.3.1",
+      "artifact_pin": "container-sha256",
+      "reference_build": {
+        "wgs": "GRCh38DH",
+        "wes": "GRCh38DH",
+        "rnaseq": "GRCh37-source-design"
+      },
+      "imgt_hla_version": "UNRESOLVED_BUNDLED_REFERENCE",
+      "configuration": "workflow/modules/optitype.nf",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "included in each compatible panel; production blocked until the bundled HLA release is reconstructed",
+      "command": "OptiTypePipeline.py -i R1.fastq R2.fastq {--dna|--rna} -v -o {sample} -p {sample}",
+      "threads": 4,
+      "memory": "process_medium; Slurm sample envelope 180 GiB",
+      "artifact_sha256": "7f3f32904a25bd6936e38de1092acb307b5239567b8923c4526aac1007c5684a",
+      "source_sha256": "7bfd890f8e1a060deb566691f4e308e113931a649562431750648459654fd10d",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "reference_artifacts": [
+        {
+          "artifact_id": "data/alleles.h5",
+          "sha256": "4101ae68b6c5a579b04b1b6f43bb9a6c680d63d830db478d7b20803080240738"
+        },
+        {
+          "artifact_id": "data/hla_reference_dna.fasta",
+          "sha256": "bbcd202382d831235739460966d92c94b30f1d407158d807dfb81e0a9872a8f0"
+        },
+        {
+          "artifact_id": "data/hla_reference_rna.fasta",
+          "sha256": "9e75aa2284eb34f00341777366264b7c4b93b4a430c712ed38f22a52d66bcb65"
+        }
+      ]
+    },
+    {
+      "method_id": "Caller:POLYSOLVER",
+      "kind": "caller",
+      "modalities": [
+        "wes"
+      ],
+      "version": "container-v4",
+      "artifact_pin": "container-sha256",
+      "reference_build": "GRCh38DH",
+      "imgt_hla_version": "UNRESOLVED_FILENAME_SUGGESTS_3.10.0",
+      "configuration": "workflow/modules/polysolver.nf",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "included in WES; a suggestive filename is not authoritative release evidence",
+      "command": "bash patched_shell_call_hla_type {fixed_bam} Unknown 0 hg38 STDFQ 0 {output_dir}",
+      "threads": 4,
+      "memory": "process_medium; Slurm sample envelope 180 GiB",
+      "artifact_sha256": "b4f39a6dd86d138d8ec15a73cf4b2d33fbc069c84c3b7de4117b4892b65767da",
+      "source_sha256": "25f813010aa9454f34ac30321aa11c27545e33f40ca540a0ca88fbbe6cb8b461",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "reference_artifacts": [
+        {
+          "artifact_id": "a_complete.3100.new.eb.fasta",
+          "sha256": "0a88e15ac8c4baba8ed7c1d77a9b8119f9911abd2ad096cafecb87fb7edc86cb"
+        },
+        {
+          "artifact_id": "b_complete.3100.new.eb.fasta",
+          "sha256": "2b56773fd973fc8f686172c8b5f65fef2f5026dea6271e0a263bfc5a16a08f0a"
+        },
+        {
+          "artifact_id": "c_complete.3100.new.eb.fasta",
+          "sha256": "627198757d834acc160952a9ae23c80b8e6da52d15d2fcc8892933a73a9bc6d7"
+        }
+      ]
+    },
+    {
+      "method_id": "Caller:SpecHLA",
+      "kind": "caller",
+      "modalities": [
+        "wgs",
+        "wes"
+      ],
+      "version": "1.0.7-deployed-wrapper",
+      "artifact_pin": "git-commit-plus-deployed-wrapper-sha256",
+      "reference_build": "GRCh38DH",
+      "imgt_hla_version": "UNRESOLVED_MIXED_3.38.0_AND_3.51.0_COMPONENTS",
+      "configuration": "workflow/modules/spechla.nf",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "included in DNA panels; production blocked until the dirty mixed database is reconstructed immutably",
+      "command": "bash /projappl/project_2008084/SpecHLAx/script/whole/SpecHLA.sh -n {sample} -1 R1.fastq.gz -2 R2.fastq.gz -o . -j {threads} -u {exon_only}",
+      "threads": 4,
+      "memory": "process_high; Slurm sample envelope 180 GiB",
+      "artifact_sha256": "77c7b6ef5ad704d0731c6895aca367081f39ca6529206be18070e319ae94ba2b",
+      "source_sha256": "95864b6c6bd1e360e7f4b609b776eb18552aeacaf91ceb1b3b8695605314de4b",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "reference_artifacts": [
+        {
+          "artifact_id": "db/HLA/Allelelist.txt",
+          "sha256": "e688976b0a96e5db414f68cbe791fb96d1ae0f178cb9e65081303dc4fe0bbc13"
+        },
+        {
+          "artifact_id": "db/HLA/hla_nom_g.txt",
+          "sha256": "c028c492ac959a9a2494b7cefb73bd91bf951923d1c6b2dc6db6cb5a501e1f8d"
+        },
+        {
+          "artifact_id": "deployed SpecHLA.sh",
+          "sha256": "77c7b6ef5ad704d0731c6895aca367081f39ca6529206be18070e319ae94ba2b"
+        }
+      ]
+    },
+    {
+      "method_id": "Caller:T1K",
+      "kind": "caller",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "1.0.9-r251",
+      "artifact_pin": "container-sha256",
+      "reference_build": {
+        "wgs": "GRCh38DH",
+        "wes": "GRCh38DH",
+        "rnaseq": "GRCh37-source-design"
+      },
+      "imgt_hla_version": "3.63.0",
+      "configuration": "workflow/modules/t1k.nf",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "included in each compatible panel",
+      "command": "run-t1k -1 R1 -2 R2 -f {_dna_seq.fa|_rna_seq.fa} --preset {hla-wgs|hla} -t {threads} -o {sample}",
+      "threads": 4,
+      "memory": "process_medium; Slurm sample envelope 180 GiB",
+      "artifact_sha256": "e34c4433021cc21c16a54c8ce6bef6d8b1bd367dddc2920afd4053d053b44c3c",
+      "source_sha256": "8f9e416a6c9babb6e80648b0eb43521999a13b4becb3007dbd74dd6f8164d55f",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "reference_artifacts": [
+        {
+          "artifact_id": "hla.dat",
+          "sha256": "8e0c7f8144f0b5006d5ddae99140821aa7f2bd5f53db4d8a00cdb025099a0ed2"
+        },
+        {
+          "artifact_id": "_dna_seq.fa",
+          "sha256": "60be918064394b762d4097f8ff7ec1ed012f007a7138730a821b0916b18aa085"
+        },
+        {
+          "artifact_id": "_rna_seq.fa",
+          "sha256": "87e194f462336253e70b5cdcf2f7a83867e82390a7df5d622a060b22bab81aa8"
+        }
+      ]
+    },
+    {
+      "method_id": "Caller:ArcasHLA",
+      "kind": "caller",
+      "modalities": [
+        "rnaseq"
+      ],
+      "version": "0.2.0",
+      "artifact_pin": "container-sha256",
+      "reference_build": "GRCh37-source-design",
+      "imgt_hla_version": "3.40.0",
+      "configuration": "workflow/modules/arcashla.nf",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "included in the RNA-seq panel",
+      "command": "arcasHLA genotype R1.fq.gz R2.fq.gz -o {sample} -t {threads} --min_count 75 -v",
+      "threads": 4,
+      "memory": "process_medium; Slurm sample envelope 180 GiB",
+      "artifact_sha256": "60c42737ccb8c0fa91beef256437028b64d75451ca16e4bf90bb849ba0b6c05c",
+      "source_sha256": "764a69320fa314257ccbb49c57e91ecb24bee28526bb74a6f7d387a024887dbe",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "reference_artifacts": [
+        {
+          "artifact_id": "dat/IMGTHLA/hla.dat",
+          "sha256": "9330c0b1ec21037fa5f121b06fbc09610a2f8f03b9e68b29efdd6cac67f0459b"
+        },
+        {
+          "artifact_id": "dat/IMGTHLA/version_report.txt",
+          "sha256": "93d8ecfafbc0dffc79a4ad4239e26bbd70e9057b9b1d54d2dd750dceabcad382"
+        }
+      ]
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 1,
+      "memory": "1 GiB",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "method_id": "ChampionChallenger",
+      "kind": "integration",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "truth-free-raw-cc-policy-1",
+      "artifact_pin": "policy-sha256",
+      "configuration": "models/frozen_raw_cc_policy.json",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "historical operating method retained neutrally",
+      "command": "run_truth_blind_predictions --raw-cc-policy models/frozen_raw_cc_policy.json",
+      "artifact_sha256": "2e4091488921c7ccf6b94c6fc47686397b15662ca9d52048a87f56b86f576a5d",
+      "source_sha256": "f4574b0f2e8f43a6dd58599dbb92a61a381447f9954de04a19643f27b0dc7a5d",
+      "reference_artifacts": [
+        {
+          "artifact_id": "frozen_raw_cc_policy.json",
+          "sha256": "2e4091488921c7ccf6b94c6fc47686397b15662ca9d52048a87f56b86f576a5d"
+        }
+      ]
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 1,
+      "memory": "1 GiB",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "method_id": "TwoThirdsGuardedCC",
+      "kind": "integration",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "guarded-cc-v2-partial-safe",
+      "artifact_pin": "source-sha256",
+      "configuration": "src/champhla_confirmation/consensus.py",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "superseded primary method retained as a comparator",
+      "command": "run_truth_blind_predictions --raw-cc-policy models/frozen_raw_cc_policy.json",
+      "artifact_sha256": "e4059eeba96a0047e0107dca77b8a1147c163c5ddd6454e77ace04888b0d6e86",
+      "source_sha256": "e4059eeba96a0047e0107dca77b8a1147c163c5ddd6454e77ace04888b0d6e86",
+      "reference_artifacts": [
+        {
+          "artifact_id": "frozen_raw_cc_policy.json",
+          "sha256": "2e4091488921c7ccf6b94c6fc47686397b15662ca9d52048a87f56b86f576a5d"
+        }
+      ]
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 1,
+      "memory": "1 GiB",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "method_id": "MVFlooredCC",
+      "kind": "integration",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "mv-floor-frozen-policy-v1",
+      "artifact_pin": "policy-and-source-sha256",
+      "configuration": "models/frozen_mvfloor_policy.json",
+      "deployable": true,
+      "primary_family": true,
+      "disposition_reason": "historical routing policy retained through a truth-free repository adapter",
+      "command": "run_truth_blind_predictions --raw-cc-policy models/frozen_raw_cc_policy.json --mvfloor-policy models/frozen_mvfloor_policy.json",
+      "artifact_sha256": "922230f2766a23dcaa0d9318c1695026855019683920b0b31a6cff166d7358b9",
+      "source_sha256": "e4059eeba96a0047e0107dca77b8a1147c163c5ddd6454e77ace04888b0d6e86",
+      "reference_artifacts": [
+        {
+          "artifact_id": "frozen_mvfloor_policy.json",
+          "sha256": "922230f2766a23dcaa0d9318c1695026855019683920b0b31a6cff166d7358b9"
+        },
+        {
+          "artifact_id": "frozen_raw_cc_policy.json",
+          "sha256": "2e4091488921c7ccf6b94c6fc47686397b15662ca9d52048a87f56b86f576a5d"
+        }
+      ]
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 1,
+      "memory": "1 GiB",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "method_id": "SimpleTwoThirdsConsensus",
+      "kind": "abstaining_baseline",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "two-thirds-v2-partial-safe",
+      "artifact_pin": "source-sha256",
+      "configuration": "src/champhla_confirmation/consensus.py",
+      "deployable": true,
+      "primary_family": false,
+      "disposition_reason": "coverage-accuracy sensitivity baseline outside the primary family",
+      "command": "run_truth_blind_predictions --calls CALLS",
+      "artifact_sha256": "e4059eeba96a0047e0107dca77b8a1147c163c5ddd6454e77ace04888b0d6e86",
+      "source_sha256": "e4059eeba96a0047e0107dca77b8a1147c163c5ddd6454e77ace04888b0d6e86",
+      "reference_artifacts": [
+        {
+          "artifact_id": "consensus.py",
+          "sha256": "e4059eeba96a0047e0107dca77b8a1147c163c5ddd6454e77ace04888b0d6e86"
+        }
+      ]
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 0,
+      "memory": "not_applicable",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "method_id": "MetaConsensus",
+      "kind": "historical_ablation",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "frozen-logistic-v1",
+      "artifact_pin": "model-sha256",
+      "configuration": "models/frozen_meta_model.json",
+      "deployable": false,
+      "primary_family": false,
+      "disposition_reason": "historical learned ablation; corrected native-confidence runtime features are not reproducibly available",
+      "command": "historical-only",
+      "artifact_sha256": "29000927c663e7fbffae266ab8ed303bbebceef3680d2d8f1feaad99b710d5f9",
+      "source_sha256": "c982cc9b74dee41b849c51ec80a8c579aa98da1d2120c17ba1b9151c48d18cc8",
+      "reference_artifacts": [
+        {
+          "artifact_id": "frozen_meta_model.json",
+          "sha256": "29000927c663e7fbffae266ab8ed303bbebceef3680d2d8f1feaad99b710d5f9"
+        }
+      ]
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 0,
+      "memory": "not_applicable",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "method_id": "BestSingleTool_nestedCV",
+      "kind": "historical_selection",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "nested-cv-v1",
+      "artifact_pin": "fold-policy-sha256",
+      "configuration": "models/metaconsensus_outer_fold_policies.tsv",
+      "deployable": false,
+      "primary_family": false,
+      "disposition_reason": "historical cross-validated caller-selection analysis, not a prospective method",
+      "command": "historical-only",
+      "artifact_sha256": "4449eed5ab81a4cb482c1cba50124405251dff3abd48d04c74bda809543dc57a",
+      "source_sha256": "64521d062632b5af2312fb064bbd976b82085173a650ff8ab7826c31f2823dd1",
+      "reference_artifacts": [
+        {
+          "artifact_id": "metaconsensus_fold_assignments.tsv",
+          "sha256": "038411712d666c4116d13b49ba497fb50a482b78e8aa6e9e2449d8ad01f160bd"
+        }
+      ]
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 0,
+      "memory": "not_applicable",
+      "workflow_hash": "",
+      "method_id": "WeightedConsensus",
+      "kind": "historical_ablation",
+      "modalities": [
+        "wes",
+        "rnaseq"
+      ],
+      "version": "artifact-only",
+      "artifact_pin": "not-imported",
+      "configuration": "historical artifact",
+      "deployable": false,
+      "primary_family": false,
+      "disposition_reason": "supplemental ablation; no canonical frozen inference bundle",
+      "command": "historical-only",
+      "artifact_sha256": "",
+      "source_sha256": "",
+      "reference_artifacts": []
+    },
+    {
+      "reference_build": "GRCh38DH",
+      "imgt_hla_version": "historical",
+      "threads": 0,
+      "memory": "not_applicable",
+      "workflow_hash": "",
+      "method_id": "RefFormer",
+      "kind": "historical_ablation",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "artifact-only",
+      "artifact_pin": "ablation-artifacts",
+      "configuration": "ablations/refformer",
+      "deployable": false,
+      "primary_family": false,
+      "disposition_reason": "negative supplemental ablation, not an operating method",
+      "command": "historical-only",
+      "artifact_sha256": "",
+      "source_sha256": "",
+      "reference_artifacts": []
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 0,
+      "memory": "not_applicable",
+      "workflow_hash": "",
+      "method_id": "EvidenceGatedCC",
+      "kind": "historical_ablation",
+      "modalities": [
+        "wes",
+        "rnaseq"
+      ],
+      "version": "artifact-only",
+      "artifact_pin": "not-imported",
+      "configuration": "historical artifact",
+      "deployable": false,
+      "primary_family": false,
+      "disposition_reason": "supplemental ablation; no canonical frozen inference bundle",
+      "command": "historical-only",
+      "artifact_sha256": "",
+      "source_sha256": "",
+      "reference_artifacts": []
+    },
+    {
+      "reference_build": "not_applicable",
+      "imgt_hla_version": "not_applicable",
+      "threads": 0,
+      "memory": "not_applicable",
+      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "method_id": "CandidateSetOracle",
+      "kind": "oracle",
+      "modalities": [
+        "wgs",
+        "wes",
+        "rnaseq"
+      ],
+      "version": "analysis-only-v2",
+      "artifact_pin": "evaluation-source-sha256",
+      "configuration": "src/champhla_confirmation/evaluation.py",
+      "deployable": false,
+      "primary_family": false,
+      "disposition_reason": "truth-aware ceiling reported outside Holm families",
+      "command": "evaluation-only",
+      "artifact_sha256": "4e217601c1c00117ca8c855af4d322c17a27e57cd258ac2ac9070e8c5d91033c",
+      "source_sha256": "4e217601c1c00117ca8c855af4d322c17a27e57cd258ac2ac9070e8c5d91033c",
+      "reference_artifacts": []
+    }
   ]
 }

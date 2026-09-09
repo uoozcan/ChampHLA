@@ -1,0 +1,52 @@
+{
+  "schema_version": "champhla-historical-integration-import-1",
+  "imported_at_utc": "2026-09-09T12:45:00Z",
+  "source_root": "/mnt/d/Users/uonur/Downloads/ChampHLA_MetaConsensus_implementation",
+  "policy": "Imported artifacts are preserved as historical development evidence. Import does not make a method deployable in the corrected rerun; runtime compatibility and truth-free inputs are assessed separately.",
+  "artifacts": [
+    {
+      "role": "frozen_meta_model",
+      "source_path": "analysis/metaconsensus_nested/frozen_meta_model.json",
+      "source_sha256": "29000927c663e7fbffae266ab8ed303bbebceef3680d2d8f1feaad99b710d5f9",
+      "imported_path": "models/frozen_meta_model.json",
+      "imported_sha256": "29000927c663e7fbffae266ab8ed303bbebceef3680d2d8f1feaad99b710d5f9",
+      "normalization": "none"
+    },
+    {
+      "role": "frozen_mvfloor_policy",
+      "source_path": "analysis/mvfloor_refresh/authoritative/frozen_deployment_policy.json",
+      "source_sha256": "922230f2766a23dcaa0d9318c1695026855019683920b0b31a6cff166d7358b9",
+      "imported_path": "models/frozen_mvfloor_policy.json",
+      "imported_sha256": "922230f2766a23dcaa0d9318c1695026855019683920b0b31a6cff166d7358b9",
+      "normalization": "none"
+    },
+    {
+      "role": "metaconsensus_fold_assignments",
+      "source_path": "analysis/metaconsensus_nested/fold_assignments.tsv",
+      "source_sha256": "cce550983a5939b2a2c923a2f0789c9be62e317d736e029775dcd3f62dfe7669",
+      "imported_path": "models/metaconsensus_fold_assignments.tsv",
+      "imported_sha256": "038411712d666c4116d13b49ba497fb50a482b78e8aa6e9e2449d8ad01f160bd",
+      "normalization": "CRLF_to_LF"
+    },
+    {
+      "role": "metaconsensus_outer_fold_policies",
+      "source_path": "analysis/metaconsensus_nested/outer_fold_policies.tsv",
+      "source_sha256": "ec4d7f13ca202f158d8c91a317b9be07e682e56faa1a70fd3720e733b87e54cb",
+      "imported_path": "models/metaconsensus_outer_fold_policies.tsv",
+      "imported_sha256": "4449eed5ab81a4cb482c1cba50124405251dff3abd48d04c74bda809543dc57a",
+      "normalization": "CRLF_to_LF"
+    }
+  ],
+  "historical_source_code": [
+    {"path": "workflow/bin/meta_consensus.py", "sha256": "c982cc9b74dee41b849c51ec80a8c579aa98da1d2120c17ba1b9151c48d18cc8"},
+    {"path": "workflow/bin/hla_benchmark.py", "sha256": "d4d2480cc45464e689afb7dc8a3cb670d0cf999e383083c1bcaa28fc09c349f6"},
+    {"path": "workflow/bin/mvfloor_refresh.py", "sha256": "4dad0163a58e61da0545ed5d2cf198943c11458aac89d2df5255d27150b9e813"},
+    {"path": "workflow/bin/nested_cv_champion_challenger.py", "sha256": "64521d062632b5af2312fb064bbd976b82085173a650ff8ab7826c31f2823dd1"}
+  ],
+  "runtime_assessment": {
+    "MVFlooredCC": "deployable through the repository-owned truth-free adapter and imported policy",
+    "MetaConsensus": "historical_only_until_native-confidence feature extraction and the runtime dependency are vendored and validated against corrected calls",
+    "BestSingleTool_nestedCV": "historical selection analysis, not a deployable prospective method",
+    "CandidateSetOracle": "truth-aware evaluation ceiling, never deployable and never included in Holm families"
+  }
+}

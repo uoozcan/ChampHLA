@@ -13,7 +13,7 @@
     "src/champhla_confirmation/evaluation.py": "4e217601c1c00117ca8c855af4d322c17a27e57cd258ac2ac9070e8c5d91033c",
     "src/champhla_confirmation/statistics.py": "8be39c0002794fa714bc0c85d5d8cd75d2def2df4a5bc5a32eb8e8aff9481f3b",
     "configs/consensus_evaluation.json": "9a6931c49436a66b4f66017de22eb16dc0698ca777eb045f68b659fb61be57d7",
-    "configs/comparator_manifest.json": "180f2e4eaad81875bcf7f7b6b242b87e358203373d996d0bb158f9c2666e55d1"
+    "provenance/snapshots/comparator_manifest_20260908.json": "180f2e4eaad81875bcf7f7b6b242b87e358203373d996d0bb158f9c2666e55d1"
   },
   "outputs": {
     "artifacts/generated/development_evaluation/confirmation_decision.json": "e1c4dc14aa27fccc810c974404ea3d5be88bd6e3546938a525c268b1949a8e9e",

@@ -198,7 +198,7 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
     environment_failures = []
     environment = read_json(environment_manifest_path) if environment_manifest_path else {}
     required_environment = {
-        "reference_build", "reference_sha256", "imgt_hla_version",
+        "reference_build", "reference_sha256", "caller_reference_attestation",
         "python_version", "samtools_version", "caller_artifacts",
     }
     if required_environment - set(environment):
@@ -209,6 +209,8 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
         environment_failures.append("caller_artifacts does not exactly match the WGS panel")
     elif not all(str(value).strip() for value in environment["caller_artifacts"].values()):
         environment_failures.append("one or more caller artifact hashes are empty")
+    elif environment["caller_reference_attestation"].get("passed") is not True:
+        environment_failures.append("caller/reference attestation is not production ready")
     environment_passed = not environment_failures
     passed = automated_passed and manual_review_complete and environment_passed
     out = Path(output_dir)
