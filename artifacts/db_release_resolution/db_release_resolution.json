@@ -1,0 +1,306 @@
+{
+  "allele_list_cache": "/scratch/project_2008084/hla_references/imgt_allelelists",
+  "allele_list_releases": 66,
+  "callers": {
+    "HLA-HD": {
+      "components": [
+        {
+          "allele_list_sha256": "2d5210fb93cacab5155010095a964e2aea7702d227e832ebffb0beefb4af89cd",
+          "allele_list_source": "Allelelist.3.15.0.txt",
+          "artifact_id": "dictionary/allele.list",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.999752,
+          "coverage_at_successor": 0.939737,
+          "evidence": "content_match",
+          "extracted_from": "hlahd__dictionary_allele.list",
+          "filtered_subset": false,
+          "missing_from_predecessor": 410,
+          "predecessor": "3.14.0",
+          "release": "3.15.0",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 8064,
+          "successor": "3.16.0",
+          "two_field_types": 8062
+        },
+        {
+          "artifact_id": "HLA_gene.split.txt",
+          "note": "gene and exon-count table; carries no allele designations",
+          "release": "NOT_RELEASE_BEARING",
+          "release_evidence": "content_match"
+        },
+        {
+          "artifact_id": "HLA_gene.split.3.32.0.txt",
+          "note": "inactive bundled exon-split variant; carries no allele designations",
+          "release": "NOT_RELEASE_BEARING",
+          "release_evidence": "content_match"
+        }
+      ],
+      "derived_release": "3.15.0"
+    },
+    "Kourami": {
+      "components": [
+        {
+          "allele_list_sha256": "f395c43cc16586c56a5c44db1978188fcd745517356f3d81d8dabec880214474",
+          "allele_list_source": "Allelelist.3.24.0.txt",
+          "artifact_id": "db/All_FINAL_with_Decoy.fa.gz",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.999546,
+          "coverage_at_successor": 0.960615,
+          "evidence": "content_match",
+          "extracted_from": "kourami__All_FINAL.headers",
+          "filtered_subset": false,
+          "missing_from_predecessor": 144,
+          "note": "positive control: the database also declares its release in db/VERSION.txt",
+          "predecessor": "3.23.0",
+          "release": "3.24.0",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 11005,
+          "successor": "3.25.0",
+          "two_field_types": 11000
+        }
+      ],
+      "derived_release": "3.24.0"
+    },
+    "OptiType": {
+      "components": [
+        {
+          "allele_list_sha256": "3dd000e9c4a9e8406bfab08a92578c5c87dfac759acfeaf94f8e83704abdf1f6",
+          "allele_list_source": "Allelelist.3.13.1.txt",
+          "artifact_id": "data/hla_reference_rna.fasta",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.998033,
+          "coverage_at_successor": 0.957618,
+          "evidence": "content_match",
+          "extracted_from": "optitype__hla_reference_rna.headers",
+          "filtered_subset": false,
+          "missing_from_predecessor": 190,
+          "predecessor": "3.12.0",
+          "release": "3.13.1",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 5592,
+          "successor": "3.14.0",
+          "two_field_types": 5581
+        },
+        {
+          "allele_list_sha256": "3dd000e9c4a9e8406bfab08a92578c5c87dfac759acfeaf94f8e83704abdf1f6",
+          "allele_list_source": "Allelelist.3.13.1.txt",
+          "artifact_id": "data/hla_reference_dna.fasta",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.94814,
+          "coverage_at_successor": 0.909746,
+          "evidence": "content_match",
+          "extracted_from": "optitype__hla_reference_dna.headers",
+          "filtered_subset": true,
+          "interpretation": "database is a filtered subset of its release; the release is the earliest that contains every type it carries",
+          "missing_from_predecessor": 178,
+          "predecessor": "3.12.0",
+          "release": "3.13.1",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 5592,
+          "successor": "3.14.0",
+          "two_field_types": 5302
+        },
+        {
+          "artifact_id": "data/alleles.h5",
+          "note": "binary index derived from the two FASTA references",
+          "release": "NOT_RELEASE_BEARING",
+          "release_evidence": "content_match"
+        }
+      ],
+      "derived_release": "3.13.1"
+    },
+    "POLYSOLVER": {
+      "components": [
+        {
+          "allele_list_sha256": "2246494179362eba8f2207a136b8c595620c0b4fe47802252dd0add52715884f",
+          "allele_list_source": "Allelelist.3.11.0.txt",
+          "artifact_id": "data/a_complete.3100.new.eb.fasta",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.968955,
+          "coverage_at_successor": 0.944703,
+          "evidence": "content_match",
+          "extracted_from": "polysolver__a_complete.headers",
+          "filtered_subset": true,
+          "interpretation": "database is a filtered subset of its release; the release is the earliest that contains every type it carries",
+          "missing_from_predecessor": 82,
+          "predecessor": "3.10.0",
+          "release": "3.11.0",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 1675,
+          "successor": "3.12.0",
+          "two_field_types": 1623
+        },
+        {
+          "allele_list_sha256": "2246494179362eba8f2207a136b8c595620c0b4fe47802252dd0add52715884f",
+          "allele_list_source": "Allelelist.3.11.0.txt",
+          "artifact_id": "data/b_complete.3100.new.eb.fasta",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.977768,
+          "coverage_at_successor": 0.953599,
+          "evidence": "content_match",
+          "extracted_from": "polysolver__b_complete.headers",
+          "filtered_subset": true,
+          "interpretation": "database is a filtered subset of its release; the release is the earliest that contains every type it carries",
+          "missing_from_predecessor": 130,
+          "predecessor": "3.10.0",
+          "release": "3.11.0",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 2249,
+          "successor": "3.12.0",
+          "two_field_types": 2199
+        },
+        {
+          "allele_list_sha256": "2246494179362eba8f2207a136b8c595620c0b4fe47802252dd0add52715884f",
+          "allele_list_source": "Allelelist.3.11.0.txt",
+          "artifact_id": "data/c_complete.3100.new.eb.fasta",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.959136,
+          "coverage_at_successor": 0.936699,
+          "evidence": "content_match",
+          "extracted_from": "polysolver__c_complete.headers",
+          "filtered_subset": true,
+          "interpretation": "database is a filtered subset of its release; the release is the earliest that contains every type it carries",
+          "missing_from_predecessor": 84,
+          "predecessor": "3.10.0",
+          "release": "3.11.0",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 1297,
+          "successor": "3.12.0",
+          "two_field_types": 1244
+        },
+        {
+          "artifact_id": "scripts/shell_call_hla_type",
+          "note": "caller script; not a reference",
+          "release": "NOT_RELEASE_BEARING",
+          "release_evidence": "content_match"
+        }
+      ],
+      "derived_release": "3.11.0"
+    },
+    "SpecHLA": {
+      "components": [
+        {
+          "allele_list_sha256": "e688976b0a96e5db414f68cbe791fb96d1ae0f178cb9e65081303dc4fe0bbc13",
+          "allele_list_source": "Allelelist.3.38.0.txt",
+          "artifact_id": "db/HLA/Allelelist.txt",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "content_match_agrees": true,
+          "coverage_at_release": 1.0,
+          "coverage_at_successor": 0.985317,
+          "declared_in_file": "3.38.0",
+          "evidence": "content_match",
+          "extracted_from": "spechla__Allelelist.txt",
+          "filtered_subset": false,
+          "missing_from_predecessor": 458,
+          "predecessor": "3.37.0",
+          "release": "3.38.0",
+          "release_evidence": "in_file_header",
+          "release_types_in_scope": 17661,
+          "successor": "3.39.0",
+          "two_field_types": 17661
+        },
+        {
+          "artifact_id": "db/HLA/hla_nom_g.txt",
+          "extracted_from": "spechla__hla_nom_g.txt",
+          "release": "3.51.0",
+          "release_evidence": "in_file_header"
+        },
+        {
+          "allele_list_sha256": "e688976b0a96e5db414f68cbe791fb96d1ae0f178cb9e65081303dc4fe0bbc13",
+          "allele_list_source": "Allelelist.3.38.0.txt",
+          "artifact_id": "db/ref/hla_gen.format.filter.extend.DRB.no26789.fasta",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.053249,
+          "coverage_at_successor": 0.052391,
+          "evidence": "content_match",
+          "extracted_from": "spechla__hla_gen_extend.headers",
+          "filtered_subset": true,
+          "interpretation": "database is a filtered subset of its release; the release is the earliest that contains every type it carries",
+          "missing_from_predecessor": 10,
+          "predecessor": "3.37.0",
+          "release": "3.38.0",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 17653,
+          "successor": "3.39.0",
+          "two_field_types": 940
+        },
+        {
+          "artifact_id": "db/HLA/hla.ref.extend.fa",
+          "note": "eight per-gene reference sequences; too few designations to identify a release",
+          "release": "NOT_RELEASE_BEARING",
+          "release_evidence": "content_match"
+        },
+        {
+          "artifact_id": "db/ref/hla_exon_ref.fasta",
+          "note": "eight per-gene exon references; too few designations to identify a release",
+          "release": "NOT_RELEASE_BEARING",
+          "release_evidence": "content_match"
+        }
+      ],
+      "derived_release": "HETEROGENEOUS"
+    },
+    "T1K": {
+      "components": [
+        {
+          "allele_list_sha256": "db4cb6fd54e22b519851017be1882d907cff7c6b045e8561d84e5b570f0d121f",
+          "allele_list_source": "Allelelist.3.63.0.txt",
+          "artifact_id": "t1k_hlaidx/_dna_seq.fa",
+          "candidate_window": [
+            "3.0.0",
+            "3.65.0"
+          ],
+          "coverage_at_release": 0.519541,
+          "coverage_at_successor": 0.509044,
+          "evidence": "content_match",
+          "extracted_from": "t1k__dna_seq.headers",
+          "filtered_subset": true,
+          "interpretation": "database is a filtered subset of its release; the release is the earliest that contains every type it carries",
+          "missing_from_predecessor": 350,
+          "note": "positive control: the deployment declares 3.63.0",
+          "predecessor": "3.62.0",
+          "release": "3.63.0",
+          "release_evidence": "content_match",
+          "release_types_in_scope": 27251,
+          "successor": "3.64.0",
+          "two_field_types": 14158
+        }
+      ],
+      "derived_release": "3.63.0"
+    }
+  },
+  "generated_at_utc": "2026-09-09T21:32:44Z",
+  "generated_on": "roihu-cpu-login3",
+  "method": "Two-field content identification against pinned official per-release IPD-IMGT/HLA allele lists. The release is the earliest that contains every two-field type the database carries. Coverage separates an unfiltered database from a filtered subset. A filename is never accepted as provenance.",
+  "positive_controls": {
+    "Kourami": "declares 3.24.0 in db/VERSION.txt",
+    "T1K": "deployment declares 3.63.0"
+  },
+  "schema_version": "champhla-db-release-resolution-1"
+}

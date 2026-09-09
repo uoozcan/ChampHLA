@@ -15,7 +15,7 @@
     "registry": "result_registry.tsv",
     "count_reconciliation": "decisions/20260908_count_reconciliation.json",
     "main_claim_audit": "artifacts/benchmark_manuscript_audit.json",
-    "supplement_claim_audit": "artifacts/benchmark_manuscript_audit.json"
+    "supplement_claim_audit": "artifacts/benchmark_combined_audit.json"
   },
   "test_attestations": {
     "local": "artifacts/verification/local_tests.json",
@@ -23,5 +23,16 @@
     "ubuntu_ci": "artifacts/verification/ubuntu_ci.json",
     "windows_ci": "artifacts/verification/windows_ci.json"
   },
-  "benchmark_required_test_attestations": ["roihu", "ubuntu_ci", "windows_ci"]
+  "benchmark_required_test_attestations": [
+    "roihu",
+    "ubuntu_ci",
+    "windows_ci"
+  ],
+  "claim_audit_note": "Two distinct gates. main_claim_audit is the main text audited alone. supplement_claim_audit is the main text audited together with the supplement via --supplement, which is the invocation that activates the supplement-specific rules (a diagnostically labelled paragraph may cite an invalid result; an unlabelled one may not). Both must point at different files, or the supplement is never gated.",
+  "distinct_path_pairs": [
+    [
+      "main_claim_audit",
+      "supplement_claim_audit"
+    ]
+  ]
 }

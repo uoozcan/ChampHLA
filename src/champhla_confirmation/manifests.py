@@ -1,7 +1,14 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
+from .imgt_release import (
+    EVIDENCE_KINDS,
+    NOT_RELEASE_BEARING,
+    NO_MATCH,
+    caller_release_summary,
+)
 from .io import read_json
 from .panels import MODALITIES, canonical_method
 from .panels import PANELS
@@ -87,14 +94,58 @@ def validate_comparator_manifest(path: str, require_frozen: bool = False) -> lis
                     failures.append(f"{label}.reference_artifacts[{reference_index}].sha256 is not exact")
     if require_frozen and manifest.get("status") != "FROZEN":
         failures.append("comparator manifest status is not FROZEN")
+    if require_frozen:
+        failures.extend(_cross_check_attestation(manifest, path))
     return sorted(set(failures))
 
 
+def _cross_check_attestation(manifest: dict, manifest_path: str) -> list[str]:
+    """Confirm the manifest reports the release the attestation evidence derives.
+
+    The two files are written at different times by different steps. Without this check a
+    caller could be frozen in the manifest at one release while its component evidence says
+    another, and nothing would notice.
+    """
+    reference = manifest.get("provenance_attestation")
+    if not reference:
+        return ["frozen comparator manifest has no provenance attestation reference"]
+    attestation = Path(manifest_path).resolve().parent.parent / reference
+    if not attestation.is_file():
+        attestation = Path(reference)
+    if not attestation.is_file():
+        return [f"provenance attestation not found: {reference}"]
+    derived = caller_release_map(str(attestation))
+    failures = []
+    for row in manifest.get("comparators", []):
+        if row.get("kind") != "caller":
+            continue
+        caller = str(row["method_id"]).split(":", 1)[-1]
+        if caller not in derived:
+            failures.append(f"{row['method_id']} has no attestation record")
+            continue
+        if str(row.get("imgt_hla_version", "")).strip() != derived[caller]:
+            failures.append(
+                f"{row['method_id']}.imgt_hla_version {row.get('imgt_hla_version')!r} "
+                f"disagrees with attestation evidence {derived[caller]!r}"
+            )
+    return failures
+
+
 def validate_caller_reference_attestation(path: str, require_ready: bool = True) -> list[str]:
-    """Validate the caller/database evidence without substituting a global release."""
+    """Validate caller/database evidence at the component level.
+
+    Release identity belongs to a component, not to a caller. A deployed database may mix
+    components built from different releases; that is a property of the deployment, not a
+    failure to determine it, so such a caller is recorded as HETEROGENEOUS and is resolved.
+    A component that carries no allele content -- an exon-split table, for example -- is
+    marked NOT_RELEASE_BEARING and is excluded from the caller summary.
+
+    Resolution is derived from the component evidence rather than read from a flag, so a
+    caller cannot be declared resolved by editing a boolean.
+    """
     data = read_json(path)
     failures: list[str] = []
-    if data.get("schema_version") != "champhla-caller-reference-attestation-1":
+    if data.get("schema_version") != "champhla-caller-reference-attestation-2":
         failures.append("unsupported caller-reference attestation schema")
     callers = data.get("callers", {})
     expected = {caller for panel in PANELS.values() for caller in panel}
@@ -111,16 +162,56 @@ def validate_caller_reference_attestation(path: str, require_ready: bool = True)
         components = row.get("reference_components", [])
         if not components:
             failures.append(f"{caller}: no reference components")
+        component_releases: list[str] = []
         for index, component in enumerate(components, start=1):
             if not component.get("artifact_id"):
                 failures.append(f"{caller}: reference component {index} has no identifier")
             if not HEX64.fullmatch(str(component.get("sha256", "")).lower()):
                 failures.append(f"{caller}: reference component {index} has no exact SHA-256")
-        if require_ready and not row.get("release_resolved"):
+            release = str(component.get("release", "")).strip()
+            evidence = str(component.get("release_evidence", "")).strip()
+            if not release:
+                if require_ready:
+                    failures.append(f"{caller}: component {index} has no release")
+                continue
+            component_releases.append(release)
+            if release == NOT_RELEASE_BEARING:
+                continue
+            if release == NO_MATCH and require_ready:
+                failures.append(f"{caller}: component {index} matched no release")
+            if evidence not in EVIDENCE_KINDS:
+                failures.append(
+                    f"{caller}: component {index} release evidence is not one of {sorted(EVIDENCE_KINDS)}"
+                )
+        derived = caller_release_summary(component_releases)
+        declared = str(row.get("database_release", "")).strip()
+        if declared and declared != derived:
+            failures.append(
+                f"{caller}: database_release {declared!r} disagrees with component evidence {derived!r}"
+            )
+        resolved = derived not in {NO_MATCH, ""}
+        if bool(row.get("release_resolved")) != resolved:
+            failures.append(
+                f"{caller}: release_resolved does not match the component evidence"
+            )
+        if require_ready and not resolved:
             failures.append(f"{caller}: database release unresolved")
     if require_ready and data.get("production_ready") is not True:
         failures.append("caller-reference attestation is not production ready")
     return sorted(set(failures))
+
+
+def caller_release_map(path: str) -> dict[str, str]:
+    """Return the derived release summary per caller, for cross-checking other manifests."""
+    data = read_json(path)
+    out: dict[str, str] = {}
+    for caller, row in data.get("callers", {}).items():
+        releases = [
+            str(component.get("release", "")).strip()
+            for component in row.get("reference_components", [])
+        ]
+        out[caller] = caller_release_summary([value for value in releases if value])
+    return out
 
 
 def validate_hprc_truth_protocol(path: str, require_frozen: bool = True) -> list[str]:

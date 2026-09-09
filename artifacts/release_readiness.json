@@ -1,8 +1,8 @@
 {
   "blockers": [
+    "clean_git_state",
     "corrected_three_modality_evaluation",
     "count_reconciliation",
-    "frozen_comparators",
     "main_claim_audit",
     "one_time_truth_join",
     "signed_amendment",
@@ -14,9 +14,14 @@
     "wgs_technical_and_human_review"
   ],
   "gates": {
+    "caller_reference_provenance": {
+      "evidence": "configs/roihu_caller_reference_attestation.json",
+      "failures": [],
+      "passed": true
+    },
     "clean_git_state": {
       "evidence": "git status --porcelain",
-      "passed": true
+      "passed": false
     },
     "corrected_three_modality_evaluation": {
       "evidence": "artifacts/corrected/evaluation/confirmation_decision.json",
@@ -28,28 +33,22 @@
     },
     "frozen_comparators": {
       "evidence": "configs/comparator_manifest.json",
-      "failures": [
-        "BestSingleTool_nestedCV.artifact_pin is unresolved",
-        "Caller:ArcasHLA.artifact_pin is unresolved",
-        "Caller:ArcasHLA.version is unresolved",
-        "Caller:HLA-HD.artifact_pin is unresolved",
-        "Caller:Kourami.artifact_pin is unresolved",
-        "Caller:OptiType.artifact_pin is unresolved",
-        "Caller:OptiType.version is unresolved",
-        "Caller:POLYSOLVER.artifact_pin is unresolved",
-        "Caller:POLYSOLVER.version is unresolved",
-        "Caller:SpecHLA.artifact_pin is unresolved",
-        "Caller:SpecHLA.version is unresolved",
-        "Caller:T1K.artifact_pin is unresolved",
-        "ChampionChallenger.artifact_pin is unresolved",
-        "ChampionChallenger.version is unresolved",
-        "MVFlooredCC.artifact_pin is unresolved",
-        "MetaConsensus.artifact_pin is unresolved",
-        "SimpleTwoThirdsConsensus.artifact_pin is unresolved",
-        "TwoThirdsGuardedCC.artifact_pin is unresolved",
-        "comparator manifest status is not FROZEN"
-      ],
-      "passed": false
+      "failures": [],
+      "passed": true
+    },
+    "frozen_nci60_exploratory_manifest": {
+      "evidence": "cohorts/nci60_rna_truth_free.freeze.json",
+      "passed": true,
+      "required_for_benchmark_release": false
+    },
+    "frozen_same_resource_manifest": {
+      "evidence": "cohorts/same_resource_truth_free.freeze.json",
+      "passed": true
+    },
+    "frozen_workflow": {
+      "evidence": "configs/roihu_workflow_lock.json",
+      "failures": [],
+      "passed": true
     },
     "main_claim_audit": {
       "evidence": "artifacts/benchmark_manuscript_audit.json",
@@ -69,7 +68,7 @@
       "passed": false
     },
     "supplement_claim_audit": {
-      "evidence": "artifacts/benchmark_manuscript_audit.json",
+      "evidence": "artifacts/benchmark_combined_audit.json",
       "passed": false
     },
     "tests_local": {

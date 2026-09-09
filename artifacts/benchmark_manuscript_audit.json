@@ -1,35 +1,20 @@
 {
-  "diagnostic_invalid_result_references": [
-    "DEV_WGS_CONSENSUS",
-    "DEV_WGS_LEGACY_BASE",
-    "DEV_WGS_LEGACY_GCC",
-    "META_WGS_INTERNAL"
-  ],
+  "diagnostic_invalid_result_references": [],
   "draft_route": "benchmark",
   "failures": [],
-  "manuscript": "manuscripts/benchmark/manuscript.md",
+  "manuscript": "D:/Users/uonur/Downloads/champhla_publication_candidate_stage/manuscripts/benchmark/manuscript.md",
   "manuscript_sha256": "fd468785b262f0908bf3538d8aa117fbce1cbe7fcebed41950bd3e3f28cc5d19",
   "result_references": [
     "DEV_RNA_CONSENSUS",
-    "DEV_TT_RNA_BASE",
-    "DEV_TT_RNA_GCC",
-    "DEV_TT_WES_BASE",
-    "DEV_TT_WES_GCC",
     "DEV_WES_CONSENSUS",
-    "DEV_WGS_CONSENSUS",
-    "DEV_WGS_LEGACY_BASE",
-    "DEV_WGS_LEGACY_GCC",
     "EGCC_GATE",
-    "META_NCI60_RNA",
-    "META_NCI60_WES",
-    "META_WGS_INTERNAL",
     "REFFORMER_GATE"
   ],
   "schema_version": "manuscript-claim-audit-1",
   "submission_ready": false,
-  "supplement": "manuscripts/benchmark/supplementary.md",
-  "supplement_sha256": "57ab83717e3d566f09c63146b38d3365aed762ad9cb287a91dfd43b99a13e08d",
-  "supplement_word_count": 925,
+  "supplement": "",
+  "supplement_sha256": "",
+  "supplement_word_count": 0,
   "warnings": [
     "pending claim: BM-007"
   ],

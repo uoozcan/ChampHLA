@@ -1,0 +1,15 @@
+{
+  "attestation": "configs/roihu_caller_reference_attestation.json",
+  "derived_releases": {
+    "ArcasHLA": "3.40.0",
+    "HLA-HD": "3.15.0",
+    "Kourami": "3.24.0",
+    "OptiType": "3.13.1",
+    "POLYSOLVER": "3.11.0",
+    "SpecHLA": "HETEROGENEOUS",
+    "T1K": "3.63.0"
+  },
+  "failures": [],
+  "passed": true,
+  "require_ready": true
+}

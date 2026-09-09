@@ -13,7 +13,13 @@ from .external import build_hprc_release2_candidates, select_hprc_confirmation_r
 from .freeze import freeze_bundle, validate_freeze
 from .hprc_truth import build_hprc_assembly_truth
 from .io import read_json, read_tsv, reject_truth_columns, sha256, write_json, write_tsv
-from .manifests import validate_comparator_manifest, validate_hprc_truth_protocol
+from .imgt_release import SOURCE_KINDS, load_release_index, resolve_source
+from .manifests import (
+    caller_release_map,
+    validate_caller_reference_attestation,
+    validate_comparator_manifest,
+    validate_hprc_truth_protocol,
+)
 from .panels import (
     METHOD_GUARDED_CC,
     METHOD_PLURALITY,
@@ -495,6 +501,59 @@ def freeze_workflow_lock_main() -> int:
     result = freeze_workflow_lock(args.project_root, args.workflow_root, args.output)
     print(f"workflow lock frozen files={len(result['files'])}")
     return 0
+
+
+def resolve_caller_database_release_main() -> int:
+    """Identify a caller database's IPD-IMGT/HLA release from its content.
+
+    A filename is not provenance. This resolves a database source against a pinned cache of
+    official per-release allele lists and reports NO_MATCH rather than guessing.
+    """
+    parser = argparse.ArgumentParser(
+        description="Identify a caller database release from content")
+    parser.add_argument("--component", required=True,
+                        help="extracted database source to identify")
+    parser.add_argument("--kind", required=True, choices=sorted(SOURCE_KINDS))
+    parser.add_argument("--allele-list-cache",
+                        help="pinned per-release allele lists; required unless kind is declared_header")
+    parser.add_argument("--caller")
+    parser.add_argument("--output")
+    args = parser.parse_args()
+    record = resolve_source(args.component, args.kind, args.allele_list_cache)
+    if args.caller:
+        record["caller"] = args.caller
+    record["component"] = args.component
+    if args.allele_list_cache:
+        record["allele_list_releases"] = len(load_release_index(args.allele_list_cache))
+    if args.output:
+        write_json(args.output, record)
+    print(f"{args.caller or args.component}: release={record['release']} "
+          f"evidence={record.get('evidence')}")
+    return 0 if record["release"] != "NO_MATCH" else 2
+
+
+def validate_caller_reference_attestation_main() -> int:
+    """Gate production on component-level database-release evidence."""
+    parser = argparse.ArgumentParser(
+        description="Validate the caller/database reference attestation")
+    parser.add_argument("--attestation", required=True)
+    parser.add_argument("--require-ready", action="store_true")
+    parser.add_argument("--output")
+    args = parser.parse_args()
+    failures = validate_caller_reference_attestation(args.attestation, args.require_ready)
+    result = {
+        "attestation": args.attestation,
+        "require_ready": args.require_ready,
+        "passed": not failures,
+        "failures": failures,
+        "derived_releases": caller_release_map(args.attestation),
+    }
+    if args.output:
+        write_json(args.output, result)
+    for failure in failures:
+        print(f"FAIL {failure}")
+    print(f"caller-reference attestation passed={result['passed']}")
+    return 0 if result["passed"] else 2
 
 
 def validate_workflow_lock_main() -> int:

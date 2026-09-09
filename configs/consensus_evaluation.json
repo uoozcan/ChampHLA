@@ -3,10 +3,23 @@
   "status": "development_only_post_result_amendment",
   "reference_method": "SimplePluralityLex",
   "prospective": false,
-  "valid_modalities": ["wes", "rnaseq"],
-  "invalid_modalities": {"wgs": "legacy chromosome-6 slice omitted HLA alternate-contig mappings and mates"},
+  "valid_modalities": [
+    "wes",
+    "rnaseq"
+  ],
+  "invalid_modalities": {
+    "wgs": "legacy chromosome-6 slice omitted HLA alternate-contig mappings and mates"
+  },
   "noninferiority_margin_points": 2.0,
-  "minimum_subjects": {"wgs": 120, "wes": 89, "rnaseq": 130},
+  "minimum_subjects": {
+    "wgs": 120,
+    "wes": 89,
+    "rnaseq": 130
+  },
   "multiplicity": "Holm within each modality for superiority; Bonferroni-simultaneous subject-cluster bootstrap intervals for noninferiority",
-  "claim_language": "No evaluated comparator significantly exceeded plurality; equivalence is not claimed from a failed superiority test."
+  "claim_language": "No evaluated comparator significantly exceeded plurality; equivalence is not claimed from a failed superiority test.",
+  "family_policy": "Holm correction runs within each modality's frozen deployable always-call comparator family. Abstaining rules such as SimpleTwoThirdsConsensus are excluded from that family and reported separately with callability and called-only accuracy, because mixing an abstaining rule into a family of always-call comparators changes what the correction means. Exclusion from the family is not exclusion from the manuscript.",
+  "abstaining_comparators": [
+    "SimpleTwoThirdsConsensus"
+  ]
 }

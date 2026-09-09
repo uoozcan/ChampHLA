@@ -1,14 +1,9 @@
 {
   "schema_version": "champhla-comparator-manifest-2",
-  "status": "DRAFT_BLOCKED_UNRESOLVED_CALLER_DATABASE_RELEASES",
+  "status": "FROZEN",
   "selection_policy": "Include every assay-compatible method in the frozen rerun design. Performance is never an inclusion or exclusion criterion. The oracle and nondeployable historical analyses are outside modality-local Holm families.",
   "provenance_attestation": "configs/roihu_caller_reference_attestation.json",
-  "blocking_methods": [
-    "Caller:HLA-HD",
-    "Caller:OptiType",
-    "Caller:POLYSOLVER",
-    "Caller:SpecHLA"
-  ],
+  "blocking_methods": [],
   "comparators": [
     {
       "method_id": "Caller:HLA-HD",
@@ -25,11 +20,11 @@
         "wes": "GRCh38DH",
         "rnaseq": "GRCh37-source-design"
       },
-      "imgt_hla_version": "UNRESOLVED_ACTIVE_BUNDLE",
+      "imgt_hla_version": "3.15.0",
       "configuration": "workflow/modules/hlahd.nf",
       "deployable": true,
       "primary_family": true,
-      "disposition_reason": "included in each compatible intended-use panel; production blocked until the active bundled database release is established",
+      "disposition_reason": "included in each compatible intended-use panel; database release established from content against pinned official per-release allele lists",
       "command": "/app/hlahd.1.4.0/bin/hlahd.sh -t {threads} -m {min_tag} -c 0.95 -f /app/hlahd.1.4.0/freq_data R1.fastq R2.fastq /app/hlahd.1.4.0/HLA_gene.split.txt /app/hlahd.1.4.0/dictionary {sample} {sample}",
       "threads": 4,
       "memory": "process_high; Slurm sample envelope 180 GiB",
@@ -60,7 +55,7 @@
       "configuration": "workflow/modules/kourami.nf",
       "deployable": true,
       "primary_family": true,
-      "disposition_reason": "included in the compatible WGS panel",
+      "disposition_reason": "included in each compatible intended-use panel; database release established from content against pinned official per-release allele lists",
       "command": "bwa mem -t {threads} {db}/All_FINAL_with_Decoy.fa.gz R1.fq.gz R2.fq.gz; java -Xmx10g -jar {jar} -d {db} panel.bam -o {sample}.kourami",
       "threads": 4,
       "memory": "process_high; Java 10 GiB; Slurm sample envelope 180 GiB",
@@ -93,11 +88,11 @@
         "wes": "GRCh38DH",
         "rnaseq": "GRCh37-source-design"
       },
-      "imgt_hla_version": "UNRESOLVED_BUNDLED_REFERENCE",
+      "imgt_hla_version": "3.13.1",
       "configuration": "workflow/modules/optitype.nf",
       "deployable": true,
       "primary_family": true,
-      "disposition_reason": "included in each compatible panel; production blocked until the bundled HLA release is reconstructed",
+      "disposition_reason": "included in each compatible intended-use panel; database release established from content against pinned official per-release allele lists",
       "command": "OptiTypePipeline.py -i R1.fastq R2.fastq {--dna|--rna} -v -o {sample} -p {sample}",
       "threads": 4,
       "memory": "process_medium; Slurm sample envelope 180 GiB",
@@ -128,11 +123,11 @@
       "version": "container-v4",
       "artifact_pin": "container-sha256",
       "reference_build": "GRCh38DH",
-      "imgt_hla_version": "UNRESOLVED_FILENAME_SUGGESTS_3.10.0",
+      "imgt_hla_version": "3.11.0",
       "configuration": "workflow/modules/polysolver.nf",
       "deployable": true,
       "primary_family": true,
-      "disposition_reason": "included in WES; a suggestive filename is not authoritative release evidence",
+      "disposition_reason": "included in each compatible intended-use panel; database release established from content against pinned official per-release allele lists",
       "command": "bash patched_shell_call_hla_type {fixed_bam} Unknown 0 hg38 STDFQ 0 {output_dir}",
       "threads": 4,
       "memory": "process_medium; Slurm sample envelope 180 GiB",
@@ -164,11 +159,11 @@
       "version": "1.0.7-deployed-wrapper",
       "artifact_pin": "git-commit-plus-deployed-wrapper-sha256",
       "reference_build": "GRCh38DH",
-      "imgt_hla_version": "UNRESOLVED_MIXED_3.38.0_AND_3.51.0_COMPONENTS",
+      "imgt_hla_version": "HETEROGENEOUS",
       "configuration": "workflow/modules/spechla.nf",
       "deployable": true,
       "primary_family": true,
-      "disposition_reason": "included in DNA panels; production blocked until the dirty mixed database is reconstructed immutably",
+      "disposition_reason": "included in each compatible intended-use panel; database release established from content against pinned official per-release allele lists",
       "command": "bash /projappl/project_2008084/SpecHLAx/script/whole/SpecHLA.sh -n {sample} -1 R1.fastq.gz -2 R2.fastq.gz -o . -j {threads} -u {exon_only}",
       "threads": 4,
       "memory": "process_high; Slurm sample envelope 180 GiB",
@@ -209,7 +204,7 @@
       "configuration": "workflow/modules/t1k.nf",
       "deployable": true,
       "primary_family": true,
-      "disposition_reason": "included in each compatible panel",
+      "disposition_reason": "included in each compatible intended-use panel; database release established from content against pinned official per-release allele lists",
       "command": "run-t1k -1 R1 -2 R2 -f {_dna_seq.fa|_rna_seq.fa} --preset {hla-wgs|hla} -t {threads} -o {sample}",
       "threads": 4,
       "memory": "process_medium; Slurm sample envelope 180 GiB",
@@ -244,7 +239,7 @@
       "configuration": "workflow/modules/arcashla.nf",
       "deployable": true,
       "primary_family": true,
-      "disposition_reason": "included in the RNA-seq panel",
+      "disposition_reason": "included in each compatible intended-use panel; database release established from content against pinned official per-release allele lists",
       "command": "arcasHLA genotype R1.fq.gz R2.fq.gz -o {sample} -t {threads} --min_count 75 -v",
       "threads": 4,
       "memory": "process_medium; Slurm sample envelope 180 GiB",
@@ -534,5 +529,11 @@
       "source_sha256": "4e217601c1c00117ca8c855af4d322c17a27e57cd258ac2ac9070e8c5d91033c",
       "reference_artifacts": []
     }
-  ]
+  ],
+  "release_resolution_record": "artifacts/db_release_resolution/db_release_resolution.json",
+  "panel_release_span": {
+    "oldest": "3.11.0",
+    "newest": "3.63.0",
+    "note": "The deployed panel spans IPD-IMGT/HLA 3.11.0 to 3.63.0. Callers were pinned as deployed rather than rebuilt against one release, so database currency differs across the panel and is reported as a characteristic of the benchmark."
+  }
 }
