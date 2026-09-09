@@ -1,0 +1,31 @@
+{
+  "schema_version": "champhla-test-attestation-1",
+  "date": "2026-09-10",
+  "commit": "1b3209f187fcc0083ec64fc72966da5f7a82103d",
+  "environment": "CSC Roihu login node, project_2008084",
+  "python_version": "3.11.15",
+  "pytest_version": "8.3.5",
+  "pytest_entrypoint": {
+    "passed": true,
+    "tests": 104
+  },
+  "python_module_entrypoint": {
+    "passed": true,
+    "tests": 104
+  },
+  "supported_runtime": true,
+  "passed": true,
+  "preflight": {
+    "script": "scripts/roihu_preflight.sh",
+    "exit_code": 0,
+    "workflow_lock": {
+      "passed": true,
+      "files": 14
+    },
+    "environment_audit": {
+      "passed": true,
+      "failures": 0
+    },
+    "note": "The preflight previously exited at the caller-database gate with four unresolved releases. It now runs to the Slurm submission boundary. Passing preflight is not authorisation to submit production arrays; the storage pilots have not run."
+  }
+}

@@ -7,9 +7,6 @@
     "one_time_truth_join",
     "signed_amendment",
     "supplement_claim_audit",
-    "tests_roihu",
-    "tests_ubuntu_ci",
-    "tests_windows_ci",
     "truth_blind_prediction_freeze",
     "wgs_technical_and_human_review"
   ],
@@ -73,22 +70,22 @@
     },
     "tests_local": {
       "evidence": "artifacts/verification/local_tests.json",
-      "passed": false,
+      "passed": true,
       "required_for_benchmark_release": false
     },
     "tests_roihu": {
       "evidence": "artifacts/verification/roihu_tests.json",
-      "passed": false,
+      "passed": true,
       "required_for_benchmark_release": true
     },
     "tests_ubuntu_ci": {
       "evidence": "artifacts/verification/ubuntu_ci.json",
-      "passed": false,
+      "passed": true,
       "required_for_benchmark_release": true
     },
     "tests_windows_ci": {
       "evidence": "artifacts/verification/windows_ci.json",
-      "passed": false,
+      "passed": true,
       "required_for_benchmark_release": true
     },
     "truth_blind_prediction_freeze": {

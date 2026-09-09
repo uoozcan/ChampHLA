@@ -1,12 +1,21 @@
 {
   "schema_version": "champhla-test-attestation-1",
-  "date": "2026-09-09",
-  "environment": "local workspace",
-  "python_version": "3.8.10",
-  "pytest_version": "7.4.3",
-  "pytest_entrypoint": {"passed": true, "tests": 81},
-  "python_module_entrypoint": {"passed": true, "tests": 81},
-  "supported_runtime": false,
-  "passed": false,
-  "reason": "The suite passes, but this shell is below the declared Python >=3.10 support boundary; CI and Roihu attestations are required."
+  "date": "2026-09-10",
+  "commit": "1b3209f187fcc0083ec64fc72966da5f7a82103d",
+  "environment": "local Windows workspace",
+  "python_version": "3.13.6",
+  "pytest_version": "8.3.5",
+  "pytest_entrypoint": {
+    "passed": true,
+    "tests": 103,
+    "skipped": 1
+  },
+  "python_module_entrypoint": {
+    "passed": true,
+    "tests": 103,
+    "skipped": 1
+  },
+  "supported_runtime": true,
+  "passed": true,
+  "note": "One test is skipped on Windows by design. Roihu and CI attestations remain the gating evidence for release."
 }

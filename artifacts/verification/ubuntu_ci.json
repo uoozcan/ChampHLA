@@ -1,0 +1,17 @@
+{
+  "schema_version": "champhla-test-attestation-1",
+  "date": "2026-09-10",
+  "commit": "1b3209f187fcc0083ec64fc72966da5f7a82103d",
+  "environment": "GitHub Actions ubuntu-latest",
+  "python_version": [
+    "3.10",
+    "3.11"
+  ],
+  "workflow_run": 34409003092,
+  "jobs": [
+    "cross-platform (ubuntu-latest, 3.10)",
+    "cross-platform (ubuntu-latest, 3.11)"
+  ],
+  "supported_runtime": true,
+  "passed": true
+}
