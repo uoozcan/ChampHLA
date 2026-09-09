@@ -1,0 +1,22 @@
+{
+  "expected_caller_locus_records": 5289,
+  "expected_plurality_rows": 1122,
+  "expected_samples_by_modality": {
+    "rnaseq": 107,
+    "wes": 130,
+    "wgs": 137
+  },
+  "failures": [],
+  "frozen": true,
+  "passed": true,
+  "path": "same_resource_truth_free.tsv",
+  "rows": 374,
+  "samples_by_modality": {
+    "rnaseq": 107,
+    "wes": 130,
+    "wgs": 137
+  },
+  "schema_version": "champhla-truth-free-run-manifest-freeze-1",
+  "source_sha256": "c63d1c3505ce699389d09e12a31381f9bdfa205372501a6564f9027c84187eea",
+  "truth_blind": true
+}

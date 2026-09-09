@@ -8,7 +8,13 @@
     "source_truth_blind_sha256": "29ab9ca4d44f7b416530918c9b340a87dff22b60393239eae6bc3fe78f8c2eaa",
     "public_assay_manifest": "cohorts/official_1000g_assay_manifest.tsv",
     "geuvadis_ena_report": "cohorts/sources/geuvadis_ena_fastq_report.tsv",
-    "index_checksum_policy": "missing public CRAI checksums are streamed and hashed on Roihu; sequencing inputs are not downloaded by the resolver"
+    "public_index_checksums": "cohorts/sources/1000g_public_index_checksums.tsv",
+    "public_index_checksums_sha256": "31cf888454242cedc61a9df955c20d98620d15f5b00a74f73c8ee059284fa1be",
+    "manifest": "cohorts/same_resource_truth_free.tsv",
+    "manifest_sha256": "c63d1c3505ce699389d09e12a31381f9bdfa205372501a6564f9027c84187eea",
+    "freeze": "cohorts/same_resource_truth_free.freeze.json",
+    "freeze_sha256": "e814bd0aae3bcc60ead6c5096154a9baa6789412c6ba9d8638e5eb3079b4654c",
+    "index_checksum_policy": "137 missing public CRAI checksums were streamed with eight bounded workers and hashed on Roihu; sequencing inputs were not retained by the resolver"
   },
   "nci60": {
     "manifest": "cohorts/nci60_rna_truth_free.tsv",
