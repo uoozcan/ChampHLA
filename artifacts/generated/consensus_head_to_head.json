@@ -1,0 +1,9 @@
+{
+  "bootstrap_iterations": 1000,
+  "comparison_rows": 29,
+  "evaluation_design": "configs/consensus_evaluation.json",
+  "integration_method_count": 7,
+  "output": "artifacts/generated/consensus_head_to_head.md",
+  "schema_version": "plurality-head-to-head-render-1",
+  "source": "existing_evaluation"
+}

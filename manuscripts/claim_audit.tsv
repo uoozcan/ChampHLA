@@ -1,12 +1,15 @@
 claim_id	draft	section	claim	status	evidence_result_id	action
-SRC-001	source_original	Abstract	MV-floor improves WGS from 0.399 to 0.494.	remove	DEV_WGS_LEGACY_BASE	Remove because the WGS input is invalid.
-SRC-002	source_original	Abstract	MV-floor is the reported operating method.	remove		Replace with the benchmark route unless confirmation activates Guarded CC.
-SRC-003	source_original	Methods	Population stratification key requires author confirmation.	remove		Resolve from machine-readable fold assignments.
-SRC-004	source_original	Supplement	FIMM survival and HED support the main method.	remove		Keep outside the main manuscript as exploratory work.
-BM-001	benchmark	Abstract	ChampHLA provides auditable multi-caller class-I integration.	supported		Retain as the software/benchmark headline.
-BM-002	benchmark	Results	Guarded CC resolves two-thirds consensus failures in internal WES.	exploratory	DEV_TT_WES_GCC	Label as development evidence and report callability.
-BM-003	benchmark	Results	Guarded CC resolves two-thirds consensus failures in internal RNA-seq.	exploratory	DEV_TT_RNA_GCC	Label as development evidence and report callability.
-BM-004	benchmark	Ablations	RefFormer failed its prespecified gate.	supported	REFFORMER_GATE	Retain as a transparent negative ablation.
-BM-005	benchmark	Ablations	EvidenceGatedCC failed its prespecified gate.	supported	EGCC_GATE	Retain as a transparent negative ablation.
-METHOD-001	method	Status	Three-modality Guarded CC superiority is not yet confirmed.	pending		Activate only after all frozen confirmation gates pass.
-
+SRC-001	source_original	Abstract	Historical WGS performance supports an operating-method claim.	remove	DEV_WGS_LEGACY_BASE	Retain only as labeled invalid diagnostics.
+SRC-002	source_original	Abstract	MV-floor is the primary operating method.	remove		Superseded by the disclosed plurality amendment.
+SRC-003	source_original	Methods	Population stratification requires manual completion.	remove		Resolve from machine-readable assignments.
+SRC-004	source_original	Supplement	FIMM survival and HED support the primary method.	remove		Keep outside the benchmark claim.
+BM-001	benchmark	Abstract	ChampHLA provides auditable multi-caller HLA-A/B/C integration with pair-level plurality as the default.	supported		Retain as the software and benchmark headline.
+BM-002	benchmark	Results	WES plurality development accuracy uses the fixed eligible-truth denominator.	development	DEV_WES_CONSENSUS	Retain with post-result disclosure.
+BM-003	benchmark	Results	RNA-seq plurality development accuracy uses the fixed eligible-truth denominator.	development	DEV_RNA_CONSENSUS	Retain with post-result disclosure.
+BM-004	benchmark	Ablations	RefFormer failed its frozen retention gate.	supported	REFFORMER_GATE	Retain as a negative historical ablation.
+BM-005	benchmark	Ablations	EvidenceGatedCC failed its development gate.	supported	EGCC_GATE	Retain as a negative historical ablation.
+BM-006	benchmark	WGS	Historical WGS values are invalid and diagnostic only.	supported	DEV_WGS_CONSENSUS	Permit only in the supplement with explicit invalid labeling.
+BM-007	benchmark	Conclusion	Cross-assay performance wording depends on a valid corrected prospective rerun.	pending		Resolve from three_modality_claim_ready.
+METHOD-001	method	Status	The Guarded CC method manuscript is superseded and retained only for provenance.	supported		Do not reactivate as the primary manuscript.
+SHARED-001	shared	Methods	A native missing second allele remains partial and never implies homozygosity.	supported		Enforced by parser and harmonisation tests.
+SHARED-002	shared	Methods	Donor-independent and overlapping-donor evidence is not pooled.	supported		Enforced by the generic evaluator.

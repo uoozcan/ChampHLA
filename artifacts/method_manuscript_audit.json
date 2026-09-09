@@ -1,13 +1,15 @@
 {
+  "diagnostic_invalid_result_references": [],
   "draft_route": "method",
   "failures": [],
-  "manuscript": "/mnt/d/Users/uonur/Downloads/champhla_publication_candidate_stage/manuscripts/method_conditional/manuscript.md",
-  "manuscript_sha256": "0fd05aebe60e0b90bad29e6039f12c72d5547595daeda3f54f2118189fab4959",
+  "manuscript": "manuscripts/method_conditional/manuscript.md",
+  "manuscript_sha256": "00bbf47f0004cb03dbffa52ce058a583a3d444b481c06257659f438f1c8b2748",
   "result_references": [],
   "schema_version": "manuscript-claim-audit-1",
-  "submission_ready": false,
-  "warnings": [
-    "pending claim: METHOD-001"
-  ],
-  "word_count": 261
+  "submission_ready": true,
+  "supplement": "",
+  "supplement_sha256": "",
+  "supplement_word_count": 0,
+  "warnings": [],
+  "word_count": 256
 }

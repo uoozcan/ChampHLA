@@ -1,0 +1,28 @@
+{
+  "generated_from_official_metadata": true,
+  "input_sha256": {
+    "afgr_encode_json": "9fa28e20de8757a4af338729a8192f2ccecd56b3b0d480f1cf31a76a2dceaccc",
+    "afgr_supplement_zip": "c3586fb1f87b0830dcabc8c6d19651313773dedac3a5cb57e8e4e7dd35e79a1c",
+    "ccle_wes_ena": "dd5abab97eb380abc5e8f284b6504ce71479ab3f39a90e0d496299d6ffdbdf33",
+    "development": "29ab9ca4d44f7b416530918c9b340a87dff22b60393239eae6bc3fe78f8c2eaa",
+    "nci_hla_html": "c5e204662197042c7c6bc2ab4dcf64d5e78aa69aa760bf42005140d289012334",
+    "nci_rna_ena": "0d8ae2540e9fd76e921589f72b2a5a9e516aaa10ff2bd2df37b6c21003d200e0"
+  },
+  "raw_reads_downloaded": false,
+  "schema_version": "dataset-discovery-source-snapshot-1",
+  "snapshot_counts": {
+    "afgr_mkk_rna_subjects": 166,
+    "ccle_nci60_wes_subjects": 3,
+    "crosswalk_rows": 391,
+    "nci_rna_subjects": 58,
+    "nci_truth_subjects": 58,
+    "pilot_rows": 111
+  },
+  "source_urls": {
+    "afgr_encode": "https://www.encodeproject.org/search/?type=Experiment&searchTerm=AFGR&format=json&limit=all",
+    "afgr_supplement": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10659267/supplementaryFiles",
+    "ccle_wes": "https://www.ebi.ac.uk/ena/portal/api/search?result=read_run&query=study_accession%3D%22PRJNA523380%22%20AND%20library_strategy%3D%22WXS%22",
+    "nci_hla": "https://pmc.ncbi.nlm.nih.gov/articles/PMC555742/",
+    "nci_rna": "https://www.ebi.ac.uk/ena/portal/api/search?result=read_run&query=study_accession%3D%22PRJNA433861%22"
+  }
+}

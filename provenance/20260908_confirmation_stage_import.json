@@ -1,0 +1,24 @@
+{
+  "schema_version": "champhla-source-import-1",
+  "date": "2026-09-08",
+  "source_root": "/mnt/d/Users/uonur/Downloads/champhla_cc_confirmation_stage",
+  "source_is_git_repository": false,
+  "policy": "copy compact discovery evidence into the canonical Git repository, preserve source checksums, then evolve code under version control",
+  "records": [
+    {"path": "external/dataset_discovery/dataset_registry.tsv", "source_sha256": "b872c807ee413b0970f65eefd4f0dc65b277f35dadd9722e93b4db8d5f8738c5", "disposition": "imported_exact"},
+    {"path": "external/dataset_discovery/truth_registry.tsv", "source_sha256": "074aea19264860dbf1255a9738f9a8c29d4fbd94f4ac90a6f31114da5535aafd", "disposition": "imported_exact"},
+    {"path": "external/dataset_discovery/sample_crosswalk.tsv", "source_sha256": "ebe7431f2544b17149c62462196d977afaba015d867c163bfb26e20e93e751ea", "disposition": "imported_exact"},
+    {"path": "external/dataset_discovery/pilot_manifest.tsv", "source_sha256": "d5387041f4427b408cd0b70147bff46e033257a3fa63e77bec708d6cc926cbe0", "disposition": "imported_exact"},
+    {"path": "external/dataset_discovery/comparison_design.json", "source_sha256": "a6637bf26fba9758b866035c61e4b0fe3de949fe70b6d06c10ac4047f0b12466", "disposition": "imported_then_amended_for_plurality_primary"},
+    {"path": "external/dataset_discovery/candidate_assessment.md", "source_sha256": "7f5896f3c7ba5fcc36988770e9cee797fe7a21c4eef32e51404836262e5cabaf", "disposition": "imported_then_amended_for_plurality_primary"},
+    {"path": "external/dataset_discovery/audit_summary.json", "source_sha256": "aea05970fce06125867ad726d4e7b3ef31d59d77508977cce46586bd5efa9fed", "disposition": "imported_then_regenerated_with_lane_states"},
+    {"path": "external/dataset_discovery/sources/afgr_mkk_encode.tsv", "source_sha256": "a3b7cc2f24fffcd0685f81efaf7370493b043228d9f3a11f22e2202849eef3c2", "disposition": "imported_exact"},
+    {"path": "external/dataset_discovery/sources/ccle_nci60_wes_ena.tsv", "source_sha256": "482c4179aa44cae0c53328e002f6c0a4ca604631052458f5899db16d18038d71", "disposition": "imported_exact"},
+    {"path": "external/dataset_discovery/sources/nci60_rna_ena.tsv", "source_sha256": "8b1f203ae48b0fe619455232a0d9c2bdb5e31c7284b0de7bddbc38d8854d06f5", "disposition": "imported_exact"},
+    {"path": "external/dataset_discovery/sources/nci60_truth_eligibility.tsv", "source_sha256": "f49939a88206d6c7d73de0263386683963d3ba01625e5c033227e4cdb9796785", "disposition": "imported_exact"},
+    {"path": "external/dataset_discovery/sources/source_manifest.json", "source_sha256": "0cce3121c578a9dfc7da1861f658074399bc8aae50e8ba2dfab75570a2981fe8", "disposition": "imported_exact"},
+    {"path": "src/champhla_confirmation/dataset_discovery.py", "source_sha256": "1d05709608d7dea2dae922432b5249a29a3d67197d393f0e39d20a3d12daa0cb", "disposition": "imported_then_extended"},
+    {"path": "scripts/build_dataset_discovery_sources.py", "source_sha256": "465786d40fc1e04c26f57568cf0ef94a7ae744d16f922fa8602367a6d1e52ffb", "disposition": "imported_then_refactored"},
+    {"path": "tests/test_dataset_discovery.py", "source_sha256": "a9a3a7c9ce503346d884144c0c91df621dff18b980e997b18a2ec8b599cbf96e", "disposition": "imported_then_refactored"}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "plurality-evaluation-design-1",
+  "status": "PREDECLARED_PENDING_AUTHOR_SIGNATURE_AND_COMPARATOR_FREEZE",
+  "reference_method": "SimplePluralityLex",
+  "prospective": true,
+  "valid_modalities": ["wgs", "wes", "rnaseq"],
+  "invalid_modalities": {},
+  "primary_independence_stratum": "donor_independent",
+  "noninferiority_margin_points": 2.0,
+  "minimum_subjects": {"wgs": 120, "wes": 89, "rnaseq": 130},
+  "multiplicity": "Holm within each modality's frozen deployable family",
+  "simultaneous_intervals": "Bonferroni familywise subject-clustered bootstrap within modality",
+  "candidate_oracle": "descriptive and outside the deployable family",
+  "selected_best_caller": "descriptive post-selection summary; all frozen callers remain in inference",
+  "external_strata_rule": "new-library overlapping-donor cohorts are reported separately and never pooled into the primary donor-independent estimate"
+}

@@ -50,6 +50,9 @@ class FirewallEvaluationTests(unittest.TestCase):
             frozen_paths = {row["path"] for row in payload["project_files"]}
             self.assertIn("src/code.py", frozen_paths)
             self.assertNotIn("discovery/truth.tsv", frozen_paths)
+            self.assertEqual("pred.tsv", payload["inputs"]["predictions"]["path"])
+            self.assertNotIn("\\", payload["project_root_locator"])
+            self.assertTrue(validate_freeze(manifest)["valid"])
 
     def test_join_once_checksum_and_partial_evaluation(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -79,9 +82,10 @@ class FirewallEvaluationTests(unittest.TestCase):
             join_truth(str(pred_path), str(truth_path), str(freeze_path), str(joined), str(join_manifest))
             result = evaluate(str(joined), str(root / "eval"), bootstrap=1000, allow_partial=True,
                               mode="discovery")
-            self.assertFalse(result["headline_retained"])
+            self.assertFalse(result["three_modality_claim_ready"])
+            self.assertEqual("SimplePluralityLex", result["reference_method"])
             primary = (root / "eval" / "primary_modality_results.tsv").read_text(encoding="utf-8")
-            self.assertIn("100", primary)
+            self.assertIn("\t0\t0.0\t8\t1.0\t", primary)
             self.assertEqual(8, read_json(join_manifest)["loci"])
 
     def test_capacity_requires_three_modalities(self):

@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from .io import canonical_pair, normalize_gene, normalize_modality, read_tsv, sha256, write_json, write_tsv
-from .panels import PANELS
-from .parsers import parse_caller_pair
+from .io import canonical_allele, canonical_pair, normalize_gene, normalize_modality, read_json, read_tsv, sha256, write_json, write_tsv
+from .panels import GENES, PANELS
+from .parsers import parse_caller_call
 
 
 def _safe_pair(a: str, b: str, gene: str):
@@ -15,7 +15,7 @@ def _safe_pair(a: str, b: str, gene: str):
         return None, str(exc)
 
 
-def _raw_tokens_found(path: Path, alleles: tuple[str, str] | None) -> bool:
+def _raw_tokens_found(path: Path, alleles: tuple[str, ...] | None) -> bool:
     if not alleles:
         return True
     try:
@@ -29,7 +29,8 @@ def _raw_tokens_found(path: Path, alleles: tuple[str, str] | None) -> bool:
 
 
 def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
-              manual_review_path: str | Path | None = None) -> dict:
+              manual_review_path: str | Path | None = None,
+              environment_manifest_path: str | Path | None = None) -> dict:
     source_rows = read_tsv(harmonized_path)
     rows = [row for row in source_rows if normalize_modality(row.get("modality", "")) == "wgs"
             and row.get("tool", row.get("caller", "")) in PANELS["wgs"]]
@@ -37,7 +38,7 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
         raise ValueError("no eligible WGS rows")
     cohort_default = "1000G-development"
     observed = {}
-    universe = set()
+    observed_subjects = set()
     populations = {}
     for row in rows:
         subject = row.get("subject", row.get("sample", "")).strip()
@@ -47,8 +48,10 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
         if key in observed:
             raise ValueError(f"duplicate WGS caller/locus row: {key}")
         observed[key] = row
-        universe.add((key[0], subject, gene))
+        observed_subjects.add((key[0], subject))
         populations[subject] = row.get("superpopulation", row.get("population", ""))
+
+    universe = {(cohort, subject, gene) for cohort, subject in observed_subjects for gene in GENES}
 
     file_hash_cache = {}
     audit_rows = []
@@ -73,7 +76,25 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
             parsed_a1, parsed_a2 = row.get("allele1", ""), row.get("allele2", "")
             raw_pair, raw_error = _safe_pair(raw_a1, raw_a2, gene) if status == "callable" else (None, "")
             parsed_pair, parsed_error = _safe_pair(parsed_a1, parsed_a2, gene) if status == "callable" else (None, "")
-            pair_match = status != "callable" or bool(raw_pair and raw_pair == parsed_pair)
+            partial_allele = None
+            raw_partial_allele = None
+            if status == "partial":
+                try:
+                    partial_allele = canonical_allele(parsed_a1, gene)
+                    if parsed_a2:
+                        raise ValueError("partial row has a second parsed allele")
+                except ValueError as exc:
+                    parsed_error = str(exc)
+                try:
+                    raw_partial_allele = canonical_allele(raw_a1, gene)
+                    if raw_a2.strip() not in {"", "-"}:
+                        raise ValueError("partial raw row has a second allele")
+                except ValueError as exc:
+                    raw_error = str(exc)
+            pair_match = status not in {"callable", "partial"} or (
+                bool(raw_pair and raw_pair == parsed_pair) if status == "callable"
+                else bool(partial_allele and raw_partial_allele == partial_allele)
+            )
             source_path = row.get("source_path", row.get("source_file", ""))
             path = Path(source_path) if source_path else None
             exists = bool(path and path.is_file())
@@ -84,27 +105,33 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
                 actual_hash = file_hash_cache[source_path]
             expected_hash = row.get("source_sha256", "")
             hash_match = bool(exists and (not expected_hash or expected_hash == actual_hash))
-            tokens_found = bool(exists and _raw_tokens_found(path, raw_pair))
-            source_pair = None
-            if exists and status == "callable":
+            audit_alleles = raw_pair if status == "callable" else ((partial_allele,) if partial_allele else None)
+            tokens_found = bool(exists and _raw_tokens_found(path, audit_alleles))
+            source_call = None
+            if exists and status in {"callable", "partial"}:
                 try:
-                    source_pair = parse_caller_pair(
+                    source_call = parse_caller_call(
                         caller, path.read_text(encoding="utf-8", errors="replace"), gene)
                 except (OSError, ValueError):
-                    source_pair = None
-            source_pair_match = status != "callable" or bool(source_pair and source_pair == parsed_pair)
+                    source_call = None
+            source_pair_match = status not in {"callable", "partial"} or bool(
+                source_call
+                and source_call["call_status"] == status
+                and source_call["allele1"] == parsed_a1
+                and source_call["allele2"] == parsed_a2
+            )
             failures = []
-            if status == "callable" and not pair_match:
+            if status in {"callable", "partial"} and not pair_match:
                 failures.append("raw_parsed_mismatch")
-            if status == "callable" and (raw_error or parsed_error):
+            if status in {"callable", "partial"} and (raw_error or parsed_error):
                 failures.append("unresolved_allele")
             if not exists:
                 failures.append("source_unavailable")
             elif not hash_match:
                 failures.append("source_hash_mismatch")
-            if status == "callable" and exists and not tokens_found:
+            if status in {"callable", "partial"} and exists and not tokens_found:
                 failures.append("raw_tokens_not_found")
-            if status == "callable" and exists and not source_pair_match:
+            if status in {"callable", "partial"} and exists and not source_pair_match:
                 failures.append("source_pair_unparsed_or_mismatch")
             audit_rows.append({
                 "cohort": cohort, "subject": subject, "superpopulation": populations.get(subject, ""),
@@ -125,16 +152,21 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
             existing_review[(row["subject"], row["gene"], row["caller"])] = row
     by_caller = defaultdict(list)
     for row in audit_rows:
-        if row["call_status"] == "callable":
+        if row["call_status"] == "missing":
+            row["review_stratum"] = "missing"
+        elif row["call_status"] in {"callable", "partial"}:
             homo = row["parsed_allele1"] == row["parsed_allele2"]
             high = row["raw_allele1"].count(":") > 1 or row["raw_allele2"].count(":") > 1
-            row["review_stratum"] = "high_field" if high else "homozygous" if homo else "heterozygous"
-            by_caller[row["caller"]].append(row)
+            row["review_stratum"] = ("partial" if row["call_status"] == "partial" else
+                                     "high_field" if high else "homozygous" if homo else "heterozygous")
+        else:
+            continue
+        by_caller[row["caller"]].append(row)
     manual_rows = []
     for caller in PANELS["wgs"]:
         candidates = by_caller[caller]
         selected = []
-        for stratum in ("high_field", "homozygous", "heterozygous"):
+        for stratum in ("partial", "high_field", "homozygous", "heterozygous", "missing"):
             for row in candidates:
                 if row["review_stratum"] == stratum and row not in selected:
                     selected.append(row)
@@ -161,8 +193,24 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
     manual_review_complete = bool(
         len(manual_rows) == 10 * len(PANELS["wgs"])
         and all(row["review_status"] == "pass" for row in manual_rows)
+        and all(row["reviewer"].strip() for row in manual_rows)
     )
-    passed = automated_passed and manual_review_complete
+    environment_failures = []
+    environment = read_json(environment_manifest_path) if environment_manifest_path else {}
+    required_environment = {
+        "reference_build", "reference_sha256", "imgt_hla_version",
+        "python_version", "samtools_version", "caller_artifacts",
+    }
+    if required_environment - set(environment):
+        environment_failures.append(
+            f"missing environment fields: {sorted(required_environment - set(environment))}"
+        )
+    elif set(environment["caller_artifacts"]) != set(PANELS["wgs"]):
+        environment_failures.append("caller_artifacts does not exactly match the WGS panel")
+    elif not all(str(value).strip() for value in environment["caller_artifacts"].values()):
+        environment_failures.append("one or more caller artifact hashes are empty")
+    environment_passed = not environment_failures
+    passed = automated_passed and manual_review_complete and environment_passed
     out = Path(output_dir)
     write_tsv(out / "wgs_audit.tsv", audit_rows)
     write_tsv(out / "wgs_manual_review.tsv", manual_rows)
@@ -170,12 +218,26 @@ def audit_wgs(harmonized_path: str | Path, output_dir: str | Path,
         "schema_version": "wgs-input-audit-1", "passed": passed,
         "automated_passed": automated_passed,
         "manual_review_complete": manual_review_complete,
+        "human_review_passed": manual_review_complete,
+        "named_reviewer": ",".join(sorted({row["reviewer"] for row in manual_rows if row["reviewer"]})),
+        "environment_passed": environment_passed,
+        "environment_failures": environment_failures,
+        "environment_manifest": str(Path(environment_manifest_path).resolve()) if environment_manifest_path else "",
+        "environment_manifest_sha256": sha256(environment_manifest_path) if environment_manifest_path else "",
         "eligible_panel": list(PANELS["wgs"]), "locus_caller_records": len(audit_rows),
+        "expected_locus_caller_records": len(universe) * len(PANELS["wgs"]),
+        "observed_input_locus_caller_records": len(observed),
+        "expected_record_fraction": (len(observed) / (len(universe) * len(PANELS["wgs"]))
+                                     if universe else 0.0),
+        "native_output_checksums_passed": bool(audit_rows and all(
+            row["source_hash_match"] for row in audit_rows)),
+        "parser_round_trips_passed": bool(audit_rows and all(
+            row.get("source_pair_match", 0) for row in audit_rows)),
         "audit_status_counts": dict(sorted(counts.items())),
         "manual_review_counts": dict(sorted(review_counts.items())),
         "source_harmonized": str(Path(harmonized_path).resolve()),
         "source_harmonized_sha256": sha256(harmonized_path),
-        "failure_policy": "fail closed until every expected record, caller-native source, raw/parsed pair, checksum, and 50-record manual review passes",
+        "failure_policy": "fail closed until every expected record, caller-native source, raw/parsed pair, checksum, environment/reference manifest, and 50-record named manual review passes",
     }
     write_json(out / "wgs_audit_summary.json", summary)
     return summary

@@ -1,0 +1,12 @@
+{
+  "schema_version": "champhla-test-attestation-1",
+  "date": "2026-09-09",
+  "environment": "local workspace",
+  "python_version": "3.8.10",
+  "pytest_version": "7.4.3",
+  "pytest_entrypoint": {"passed": true, "tests": 81},
+  "python_module_entrypoint": {"passed": true, "tests": 81},
+  "supported_runtime": false,
+  "passed": false,
+  "reason": "The suite passes, but this shell is below the declared Python >=3.10 support boundary; CI and Roihu attestations are required."
+}

@@ -22,11 +22,15 @@ def exact_cluster_signflip(subject_deltas) -> float:
 
 
 def cluster_bootstrap_ci(rows: list[dict], baseline_field: str, selected_field: str,
-                         iterations: int = 100000, seed: int = 20260831) -> tuple[float, float]:
+                         iterations: int = 100000, seed: int = 20260831,
+                         alpha: float = 0.05) -> tuple[float, float]:
     """Subject bootstrap of the fixed-denominator ratio-estimator difference."""
+    if not 0 < alpha < 1:
+        raise ValueError("alpha must be between zero and one")
     by_subject: dict[str, list[int]] = defaultdict(list)
     for row in rows:
-        by_subject[row["subject"]].append(int(row[selected_field]) - int(row[baseline_field]))
+        cluster = row.get("cluster_id", row["subject"])
+        by_subject[cluster].append(int(row[selected_field]) - int(row[baseline_field]))
     subjects = sorted(by_subject)
     if not subjects:
         return 0.0, 0.0
@@ -41,9 +45,35 @@ def cluster_bootstrap_ci(rows: list[dict], baseline_field: str, selected_field: 
             denominator += len(values)
         estimates.append(numerator / denominator if denominator else 0.0)
     estimates.sort()
-    lo = estimates[int(0.025 * iterations)]
-    hi = estimates[min(iterations - 1, int(0.975 * iterations))]
+    lo = estimates[int((alpha / 2) * iterations)]
+    hi = estimates[min(iterations - 1, int((1 - alpha / 2) * iterations))]
     return lo, hi
+
+
+def simultaneous_cluster_bootstrap_ci(
+    rows_by_comparator: dict[str, list[dict]],
+    reference_field: str,
+    comparator_field: str,
+    iterations: int = 100000,
+    seed: int = 20260831,
+    alpha: float = 0.05,
+) -> dict[str, tuple[float, float]]:
+    """Bonferroni-simultaneous subject-clustered intervals for a method family."""
+    family_size = len(rows_by_comparator)
+    if family_size == 0:
+        return {}
+    family_alpha = alpha / family_size
+    return {
+        method: cluster_bootstrap_ci(
+            rows,
+            reference_field,
+            comparator_field,
+            iterations=iterations,
+            seed=seed + index,
+            alpha=family_alpha,
+        )
+        for index, (method, rows) in enumerate(sorted(rows_by_comparator.items()))
+    }
 
 
 def holm_adjust(records: list[dict], p_field: str = "p_value") -> list[dict]:
@@ -66,6 +96,6 @@ def holm_adjust(records: list[dict], p_field: str = "p_value") -> list[dict]:
 def subject_deltas(rows: list[dict], baseline_field: str, selected_field: str) -> dict[str, int]:
     totals: dict[str, int] = defaultdict(int)
     for row in rows:
-        totals[row["subject"]] += int(row[selected_field]) - int(row[baseline_field])
+        cluster = row.get("cluster_id", row["subject"])
+        totals[cluster] += int(row[selected_field]) - int(row[baseline_field])
     return dict(totals)
-

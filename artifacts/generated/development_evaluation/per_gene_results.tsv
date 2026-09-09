@@ -1,0 +1,10 @@
+modality	gene	reference_method	loci	correct	accuracy
+rnaseq	A	SimplePluralityLex	107	102	0.9532710280373832
+rnaseq	B	SimplePluralityLex	107	102	0.9532710280373832
+rnaseq	C	SimplePluralityLex	107	102	0.9532710280373832
+wes	A	SimplePluralityLex	130	124	0.9538461538461539
+wes	B	SimplePluralityLex	130	123	0.9461538461538461
+wes	C	SimplePluralityLex	130	118	0.9076923076923077
+wgs	A	SimplePluralityLex	137	57	0.41605839416058393
+wgs	B	SimplePluralityLex	137	66	0.48175182481751827
+wgs	C	SimplePluralityLex	137	41	0.29927007299270075

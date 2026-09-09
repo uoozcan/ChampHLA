@@ -1,0 +1,32 @@
+{
+  "schema_version": "champhla-derived-development-evaluation-1",
+  "date": "2026-09-08",
+  "evidence_role": "development",
+  "qualifying_confirmation": false,
+  "source_joined_path": "/mnt/d/Users/uonur/Downloads/champhla_cc_confirmation_stage/discovery/joined.tsv",
+  "source_joined_sha256": "155701a7da12e6c54833a39cee45795291cd15e97540c04be52d8da07877f345",
+  "source_joined_imported": false,
+  "source_joined_import_reason": "truth-bearing development table remains outside the compact canonical release; only derived outputs and its checksum are retained",
+  "bootstrap_iterations": 1000,
+  "warning": "Intervals are a development rendering only. Legacy partial calls and incomplete caller rows make this output non-qualifying; the corrected rerun uses the protocol default.",
+  "inputs": {
+    "src/champhla_confirmation/evaluation.py": "4e217601c1c00117ca8c855af4d322c17a27e57cd258ac2ac9070e8c5d91033c",
+    "src/champhla_confirmation/statistics.py": "8be39c0002794fa714bc0c85d5d8cd75d2def2df4a5bc5a32eb8e8aff9481f3b",
+    "configs/consensus_evaluation.json": "9a6931c49436a66b4f66017de22eb16dc0698ca777eb045f68b659fb61be57d7",
+    "configs/comparator_manifest.json": "180f2e4eaad81875bcf7f7b6b242b87e358203373d996d0bb158f9c2666e55d1"
+  },
+  "outputs": {
+    "artifacts/generated/development_evaluation/confirmation_decision.json": "e1c4dc14aa27fccc810c974404ea3d5be88bd6e3546938a525c268b1949a8e9e",
+    "artifacts/generated/development_evaluation/primary_modality_results.tsv": "edd6d80f2b19828fb7d231b2644a7da3fa7ce18d4c6addc16b026601c4bedc09",
+    "artifacts/generated/development_evaluation/head_to_head.tsv": "dac986ffe15ee6f4e7fdc6a2c94c07dd94faee0fcb9fdc798be92a8abefdc352",
+    "artifacts/generated/development_evaluation/secondary_method_results.tsv": "dac986ffe15ee6f4e7fdc6a2c94c07dd94faee0fcb9fdc798be92a8abefdc352",
+    "artifacts/generated/development_evaluation/secondary_endpoints.tsv": "a1d7dac24f43c779d3b74bd4a36992b1ba6d8fb46164cb8bdf73a090184e9278",
+    "artifacts/generated/development_evaluation/caller_call_status.tsv": "5207c08d092ff38fcb80effa5fc29231bea50e14f097c40f1b3ca0b87662e10a",
+    "artifacts/generated/development_evaluation/per_gene_results.tsv": "75d498785735085bf9a09fa1ada692ba11db8324739278b2c6351f616271af98",
+    "artifacts/generated/development_evaluation/stratified_results.tsv": "188088adc18a0fbc17f4f592ca6003bebe8c18882135bf13679fa4980c64c60b",
+    "artifacts/generated/development_evaluation/external_strata_results.tsv": "c93af2b4c6a07d3c6af10358dc00b833f457678536c2cc46232a352bd36d2dc5",
+    "artifacts/generated/development_evaluation/paired_locus_audit.tsv": "b99bde94eff475eea3eca1a0edc5e9e12898929986d811cf20e01763f00f082f",
+    "artifacts/generated/consensus_head_to_head.md": "6ff9a65913ea63babc0fde638ccc45ff0d916ef7d00762513b9d5ac9c069ae1c",
+    "artifacts/generated/consensus_head_to_head.json": "e62ec2bc34a34413b97ea87de55a0397c95ff7cdf75df748a9f2037696587858"
+  }
+}

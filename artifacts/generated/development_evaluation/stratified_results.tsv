@@ -1,0 +1,11 @@
+stratum_type	stratum	loci	reference_method	correct	accuracy
+gene	A	374	SimplePluralityLex	283	0.7566844919786097
+gene	B	374	SimplePluralityLex	291	0.7780748663101604
+gene	C	374	SimplePluralityLex	261	0.6978609625668449
+superpopulation	CEU	279	SimplePluralityLex	214	0.7670250896057348
+superpopulation	CHB	72	SimplePluralityLex	38	0.5277777777777778
+superpopulation	FIN	153	SimplePluralityLex	117	0.7647058823529411
+superpopulation	GBR	159	SimplePluralityLex	134	0.8427672955974843
+superpopulation	PUR	48	SimplePluralityLex	34	0.7083333333333334
+superpopulation	TSI	153	SimplePluralityLex	110	0.7189542483660131
+superpopulation	YRI	258	SimplePluralityLex	188	0.7286821705426356

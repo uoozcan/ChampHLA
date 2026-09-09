@@ -1,0 +1,65 @@
+{
+  "schema_version": "champhla-corrected-three-modality-rerun-1",
+  "status": "PREPARED_NOT_EXECUTED",
+  "environment": {
+    "site": "Roihu",
+    "python": "3.11.15",
+    "samtools": "1.21",
+    "reference_builds": {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"},
+    "imgt_hla_version": "3.59.0"
+  },
+  "truth_firewall": {
+    "runtime_truth_columns_forbidden": true,
+    "prediction_checksum_before_truth": true,
+    "one_time_truth_join": true,
+    "overwrite_joined_outputs": false
+  },
+  "modalities": {
+    "wgs": {
+      "input": "full CRAM",
+      "extraction": "mate-aware; retain chr6 MHC and HLA-A/B/C alternate contigs",
+      "callers": ["HLA-HD", "Kourami", "OptiType", "SpecHLA", "T1K"]
+    },
+    "wes": {
+      "input": "frozen WES CRAM/BAM/FASTQ manifest",
+      "extraction": "end-to-end rerun; no reuse of pre-correction normalized calls",
+      "callers": ["HLA-HD", "OptiType", "POLYSOLVER", "SpecHLA", "T1K"]
+    },
+    "rnaseq": {
+      "input": "frozen paired bulk RNA-seq FASTQ manifest",
+      "reference_build": "GRCh37",
+      "extraction": "end-to-end rerun; no reuse of pre-correction normalized calls",
+      "callers": ["ArcasHLA", "HLA-HD", "OptiType", "T1K"]
+    }
+  },
+  "caller_configuration": {
+    "HLA-HD": "pin command, reference bundle, container digest, threads and memory before execution",
+    "Kourami": "pin command, graph/reference bundle, container digest, threads and memory before execution",
+    "OptiType": "pin command, data type, container digest, threads and memory before execution",
+    "POLYSOLVER": "pin command, reference bundle, container digest, threads and memory before execution",
+    "SpecHLA": "pin command, Git commit, wrapper checksum, threads and memory before execution",
+    "T1K": "pin command, index checksum, container digest, threads and memory before execution",
+    "ArcasHLA": "pin command, reference bundle, container digest, threads and memory before execution"
+  },
+  "fail_closed": [
+    "missing process or nonzero exit",
+    "missing or empty native caller output",
+    "reference or IMGT/HLA mismatch",
+    "duplicate caller/locus record",
+    "incomplete expected caller/locus record set",
+    "native-to-normalized parser round-trip mismatch"
+  ],
+  "wgs_production_audit": {
+    "expected_record_fraction": 1.0,
+    "native_output_sha256_required": true,
+    "parser_round_trip_required": true,
+    "environment_manifest_required": true,
+    "stratified_human_review_records_per_caller": 10,
+    "named_reviewer_required": true
+  },
+  "denominators": {
+    "wes_eligible_truth_loci": 390,
+    "rnaseq_eligible_truth_loci": 321,
+    "change_rule": "only a separately documented truth-eligibility defect can create a new versioned denominator"
+  }
+}

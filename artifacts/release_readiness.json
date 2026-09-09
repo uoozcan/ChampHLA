@@ -1,0 +1,117 @@
+{
+  "blockers": [
+    "clean_git_state",
+    "corrected_three_modality_evaluation",
+    "count_reconciliation",
+    "frozen_comparators",
+    "main_claim_audit",
+    "one_time_truth_join",
+    "signed_amendment",
+    "supplement_claim_audit",
+    "tests_roihu",
+    "tests_ubuntu_ci",
+    "tests_windows_ci",
+    "truth_blind_prediction_freeze",
+    "wgs_technical_and_human_review"
+  ],
+  "gates": {
+    "clean_git_state": {
+      "evidence": "git status --porcelain",
+      "passed": false
+    },
+    "corrected_three_modality_evaluation": {
+      "evidence": "artifacts/corrected/evaluation/confirmation_decision.json",
+      "passed": false
+    },
+    "count_reconciliation": {
+      "evidence": "decisions/20260908_count_reconciliation.json",
+      "passed": false
+    },
+    "frozen_comparators": {
+      "evidence": "configs/comparator_manifest.json",
+      "failures": [
+        "BestSingleTool_nestedCV.artifact_pin is unresolved",
+        "Caller:ArcasHLA.artifact_pin is unresolved",
+        "Caller:ArcasHLA.version is unresolved",
+        "Caller:HLA-HD.artifact_pin is unresolved",
+        "Caller:Kourami.artifact_pin is unresolved",
+        "Caller:OptiType.artifact_pin is unresolved",
+        "Caller:OptiType.version is unresolved",
+        "Caller:POLYSOLVER.artifact_pin is unresolved",
+        "Caller:POLYSOLVER.version is unresolved",
+        "Caller:SpecHLA.artifact_pin is unresolved",
+        "Caller:SpecHLA.version is unresolved",
+        "Caller:T1K.artifact_pin is unresolved",
+        "ChampionChallenger.artifact_pin is unresolved",
+        "ChampionChallenger.version is unresolved",
+        "MVFlooredCC.artifact_pin is unresolved",
+        "MetaConsensus.artifact_pin is unresolved",
+        "SimpleTwoThirdsConsensus.artifact_pin is unresolved",
+        "TwoThirdsGuardedCC.artifact_pin is unresolved",
+        "comparator manifest status is not FROZEN"
+      ],
+      "passed": false
+    },
+    "main_claim_audit": {
+      "evidence": "artifacts/benchmark_manuscript_audit.json",
+      "passed": false
+    },
+    "one_time_truth_join": {
+      "evidence": "artifacts/corrected/truth_join_manifest.json",
+      "passed": false
+    },
+    "registry_row_validation": {
+      "evidence": "result_registry.tsv",
+      "failures": [],
+      "passed": true
+    },
+    "signed_amendment": {
+      "evidence": "decisions/20260908_consensus_primary_amendment.json",
+      "passed": false
+    },
+    "supplement_claim_audit": {
+      "evidence": "artifacts/benchmark_manuscript_audit.json",
+      "passed": false
+    },
+    "tests_local": {
+      "evidence": "artifacts/verification/local_tests.json",
+      "passed": false,
+      "required_for_benchmark_release": false
+    },
+    "tests_roihu": {
+      "evidence": "artifacts/verification/roihu_tests.json",
+      "passed": false,
+      "required_for_benchmark_release": true
+    },
+    "tests_ubuntu_ci": {
+      "evidence": "artifacts/verification/ubuntu_ci.json",
+      "passed": false,
+      "required_for_benchmark_release": true
+    },
+    "tests_windows_ci": {
+      "evidence": "artifacts/verification/windows_ci.json",
+      "passed": false,
+      "required_for_benchmark_release": true
+    },
+    "truth_blind_prediction_freeze": {
+      "evidence": "artifacts/corrected/prediction_freeze.json",
+      "failures": [
+        "freeze missing"
+      ],
+      "passed": false
+    },
+    "wgs_technical_and_human_review": {
+      "evidence": "artifacts/corrected/wgs_audit/wgs_audit_summary.json",
+      "passed": false
+    }
+  },
+  "independent_claim_blockers": [
+    "donor-independent prospective WGS/WES/RNA minima and noninferiority gate not complete"
+  ],
+  "independent_claim_evidence": "artifacts/independent/evaluation/confirmation_decision.json",
+  "independent_three_modality_claim_ready": false,
+  "policy": "independent validation is reported separately and cannot block an honest same-resource benchmark release",
+  "release_ready": false,
+  "same_resource_benchmark_ready": false,
+  "schema_version": "champhla-release-readiness-2"
+}

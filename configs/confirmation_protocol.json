@@ -1,42 +1,26 @@
 {
-  "schema_version": "champhla-confirmation-protocol-1",
-  "status": "frozen_before_external_truth",
-  "primary_baseline": "SimpleTwoThirdsConsensus",
-  "primary_method": "TwoThirdsGuardedCC",
+  "schema_version": "champhla-plurality-confirmation-protocol-2",
+  "status": "blocked_until_amendment_signed_and_comparator_versions_frozen",
+  "primary_method": "SimplePluralityLex",
+  "display_name": "pair-level plurality consensus",
+  "legacy_aliases": ["MajorityVote"],
   "endpoint": "fixed-denominator exact unordered two-field correctness",
   "genes": ["A", "B", "C"],
   "modalities": ["wgs", "wes", "rnaseq"],
-  "panels": {
-    "wgs": ["HLA-HD", "Kourami", "OptiType", "SpecHLA", "T1K"],
-    "wes": ["HLA-HD", "OptiType", "POLYSOLVER", "SpecHLA", "T1K"],
-    "rnaseq": ["ArcasHLA", "HLA-HD", "OptiType", "T1K"]
-  },
-  "baseline_rule": "one unweighted exact-pair vote per callable intended-use caller; call at support >= 2/3; otherwise no_consensus",
-  "guarded_cc_rule": "preserve callable SimpleTwoThirdsConsensus; otherwise raw ChampionChallenger; deterministic plurality only if raw CC is missing",
-  "always_emit_guarded_cc": true,
-  "external_freeze_no_evidence_policy": "reject freeze if any Guarded CC locus is not callable",
-  "homozygosity_guard_primary": false,
+  "method_rule": "one equal vote per complete canonical caller pair; partial and missing calls do not vote; maximum pair support wins; exact top ties are resolved lexicographically; no complete pair yields no_evidence",
+  "partial_call_rule": "retain one resolvable allele with call_status partial; never infer homozygosity from a missing second allele",
   "imgt_hla_version": "3.59.0",
-  "genome_reference": "GRCh38DH",
+  "genome_reference_by_modality": {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"},
   "bootstrap_iterations": 100000,
-  "permutation_iterations": 1000000,
   "random_seed": 20260831,
-  "primary_multiplicity": "Holm across WGS, WES, RNA-seq",
-  "retention": {
-    "all_primary_holm_significant": true,
-    "all_primary_delta_positive": true,
-    "all_primary_cluster_ci_lower_above_zero": true,
-    "max_plurality_regression_points": 2.0,
-    "no_holm_significant_per_gene_harm": true
+  "superiority_screen": "paired subject-cluster sign-flip tests with Holm correction within modality",
+  "noninferiority": {
+    "margin_points": 2.0,
+    "interval": "Bonferroni-simultaneous subject-cluster bootstrap upper bounds within modality",
+    "require_every_frozen_deployable_comparator": true
   },
-  "external_sample_targets": {
-    "wgs_minimum": 120,
-    "wgs_maximum": 180,
-    "wes_minimum": 89,
-    "wes_maximum": 120,
-    "rnaseq_minimum": 130,
-    "rnaseq_target": 150,
-    "rnaseq_maximum": 200
-  },
-  "claim_boundary": "resolves consensus failures while preserving high-agreement calls; does not claim higher conditional accuracy on baseline-called loci"
+  "external_sample_targets": {"wgs_minimum": 120, "wes_minimum": 89, "rnaseq_minimum": 130},
+  "truth_firewall": "truth-free prediction, immutable checksum freeze, and one-time join",
+  "three_modality_claim_rule": "all modalities valid; prospective design; sample minima met; WGS audit passed; no comparator Holm-superior; plurality noninferior within two points to every frozen deployable comparator",
+  "claim_boundary": "research-only HLA-A/B/C typing in evaluated WGS, WES, and bulk RNA-seq designs; plurality is not a novel algorithm or a universal NGS optimum"
 }

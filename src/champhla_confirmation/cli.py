@@ -6,12 +6,22 @@ from pathlib import Path
 
 from .audit import audit_wgs
 from .cohorts import build_overlap_crosswalk
-from .consensus import build_guarded_cc
+from .consensus import build_consensus, build_guarded_cc
+from .dataset_discovery import audit_dataset_discovery_registry
 from .evaluation import capacity, evaluate, join_truth
 from .external import build_hprc_release2_candidates, select_hprc_confirmation_roster
 from .freeze import freeze_bundle, validate_freeze
+from .hprc_truth import build_hprc_assembly_truth
 from .io import read_json, read_tsv, reject_truth_columns, sha256, write_json, write_tsv
-from .panels import METHOD_GUARDED_CC, METHOD_RAW_CC
+from .manifests import validate_comparator_manifest
+from .panels import (
+    METHOD_GUARDED_CC,
+    METHOD_PLURALITY,
+    METHOD_RAW_CC,
+    PANELS,
+    PLURALITY_METHOD_VERSION,
+    canonical_method,
+)
 from .power import simulate
 from .public_reads import (
     build_ihwg_provenance_review_packet,
@@ -20,7 +30,25 @@ from .public_reads import (
     scout_ihwg_public_reads,
 )
 from .raw_cc import freeze_raw_cc_policy, predict_raw_cc
-from .schema import explode_candidate_rows, normalize_caller_row, normalize_method_row, normalize_raw_cc_row
+from .roihu import (
+    assess_storage,
+    audit_run_manifest,
+    build_cleanup_plan,
+    build_hprc_run_manifest,
+    build_nci60_run_manifest,
+    collect_run_outputs,
+    freeze_run_manifest,
+    initialize_run_ledger,
+    inventory_environment,
+    transition_run_sample,
+)
+from .schema import (
+    explode_candidate_rows,
+    normalize_caller_row,
+    normalize_method_row,
+    normalize_raw_cc_row,
+    validate_production_caller_matrix,
+)
 from .wgs_pilot import collect_full_cram_wgs_pilot
 
 
@@ -29,16 +57,19 @@ def audit_wgs_inputs_main() -> int:
     parser.add_argument("--harmonized", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--manual-review")
+    parser.add_argument("--environment-manifest", required=True)
     args = parser.parse_args()
-    summary = audit_wgs(args.harmonized, args.output_dir, args.manual_review)
+    summary = audit_wgs(
+        args.harmonized, args.output_dir, args.manual_review, args.environment_manifest,
+    )
     print(f"WGS audit passed={summary['passed']} records={summary['locus_caller_records']}")
     return 0 if summary["passed"] else 2
 
 
 def run_truth_blind_predictions_main() -> int:
-    parser = argparse.ArgumentParser(description="Run frozen two-thirds baseline and guarded CC without truth")
+    parser = argparse.ArgumentParser(description="Run frozen pair-level plurality without truth")
     parser.add_argument("--calls", required=True)
-    raw_group = parser.add_mutually_exclusive_group(required=True)
+    raw_group = parser.add_mutually_exclusive_group(required=False)
     raw_group.add_argument("--raw-cc")
     raw_group.add_argument("--raw-cc-policy")
     parser.add_argument("--secondary")
@@ -53,13 +84,17 @@ def run_truth_blind_predictions_main() -> int:
     reject_truth_columns(source_cc, "runtime raw CC calls")
     calls = (explode_candidate_rows(source_calls, args.cohort_default) if args.candidate_support_format
              else [normalize_caller_row(row, args.cohort_default) for row in source_calls])
+    validate_production_caller_matrix(calls)
     if args.raw_cc_policy:
         raw_cc = predict_raw_cc(calls, args.raw_cc_policy)
-    else:
+    elif args.raw_cc:
         raw_cc = [normalize_raw_cc_row(row, args.cohort_default) for row in source_cc
                   if row.get("method", METHOD_RAW_CC) == METHOD_RAW_CC]
-    predictions = build_guarded_cc(calls, raw_cc)
-    predictions.extend(raw_cc)
+    else:
+        raw_cc = []
+    predictions = build_guarded_cc(calls, raw_cc) if raw_cc else build_consensus(calls)
+    if raw_cc:
+        predictions.extend(raw_cc)
     for row in calls:
         predictions.append({
             "cohort": row["cohort"], "subject": row["subject"],
@@ -71,26 +106,41 @@ def run_truth_blind_predictions_main() -> int:
     if args.secondary:
         secondary_source = read_tsv(args.secondary)
         reject_truth_columns(secondary_source, "runtime secondary method calls")
-        predictions.extend(normalize_method_row(row, args.cohort_default) for row in secondary_source
-                           if row.get("method") and row.get("method") != METHOD_RAW_CC)
+        predictions.extend(
+            normalize_method_row(row, args.cohort_default)
+            for row in secondary_source
+            if row.get("method")
+            and canonical_method(row["method"]) not in {METHOD_RAW_CC, METHOD_PLURALITY}
+        )
     predictions.sort(key=lambda row: (row.get("cohort", ""), row["subject"], row["modality"],
                                       row["gene"], row["method"]))
     leading = ["cohort", "subject", "superpopulation", "modality", "gene", "method",
                "allele1", "allele2", "call_status", "decision_reason"]
     all_fields = {field for row in predictions for field in row}
     write_tsv(args.predictions, predictions, leading + sorted(all_fields - set(leading)))
+    plurality_rows = [row for row in predictions if row["method"] == METHOD_PLURALITY]
     guarded_rows = [row for row in predictions if row["method"] == METHOD_GUARDED_CC]
     reasons = Counter(row.get("decision_reason", "") for row in predictions
                       if row["method"] == METHOD_GUARDED_CC)
     write_json(args.manifest, {
-        "schema_version": "truth-blind-predictions-1", "truth_blind": True,
-        "always_emit_guarded_cc": all(row["call_status"] == "callable" for row in guarded_rows),
+        "schema_version": "truth-blind-predictions-2", "truth_blind": True,
+        "primary_method": METHOD_PLURALITY,
+        "primary_method_version": PLURALITY_METHOD_VERSION,
+        "production_caller_matrix_validated": True,
+        "frozen_panels": {key: list(value) for key, value in PANELS.items()},
+        "caller_partial_records": sum(row["call_status"] == "partial" for row in calls),
+        "caller_missing_records": sum(row["call_status"] == "missing" for row in calls),
+        "plurality_rows": len(plurality_rows),
+        "plurality_no_evidence_loci": sum(row["call_status"] != "callable" for row in plurality_rows),
+        "raw_cc_included": bool(raw_cc),
+        "always_emit_guarded_cc": bool(guarded_rows) and all(row["call_status"] == "callable" for row in guarded_rows),
         "guarded_no_evidence_loci": sum(row["call_status"] != "callable" for row in guarded_rows),
         "homozygosity_guard_primary": False,
         "prediction_rows": len(predictions),
         "guarded_decision_counts": dict(sorted(reasons.items())),
         "input_sha256": {"calls": sha256(args.calls),
-                         "raw_cc_or_policy": sha256(args.raw_cc or args.raw_cc_policy)},
+                         "raw_cc_or_policy": sha256(args.raw_cc or args.raw_cc_policy)
+                         if (args.raw_cc or args.raw_cc_policy) else "not_supplied"},
         "predictions_sha256": sha256(args.predictions),
     })
     return 0
@@ -110,17 +160,21 @@ def freeze_confirmation_bundle_main() -> int:
         if not name or name in inputs:
             raise ValueError(f"invalid or duplicate freeze input name: {name!r}")
         inputs[name] = path
-    required = {"predictions", "protocol", "capacity", "wgs_audit"}
+    required = {"predictions", "protocol", "comparators", "amendment", "wgs_audit"}
     if not required.issubset(inputs):
         raise ValueError(f"external freeze missing required inputs: {sorted(required - set(inputs))}")
-    guarded = [row for row in read_tsv(inputs["predictions"])
-               if row.get("method") == METHOD_GUARDED_CC]
-    if not guarded or any(row.get("call_status") != "callable" for row in guarded):
-        raise ValueError("external freeze requires a callable Guarded CC top call at every locus")
-    if not read_json(inputs["capacity"]).get("passed"):
-        raise ValueError("external freeze requires a passed truth-blind capacity gate")
+    plurality = [row for row in read_tsv(inputs["predictions"])
+                 if row.get("method") == METHOD_PLURALITY]
+    if not plurality:
+        raise ValueError("external freeze requires pair-level plurality prediction rows")
+    amendment = read_json(inputs["amendment"])
+    if amendment.get("status") != "SIGNED_BY_AUTHOR" or not amendment.get("signed_by"):
+        raise ValueError("external freeze requires a signed consensus-primary amendment")
     if not read_json(inputs["wgs_audit"]).get("passed"):
         raise ValueError("external freeze requires a passed WGS audit")
+    comparator_failures = validate_comparator_manifest(inputs["comparators"], require_frozen=True)
+    if comparator_failures:
+        raise ValueError(f"external freeze requires a frozen comparator manifest: {comparator_failures}")
     freeze_bundle(args.project_root, inputs, args.output)
     return 0
 
@@ -151,7 +205,7 @@ def join_external_truth_main() -> int:
 
 
 def evaluate_confirmation_main() -> int:
-    parser = argparse.ArgumentParser(description="Evaluate the locked three-modality confirmation")
+    parser = argparse.ArgumentParser(description="Evaluate plurality against frozen comparator families")
     parser.add_argument("--joined", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--bootstrap", type=int, default=100000)
@@ -159,10 +213,15 @@ def evaluate_confirmation_main() -> int:
     parser.add_argument("--allow-partial", action="store_true")
     parser.add_argument("--mode", choices=("discovery", "external"), default="discovery")
     parser.add_argument("--wgs-audit-summary")
+    parser.add_argument("--evaluation-design")
+    parser.add_argument("--comparator-manifest")
     args = parser.parse_args()
-    result = evaluate(args.joined, args.output_dir, args.bootstrap, args.seed, args.allow_partial,
-                      args.mode, args.wgs_audit_summary)
-    print(f"confirmation status={result['status']} headline_retained={result['headline_retained']}")
+    result = evaluate(
+        args.joined, args.output_dir, args.bootstrap, args.seed, args.allow_partial,
+        args.mode, args.wgs_audit_summary, args.evaluation_design, args.comparator_manifest,
+    )
+    print(f"confirmation status={result['status']} "
+          f"three_modality_claim_ready={result['three_modality_claim_ready']}")
     return 0
 
 
@@ -318,4 +377,160 @@ def collect_full_cram_wgs_pilot_main() -> int:
         args.caller_root, args.manifest, args.sample, args.output, args.summary,
     )
     print(f"WGS pilot samples={result['samples']} records={result['observed_locus_caller_records']}")
+    return 0
+
+
+def audit_dataset_discovery_registry_main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Validate HLA-ground-truth dataset, truth, crosswalk, and pilot registries"
+    )
+    parser.add_argument("--datasets", required=True)
+    parser.add_argument("--truth", required=True)
+    parser.add_argument("--crosswalk", required=True)
+    parser.add_argument("--pilot", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = audit_dataset_discovery_registry(
+        args.datasets, args.truth, args.crosswalk, args.pilot, args.output,
+    )
+    print(f"dataset discovery passed={result['passed']} acceptance={result['acceptance']}")
+    return 0 if result["passed"] else 2
+
+
+def audit_run_manifest_main() -> int:
+    parser = argparse.ArgumentParser(description="Audit a truth-free Roihu run manifest")
+    parser.add_argument("--manifest", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = audit_run_manifest(args.manifest)
+    write_json(args.output, result)
+    print(f"run manifest passed={result['passed']} rows={result['rows']}")
+    return 0 if result["passed"] else 2
+
+
+def freeze_run_manifest_main() -> int:
+    parser = argparse.ArgumentParser(description="Freeze a validated truth-free run manifest")
+    parser.add_argument("--manifest", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--expected-counts", help="optional JSON modality-to-sample mapping")
+    args = parser.parse_args()
+    expected = read_json(args.expected_counts) if args.expected_counts else None
+    freeze_run_manifest(args.manifest, args.output, expected)
+    return 0
+
+
+def initialize_run_ledger_main() -> int:
+    parser = argparse.ArgumentParser(description="Create the caller-level Roihu run ledger")
+    parser.add_argument("--manifest", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--git-commit", default="")
+    parser.add_argument("--job-id", default="")
+    args = parser.parse_args()
+    rows = initialize_run_ledger(args.manifest, args.output, args.git_commit, args.job_id)
+    print(f"run ledger records={len(rows)}")
+    return 0
+
+
+def transition_run_ledger_main() -> int:
+    parser = argparse.ArgumentParser(description="Atomically transition one Roihu sample in the ledger")
+    parser.add_argument("--ledger", required=True)
+    parser.add_argument("--cohort", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--modality", required=True)
+    parser.add_argument("--state", required=True)
+    parser.add_argument("--exit-code", default="")
+    parser.add_argument("--runtime-seconds", default="")
+    parser.add_argument("--peak-memory-bytes", default="")
+    parser.add_argument("--peak-disk-bytes", default="")
+    parser.add_argument("--output-sha256", default="")
+    args = parser.parse_args()
+    updates = {
+        key: value for key, value in {
+            "exit_code": args.exit_code, "runtime_seconds": args.runtime_seconds,
+            "peak_memory_bytes": args.peak_memory_bytes,
+            "peak_disk_bytes": args.peak_disk_bytes, "output_sha256": args.output_sha256,
+        }.items() if value != ""
+    }
+    transition_run_sample(
+        args.ledger, args.cohort, args.sample, args.modality, args.state, **updates,
+    )
+    return 0
+
+
+def audit_roihu_environment_main() -> int:
+    parser = argparse.ArgumentParser(description="Inventory Roihu tools, storage, and frozen artifacts")
+    parser.add_argument("--site-config", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = inventory_environment(args.site_config, args.output)
+    print(f"Roihu environment passed={result['passed']} failures={len(result['failures'])}")
+    return 0 if result["passed"] else 2
+
+
+def assess_roihu_storage_main() -> int:
+    parser = argparse.ArgumentParser(description="Apply the pilot-derived Roihu storage gate")
+    parser.add_argument("--pilot-ledger", required=True)
+    parser.add_argument("--targets", required=True, help="JSON mapping modality to sample count")
+    parser.add_argument("--available-bytes", required=True, type=int)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = assess_storage(
+        args.pilot_ledger, read_json(args.targets), args.available_bytes, args.output,
+    )
+    print(f"storage gate passed={result['passed']} required={result['required_available_bytes']}")
+    return 0 if result["passed"] else 2
+
+
+def plan_roihu_cleanup_main() -> int:
+    parser = argparse.ArgumentParser(description="Write a dry-run cleanup plan for validated work files")
+    parser.add_argument("--run-root", required=True)
+    parser.add_argument("--freeze-validation", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = build_cleanup_plan(args.run_root, args.freeze_validation, args.output)
+    print(f"cleanup executable={result['executable']} paths={len(result['eligible_paths'])}")
+    return 0 if result["executable"] else 2
+
+
+def build_hprc_assembly_truth_main() -> int:
+    parser = argparse.ArgumentParser(description="Build conservative dual-method HPRC assembly truth")
+    parser.add_argument("--calls", required=True)
+    parser.add_argument("--truth-output", required=True)
+    parser.add_argument("--audit-output", required=True)
+    args = parser.parse_args()
+    result = build_hprc_assembly_truth(args.calls, args.truth_output, args.audit_output)
+    print(f"HPRC truth resolved={result['resolved_loci']} unresolved={result['unresolved_loci']}")
+    return 0
+
+
+def collect_roihu_outputs_main() -> int:
+    parser = argparse.ArgumentParser(description="Collect and reparse complete Roihu caller outputs")
+    parser.add_argument("--caller-root", required=True)
+    parser.add_argument("--manifest", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--summary", required=True)
+    args = parser.parse_args()
+    result = collect_run_outputs(args.caller_root, args.manifest, args.output, args.summary)
+    print(f"caller collection passed={result['passed']} records={result['observed_records']}")
+    return 0 if result["passed"] else 2
+
+
+def build_nci60_run_manifest_main() -> int:
+    parser = argparse.ArgumentParser(description="Build the strict 11-subject NCI-60 RNA manifest")
+    parser.add_argument("--pilot", required=True)
+    parser.add_argument("--ena-report", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = build_nci60_run_manifest(args.pilot, args.ena_report, args.output)
+    print(f"NCI-60 run manifest passed={result['passed']} rows={result['rows']}")
+    return 0
+
+
+def build_hprc_run_manifest_main() -> int:
+    parser = argparse.ArgumentParser(description="Build the frozen 120-subject HPRC WGS manifest")
+    parser.add_argument("--roster", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = build_hprc_run_manifest(args.roster, args.output)
+    print(f"HPRC run manifest passed={result['passed']} rows={result['rows']}")
     return 0

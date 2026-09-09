@@ -1,0 +1,17 @@
+{
+  "schema_version": "champhla-dataset-roles-1",
+  "frozen_before_corrected_predictions": true,
+  "pooling_rule": "donor-independent and new-library overlapping-donor cohorts are never pooled",
+  "datasets": [
+    {"dataset_id": "1000G_DEVELOPMENT_WES_RNA", "role": "development", "independence_stratum": "not_applicable", "accuracy_eligible": true, "status": "provisional_after_partial_call_correction"},
+    {"dataset_id": "1000G_CORRECTED_WGS_WES_RNA", "role": "same_resource_confirmation", "independence_stratum": "new_library_overlap", "accuracy_eligible": true, "status": "blocked_pending_truth_blind_rerun"},
+    {"dataset_id": "HPRC_RELEASE2_WGS", "role": "independent_validation", "independence_stratum": "donor_independent", "accuracy_eligible": false, "status": "truth_blind_roster_feasible; independent phased-assembly truth audit required"},
+    {"dataset_id": "NCI60_RNA", "role": "exploratory", "independence_stratum": "donor_independent", "accuracy_eligible": true, "status": "eleven-subject strict pilot; underpowered for confirmation"},
+    {"dataset_id": "CCLE_NCI60_WES_OVERLAP", "role": "exploratory", "independence_stratum": "new_library_overlap", "accuracy_eligible": false, "status": "metadata verified; complete A/B/C truth absent"},
+    {"dataset_id": "AFGR_MKK_RNA_WGS", "role": "exploratory", "independence_stratum": "donor_independent", "accuracy_eligible": false, "status": "blocked pending authorization, WGS accession, mapping and truth audit"},
+    {"dataset_id": "FNLCR_PBMC_RNA", "role": "exploratory", "independence_stratum": "donor_independent", "accuracy_eligible": false, "status": "blocked pending controlled access and isolation of non-RNA-informed truth"},
+    {"dataset_id": "DICE_SORTED_CELL_RNA", "role": "exploratory", "independence_stratum": "donor_independent", "accuracy_eligible": false, "status": "blocked pending controlled access, donor mapping and truth independence"},
+    {"dataset_id": "TRANSPLANT_GERMLINE_WES", "role": "exploratory", "independence_stratum": "donor_independent", "accuracy_eligible": false, "status": "blocked; HLA-matched status is not allele-level truth"},
+    {"dataset_id": "REJECTED_OR_CIRCULAR_TRUTH", "role": "invalid", "independence_stratum": "not_applicable", "accuracy_eligible": false, "status": "visible in inventory and excluded from every accuracy denominator"}
+  ]
+}

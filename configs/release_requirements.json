@@ -1,0 +1,23 @@
+{
+  "schema_version": "champhla-release-requirements-1",
+  "paths": {
+    "amendment": "decisions/20260908_consensus_primary_amendment.json",
+    "comparator_manifest": "configs/comparator_manifest.json",
+    "corrected_evaluation": "artifacts/corrected/evaluation/confirmation_decision.json",
+    "independent_evaluation": "artifacts/independent/evaluation/confirmation_decision.json",
+    "wgs_audit": "artifacts/corrected/wgs_audit/wgs_audit_summary.json",
+    "prediction_freeze": "artifacts/corrected/prediction_freeze.json",
+    "truth_join": "artifacts/corrected/truth_join_manifest.json",
+    "registry": "result_registry.tsv",
+    "count_reconciliation": "decisions/20260908_count_reconciliation.json",
+    "main_claim_audit": "artifacts/benchmark_manuscript_audit.json",
+    "supplement_claim_audit": "artifacts/benchmark_manuscript_audit.json"
+  },
+  "test_attestations": {
+    "local": "artifacts/verification/local_tests.json",
+    "roihu": "artifacts/verification/roihu_tests.json",
+    "ubuntu_ci": "artifacts/verification/ubuntu_ci.json",
+    "windows_ci": "artifacts/verification/windows_ci.json"
+  },
+  "benchmark_required_test_attestations": ["roihu", "ubuntu_ci", "windows_ci"]
+}

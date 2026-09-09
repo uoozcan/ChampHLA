@@ -1,0 +1,32 @@
+{
+  "schema_version": "champhla-roihu-site-1",
+  "account": "project_2008084",
+  "imgt_hla_version": "3.59.0",
+  "roots": {
+    "project_root": "/scratch/project_2008084/champhla_plurality",
+    "run_root": "/scratch/project_2008084/champhla_plurality_runs",
+    "input_root": "/scratch/project_2008084/champhla_plurality_inputs",
+    "truth_root": "/scratch/project_2008084/champhla_plurality_truth",
+    "reference_root": "/scratch/project_2008084/hla_references",
+    "container_root": "/scratch/project_2008084/hla_references/singularity_cache/containers",
+    "pipeline_root": "/scratch/project_2008084/pihla-publish"
+  },
+  "references": {
+    "GRCh38DH": "/scratch/project_2008084/hla_references/genomes/GRCh38_full_analysis_set_plus_decoy_hla.fa"
+  },
+  "containers": {
+    "HLA-HD": "/scratch/project_2008084/hla_references/singularity_cache/containers/hlahd.sif",
+    "Kourami": "/scratch/project_2008084/hla_references/singularity_cache/containers/kourami.sif",
+    "OptiType": "/scratch/project_2008084/hla_references/singularity_cache/containers/optitype.sif",
+    "POLYSOLVER": "/scratch/project_2008084/hla_references/singularity_cache/containers/polysolver.sif",
+    "T1K": "/scratch/project_2008084/hla_references/singularity_cache/containers/t1k.sif",
+    "arcasHLA": "/scratch/project_2008084/hla_references/singularity_cache/containers/arcashla.sif"
+  },
+  "software": {
+    "pipeline": "/scratch/project_2008084/pihla-publish/main.nf",
+    "SpecHLA": "/projappl/project_2008084/SpecHLAx/script/whole/SpecHLA.sh"
+  },
+  "modules": ["bio-apps/v202603", "samtools/1.21", "nextflow/25.10.2-standalone"],
+  "production_python": "3.11.15",
+  "public_data_only": true
+}

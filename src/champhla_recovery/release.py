@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import os
 from pathlib import Path
 
 from .io import sha256, write_json
@@ -19,7 +20,7 @@ def freeze_release(root: str, output: str) -> dict:
         relative = path.relative_to(project)
         if any(part in EXCLUDED_PARTS for part in relative.parts):
             continue
-        files.append({"path": str(relative), "bytes": path.stat().st_size, "sha256": sha256(path)})
+        files.append({"path": relative.as_posix(), "bytes": path.stat().st_size, "sha256": sha256(path)})
     try:
         commit = subprocess.run(
             ["git", "-C", str(project), "rev-parse", "HEAD"], check=True,
@@ -32,11 +33,12 @@ def freeze_release(root: str, output: str) -> dict:
     except (subprocess.CalledProcessError, FileNotFoundError):
         commit, dirty = "not_a_git_repository", True
     result = {
-        "schema_version": "champhla-release-freeze-1",
-        "project_root": str(project), "git_commit": commit, "git_dirty": dirty,
+        "schema_version": "champhla-release-freeze-2",
+        "project_root": ".",
+        "project_root_locator": Path(os.path.relpath(project, target.parent)).as_posix(),
+        "git_commit": commit, "git_dirty": dirty,
         "files": files, "file_count": len(files),
         "truth_data_included": False,
     }
     write_json(target, result)
     return result
-

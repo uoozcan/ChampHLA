@@ -10,3 +10,15 @@ dist/
 runtime_data/
 truth_sealed/
 runs/
+roihu_inputs/
+roihu_work/
+roihu_references/
+roihu_containers/
+*.cram
+*.crai
+*.bam
+*.bai
+*.fastq
+*.fastq.gz
+*.sif
+*.agc

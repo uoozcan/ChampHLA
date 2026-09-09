@@ -4,7 +4,7 @@ from pathlib import Path
 
 from .io import read_tsv, reject_truth_columns, sha256, write_json, write_tsv
 from .panels import GENES, PANELS
-from .parsers import parse_caller_pair
+from .parsers import parse_caller_call
 
 
 CALLER_SUFFIX = {
@@ -58,18 +58,18 @@ def collect_full_cram_wgs_pilot(caller_root: str, manifest_tsv: str,
                 raise ValueError(f"caller-output checksum mismatch for {sample} {caller}")
             text = source.read_text(encoding="utf-8", errors="replace")
             for gene in GENES:
-                pair = parse_caller_pair(caller, text, gene)
+                call = parse_caller_call(caller, text, gene)
                 rows.append({
                     "cohort": "1000G-WGS-full-CRAM-pilot",
                     "subject": sample,
                     "modality": "wgs",
                     "gene": gene,
                     "caller": caller,
-                    "allele1_raw": pair[0] if pair else "",
-                    "allele2_raw": pair[1] if pair else "",
-                    "allele1": pair[0] if pair else "",
-                    "allele2": pair[1] if pair else "",
-                    "call_status": "callable" if pair else "missing",
+                    "allele1_raw": call["allele1"],
+                    "allele2_raw": call["allele2"],
+                    "allele1": call["allele1"],
+                    "allele2": call["allele2"],
+                    "call_status": call["call_status"],
                     "caller_version": PINNED_VERSION[caller],
                     "source_path": str(source.resolve()),
                     "source_sha256": source_hash,
@@ -88,6 +88,7 @@ def collect_full_cram_wgs_pilot(caller_root: str, manifest_tsv: str,
         "observed_locus_caller_records": len(rows),
         "explicit_status_for_every_record": len(rows) == expected,
         "callable_records": sum(row["call_status"] == "callable" for row in rows),
+        "partial_records": sum(row["call_status"] == "partial" for row in rows),
         "manifest_sha256": sha256(manifest_tsv),
         "caller_files": file_manifest,
         "output_sha256": sha256(output_tsv),

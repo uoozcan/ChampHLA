@@ -1,0 +1,60 @@
+{
+  "bootstrap_iterations": 1000,
+  "claim_boundary": "No evaluated comparator significantly exceeded pair-level plurality; noninferiority requires the separate prospective two-point gate.",
+  "cohort_subjects": {
+    "rnaseq": 107,
+    "wes": 130,
+    "wgs": 137
+  },
+  "comparator_manifest": "configs/comparator_manifest.json",
+  "comparator_manifest_sha256": "180f2e4eaad81875bcf7f7b6b242b87e358203373d996d0bb158f9c2666e55d1",
+  "consensus_noninferior_2pp": false,
+  "evaluation_design": "configs/consensus_evaluation.json",
+  "evaluation_design_sha256": "9a6931c49436a66b4f66017de22eb16dc0698ca777eb045f68b659fb61be57d7",
+  "evidence_tier": "development",
+  "incomplete_comparator_rows": [
+    "rnaseq:Caller:HLA-HD:6",
+    "rnaseq:Caller:OptiType:6",
+    "rnaseq:Caller:T1K:6",
+    "wgs:Caller:HLA-HD:30",
+    "wgs:Caller:Kourami:166",
+    "wgs:Caller:OptiType:3",
+    "wgs:Caller:SpecHLA:96",
+    "wgs:Caller:T1K:33",
+    "wgs:MetaConsensus:411"
+  ],
+  "input_sha256": "155701a7da12e6c54833a39cee45795291cd15e97540c04be52d8da07877f345",
+  "invalid_modalities": {
+    "wgs": "legacy chromosome-6 slice omitted HLA alternate-contig mappings and mates"
+  },
+  "minimum_subjects": {
+    "rnaseq": 130,
+    "wes": 89,
+    "wgs": 120
+  },
+  "mode": "discovery",
+  "no_comparator_holm_superior": false,
+  "noninferiority_by_modality": {
+    "rnaseq": false,
+    "wes": true,
+    "wgs": false
+  },
+  "noninferiority_margin_points": 2.0,
+  "observed_independence_strata": [
+    "unspecified"
+  ],
+  "primary_independence_stratum": "unspecified",
+  "prospective_design": false,
+  "random_seed": 20260831,
+  "reference_method": "SimplePluralityLex",
+  "same_resource_benchmark_ready": false,
+  "sample_size_pass": false,
+  "schema_version": "plurality-consensus-evaluation-2",
+  "status": "development_only",
+  "three_modality_claim_ready": false,
+  "valid_modalities": [
+    "wes",
+    "rnaseq"
+  ],
+  "wgs_audit_pass": false
+}

@@ -1,0 +1,4 @@
+modality	independence_stratum	subjects	loci	correct	accuracy	pooled_into_primary
+rnaseq	unspecified	107	321	306	0.9532710280373832	1
+wes	unspecified	130	390	365	0.9358974358974359	1
+wgs	unspecified	137	411	164	0.39902676399026765	1

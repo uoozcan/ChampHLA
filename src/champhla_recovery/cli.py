@@ -8,6 +8,8 @@ from .manuscript import audit_claims, write_docx_text, write_source_issue_regist
 from .provenance import build_originals_manifest
 from .registry import render_tables, validate_registry
 from .release import freeze_release
+from .readiness import audit_release_readiness
+from .recount import independent_recount
 from .rosters import freeze_rosters
 from .truth import prepare_locked_truth
 
@@ -58,6 +60,29 @@ def freeze_release_bundle_main(argv=None) -> int:
     return 0
 
 
+def audit_release_readiness_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Evaluate all plurality release gates")
+    parser.add_argument("--project-root", required=True)
+    parser.add_argument("--config", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args(argv)
+    result = audit_release_readiness(args.project_root, args.config, args.output)
+    print(f"release_ready={result['release_ready']} blockers={len(result['blockers'])}")
+    return 0 if result["release_ready"] else 2
+
+
+def independent_recount_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Independently recount exact plurality results")
+    parser.add_argument("--joined", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--summary", required=True)
+    parser.add_argument("--method", default="SimplePluralityLex")
+    args = parser.parse_args(argv)
+    result = independent_recount(args.joined, args.output, args.summary, args.method)
+    print(f"independent recount strata={len(result['rows'])}")
+    return 0
+
+
 def render_manuscript_tables_main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Render manuscript tables from the result registry")
     parser.add_argument("--registry", required=True)
@@ -78,8 +103,11 @@ def audit_manuscript_claims_main(argv=None) -> int:
     parser.add_argument("--claims", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--root")
+    parser.add_argument("--supplement")
     args = parser.parse_args(argv)
-    result = audit_claims(args.manuscript, args.registry, args.claims, args.output, args.root)
+    result = audit_claims(
+        args.manuscript, args.registry, args.claims, args.output, args.root, args.supplement,
+    )
     print(f"submission_ready={result['submission_ready']} failures={len(result['failures'])} warnings={len(result['warnings'])}")
     return 0 if result["submission_ready"] else 2
 
@@ -127,6 +155,8 @@ def _main() -> int:
         "prepare-locked-1000g-truth": prepare_locked_1000g_truth_main,
         "freeze-extension-rosters": freeze_extension_rosters_main,
         "freeze-release-bundle": freeze_release_bundle_main,
+        "audit-release-readiness": audit_release_readiness_main,
+        "independent-recount": independent_recount_main,
         "render-manuscript-tables": render_manuscript_tables_main,
         "audit-manuscript-claims": audit_manuscript_claims_main,
         "build-originals-manifest": build_originals_manifest_main,

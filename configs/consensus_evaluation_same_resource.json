@@ -1,0 +1,17 @@
+{
+  "schema_version": "plurality-evaluation-design-1",
+  "status": "LOCKED_PENDING_AUTHOR_SIGNATURE_AND_COMPARATOR_FREEZE",
+  "reference_method": "SimplePluralityLex",
+  "evidence_tier": "same_resource_confirmation",
+  "prospective": false,
+  "valid_modalities": ["wgs", "wes", "rnaseq"],
+  "invalid_modalities": {},
+  "primary_independence_stratum": "new_library_overlap",
+  "noninferiority_margin_points": 2.0,
+  "minimum_subjects": {"wgs": 137, "wes": 130, "rnaseq": 107},
+  "fixed_eligible_loci": {"wgs": 411, "wes": 390, "rnaseq": 321},
+  "inference_interpretation": "retrospective same-resource benchmark; superiority screen is descriptive and the 2-point bound is not confirmatory",
+  "multiplicity": "Holm within each modality's frozen deployable family",
+  "simultaneous_intervals": "Bonferroni familywise subject-clustered bootstrap within modality",
+  "external_strata_rule": "never pool same-resource and donor-independent estimates"
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": "champhla-dataset-comparison-design-1",
+  "execution_status": "prepared_not_executed_after_plurality_amendment",
+  "primary_scope": {
+    "genes": ["A", "B", "C"],
+    "comparison_resolution": "unordered_exact_two_field",
+    "original_truth_preserved": true,
+    "imgt_hla_release": "must_be_pinned_before_truth_normalization",
+    "missing_or_abstained_prediction_is_incorrect_for_fixed_denominator_accuracy": true
+  },
+  "reporting_strata": [
+    {
+      "id": "donor_independent",
+      "label": "Donor-independent datasets",
+      "pool_with_other_strata": false
+    },
+    {
+      "id": "new_library_overlap",
+      "label": "New assay/library data from overlapping donors",
+      "pool_with_other_strata": false
+    }
+  ],
+  "exploratory_scope": {
+    "class_ii_and_partial_loci_separate": true,
+    "denominator_rule": "only loci with independently validated truth",
+    "single_cell_rule": "pseudobulk only after an explicit 10x-to-bulk adapter is validated"
+  },
+  "methods": {
+    "primary": "SimplePluralityLex",
+    "legacy_alias": "MajorityVote",
+    "common_comparators": ["ChampionChallenger", "TwoThirdsGuardedCC", "MVFlooredCC", "BestSingleTool_nestedCV", "MetaConsensus", "SimpleTwoThirdsConsensus"],
+    "oracle_reported_separately": "CandidateSetOracle",
+    "wgs": ["HLA-HD", "Kourami", "OptiType", "SpecHLA", "T1K"],
+    "wes": ["HLA-HD", "OptiType", "POLYSOLVER", "SpecHLA", "T1K"],
+    "rnaseq": ["arcasHLA", "HLA-HD", "OptiType", "T1K"]
+  },
+  "endpoints": [
+    "fixed_denominator_genotype_accuracy",
+    "allele_accuracy",
+    "call_rate",
+    "abstention_rate",
+    "rescue_count",
+    "harm_count",
+    "caller_agreement",
+    "generation_vs_selection_error",
+    "per_locus_results",
+    "wall_time",
+    "peak_memory",
+    "cpu_time"
+  ],
+  "inference": {
+    "paired_method_differences": true,
+    "bootstrap_unit": "subject",
+    "cluster_repeated_tissues_and_libraries_by_donor": true,
+    "confidence_intervals": "simultaneous subject-clustered bootstrap within modality",
+    "per_locus_tests": "paired tests with Holm multiplicity correction within each modality's frozen deployable family",
+    "noninferiority_margin_points": 2.0,
+    "selected_best_caller_is_descriptive": true
+  },
+  "truth_firewall": {
+    "pilot_manifest_contains_truth": false,
+    "truth_join_after_prediction_checksum": true,
+    "computational_or_imputed_truth_in_accuracy_denominator": false,
+    "rna_informed_reconciled_truth_for_rna_accuracy": false
+  }
+}

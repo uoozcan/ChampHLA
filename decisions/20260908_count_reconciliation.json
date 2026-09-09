@@ -1,0 +1,17 @@
+{
+  "schema_version": "champhla-count-reconciliation-1",
+  "date": "2026-09-08",
+  "status": "PROVISIONAL_PENDING_PARTIAL_CALL_RERUN",
+  "canonical_development_counts": {
+    "wes": {"subjects": 130, "loci": 390, "SimplePluralityLex_correct": 365},
+    "rnaseq": {"subjects": 107, "loci": 321, "SimplePluralityLex_correct": 306},
+    "wgs": {"subjects": 137, "loci": 411, "SimplePluralityLex_correct": 164, "validity": "invalid"}
+  },
+  "known_conflicts": [
+    "Raw ChampionChallenger WES was reported as both 364/390 and 365/390.",
+    "MetaConsensus WGS was reported as both 220/411 and 230/411.",
+    "Guarded CC and raw ChampionChallenger pooled totals were previously conflated."
+  ],
+  "resolution_rule": "Regenerate every count from corrected native caller outputs and a single versioned long-format result artifact; never resolve a conflict by selecting the favorable source.",
+  "denominator_rule": "Prediction behavior cannot change truth eligibility. Any denominator change requires a separate truth-defect record and a new result version."
+}

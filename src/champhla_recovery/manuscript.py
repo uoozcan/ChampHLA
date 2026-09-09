@@ -16,6 +16,16 @@ PLACEHOLDER_RE = re.compile(
 )
 INVALID_WGS_RE = re.compile(r"(?:0\.399|0\.494|\+30\.66|79/411|205/411)")
 RESULT_REF_RE = re.compile(r"\[RESULT:([A-Za-z0-9_.:-]+)\]")
+OVERCLAIM_RE = re.compile(
+    r"\b(?:best (?:tool|method) (?:for|across) all|universally best|all NGS types|"
+    r"outperforms every (?:tool|caller|method)|equivalent to the best)\b",
+    re.I,
+)
+NUMERIC_RESULT_RE = re.compile(
+    r"(?:\b\d+\s*(?:/|of)\s*\d+\b|\b\d+(?:\.\d+)?\s*%|"
+    r"\b0\.\d{3,}\b|[+−-]\d+(?:\.\d+)?\s*(?:percentage\s+)?points?\b)",
+    re.I,
+)
 
 
 def extract_docx_text(path: str) -> str:
@@ -37,31 +47,65 @@ def write_docx_text(source: str, output: str) -> None:
 
 
 def audit_claims(manuscript: str, registry_path: str, claims_path: str, output: str,
-                 root: str | None = None) -> dict:
+                 root: str | None = None, supplement: str | None = None) -> dict:
     path = Path(manuscript)
     text = extract_docx_text(str(path)) if path.suffix.lower() == ".docx" else path.read_text(encoding="utf-8")
+    supplement_path = Path(supplement) if supplement else None
+    supplement_text = ""
+    if supplement_path:
+        supplement_text = (extract_docx_text(str(supplement_path))
+                           if supplement_path.suffix.lower() == ".docx"
+                           else supplement_path.read_text(encoding="utf-8"))
+    audited_text = text + ("\n" + supplement_text if supplement_text else "")
     rows = read_tsv(registry_path)
     registry = {row["result_id"]: row for row in rows}
     claims = read_tsv(claims_path)
     failures = validate_registry(registry_path, root)
     warnings = []
 
-    placeholders = sorted(set(PLACEHOLDER_RE.findall(text)))
+    placeholders = sorted(set(PLACEHOLDER_RE.findall(audited_text)))
     if placeholders:
         failures.append(f"manuscript contains {len(placeholders)} placeholder marker(s)")
     if INVALID_WGS_RE.search(text):
         failures.append("manuscript contains a historical invalid-WGS performance number")
-    for result_id in RESULT_REF_RE.findall(text):
+    if OVERCLAIM_RE.search(audited_text):
+        failures.append("manuscript contains an unsupported universal or equivalence claim")
+    main_refs = RESULT_REF_RE.findall(text)
+    supplement_refs = RESULT_REF_RE.findall(supplement_text)
+    diagnostic_invalid_refs = []
+    for result_id in main_refs:
         if result_id not in registry:
             failures.append(f"unknown result reference: {result_id}")
         elif registry[result_id]["validity"] != "valid":
             failures.append(f"manuscript cites invalid result: {result_id}")
+    for paragraph in re.split(r"\n\s*\n", supplement_text):
+        for result_id in RESULT_REF_RE.findall(paragraph):
+            if result_id not in registry:
+                failures.append(f"unknown supplement result reference: {result_id}")
+            elif registry[result_id]["validity"] != "valid":
+                if not re.search(r"\b(?:invalid|diagnostic|excluded|defect)\b", paragraph, re.I):
+                    failures.append(
+                        f"supplement cites invalid result without diagnostic labeling: {result_id}"
+                    )
+                else:
+                    diagnostic_invalid_refs.append(result_id)
+    for label, content in (("main", text), ("supplement", supplement_text)):
+        for paragraph in re.split(r"\n\s*\n", content):
+            if NUMERIC_RESULT_RE.search(paragraph) and not RESULT_REF_RE.search(paragraph):
+                failures.append(f"{label} numerical result lacks a registry reference")
     external_valid = any(
-        row["analysis_status"] == "external_confirmation" and row["validity"] == "valid"
+        row.get("evidence_role") == "independent_validation" and row["validity"] == "valid"
         for row in rows
     )
-    if re.search(r"\b(?:externally validated|independent external validation (?:confirmed|demonstrated))\b", text, re.I) and not external_valid:
+    if re.search(r"\b(?:externally validated|independent external validation (?:confirmed|demonstrated))\b", audited_text, re.I) and not external_valid:
         failures.append("external-validation language is unsupported by the result registry")
+    abstract_match = re.search(
+        r"(?ims)^## Abstract\s*$\n(.*?)(?=^##\s+|\Z)", text,
+    )
+    abstract = abstract_match.group(1) if abstract_match else ""
+    for result_id in RESULT_REF_RE.findall(abstract):
+        if result_id in registry and registry[result_id].get("abstract_allowed") != "1":
+            failures.append(f"abstract cites a result not allowed in the abstract: {result_id}")
 
     route = "method" if "method_conditional" in str(path) else "benchmark" if "benchmark" in str(path) else "source_original"
     active_claims = [claim for claim in claims if claim.get("draft") in {route, "shared"}]
@@ -83,17 +127,31 @@ def audit_claims(manuscript: str, registry_path: str, claims_path: str, output: 
 
     result = {
         "schema_version": "manuscript-claim-audit-1",
-        "manuscript": str(path.resolve()),
+        "manuscript": _portable_path(path, root),
         "manuscript_sha256": sha256(path),
         "word_count": len(text.split()),
+        "supplement": _portable_path(supplement_path, root) if supplement_path else "",
+        "supplement_sha256": sha256(supplement_path) if supplement_path else "",
+        "supplement_word_count": len(supplement_text.split()),
         "draft_route": route,
-        "result_references": sorted(set(RESULT_REF_RE.findall(text))),
+        "result_references": sorted(set(RESULT_REF_RE.findall(audited_text))),
+        "diagnostic_invalid_result_references": sorted(set(diagnostic_invalid_refs)),
         "failures": sorted(set(failures)),
         "warnings": sorted(set(warnings)),
         "submission_ready": not failures and not warnings,
     }
     write_json(output, result)
     return result
+
+
+def _portable_path(path: Path, root: str | None) -> str:
+    resolved = path.resolve()
+    if root:
+        try:
+            return resolved.relative_to(Path(root).resolve()).as_posix()
+        except ValueError:
+            pass
+    return resolved.as_posix()
 
 
 def write_source_issue_register(source_docx: str, output_tsv: str, output_json: str) -> dict:

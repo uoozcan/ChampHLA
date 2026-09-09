@@ -1,0 +1,4 @@
+modality	validity	reference_method	independence_stratum	subjects	loci	correct	accuracy	alleles_correct	allele_accuracy	callable	call_rate	partial	partial_rate
+rnaseq	valid	SimplePluralityLex	unspecified	107	321	306	0.9532710280373832	624	0.9719626168224299	321	1.0	0	0.0
+wes	valid	SimplePluralityLex	unspecified	130	390	365	0.9358974358974359	753	0.9653846153846154	390	1.0	0	0.0
+wgs	invalid	SimplePluralityLex	unspecified	137	411	164	0.39902676399026765	550	0.6690997566909975	407	0.9902676399026764	0	0.0

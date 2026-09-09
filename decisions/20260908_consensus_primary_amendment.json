@@ -1,0 +1,31 @@
+{
+  "schema_version": "champhla-primary-amendment-1",
+  "date": "2026-09-08",
+  "status": "UNSIGNED_AWAITING_AUTHOR",
+  "signed_by": "",
+  "signed_at_utc": "",
+  "decision": "promote SimplePluralityLex to the primary reference method for the benchmark manuscript",
+  "display_name": "pair-level plurality consensus",
+  "supersedes": [
+    "two-thirds baseline versus TwoThirdsGuardedCC primary hypothesis",
+    "MV-floor operating-method headline"
+  ],
+  "disclosures": [
+    "The method choice was made after development performance was visible.",
+    "The WES 390-locus and RNA-seq 321-locus denominators were already visible when the manuscript was reframed.",
+    "The amendment is retrospective and cannot convert development evidence into prospective confirmation."
+  ],
+  "locked_after_signature": {
+    "machine_method_id": "SimplePluralityLex",
+    "tie_rule": "lexicographic among exact top-support pairs",
+    "partial_call_rule": "retain one allele as partial; exclude it from complete-pair voting",
+    "noninferiority_margin_points": 2.0,
+    "comparator_manifest": "configs/comparator_manifest.json",
+    "confirmation_protocol": "configs/confirmation_protocol.json"
+  },
+  "authorization": {
+    "development_reanalysis": true,
+    "external_prediction_freeze": false,
+    "three_modality_claim": false
+  }
+}

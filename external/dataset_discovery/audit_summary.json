@@ -1,0 +1,209 @@
+{
+  "acceptance": {
+    "matched_wgs_rna_candidate_accession_resolved": false,
+    "overlap_report_complete": true,
+    "public_matched_wes_rna_pilot_ready": false,
+    "public_rna_pilot_ready": false,
+    "public_wes_pilot_ready": false,
+    "relatedness_report_complete": false,
+    "truth_circularity_report_complete": true,
+    "wes_minimum_closed_by_verified_cohort": false
+  },
+  "all_readiness_gates_pass": false,
+  "assay_status_counts": {
+    "rnaseq": {
+      "conditional": 4,
+      "verified": 1
+    },
+    "scrnaseq": {
+      "conditional": 1
+    },
+    "targeted_mhc": {
+      "conditional": 1
+    },
+    "wes": {
+      "conditional": 1,
+      "rejected": 1,
+      "verified": 1
+    },
+    "wgs": {
+      "conditional": 1
+    }
+  },
+  "complete_ready_subjects": {
+    "rnaseq": [
+      "NCI60_PUBLIC_PILOT:DU-145",
+      "NCI60_PUBLIC_PILOT:EKVX",
+      "NCI60_PUBLIC_PILOT:HL-60",
+      "NCI60_PUBLIC_PILOT:LOX-IMVI",
+      "NCI60_PUBLIC_PILOT:NCI-H23",
+      "NCI60_PUBLIC_PILOT:NCI-H322M",
+      "NCI60_PUBLIC_PILOT:OVCAR-8",
+      "NCI60_PUBLIC_PILOT:RPMI-8226",
+      "NCI60_PUBLIC_PILOT:SK-MEL-28",
+      "NCI60_PUBLIC_PILOT:T47D",
+      "NCI60_PUBLIC_PILOT:TK-10"
+    ],
+    "wes": [],
+    "wgs": []
+  },
+  "controlled_access_requested": false,
+  "crosswalk_rows": 391,
+  "dataset_rows": 11,
+  "dataset_status_counts": {
+    "conditional": 8,
+    "rejected": 1,
+    "verified": 2
+  },
+  "inventory_only": true,
+  "lane_state_order": [
+    "inventory",
+    "metadata_verified",
+    "truth_verified",
+    "executable",
+    "prediction_frozen",
+    "evaluated"
+  ],
+  "lane_states": {
+    "AFGR_MKK_RNA": {
+      "assay": "rnaseq",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "metadata_or_sample_link_not_verified",
+        "no_complete_truth_blind_pilot_subjects"
+      ],
+      "cohort": "AFGR_MKK",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    },
+    "AFGR_MKK_WGS": {
+      "assay": "wgs",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "metadata_or_sample_link_not_verified",
+        "no_complete_truth_blind_pilot_subjects"
+      ],
+      "cohort": "AFGR_MKK",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    },
+    "CCLE_NCI60_WES_OVERLAP": {
+      "assay": "wes",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "no_complete_truth_blind_pilot_subjects"
+      ],
+      "cohort": "NCI60_CCLE",
+      "complete_executable_subjects": 0,
+      "state": "metadata_verified",
+      "state_index": 1
+    },
+    "DICE_SORTED_CELL_RNA": {
+      "assay": "rnaseq",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "metadata_or_sample_link_not_verified",
+        "no_complete_truth_blind_pilot_subjects"
+      ],
+      "cohort": "DICE",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    },
+    "E_MTAB_197_LCL_RNA": {
+      "assay": "rnaseq",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "metadata_or_sample_link_not_verified",
+        "no_complete_truth_blind_pilot_subjects"
+      ],
+      "cohort": "E_MTAB_197",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    },
+    "FNLCR_PBMC_RNA": {
+      "assay": "rnaseq",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "metadata_or_sample_link_not_verified",
+        "no_complete_truth_blind_pilot_subjects"
+      ],
+      "cohort": "FNLCR",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    },
+    "GSE120221_SCRNA": {
+      "assay": "scrnaseq",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "metadata_or_sample_link_not_verified"
+      ],
+      "cohort": "GSE120221",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    },
+    "IHWG_PRJEB6763_TARGETED_MHC": {
+      "assay": "targeted_mhc",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "metadata_or_sample_link_not_verified"
+      ],
+      "cohort": "IHWG_HOMOZYGOUS_LINES",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    },
+    "NCI60_ORIGINAL_WES": {
+      "assay": "wes",
+      "blocked_reasons": [
+        "metadata_or_sample_link_not_verified",
+        "no_complete_truth_blind_pilot_subjects"
+      ],
+      "cohort": "NCI60",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    },
+    "NCI60_RNA": {
+      "assay": "rnaseq",
+      "blocked_reasons": [],
+      "cohort": "NCI60",
+      "complete_executable_subjects": 11,
+      "state": "executable",
+      "state_index": 3
+    },
+    "TRANSPLANT_GERMLINE_WES": {
+      "assay": "wes",
+      "blocked_reasons": [
+        "independent_truth_not_verified",
+        "metadata_or_sample_link_not_verified",
+        "no_complete_truth_blind_pilot_subjects"
+      ],
+      "cohort": "TRANSPLANT_WES",
+      "complete_executable_subjects": 0,
+      "state": "inventory",
+      "state_index": 0
+    }
+  },
+  "matched_public_wes_rna_subjects": [],
+  "matched_resolved_wgs_rna_subjects": [],
+  "passed": false,
+  "pilot_rows": 111,
+  "pilot_subject_target": 12,
+  "raw_reads_downloaded": false,
+  "registry_valid": true,
+  "schema_version": "hla-ground-truth-dataset-discovery-1",
+  "source_sha256": {
+    "dataset_registry": "b872c807ee413b0970f65eefd4f0dc65b277f35dadd9722e93b4db8d5f8738c5",
+    "pilot_manifest": "d5387041f4427b408cd0b70147bff46e033257a3fa63e77bec708d6cc926cbe0",
+    "sample_crosswalk": "ebe7431f2544b17149c62462196d977afaba015d867c163bfb26e20e93e751ea",
+    "truth_registry": "074aea19264860dbf1255a9738f9a8c29d4fbd94f4ac90a6f31114da5535aafd"
+  },
+  "truth_rows": 10,
+  "verified_wes_capacity_datasets": []
+}

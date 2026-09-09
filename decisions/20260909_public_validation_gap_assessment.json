@@ -1,0 +1,63 @@
+{
+  "schema_version": "champhla-public-validation-gap-assessment-1",
+  "date": "2026-09-09",
+  "status": "BOUNDED_SEARCH_COMPLETE_EVIDENCE_GAPS_RETAINED",
+  "authorization_scope": "public data only; EGA and dbGaP untouched",
+  "prospective_minima": {"wes_donors": 89, "rnaseq_donors": 130},
+  "required_truth": "direct independent complete two-field HLA-A/B/C truth",
+  "repositories_searched": [
+    "NCBI SRA and GEO",
+    "EMBL-EBI ENA and BioStudies/ArrayExpress",
+    "official study records already preserved in external/dataset_discovery"
+  ],
+  "search_terms": [
+    "HLA two-field truth whole exome sequencing cohort public",
+    "HLA typed whole exome sequencing public cohort",
+    "HLA typed RNA-seq cohort two field",
+    "HLA RNA-seq genotype cohort"
+  ],
+  "candidate_dispositions": [
+    {
+      "candidate": "1000 Genomes/HapMap WES",
+      "modality": "wes",
+      "disposition": "same-resource_or_overlapping_donor_only",
+      "reason": "public WES and HLA truth exist, but these subjects overlap the development resource and cannot supply donor-independent confirmation",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/24223151/"
+    },
+    {
+      "candidate": "GEUVADIS E-GEUV-3",
+      "modality": "rnaseq",
+      "disposition": "new_library_overlapping_donor_only",
+      "reason": "465 RNA-seq lymphoblastoid cell lines are from 1000 Genomes subjects, so the cohort cannot clear the donor-independent gate",
+      "source": "https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-GEUV-3"
+    },
+    {
+      "candidate": "NCI-60 PRJNA433861",
+      "modality": "rnaseq",
+      "disposition": "exploratory_underpowered",
+      "reason": "11 non-derivative subjects meet complete strict A/B/C truth eligibility, below the 130-donor minimum",
+      "source": "external/dataset_discovery/audit_summary.json"
+    },
+    {
+      "candidate": "seq2HLA HapMap validation",
+      "modality": "rnaseq",
+      "disposition": "underpowered_and_insufficient_resolution",
+      "reason": "the published control evaluation used 50 subjects and reported two-digit rather than required direct two-field truth",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4064318/"
+    },
+    {
+      "candidate": "NCI-60 original WES and CCLE overlaps",
+      "modality": "wes",
+      "disposition": "not_accuracy_eligible",
+      "reason": "the original raw endpoint is unavailable and the public CCLE overlaps lack complete strict A/B/C truth",
+      "source": "external/dataset_discovery/candidate_assessment.md"
+    }
+  ],
+  "outcome": {
+    "independent_wes": "BLOCKED_NO_QUALIFYING_PUBLIC_COHORT",
+    "independent_rnaseq": "BLOCKED_NO_QUALIFYING_PUBLIC_COHORT",
+    "criteria_relaxed": false,
+    "independent_three_modality_claim_ready": false
+  },
+  "reopen_rule": "Repeat the bounded official-repository search before submission or when a newly public cohort is nominated; preserve the same truth and sample-size criteria."
+}

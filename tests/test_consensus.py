@@ -3,8 +3,13 @@ from __future__ import annotations
 import random
 import unittest
 
-from champhla_confirmation.consensus import build_guarded_cc
-from champhla_confirmation.schema import normalize_caller_row
+from champhla_confirmation.consensus import build_consensus, build_guarded_cc
+from champhla_confirmation.schema import (
+    normalize_caller_row,
+    normalize_method_row,
+    validate_production_caller_matrix,
+)
+from champhla_confirmation.panels import GENES, PANELS
 
 
 def call(subject, caller, pair, modality="wgs", gene="A", status="callable"):
@@ -83,6 +88,66 @@ class ConsensusTests(unittest.TestCase):
         row = call("S", "HLA-HD", self.p1)
         row["call_status"] = "called"
         self.assertEqual("callable", normalize_caller_row(row)["call_status"])
+
+    def test_partial_call_is_retained_but_does_not_vote(self):
+        partial = call("S", "HLA-HD", ("A*01:01", "-"))
+        normalized = normalize_caller_row(partial)
+        self.assertEqual("partial", normalized["call_status"])
+        self.assertEqual("A*01:01", normalized["allele1"])
+        rows = build_guarded_cc(
+            [normalized, call("S", "Kourami", self.p2)], [cc("S", self.p1)]
+        )
+        plurality = self._method(rows, "SimplePluralityLex")
+        self.assertEqual(self.p2, (plurality["allele1"], plurality["allele2"]))
+        self.assertEqual(1, plurality["partial_tools"])
+        self.assertEqual(1, plurality["complete_tools"])
+
+    def test_tie_audit_and_duplicate_caller_rejection(self):
+        callers = [call("S", "HLA-HD", self.p2), call("S", "Kourami", self.p1)]
+        plurality = self._method(build_guarded_cc(callers, [cc("S", self.p1)]), "SimplePluralityLex")
+        self.assertEqual(1, plurality["tie_at_top"])
+        self.assertIn("|", plurality["tied_pairs"])
+        with self.assertRaisesRegex(ValueError, "duplicate caller row"):
+            build_guarded_cc(callers + [call("S", "HLA-HD", self.p2)], [cc("S", self.p1)])
+
+    def test_complete_missingness_returns_no_evidence(self):
+        rows = build_consensus([
+            call("S", "HLA-HD", None, status="missing"),
+            call("S", "Kourami", None, status="missing"),
+        ])
+        plurality = self._method(rows, "SimplePluralityLex")
+        self.assertEqual("no_evidence", plurality["call_status"])
+        self.assertEqual(0, plurality["complete_tools"])
+        self.assertEqual(5, plurality["missing_tools"])
+
+    def test_majority_vote_is_a_legacy_input_alias(self):
+        row = normalize_method_row({
+            "cohort": "C", "subject": "S", "modality": "wgs", "gene": "A",
+            "method": "MajorityVote", "allele1": self.p1[0], "allele2": self.p1[1],
+            "call_status": "callable",
+        })
+        self.assertEqual("SimplePluralityLex", row["method"])
+
+    def test_explicit_native_homozygous_status_can_duplicate_one_allele(self):
+        row = call("S", "HLA-HD", ("A*01:01", "-"), status="homozygous")
+        normalized = normalize_caller_row(row)
+        self.assertEqual("callable", normalized["call_status"])
+        self.assertEqual(("A*01:01", "A*01:01"),
+                         (normalized["allele1"], normalized["allele2"]))
+
+    def test_production_matrix_requires_explicit_missing_rows(self):
+        pairs = {
+            "A": ("A*01:01", "A*02:01"),
+            "B": ("B*07:02", "B*08:01"),
+            "C": ("C*07:01", "C*07:02"),
+        }
+        rows = [
+            normalize_caller_row(call("S", caller, pairs[gene], gene=gene))
+            for gene in GENES for caller in PANELS["wgs"]
+        ]
+        validate_production_caller_matrix(rows)
+        with self.assertRaisesRegex(ValueError, "incomplete production caller matrix"):
+            validate_production_caller_matrix(rows[:-1])
 
 
 if __name__ == "__main__":

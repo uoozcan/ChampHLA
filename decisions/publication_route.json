@@ -1,9 +1,23 @@
 {
-  "schema_version": "publication-route-1",
-  "active_manuscript": "benchmark",
-  "method_manuscript_status": "blocked_pending_frozen_confirmation",
-  "external_validation_complete": false,
-  "rna_locked_minimum_met": false,
+  "schema_version": "publication-route-2",
+  "active_manuscript": "plurality_centered_benchmark",
+  "primary_method": "SimplePluralityLex",
+  "method_manuscript_status": "superseded_retained_for_provenance",
+  "amendment_status": "UNSIGNED_AWAITING_AUTHOR",
+  "performance_manuscript_status": "blocked_pending_corrected_three_modality_rerun",
   "historical_wgs_valid": false,
-  "abstract_numeric_performance_allowed": false
+  "valid_current_performance_scope": ["wes", "rnaseq"],
+  "three_modality_claim_ready": false,
+  "abstract_numeric_performance_allowed": false,
+  "supersession_chain": [
+    {"artifact": "manuscripts/benchmark/manuscript.md", "status": "active_plurality_centered_draft"},
+    {"artifact": "manuscripts/method_conditional/manuscript.md", "status": "archived_superseded"},
+    {"artifact": "Guarded CC, MV-floor, MetaConsensus, RefFormer, EvidenceGatedCC and weighted analyses", "status": "preserved_supplemental_ablations"},
+    {"artifact": "three-modality performance claim", "status": "blocked_pending_valid_corrected_WGS_WES_RNA_and_prospective_gate"}
+  ],
+  "outcome_wording": {
+    "all_three_noninferior": "Plurality was not materially exceeded across the evaluated HLA short-read assays.",
+    "wgs_fails": "Plurality is a strong WES/RNA-seq default with a demonstrated WGS limitation.",
+    "wgs_integrity_fails": "Retain a software/benchmark manuscript without a finalized cross-assay performance claim."
+  }
 }

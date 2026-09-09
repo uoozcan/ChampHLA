@@ -33,3 +33,14 @@ def test_imported_wgs_pilot_artifact_hashes():
     for relative, expected in manifest["files"].items():
         observed = hashlib.sha256((root / relative).read_bytes()).hexdigest()
         assert observed == expected
+
+
+def test_supported_python_and_cross_platform_ci_are_pinned():
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert 'requires-python = ">=3.10"' in pyproject
+    assert "ubuntu-latest" in workflow
+    assert "windows-latest" in workflow
+    assert 'python-version: ["3.10", "3.11"]' in workflow
+    assert "pytest -q" in workflow
+    assert "python -m pytest -q" in workflow

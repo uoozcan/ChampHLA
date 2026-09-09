@@ -1,0 +1,59 @@
+subject	truth_identifier	tissue	complete_abc_two_field	ambiguity_status	related_group	relationship	truth_source
+BT-549	41292-D	Breast CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+HS 578T	41293-D	Breast CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+MCF7	41294-D	Breast CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+MDA-MB-231	41296-D	Breast CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+MDA-MB-435	41297-D	Breast CA	0	contains_one_field_or_unresolved	M14_MDA-MB-435	derivative_or_duplicate	PMC555742_Table_2
+T47D	41298-D	Breast CA	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+SF-268	41286-D	CNS CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+SF-295	41287-D	CNS CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+SF-539	41288-D	CNS CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+SNB-19	41289-D	CNS CA	0	contains_one_field_or_unresolved	SNB-19_U251	canonical	PMC555742_Table_2
+SNB-75	41290-D	CNS CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+U251	41291-D	CNS CA	0	contains_one_field_or_unresolved	SNB-19_U251	derivative_or_duplicate	PMC555742_Table_2
+COLO 205	41299-D	Colon CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+HCC-2998	41300-D	Colon CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+HCT-116	41301-D	Colon CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+HCT-15	41302-D	Colon CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+HT29	41303-D	Colon CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+KM12	41304-D	Colon CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+SW-620	41305-D	Colon CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+MOLT-4	41281-D	Leukemia, ALL	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+CCRF-CEM	41282-D	Leukemia, ALL	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+HL-60	41284-D	Leukemia, APL	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+K-562	41280-D	Leukemia, CML	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+SR	41285-D	Leukemia, LCIL	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+LOX-IMVI	41315-D	Melanoma	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+M14	41316-D	Melanoma	0	contains_one_field_or_unresolved	M14_MDA-MB-435	canonical	PMC555742_Table_2
+SK-MEL-2	41317-D	Melanoma	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+SK-MEL-5	41319-D	Melanoma	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+SK-MEL-28	41318-D	Melanoma	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+UACC-62	41321-D	Melanoma	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+UACC-257	41320-D	Melanoma	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+RPMI-8226	41283-D	MM	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+A549	41306-D	NSCLC	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+EKVX	41307-D	NSCLC	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+HOP-62	41308-D	NSCLC	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+HOP-92	41309-D	NSCLC	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+NCI-H23	41312-D	NSCLC	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+NCI-H226	41311-D	NSCLC	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+NCI-H322M	41310-D	NSCLC	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+NCI-H460	41313-D	NSCLC	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+NCI-H522	41314-D	NSCLC	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+IGROV1	41322-D	Ovarian CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+OVCAR-3	41323-D	Ovarian CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+OVCAR-4	41324-D	Ovarian CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+OVCAR-5	41325-D	Ovarian CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+OVCAR-8	41326-D	Ovarian CA	1	complete_two_field	OVCAR-8_NCI-ADR-RES	canonical	PMC555742_Table_2
+NCI-ADR-RES	41295-D	Ovarian CA	1	complete_two_field	OVCAR-8_NCI-ADR-RES	derivative_or_duplicate	PMC555742_Table_2
+SK-OV-3	41327-D	Ovarian CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+DU-145	41328-D	Prostate CA	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+PC-3	41329-D	Prostate CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+786-O	41330-D	Renal CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+A498	41331-D	Renal CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+ACHN	41332-D	Renal CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+CAKI-1	41333-D	Renal CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+SN12C	41334-D	Renal CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+TK-10	41335-D	Renal CA	1	complete_two_field		unrelated_or_unresolved	PMC555742_Table_2
+UO-31	41336-D	Renal CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2
+RXF-393	41337-D	Renal CA	0	contains_one_field_or_unresolved		unrelated_or_unresolved	PMC555742_Table_2

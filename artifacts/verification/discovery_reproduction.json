@@ -1,5 +1,6 @@
 {
   "failures": [],
+  "independent_locus_recalculation": false,
   "observed": {
     "rnaseq": {
       "baseline_correct": 296,
@@ -17,6 +18,8 @@
     }
   },
   "passed": true,
-  "schema_version": "discovery-reproduction-1",
+  "release_gate_satisfied": false,
+  "schema_version": "development-table-reconciliation-2",
+  "scope": "table-level count reconciliation against locked expected values",
   "wgs_status": "excluded_invalid_historical_input"
 }

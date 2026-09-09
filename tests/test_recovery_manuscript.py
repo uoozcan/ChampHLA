@@ -7,12 +7,19 @@ from champhla_recovery.registry import validate_registry
 
 def _registry(tmp_path: Path) -> Path:
     artifact = tmp_path / "artifact.tsv"
-    artifact.write_text("x\n1\n", encoding="utf-8")
+    artifact.write_text(
+        "result_id\tcohort\tmodality\tmethod\tevidence_role\tanalysis_status\tvalidity\tsubjects\tloci\tcorrect\taccuracy\n"
+        "GOOD\tdev\twes\tmethod\tdevelopment\tdiscovery\tvalid\t1\t3\t3\t1.0\n"
+        "BAD\tdev\twgs\tmethod\tinvalid\tdiscovery\tinvalid\t1\t3\t1\t0.333333\n",
+        encoding="utf-8",
+    )
+    source = tmp_path / "source.tsv"
+    source.write_text("x\n1\n", encoding="utf-8")
     registry = tmp_path / "registry.tsv"
     registry.write_text(
-        "result_id\tcohort\tmodality\tmethod\tanalysis_status\tvalidity\tsubjects\tloci\tcorrect\taccuracy\tartifact_path\tartifact_sha256\tabstract_allowed\tclaim_boundary\n"
-        f"GOOD\tdev\twes\tmethod\tdiscovery\tvalid\t1\t3\t3\t1.0\tartifact.tsv\t{sha256(artifact)}\t0\ttest\n"
-        f"BAD\tdev\twgs\tmethod\tdiscovery\tinvalid\t1\t3\t1\t0.333\tartifact.tsv\t{sha256(artifact)}\t0\ttest\n",
+        "result_id\tcohort\tmodality\tmethod\tevidence_role\tanalysis_status\tvalidity\tsubjects\tloci\tcorrect\taccuracy\tartifact_path\tartifact_sha256\tartifact_record_key\tsource_artifact_path\tsource_artifact_sha256\tabstract_allowed\tclaim_boundary\n"
+        f"GOOD\tdev\twes\tmethod\tdevelopment\tdiscovery\tvalid\t1\t3\t3\t1.0\tartifact.tsv\t{sha256(artifact)}\tresult_id=GOOD\tsource.tsv\t{sha256(source)}\t0\ttest\n"
+        f"BAD\tdev\twgs\tmethod\tinvalid\tdiscovery\tinvalid\t1\t3\t1\t0.333333\tartifact.tsv\t{sha256(artifact)}\tresult_id=BAD\tsource.tsv\t{sha256(source)}\t0\ttest\n",
         encoding="utf-8",
     )
     return registry
@@ -20,7 +27,7 @@ def _registry(tmp_path: Path) -> Path:
 
 def test_registry_rejects_invalid_abstract_claim(tmp_path: Path):
     registry = _registry(tmp_path)
-    text = registry.read_text(encoding="utf-8").replace("BAD\tdev\twgs\tmethod\tdiscovery\tinvalid", "BAD\tdev\twgs\tmethod\tdiscovery\tinvalid").replace("\t0\ttest\n", "\t1\ttest\n", 2)
+    text = registry.read_text(encoding="utf-8").replace("\t0\ttest\n", "\t1\ttest\n", 2)
     registry.write_text(text, encoding="utf-8")
     assert validate_registry(str(registry), str(tmp_path))
 
@@ -54,4 +61,3 @@ def test_manuscript_rejects_placeholder_and_invalid_wgs_number(tmp_path: Path):
     result = audit_claims(str(manuscript), str(registry), str(claims), str(tmp_path / "audit.json"), str(tmp_path))
     assert result["submission_ready"] is False
     assert any("invalid-WGS" in failure for failure in result["failures"])
-

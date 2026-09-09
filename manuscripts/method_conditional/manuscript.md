@@ -1,10 +1,12 @@
 # ChampHLA Guarded Champion–Challenger for resolving low-agreement HLA consensus calls
 
-## Status
+## Status: superseded archive
 
-This manuscript is a conditional working copy and is not submission-ready. It
-cannot become the active manuscript until the frozen decision in
-`decisions/20260901_publication_recovery.json` passes without policy changes.
+This manuscript is preserved only for provenance. The signed-state-independent
+supersession chain in `decisions/publication_route.json` makes the
+plurality-centered benchmark the active manuscript. Guarded CC remains an
+ablation and comparator; this draft cannot become the primary manuscript by a
+favorable future result.
 
 ## Proposed claim
 
@@ -14,14 +16,14 @@ claim is specifically that it resolves consensus failures at a fixed
 denominator. It is not a claim of better conditional accuracy on already-called
 loci and is not a claim that every always-call comparator is inferior.
 
-## Required evidence
+## Historical activation rule
 
-The manuscript will be activated only if subject-unseen 1000G WGS, WES, and
+The earlier design would have required subject-unseen 1000G WGS, WES, and
 RNA-seq comparisons are each positive, Holm-significant, and have
 subject-clustered confidence intervals above zero; per-gene harm and plurality
 non-regression gates must pass; and independent HPRC WGS must exclude a
-regression worse than two percentage points. No development number will be
-copied into the abstract as confirmation evidence.
+regression worse than two percentage points. This rule is retained to explain
+the archive and no longer controls manuscript selection.
 
 ## Methods
 
@@ -38,8 +40,5 @@ to independently locked truth.
 
 ## Decision
 
-If all gates pass, this copy becomes the method manuscript. If one or two
-modalities pass, their results move to the benchmark manuscript with restricted
-claims. If no modality passes, this copy is archived and baseline searching or
-post-result retuning stops.
-
+This copy remains archived. Future results update the outcome-dependent wording
+of the plurality-centered benchmark and do not reactivate this manuscript.

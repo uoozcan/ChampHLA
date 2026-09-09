@@ -24,13 +24,17 @@ def _alleles(text: str, gene: str) -> list[str]:
     return values
 
 
-def _line_pair(text: str, gene: str):
+def _line_call(text: str, gene: str):
     for line in text.splitlines():
         values = _alleles(line, gene)
         if len(values) == 2:
-            return canonical_pair(values[0], values[1], gene)
+            pair = canonical_pair(values[0], values[1], gene)
+            return {"allele1": pair[0], "allele2": pair[1], "call_status": "callable"}
         if len(values) == 1 and re.search(r"(?:homo|hom|same)", line, re.I):
-            return canonical_pair(values[0], values[0], gene)
+            pair = canonical_pair(values[0], values[0], gene)
+            return {"allele1": pair[0], "allele2": pair[1], "call_status": "callable"}
+        if len(values) == 1 and re.search(r"(?:^|[\t ,;])-(?:$|[\t ,;])", line):
+            return {"allele1": values[0], "allele2": "", "call_status": "partial"}
     return None
 
 
@@ -46,26 +50,44 @@ def _optitype_matrix(text: str, gene: str):
     values = rows[-1]
     if max(indices) >= len(values):
         return None
-    return canonical_pair(values[indices[0]], values[indices[1]], target)
+    alleles = [values[index].strip() for index in indices]
+    present = [value for value in alleles if value not in {"", "-", "."}]
+    if len(present) == 2:
+        pair = canonical_pair(present[0], present[1], target)
+        return {"allele1": pair[0], "allele2": pair[1], "call_status": "callable"}
+    if len(present) == 1:
+        return {"allele1": canonical_allele(present[0], target), "allele2": "",
+                "call_status": "partial"}
+    return {"allele1": "", "allele2": "", "call_status": "missing"}
 
 
-def parse_caller_pair(caller: str, text: str, gene: str):
-    """Parse a diploid pair from the pinned caller-native result summaries.
+def parse_caller_call(caller: str, text: str, gene: str) -> dict[str, str]:
+    """Parse a complete, partial, or missing call from a native summary.
 
     Wrappers may use a normalized line-oriented summary. OptiType's standard
     matrix form is handled explicitly; other pinned wrappers are validated by
-    gene-specific allele lines. Unknown or ambiguous content fails closed.
+    gene-specific allele lines. A lone allele is retained as partial and is
+    never promoted to homozygous without explicit native evidence.
     """
     if caller == "OptiType":
-        pair = _optitype_matrix(text, gene)
-        if pair:
-            return pair
-    pair = _line_pair(text, gene)
-    if pair:
-        return pair
+        call = _optitype_matrix(text, gene)
+        if call:
+            return call
+    call = _line_call(text, gene)
+    if call:
+        return call
     values = _alleles(text, gene)
     if len(values) == 1:
-        return canonical_pair(values[0], values[0], gene)
+        return {"allele1": values[0], "allele2": "", "call_status": "partial"}
     if len(values) == 2:
-        return canonical_pair(values[0], values[1], gene)
-    return None
+        pair = canonical_pair(values[0], values[1], gene)
+        return {"allele1": pair[0], "allele2": pair[1], "call_status": "callable"}
+    return {"allele1": "", "allele2": "", "call_status": "missing"}
+
+
+def parse_caller_pair(caller: str, text: str, gene: str):
+    """Compatibility adapter returning only complete diploid pairs."""
+    call = parse_caller_call(caller, text, gene)
+    if call["call_status"] != "callable":
+        return None
+    return (call["allele1"], call["allele2"])

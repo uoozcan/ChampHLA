@@ -30,8 +30,11 @@ def main() -> int:
             if actual != value:
                 failures.append(f"{modality}.{field}: expected {value}, observed {actual}")
     result = {
-        "schema_version": "discovery-reproduction-1",
+        "schema_version": "development-table-reconciliation-2",
         "passed": not failures,
+        "scope": "table-level count reconciliation against locked expected values",
+        "independent_locus_recalculation": False,
+        "release_gate_satisfied": False,
         "observed": observed,
         "failures": failures,
         "wgs_status": "excluded_invalid_historical_input",
@@ -43,4 +46,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

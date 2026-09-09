@@ -1,0 +1,24 @@
+{
+  "schema_version": "champhla-hprc-assembly-truth-protocol-1",
+  "status": "PREPARED_NOT_FROZEN",
+  "target_subjects": 120,
+  "assembly_access": {
+    "format": "AGC",
+    "official_archive": "https://s3-us-west-2.amazonaws.com/human-pangenomics/index.html?prefix=working/HPRC/HPRC-Release2/",
+    "storage_policy": "extract one subject's two haplotypes at a time; retain source archive checksum and per-haplotype hashes"
+  },
+  "methods": [
+    {"method": "HLA-ASM", "version": "VERIFY_ON_ROIHU", "artifact_sha256": "REQUIRED_BEFORE_EXECUTION"},
+    {"method": "Immuannot", "version": "VERIFY_ON_ROIHU", "artifact_sha256": "REQUIRED_BEFORE_EXECUTION"}
+  ],
+  "acceptance": {
+    "required_haplotypes": ["1", "2"],
+    "required_genes": ["A", "B", "C"],
+    "resolution": "two-field",
+    "method_concordance": true,
+    "required_gap_free_coding_exons": [2, 3],
+    "equally_supported_conflict_allowed": false
+  },
+  "firewall": "assembly outputs and truth remain unreadable to the short-read prediction workflow until its freeze validates",
+  "execution_gate": "Do not submit assembly typing until both methods and the AGC archive are checksum-pinned and status is FROZEN."
+}

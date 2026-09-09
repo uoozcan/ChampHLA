@@ -6,11 +6,22 @@ from pathlib import Path
 
 from champhla_confirmation.audit import audit_wgs
 from champhla_confirmation.cohorts import build_overlap_crosswalk
-from champhla_confirmation.io import read_tsv, write_tsv
+from champhla_confirmation.io import read_tsv, write_json, write_tsv
 from champhla_confirmation.panels import PANELS
 
 
 class OverlapAuditTests(unittest.TestCase):
+    @staticmethod
+    def _environment(root: Path) -> Path:
+        path = root / "environment.json"
+        write_json(path, {
+            "reference_build": "GRCh38DH", "reference_sha256": "fixture",
+            "imgt_hla_version": "3.59.0", "python_version": "3.11.15",
+            "samtools_version": "1.21",
+            "caller_artifacts": {caller: f"sha256:{caller}" for caller in PANELS["wgs"]},
+        })
+        return path
+
     def test_alias_and_relative_exclusion(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -34,7 +45,7 @@ class OverlapAuditTests(unittest.TestCase):
                               "allele1_raw": "A*01:01:01", "allele2_raw": "A*02:01:01",
                               "allele1": "A*01:01", "allele2": "A*02:01", "call_status": "callable",
                               "source_file": str(root / "missing.txt")}])
-            result = audit_wgs(path, root / "audit")
+            result = audit_wgs(path, root / "audit", environment_manifest_path=self._environment(root))
             self.assertFalse(result["passed"])
             self.assertFalse(result["automated_passed"])
             self.assertFalse(result["manual_review_complete"])
@@ -61,7 +72,8 @@ class OverlapAuditTests(unittest.TestCase):
                                      "source_file": str(source)})
             harmonized = root / "harm.tsv"
             write_tsv(harmonized, rows)
-            first = audit_wgs(harmonized, root / "first")
+            environment = self._environment(root)
+            first = audit_wgs(harmonized, root / "first", environment_manifest_path=environment)
             self.assertFalse(first["passed"])
             self.assertTrue(first["automated_passed"])
             self.assertFalse(first["manual_review_complete"])
@@ -71,7 +83,7 @@ class OverlapAuditTests(unittest.TestCase):
                 row["reviewer"] = "fixture-reviewer"
             reviewed = root / "reviewed.tsv"
             write_tsv(reviewed, review)
-            second = audit_wgs(harmonized, root / "second", reviewed)
+            second = audit_wgs(harmonized, root / "second", reviewed, environment)
             self.assertTrue(second["passed"])
             self.assertTrue(second["automated_passed"])
             self.assertTrue(second["manual_review_complete"])

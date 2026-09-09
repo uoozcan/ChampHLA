@@ -12,7 +12,7 @@ TRUTH_TOKENS = {
     "is_correct", "is_correct_2field", "correct_status", "candidate_set_oracle",
     "match_grade", "compatibility_grade",
 }
-UNCALLABLE = {"", "missing", "uncallable", "no_call", "no_consensus", "abstained", "failed"}
+UNCALLABLE = {"", "missing", "partial", "uncallable", "no_call", "no_consensus", "abstained", "failed"}
 ALLELE_RE = re.compile(r"^(?:HLA-)?([A-Za-z0-9]+)\*([0-9A-Za-z]+)(?::([0-9A-Za-z]+))?(?::.*)?$")
 
 
