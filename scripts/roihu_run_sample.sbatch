@@ -138,7 +138,7 @@ ledger_transition --state succeeded --exit-code 0 --runtime-seconds "${runtime}"
   --output-sha256 "${output_hash}"
 ledger_transition --state validated
 if [[ "${CHAMPHLA_EXECUTION_MODE:-full_scale}" == sequential_low_storage ]]; then
-  "${CHAMPHLA_CODE_ROOT}/scripts/roihu_prune_sample_work.sh" \
+  bash "${CHAMPHLA_CODE_ROOT}/scripts/roihu_prune_sample_work.sh" \
     "${CHAMPHLA_RUN_ROOT}" "${modality}" "${sample_id}"
 fi
 trap - ERR
