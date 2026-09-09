@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -254,6 +255,21 @@ def test_directory_tree_hash_uses_posix_relative_paths(tmp_path: Path):
     assert len(first["tree_sha256"]) == 64
     (root / "nested" / "a.txt").write_text("B\n", encoding="utf-8")
     assert directory_tree_identity(root)["tree_sha256"] != first["tree_sha256"]
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows CI does not guarantee symlink privilege")
+def test_directory_tree_hash_freezes_internal_links_and_rejects_escapes(tmp_path: Path):
+    root = tmp_path / "index"
+    root.mkdir()
+    (root / "target.fa").write_text(">A\nAC\n")
+    (root / "alias.fa").symlink_to("target.fa")
+    internal = directory_tree_identity(root)
+    assert internal["failures"] == []
+    assert internal["files"] == 2
+    outside = tmp_path / "outside.fa"
+    outside.write_text(">B\nGT\n")
+    (root / "escape.fa").symlink_to(outside)
+    assert any("escapes" in failure for failure in directory_tree_identity(root)["failures"])
 
 
 def test_workflow_lock_detects_changes_and_masked_success(tmp_path: Path):
