@@ -397,15 +397,14 @@ def directory_tree_identity(path: str | Path) -> dict:
     for item in sorted(root.rglob("*"), key=lambda value: value.relative_to(root).as_posix()):
         relative = item.relative_to(root).as_posix()
         if item.is_symlink():
-            link_target = Path(os.readlink(item))
             resolved = item.resolve()
             try:
                 target_relative = resolved.relative_to(root).as_posix()
             except ValueError:
                 failures.append(f"symlink escapes frozen directory: {relative}")
                 continue
-            if link_target.is_absolute() or not resolved.is_file():
-                failures.append(f"symlink is absolute or broken: {relative}")
+            if not resolved.is_file():
+                failures.append(f"symlink is broken: {relative}")
                 continue
             digest.update(relative.encode("utf-8"))
             digest.update(b"\0SYMLINK\0")

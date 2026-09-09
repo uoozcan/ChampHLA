@@ -266,6 +266,8 @@ def test_directory_tree_hash_freezes_internal_links_and_rejects_escapes(tmp_path
     internal = directory_tree_identity(root)
     assert internal["failures"] == []
     assert internal["files"] == 2
+    (root / "absolute_alias.fa").symlink_to((root / "target.fa").resolve())
+    assert directory_tree_identity(root)["failures"] == []
     outside = tmp_path / "outside.fa"
     outside.write_text(">B\nGT\n")
     (root / "escape.fa").symlink_to(outside)
