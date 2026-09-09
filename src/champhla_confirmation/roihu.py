@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import hashlib
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import time
 from pathlib import Path
@@ -773,12 +774,12 @@ def build_nci60_run_manifest(pilot_path: str | Path, ena_report_path: str | Path
 
 def resolve_same_resource_index_checksums(roster_path: str | Path,
                                           assay_manifest_path: str | Path,
-                                          output: str | Path) -> dict:
+                                          output: str | Path, workers: int = 8) -> dict:
     """Stream only missing public CRAI files and freeze both MD5 and SHA-256."""
     roster = read_tsv(roster_path)
     reject_truth_columns(roster, "same-resource truth-free roster")
     keys = {(row.get("subject", ""), row.get("modality", "").lower()) for row in roster}
-    records = []
+    targets = []
     for row in read_tsv(assay_manifest_path):
         key = (row.get("sample_id", ""), row.get("modality", "").lower())
         if key not in keys or key[1] == "rnaseq" or row.get("index_md5", ""):
@@ -786,23 +787,29 @@ def resolve_same_resource_index_checksums(roster_path: str | Path,
         uri = row.get("index_url", "")
         if not uri:
             raise ValueError(f"{key}: missing public index URI")
+        targets.append((key, uri))
+
+    def resolve(target: tuple[tuple[str, str], str]) -> dict[str, object]:
+        key, uri = target
         md5 = hashlib.md5()
         sha = hashlib.sha256()
         total = 0
         with urlopen(uri, timeout=120) as response:
-            while True:
-                chunk = response.read(1024 * 1024)
-                if not chunk:
-                    break
+            while chunk := response.read(1024 * 1024):
                 md5.update(chunk)
                 sha.update(chunk)
                 total += len(chunk)
         if total == 0:
             raise ValueError(f"{key}: empty public index response")
-        records.append({
+        return {
             "sample_id": key[0], "modality": key[1], "index_uri": uri,
             "bytes": total, "md5": md5.hexdigest(), "sha256": sha.hexdigest(),
-        })
+        }
+
+    if workers < 1 or workers > 16:
+        raise ValueError("index checksum workers must be between 1 and 16")
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        records = list(executor.map(resolve, targets))
     records.sort(key=lambda row: (row["modality"], row["sample_id"]))
     write_tsv(output, records, ["sample_id", "modality", "index_uri", "bytes", "md5", "sha256"])
     return {"records": len(records), "output_sha256": sha256(output), "truth_blind": True}

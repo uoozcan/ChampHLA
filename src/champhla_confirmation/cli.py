@@ -596,9 +596,10 @@ def resolve_same_resource_index_checksums_main() -> int:
     parser.add_argument("--roster", required=True)
     parser.add_argument("--assay-manifest", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--workers", type=int, default=8)
     args = parser.parse_args()
     result = resolve_same_resource_index_checksums(
-        args.roster, args.assay_manifest, args.output,
+        args.roster, args.assay_manifest, args.output, args.workers,
     )
     print(f"resolved public index checksums={result['records']}")
     return 0
