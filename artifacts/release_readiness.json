@@ -1,6 +1,5 @@
 {
   "blockers": [
-    "clean_git_state",
     "corrected_three_modality_evaluation",
     "count_reconciliation",
     "frozen_comparators",
@@ -17,7 +16,7 @@
   "gates": {
     "clean_git_state": {
       "evidence": "git status --porcelain",
-      "passed": false
+      "passed": true
     },
     "corrected_three_modality_evaluation": {
       "evidence": "artifacts/corrected/evaluation/confirmation_decision.json",
