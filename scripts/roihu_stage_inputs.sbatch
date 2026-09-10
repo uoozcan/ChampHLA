@@ -19,8 +19,28 @@ CODE_ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
 manifest=${1:?usage: roihu_stage_inputs.sbatch MANIFEST}
 line_number=$((SLURM_ARRAY_TASK_ID + 1))
-IFS=$'\t' read -r cohort sample_id donor_id modality input_type input_uri index_uri index_checksum source_checksum reference_build read_layout independence_stratum evidence_role \
-  < <(sed -n "${line_number}p" "${manifest}")
+# Tab is IFS whitespace, so `IFS=$'\t' read` collapses runs of tabs and silently drops
+# empty columns, shifting every later field. RNA rows have no index, so index_uri and
+# index_checksum are empty and source_checksum was receiving read_layout. mapfile -d does
+# not collapse, so empty columns are preserved.
+mapfile -t -d $'\t' _row < <(printf '%s' "$(sed -n "${line_number}p" "${manifest}")")
+if [[ ${#_row[@]} -ne 13 ]]; then
+  echo "Manifest row ${line_number} has ${#_row[@]} fields, expected 13" >&2
+  exit 2
+fi
+cohort=${_row[0]}
+sample_id=${_row[1]}
+donor_id=${_row[2]}
+modality=${_row[3]}
+input_type=${_row[4]}
+input_uri=${_row[5]}
+index_uri=${_row[6]}
+index_checksum=${_row[7]}
+source_checksum=${_row[8]}
+reference_build=${_row[9]}
+read_layout=${_row[10]}
+independence_stratum=${_row[11]}
+evidence_role=${_row[12]}
 
 if [[ -z "${sample_id:-}" || -z "${modality:-}" ]]; then
   echo "Missing manifest row for array task ${SLURM_ARRAY_TASK_ID}" >&2

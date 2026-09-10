@@ -166,3 +166,50 @@ def test_pilot_wave_runs_in_the_mode_production_will_use():
     text = (ROOT / "scripts/roihu_submit_wave.sh").read_text(encoding="utf-8")
     pilot = text[text.index("  pilot)"):text.index("  capacity)")]
     assert "execution_mode=sequential_low_storage" in pilot
+
+
+def test_manifest_rows_are_parsed_without_collapsing_empty_columns():
+    """`IFS=$'\t' read` collapses runs of tabs, because tab is IFS whitespace.
+
+    RNA rows carry no index, so index_uri and index_checksum are empty. Under the old
+    parse those two columns vanished and every later field shifted left by two, leaving
+    source_checksum holding read_layout. The downloads were correct; verification could
+    never succeed. Nothing caught it because it needs a real row with an empty column.
+    """
+    for name in ("roihu_stage_inputs.sbatch", "roihu_run_sample.sbatch"):
+        text = (ROOT / "scripts" / name).read_text(encoding="utf-8")
+        code = "\n".join(
+            line for line in text.splitlines() if not line.lstrip().startswith("#")
+        )
+        assert r"IFS=$'\t' read" not in code, f"{name} still uses the collapsing parse"
+        assert r"mapfile -t -d $'\t' _row" in code, f"{name} does not use a preserving parse"
+        assert "-ne 13" in text, f"{name} does not assert the manifest field count"
+
+
+def test_real_rna_manifest_row_has_empty_index_columns():
+    """The condition that triggered the bug must stay represented in the frozen manifest."""
+    manifest = (ROOT / "cohorts" / "same_resource_truth_free.tsv").read_text(encoding="utf-8")
+    header, *rows = [line for line in manifest.splitlines() if line]
+    columns = header.split("\t")
+    index_uri = columns.index("index_uri")
+    index_checksum = columns.index("index_checksum")
+    source_checksum = columns.index("source_checksum")
+    rna = [r.split("\t") for r in rows if r.split("\t")[columns.index("modality")] == "rnaseq"]
+    assert rna, "no RNA rows in the frozen manifest"
+    for fields in rna:
+        assert len(fields) == len(columns)
+        assert fields[index_uri] == ""
+        assert fields[index_checksum] == ""
+        # The value that was being mistaken for read_layout.
+        assert fields[source_checksum].startswith(("md5:", "sha256:"))
+
+
+def test_resource_usage_does_not_depend_on_gnu_time():
+    """GNU time is not installed on Roihu compute nodes; the job died at that line."""
+    text = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert "/usr/bin/time" not in text
+    assert "run_started=${SECONDS}" in text
+    assert "sstat" in text
+    # How each number was obtained must be recorded, not implied.
+    assert "elapsed_source=" in text
+    assert "peak_memory_source=" in text

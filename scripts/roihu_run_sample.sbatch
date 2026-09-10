@@ -17,8 +17,28 @@ source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
 export PYTHONPATH=${CHAMPHLA_CODE_ROOT}/src
 manifest=${1:?usage: roihu_run_sample.sbatch MANIFEST}
 line_number=$((SLURM_ARRAY_TASK_ID + 1))
-IFS=$'\t' read -r cohort sample_id donor_id modality input_type input_uri index_uri index_checksum source_checksum reference_build read_layout independence_stratum evidence_role \
-  < <(sed -n "${line_number}p" "${manifest}")
+# Tab is IFS whitespace, so `IFS=$'\t' read` collapses runs of tabs and silently drops
+# empty columns, shifting every later field. RNA rows have no index, so index_uri and
+# index_checksum are empty and source_checksum was receiving read_layout. mapfile -d does
+# not collapse, so empty columns are preserved.
+mapfile -t -d $'\t' _row < <(printf '%s' "$(sed -n "${line_number}p" "${manifest}")")
+if [[ ${#_row[@]} -ne 13 ]]; then
+  echo "Manifest row ${line_number} has ${#_row[@]} fields, expected 13" >&2
+  exit 2
+fi
+cohort=${_row[0]}
+sample_id=${_row[1]}
+donor_id=${_row[2]}
+modality=${_row[3]}
+input_type=${_row[4]}
+input_uri=${_row[5]}
+index_uri=${_row[6]}
+index_checksum=${_row[7]}
+source_checksum=${_row[8]}
+reference_build=${_row[9]}
+read_layout=${_row[10]}
+independence_stratum=${_row[11]}
+evidence_role=${_row[12]}
 input_root=${CHAMPHLA_INPUT_ROOT}/${modality}/${sample_id}
 sample_root=${CHAMPHLA_RUN_ROOT}/caller_outputs/${modality}/${sample_id}
 wave=$(basename "${manifest}" .tsv)
@@ -97,8 +117,11 @@ sha256sum "${sample_root}/samplesheet.csv" "${manifest}" \
   "${CHAMPHLA_CODE_ROOT}/configs/roihu_workflow_lock.json" \
   "${CHAMPHLA_PIPELINE_ROOT}/main.nf" > "${sample_root}/pre_run_sha256.txt"
 cd "${sample_root}/launch"
-/usr/bin/time -f 'elapsed_seconds=%e\npeak_memory_kbytes=%M' \
-  -o "${sample_root}/resource_usage.txt" nextflow run "${CHAMPHLA_PIPELINE_ROOT}/main.nf" \
+# GNU time is not installed on Roihu compute nodes and no cgroup peak-memory file is
+# readable there, so elapsed time comes from the shell and peak RSS from Slurm accounting.
+# Both sources are recorded so a reader can tell how each number was obtained.
+run_started=${SECONDS}
+nextflow run "${CHAMPHLA_PIPELINE_ROOT}/main.nf" \
   -name "plurality_${modality}_${sample_id}_${SLURM_JOB_ID}" \
   -w "${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}" \
   -params-file "${CHAMPHLA_PIPELINE_ROOT}/conf/roihu_params.yaml" \
@@ -107,6 +130,27 @@ cd "${sample_root}/launch"
   --outdir "${sample_root}/results" --slurm_account "${CHAMPHLA_ACCOUNT}" \
   --singularity_cache_dir "${CHAMPHLA_CONTAINER_ROOT}" "${extra[@]}" \
   -profile roihu,singularity
+run_elapsed=$(( SECONDS - run_started ))
+
+peak_rss_raw=$(sstat --noheader --parsable2 --format=MaxRSS -j "${SLURM_JOB_ID}.batch" 2>/dev/null | head -1 || true)
+peak_rss_kb=$(printf '%s' "${peak_rss_raw}" | awk '
+  {
+    v=$0; u=substr(v, length(v), 1);
+    if (u ~ /^[KMGT]$/) { n=substr(v, 1, length(v)-1)+0 } else { n=v+0; u="K" }
+    m=(u=="K")?1:(u=="M")?1024:(u=="G")?1048576:(u=="T")?1073741824:1;
+    printf "%d", n*m
+  }')
+[[ "${peak_rss_kb}" =~ ^[0-9]+$ ]] || peak_rss_kb=0
+{
+  printf 'elapsed_seconds=%s\n' "${run_elapsed}"
+  printf 'peak_memory_kbytes=%s\n' "${peak_rss_kb}"
+  printf 'elapsed_source=bash SECONDS\n'
+  if [[ "${peak_rss_kb}" -gt 0 ]]; then
+    printf 'peak_memory_source=slurm sstat MaxRSS\n'
+  else
+    printf 'peak_memory_source=unavailable\n'
+  fi
+} > "${sample_root}/resource_usage.txt"
 
 validation=${sample_root}/caller_output_validation.tsv
 printf 'caller\tnative_summary\tsha256\n' > "${validation}"
