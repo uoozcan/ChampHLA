@@ -28,7 +28,14 @@ python3 -c 'from champhla_confirmation.cli import audit_run_manifest_main; raise
 
 execution_mode=full_scale
 case "${wave}" in
-  pilot) limit=2; concurrency=1 ;;
+  pilot)
+    # Pilots run in the same mode production will use, so the retained figure the
+    # storage gate consumes describes a state that actually persists. Peak disk is
+    # still measured before the release, so both projections stay honest.
+    limit=2
+    concurrency=1
+    execution_mode=sequential_low_storage
+    ;;
   capacity)
     limit=10
     test -s "${CHAMPHLA_RUN_ROOT}/storage_gate.json"

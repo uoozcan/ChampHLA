@@ -24,9 +24,18 @@
     "T1K_HLA_INDEX": "/scratch/project_2008084/hla_references/t1k_hlaidx"
   },
   "reference_designs": {
-    "wgs": {"source_build": "GRCh38DH", "runtime_fasta": "GRCh38DH"},
-    "wes": {"source_build": "GRCh38DH", "runtime_fasta": "GRCh38DH"},
-    "rnaseq": {"source_build": "GRCh37", "runtime_fasta": null}
+    "wgs": {
+      "source_build": "GRCh38DH",
+      "runtime_fasta": "GRCh38DH"
+    },
+    "wes": {
+      "source_build": "GRCh38DH",
+      "runtime_fasta": "GRCh38DH"
+    },
+    "rnaseq": {
+      "source_build": "GRCh37",
+      "runtime_fasta": null
+    }
   },
   "containers": {
     "HLA-HD": "/scratch/project_2008084/hla_references/singularity_cache/containers/hlahd.sif",
@@ -41,7 +50,37 @@
     "SpecHLA": "/projappl/project_2008084/SpecHLAx/script/whole/SpecHLA.sh"
   },
   "workflow_lock": "/scratch/project_2008084/champhla_plurality/configs/roihu_workflow_lock.json",
-  "modules": ["bio-apps/v202603", "samtools/1.21", "nextflow/25.10.2-standalone"],
+  "modules": [
+    "bio-apps/v202603",
+    "samtools/1.21",
+    "nextflow/25.10.2-standalone"
+  ],
   "production_python": "3.11.15",
-  "public_data_only": true
+  "public_data_only": true,
+  "input_retention_policy": {
+    "schema_note": "Set 2026-09-10 to make the production run fit the project allocation.",
+    "wgs": {
+      "staging": "streamed",
+      "source_retained": false,
+      "detail": "The source CRAM is read over HTTPS and never written to disk; only the mate-aware HLA BAM the callers consume is kept. samtools 1.21 is built with libcurl=yes S3=yes GCS=yes and plugins=no, so the handlers are compiled in and HTS_PATH is not required.",
+      "verification_caveat": "Because the CRAM is never on disk its source_checksum cannot be independently reverified. Each sample records the declared checksum, the verified index checksum and the extracted BAM checksum in streamed_source.json."
+    },
+    "wes": {
+      "staging": "downloaded_and_verified",
+      "source_retained_until": "validation",
+      "detail": "WES callers consume the CRAM itself, so it cannot be replaced by an extract without changing what every WES caller sees. It is verified on arrival and released after CALLERS_COMPLETE and output validation."
+    },
+    "rnaseq": {
+      "staging": "downloaded_and_verified",
+      "source_retained_until": "validation",
+      "detail": "Same as WES; the callers consume the FASTQ pair directly."
+    },
+    "recoverability": "Every released input remains re-derivable: the frozen manifest pins input_uri, source_checksum and index_checksum, and staged_files_sha256.txt is retained for each sample.",
+    "never_released": [
+      "WGS mate-aware HLA BAM",
+      "native caller outputs",
+      "prediction evidence and checksum records",
+      "logs"
+    ]
+  }
 }

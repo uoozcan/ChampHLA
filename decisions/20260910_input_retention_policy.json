@@ -1,0 +1,55 @@
+{
+  "schema_version": "champhla-retention-policy-1",
+  "date": "2026-09-10",
+  "decision": "stream the WGS source and release WES/RNA sources after validation",
+  "status": "ACTIVE",
+  "problem": {
+    "summary": "The production run did not fit the project allocation by roughly an order of magnitude.",
+    "staged_source_estimate_bytes": "~3.3 TB across 374 samples",
+    "allocation_bytes": 268435456000,
+    "observed_available_bytes": 139313131520,
+    "reserve_bytes": 107374182400,
+    "spendable_after_reserve": "~29.7 GiB",
+    "detail": "roihu_stage_inputs.sbatch downloaded and retained every source file, and roihu_prune_sample_work.sh released only the Nextflow work directory. A single 30x WGS CRAM is roughly 18 GB, so even the standard two-sample WGS pilot exceeded the headroom."
+  },
+  "changes": [
+    {
+      "component": "scripts/roihu_stage_inputs.sbatch",
+      "change": "WGS staging reads the source CRAM over HTTPS and writes only the mate-aware HLA BAM.",
+      "why_safe": "workflow/main.nf already requires input_type=bam for WGS and the callers already consume the extracted BAM, so no caller sees anything different. Only the means of producing that BAM changed.",
+      "enabled_by": "samtools 1.21 on Roihu is built with libcurl=yes S3=yes GCS=yes and plugins=no, so remote handlers are compiled in and HTS_PATH is not needed. This supersedes the relocated samtools 1.15.1 bundle the earlier EGCC pilot required."
+    },
+    {
+      "component": "scripts/roihu_prune_sample_work.sh",
+      "change": "After a sample validates, release the staged WES/RNA source in addition to the Nextflow work directory.",
+      "why_safe": "The frozen manifest pins input_uri, source_checksum and index_checksum, and staged_files_sha256.txt is retained, so a released input is re-fetchable and re-verifiable.",
+      "not_applied_to": "The WGS mate-aware BAM, which under streaming is the only surviving artifact of the extraction and is small."
+    },
+    {
+      "component": "scripts/roihu_run_sample.sbatch",
+      "change": "Measure peak disk before the release and retained disk after it.",
+      "why": "The storage gate multiplies retained bytes by the full cohort size. A retained figure taken before the release would describe a state that never persists and would make the projection meaningless. Peak is still taken while everything is on disk, so both projections stay honest."
+    },
+    {
+      "component": "scripts/roihu_submit_wave.sh",
+      "change": "The pilot wave now runs in sequential_low_storage rather than full_scale.",
+      "why": "With the measurement reordering above, pruning happens between the peak and retained measurements, so a pilot in production mode yields correct inputs to both projections. It also stops pilots permanently consuming the headroom."
+    }
+  ],
+  "what_was_not_changed": {
+    "wes_caller_input": "WES callers still consume the CRAM itself. Substituting an extracted BAM would change what every WES caller sees, which is a scientific change and not a storage fix. It was not made.",
+    "reserve": "The 100 GiB reserve is unchanged. If the storage gate returns blocked, the allocation is escalated or the wave reduced; the reserve is not reduced to force a pass."
+  },
+  "verification_strength_reduction": {
+    "what": "For streamed WGS samples the source CRAM checksum is no longer independently reverified, because the file is never on disk to hash.",
+    "recorded_where": "Each sample writes streamed_source.json with source_checksum_declared, source_checksum_verified=false, source_retained=false, the verified index checksum and the extracted BAM checksum.",
+    "residual_verification": "The index is fetched and checksum-verified, the extracted BAM is checksummed, samtools quickcheck runs on the unsorted and sorted BAM, and staged_files_sha256.txt records everything retained.",
+    "disclosure": "This is a real reduction in verification strength and is stated in configs/roihu_site.json and in the per-sample record rather than left implicit."
+  },
+  "acceptance_test": {
+    "claim": "A streamed extraction produces the same read set as download-then-extract.",
+    "method": "Run both paths on HG00096 and compare sorted SAM records by SHA-256.",
+    "status": "see artifacts/db_release_resolution/.. replaced by artifacts/streaming/stream_equivalence.json",
+    "note": "The storage fix rests entirely on this claim, so it is verified on a real sample before anything depends on it."
+  }
+}

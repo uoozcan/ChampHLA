@@ -129,16 +129,23 @@ touch "${sample_root}/CALLERS_COMPLETE"
 runtime=$(awk -F= '$1=="elapsed_seconds"{print $2}' "${sample_root}/resource_usage.txt")
 peak_kb=$(awk -F= '$1=="peak_memory_kbytes"{print $2}' "${sample_root}/resource_usage.txt")
 peak_memory=$((peak_kb * 1024))
+# Peak is measured while everything is still on disk, so it reflects the true
+# high-water mark for this sample.
 peak_disk=$(du -sb "${input_root}" "${sample_root}" "${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}" | awk '{sum+=$1} END{print sum}')
+
+# Release before measuring what is retained. The storage gate multiplies retained
+# bytes by the full cohort size, so a figure taken before the release would
+# describe a state that never persists and would make the projection meaningless.
+if [[ "${CHAMPHLA_EXECUTION_MODE:-full_scale}" == sequential_low_storage ]]; then
+  bash "${CHAMPHLA_CODE_ROOT}/scripts/roihu_prune_sample_work.sh" \
+    "${CHAMPHLA_RUN_ROOT}" "${modality}" "${sample_id}"
+fi
 retained_disk=$(du -sb "${input_root}" "${sample_root}" | awk '{sum+=$1} END{print sum}')
+
 output_hash=$(sha256sum "${sample_root}/prediction_files_sha256.txt" | cut -d ' ' -f 1)
 ledger_transition --state succeeded --exit-code 0 --runtime-seconds "${runtime}" \
   --peak-memory-bytes "${peak_memory}" --peak-disk-bytes "${peak_disk}" \
   --retained-disk-bytes "${retained_disk}" \
   --output-sha256 "${output_hash}"
 ledger_transition --state validated
-if [[ "${CHAMPHLA_EXECUTION_MODE:-full_scale}" == sequential_low_storage ]]; then
-  bash "${CHAMPHLA_CODE_ROOT}/scripts/roihu_prune_sample_work.sh" \
-    "${CHAMPHLA_RUN_ROOT}" "${modality}" "${sample_id}"
-fi
 trap - ERR

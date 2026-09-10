@@ -78,3 +78,67 @@ def test_canonical_workflow_is_fail_closed_and_submission_validates_lock():
     assert "CALLERS_COMPLETE" in prune
     assert "caller_output_validation.tsv" in prune
     assert "find \"${work_root}\" -depth -type f -delete" in prune
+
+
+def test_wgs_staging_streams_and_never_writes_the_source_cram():
+    """A 30x CRAM is ~18 GB and no caller sees it; 137 of them do not fit the allocation."""
+    text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
+    wgs = text[text.index('elif [[ "${modality}" == wgs ]]'):text.index('elif [[ "${input_type}" == cram')]
+    # The source is read straight from its URI, never fetched to the staging root.
+    assert '-X "${input_uri}"' in wgs
+    assert 'fetch_one "${input_uri}"' not in wgs
+    # Only the index is fetched, and it is still verified.
+    assert 'fetch_one "${index_uri}"' in wgs
+    assert 'verify_one "${index_checksum}"' in wgs
+    # Remote sources only; a local path would silently defeat the point.
+    assert '"${input_uri}" == https://*' in wgs
+
+
+def test_streamed_wgs_records_that_the_source_checksum_was_not_reverified():
+    """The CRAM is never on disk, so claiming verification would be false."""
+    text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
+    assert '"source_checksum_verified": false' in text
+    assert '"source_retained": false' in text
+    assert '"source_checksum_declared"' in text
+    assert "not independently reverified" in text
+
+
+def test_wes_staging_still_downloads_and_verifies_its_source():
+    """WES callers consume the CRAM itself, so it cannot be replaced by an extract."""
+    text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
+    wes = text[text.index('elif [[ "${input_type}" == cram'):text.index("else\n  echo \"Unsupported input type")]
+    assert 'fetch_one "${input_uri}" "${raw}"' in wes
+    assert 'verify_one "${source_checksum}" "${raw}"' in wes
+
+
+def test_retained_disk_is_measured_after_the_release_not_before():
+    """The gate multiplies retained bytes by the cohort size, so it must be post-release."""
+    text = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    peak = text.index("peak_disk=$(du -sb")
+    prune = text.index("roihu_prune_sample_work.sh")
+    retained = text.index("retained_disk=$(du -sb")
+    assert peak < prune < retained
+
+
+def test_prune_releases_wes_and_rna_input_but_never_the_wgs_bam():
+    text = (ROOT / "scripts/roihu_prune_sample_work.sh").read_text(encoding="utf-8")
+    assert '[[ "${modality}" == wes || "${modality}" == rnaseq ]]' in text
+    release = text[text.index('if [[ "${modality}" == wes'):]
+    assert "mate_aware_hla" not in release
+    # The record of what was staged must survive the release.
+    assert 'test -s "${input_root}/staged_files_sha256.txt"' in text
+    assert "! -name staged_files_sha256.txt" in text
+    assert "INPUT_RELEASED_AFTER_VALIDATION" in text
+
+
+def test_prune_refuses_outside_the_project_input_root():
+    text = (ROOT / "scripts/roihu_prune_sample_work.sh").read_text(encoding="utf-8")
+    assert '/scratch/project_2008084/champhla_plurality_inputs*' in text
+    assert "CHAMPHLA_INPUT_ROOT:?" in text
+
+
+def test_pilot_wave_runs_in_the_mode_production_will_use():
+    """Otherwise the pilot's retained figure describes a state that never persists."""
+    text = (ROOT / "scripts/roihu_submit_wave.sh").read_text(encoding="utf-8")
+    pilot = text[text.index("  pilot)"):text.index("  capacity)")]
+    assert "execution_mode=sequential_low_storage" in pilot
