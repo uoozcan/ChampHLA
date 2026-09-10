@@ -11,7 +11,9 @@
 #        mate-aware HLA BAM. The 18 GB source is never written to disk.
 #   WES/RNA: fetch and verify the source, which the callers consume directly.
 #        It is released after validation by roihu_prune_sample_work.sh.
-set -euo pipefail
+# nounset is enabled after the CSC environment is sourced: zz-csc-env.sh reads
+# PS1, which is unbound in a batch shell, and would abort the job immediately.
+set -eo pipefail
 
 CODE_ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
@@ -43,6 +45,7 @@ trap on_stage_failure ERR
 
 export CSC_ENV_INIT_NON_INTERACTIVE=yes
 source /etc/profile.d/zz-csc-env.sh
+set -u
 module load bio-apps/v202603
 module load samtools/1.21
 

@@ -11,6 +11,30 @@ def test_roihu_preflight_enables_nounset_after_csc_environment():
     assert text.index("source /etc/profile.d/zz-csc-env.sh") < text.index("set -u")
 
 
+def test_no_script_sources_the_csc_environment_under_nounset():
+    """zz-csc-env.sh reads PS1, which is unbound in a batch shell.
+
+    Sourcing it with `set -u` already active aborts the job in under a second with
+    "PS1: unbound variable". Both production sbatch scripts carried this defect and it
+    was never caught, because it only fires once a job is actually submitted.
+    """
+    offenders = []
+    for path in sorted((ROOT / "scripts").iterdir()):
+        if path.suffix not in {".sh", ".sbatch"}:
+            continue
+        text = path.read_text(encoding="utf-8")
+        if "source /etc/profile.d/zz-csc-env.sh" not in text:
+            continue
+        source_at = text.index("source /etc/profile.d/zz-csc-env.sh")
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith("set -") and "u" in stripped.split()[1].lstrip("-"):
+                if text.index(line) < source_at:
+                    offenders.append(f"{path.name}: `{stripped}` precedes the CSC source")
+                break
+    assert not offenders, offenders
+
+
 def test_wgs_scripts_fail_closed():
     run = (ROOT / "scripts/roihu_run_full_cram_wgs_pilot.sbatch").read_text(encoding="utf-8")
     repair = (ROOT / "scripts/roihu_repair_kourami_full_bam.sbatch").read_text(encoding="utf-8")

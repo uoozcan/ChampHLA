@@ -8,7 +8,9 @@
 
 # Run the frozen assay panel for one staged sample. Nextflow placeholders and
 # masked process failures are rejected by the native-output checks below.
-set -euo pipefail
+# nounset is enabled after the CSC environment is sourced: zz-csc-env.sh reads
+# PS1, which is unbound in a batch shell, and would abort the job immediately.
+set -eo pipefail
 
 CODE_ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
@@ -31,6 +33,7 @@ python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["passed"] is Tr
 export CSC_ENV_INIT_NON_INTERACTIVE=yes
 export NXF_OPTS='-Xms256m -Xmx4g'
 source /etc/profile.d/zz-csc-env.sh
+set -u
 module load bio-apps/v202603
 module load samtools/1.21
 module load nextflow/25.10.2-standalone
