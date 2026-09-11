@@ -42,7 +42,7 @@ with open(sys.argv[2], "w", encoding="utf-8") as out:
         alleles = data.get(gene) or []
         a1 = alleles[0] if len(alleles) > 0 else "-"
         a2 = alleles[1] if len(alleles) > 1 else "-"
-        out.write(f"HLA-{gene}\\t{a1}\\t{a2}\\n")
+        out.write("HLA-{0}\\t{1}\\t{2}\\n".format(gene, a1, a2))
 PY
     test -s ${sample_id}_arcashla.txt
     printf '"%s":\\n    arcashla: "container-pinned"\\n' "${task.process}" > versions.yml

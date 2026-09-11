@@ -172,3 +172,21 @@ def test_region_queries_are_preceded_by_an_index_guard(path: Path):
     assert ".bai" in text and "samtools index" in text, (
         f"{path.name} performs a region query without guaranteeing the BAM index"
     )
+
+
+@pytest.mark.parametrize("path", MODULE_FILES, ids=lambda p: p.name)
+def test_embedded_python_avoids_f_strings(path: Path):
+    """Caller containers ship old Pythons; f-strings need 3.6.
+
+    Measured in the pinned images: optitype 3.5.2, hlahd 3.5.2, polysolver 3.4.0,
+    kourami 3.6.7, arcashla 3.6.9, t1k 3.11.0. OptiType produced its result and then
+    failed parsing it, because its embedded heredoc used an f-string its own Python could
+    not compile. str.format() works on every one of them.
+    """
+    text = path.read_text(encoding="utf-8")
+    offenders = [
+        f"{path.name}:{number}: {line.strip()[:70]}"
+        for number, line in enumerate(text.splitlines(), 1)
+        if re.search(r"""\bf["']""", line)
+    ]
+    assert not offenders, offenders

@@ -36,7 +36,9 @@ with open(sys.argv[1], encoding="utf-8") as handle:
 with open(sys.argv[2], "w", encoding="utf-8") as out:
     out.write("Gene\\tAllele1\\tAllele2\\n")
     for gene in ("A", "B", "C"):
-        out.write(f"HLA-{gene}\\t{row.get(gene + '1') or '-'}\\t{row.get(gene + '2') or '-'}\\n")
+        a1 = row.get(gene + "1") or "-"
+        a2 = row.get(gene + "2") or "-"
+        out.write("HLA-{0}\\t{1}\\t{2}\\n".format(gene, a1, a2))
 PY
     test -s ${sample_id}_optitype.txt
     printf '"%s":\\n    optitype: "container-pinned"\\n' "${task.process}" > versions.yml
