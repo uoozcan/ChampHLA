@@ -150,3 +150,25 @@ def test_nested_language_escapes_are_doubled(path: Path):
                 f"{path.name}:{number}: single-backslash escape in {line.strip()[:70]}"
             )
     assert not offenders, offenders
+
+
+@pytest.mark.parametrize("path", MODULE_FILES, ids=lambda p: p.name)
+def test_region_queries_are_preceded_by_an_index_guard(path: Path):
+    """A region query needs a .bai, and CRAM_TO_BAM does not propagate one.
+
+    CRAM_TO_BAM indexes its output but declares only path("${sample_id}.bam"), so Nextflow
+    stages the BAM into a consumer's work directory without the index beside it:
+
+        [E::idx_find_and_load] Could not retrieve index file for 'HG00096.bam'
+        samtools view: Random alignment retrieval only works for indexed BAM
+
+    EXTRACT_HLA_AND_CONVERT and KOURAMI_BAM already guarded; SPECHLA_BAM and HLAHD_BAM did
+    not, and SpecHLA was the last caller failing because of it.
+    """
+    text = path.read_text(encoding="utf-8")
+    does_region_query = re.search(r"samtools view[^\n]*\$\{chr\}:", text)
+    if not does_region_query:
+        pytest.skip("no region query in this module")
+    assert ".bai" in text and "samtools index" in text, (
+        f"{path.name} performs a region query without guaranteeing the BAM index"
+    )

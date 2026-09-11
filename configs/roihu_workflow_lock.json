@@ -7,11 +7,11 @@
     "workflow/main.nf": "fe0eb0f5131e0805710f099d0549314e5633463850980a34c92f08c5a0c7738e",
     "workflow/modules/arcashla.nf": "8ab9111b9b0773c32014b03c4a30d3638baafc45cafd0c4a74e054dcd9ff7601",
     "workflow/modules/bam_to_fastq.nf": "12f054cfdf6e8e617f37b321d5e7ae824bf63e2d24e8f49a776a8254b9b4124a",
-    "workflow/modules/hlahd.nf": "fab48baae1c3305264126ff3b83156e1411c19a3d9334a032e0edc195d0a5fb4",
+    "workflow/modules/hlahd.nf": "a9740ed22ced741c3451ac974c0d590f9a30e3ddcb6e72cd6b6907ffcb1e4229",
     "workflow/modules/kourami.nf": "5d94732199d4425b049e391792e9631ff41bf627150f4b975868944c2aa99495",
     "workflow/modules/optitype.nf": "7613c5532956717aff4eb2d5411819b20735daa74e794a7defbc882107ef7fd9",
     "workflow/modules/polysolver.nf": "a17a66b140ce06e55627142607d260b87e6c1fcba2fb8bf5d8b0edc9c9a2123b",
-    "workflow/modules/spechla.nf": "40e5684265a1d1fdf52c9154ab67381d5bc0ac22623ef93e588971129a67aa5f",
+    "workflow/modules/spechla.nf": "a806198e69a93f609c088f2565a347b2eb530f0387582ceeceaa6e4be2107874",
     "workflow/modules/t1k.nf": "3c881e22a12d4d546576964421788895fb151bed78cb927dfa5dec888c97caae",
     "workflow/nextflow.config": "4dc8fcef5b6231daa105c7a17a0dfbfa2025f9a9bfed02661640224ccc011a17"
   },
