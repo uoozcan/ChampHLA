@@ -89,3 +89,19 @@ def test_workflow_lock_covers_every_workflow_file():
         if p.is_file()
     }
     assert locked == present, {"only_in_lock": locked - present, "only_on_disk": present - locked}
+
+def test_locked_files_have_no_carriage_returns():
+    """The workflow lock hashes raw bytes, so a CRLF working copy produces a lock that
+    fails on the Linux execution platform.
+
+    This happened: the lock was regenerated on Windows, where Python writes CRLF by
+    default, and every one of the 14 hashes mismatched on Roihu even though git stored
+    the correct LF content. .gitattributes mandates eol=lf; this asserts the working
+    copy actually honours it for the files the lock covers.
+    """
+    offenders = [
+        str(path.relative_to(ROOT))
+        for path in sorted(WORKFLOW.rglob("*"))
+        if path.is_file() and b"\r\n" in path.read_bytes()
+    ]
+    assert not offenders, offenders
