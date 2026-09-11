@@ -17,10 +17,10 @@ process T1K_FASTQ {
     set -euo pipefail
     mkdir -p t1k_out
     reference=${params.t1k_hlaidx}/${reference_name}
-    test -s "${reference}"
+    test -s "\${reference}"
     test -s ${fastq1}
     test -s ${fastq2}
-    run-t1k -1 ${fastq1} -2 ${fastq2} -f "${reference}" --preset ${preset} \
+    run-t1k -1 ${fastq1} -2 ${fastq2} -f "\${reference}" --preset ${preset} \
         -t ${task.cpus} -o t1k_out/${sample_id} 2>t1k_out/t1k_stderr.log
     if [ -s t1k_out/${sample_id}_genotype.tsv ]; then
         genotype=t1k_out/${sample_id}_genotype.tsv
@@ -30,7 +30,7 @@ process T1K_FASTQ {
         echo "T1K produced no genotype result" >&2
         exit 4
     fi
-    python3 ${projectDir}/bin/parse_t1k_results.py "${genotype}" ${sample_id}_t1k.txt
+    python3 ${projectDir}/bin/parse_t1k_results.py "\${genotype}" ${sample_id}_t1k.txt
     test -s ${sample_id}_t1k.txt
     printf '"%s":\n    t1k: "1.0.9-r251"\n' "${task.process}" > versions.yml
     """

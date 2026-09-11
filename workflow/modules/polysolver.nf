@@ -18,19 +18,19 @@ process POLYSOLVER {
     mkdir -p ${sample_id}_polysolver_raw picard_tmp
     ulimit -s unlimited
     export SAMTOOLS_DIR=/home/polysolver/binaries
-    export _JAVA_OPTIONS="-Djava.io.tmpdir=$(pwd)/picard_tmp"
+    export _JAVA_OPTIONS="-Djava.io.tmpdir=\$(pwd)/picard_tmp"
     /home/polysolver/binaries/samtools sort -n ${bam} ${sample_id}_namesort
     /home/polysolver/binaries/samtools fixmate ${sample_id}_namesort.bam ${sample_id}_fixmate.bam
     /home/polysolver/binaries/samtools sort ${sample_id}_fixmate.bam ${sample_id}_fixed
     /home/polysolver/binaries/samtools index ${sample_id}_fixed.bam
-    sed "s|TMP_DIR=/home/polysolver|TMP_DIR=$(pwd)/picard_tmp|g" \
+    sed "s|TMP_DIR=/home/polysolver|TMP_DIR=\$(pwd)/picard_tmp|g" \
         /home/polysolver/scripts/shell_call_hla_type > patched_shell_call_hla_type
     chmod +x patched_shell_call_hla_type
     bash patched_shell_call_hla_type ${sample_id}_fixed.bam Unknown 0 ${build} STDFQ 0 \
         ${sample_id}_polysolver_raw
     native=${sample_id}_polysolver_raw/winners.hla.nofreq.txt
-    test -s "${native}"
-    python3 ${projectDir}/bin/parse_polysolver_results.py --input "${native}" \
+    test -s "\${native}"
+    python3 ${projectDir}/bin/parse_polysolver_results.py --input "\${native}" \
         --sample ${sample_id} --output ${sample_id}_polysolver.txt
     test -s ${sample_id}_polysolver.txt
     printf '"%s":\n    polysolver: "v4"\n' "${task.process}" > versions.yml

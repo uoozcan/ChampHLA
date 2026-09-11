@@ -16,8 +16,8 @@ process ARCASHLA_FASTQ {
     set -euo pipefail
     mkdir -p ${sample_id} arcas_patch
     if [[ "${fastq1}" == *.gz ]]; then
-        ln -s $(realpath ${fastq1}) ${sample_id}/${sample_id}.1.fq.gz
-        ln -s $(realpath ${fastq2}) ${sample_id}/${sample_id}.2.fq.gz
+        ln -s \$(realpath ${fastq1}) ${sample_id}/${sample_id}.1.fq.gz
+        ln -s \$(realpath ${fastq2}) ${sample_id}/${sample_id}.2.fq.gz
     else
         gzip -c ${fastq1} > ${sample_id}/${sample_id}.1.fq.gz
         gzip -c ${fastq2} > ${sample_id}/${sample_id}.2.fq.gz
@@ -25,14 +25,14 @@ process ARCASHLA_FASTQ {
     test -s ${sample_id}/${sample_id}.1.fq.gz
     test -s ${sample_id}/${sample_id}.2.fq.gz
     cp /home/arcasHLA-master/scripts/*.py arcas_patch/
-    sed -i 's/count = counts\[eq\]/count = counts.get(eq, 0)/' arcas_patch/align.py
-    export PYTHONPATH="$(pwd)/arcas_patch:${PYTHONPATH:-}"
+    sed -i 's/count = counts\\[eq\\]/count = counts.get(eq, 0)/' arcas_patch/align.py
+    export PYTHONPATH="\$(pwd)/arcas_patch:\${PYTHONPATH:-}"
     arcasHLA genotype ${sample_id}/${sample_id}.1.fq.gz ${sample_id}/${sample_id}.2.fq.gz \
         -o ${sample_id} -t ${task.cpus} --min_count 75 -v
-    genotype_json=$(find ${sample_id} -type f -name '*.genotype.json' -size +0c | head -n 1)
-    test -n "${genotype_json}"
-    cp "${genotype_json}" ${sample_id}_arcashla.json
-    python3 - "${genotype_json}" "${sample_id}_arcashla.txt" <<'PY'
+    genotype_json=\$(find ${sample_id} -type f -name '*.genotype.json' -size +0c | head -n 1)
+    test -n "\${genotype_json}"
+    cp "\${genotype_json}" ${sample_id}_arcashla.json
+    python3 - "\${genotype_json}" "${sample_id}_arcashla.txt" <<'PY'
 import json, sys
 with open(sys.argv[1], encoding="utf-8") as handle:
     data = json.load(handle)

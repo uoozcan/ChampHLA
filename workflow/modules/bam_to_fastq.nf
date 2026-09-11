@@ -51,8 +51,8 @@ process EXTRACT_HLA_AND_CONVERT {
         samtools index -@ ${task.cpus} ${bam}
     fi
     samtools view -H ${bam} | grep -Eq '^@SQ.*SN:(chr6|6)[[:space:]]'
-    chr=$(samtools view -H ${bam} | awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}')
-    samtools view -@ ${task.cpus} -b ${bam} "${chr}:${params.hla_region_start}-${params.hla_region_end}" \
+    chr=\$(samtools view -H ${bam} | awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}')
+    samtools view -@ ${task.cpus} -b ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" \
         > ${sample_id}.hla.bam
     samtools sort -n -@ ${task.cpus} ${sample_id}.hla.bam -o ${sample_id}.namesort.bam
     samtools fastq -@ ${task.cpus} -1 ${sample_id}_R1.fastq.gz -2 ${sample_id}_R2.fastq.gz \

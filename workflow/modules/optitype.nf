@@ -21,15 +21,15 @@ process OPTITYPE_FASTQ {
         zcat ${fastq1} > R1.fastq
         zcat ${fastq2} > R2.fastq
     else
-        ln -s $(realpath ${fastq1}) R1.fastq
-        ln -s $(realpath ${fastq2}) R2.fastq
+        ln -s \$(realpath ${fastq1}) R1.fastq
+        ln -s \$(realpath ${fastq2}) R2.fastq
     fi
     test -s R1.fastq
     test -s R2.fastq
     OptiTypePipeline.py -i R1.fastq R2.fastq ${type_flag} -v -o ${sample_id} -p ${sample_id}
-    result_tsv=$(find ${sample_id} -type f -name '*_result.tsv' -size +0c | head -n 1)
-    test -n "${result_tsv}"
-    python3 - "${result_tsv}" "${sample_id}_optitype.txt" <<'PY'
+    result_tsv=\$(find ${sample_id} -type f -name '*_result.tsv' -size +0c | head -n 1)
+    test -n "\${result_tsv}"
+    python3 - "\${result_tsv}" "${sample_id}_optitype.txt" <<'PY'
 import csv, sys
 with open(sys.argv[1], encoding="utf-8") as handle:
     row = next(csv.DictReader(handle, delimiter="\t"))
