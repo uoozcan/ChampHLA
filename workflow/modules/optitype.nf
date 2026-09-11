@@ -32,13 +32,13 @@ process OPTITYPE_FASTQ {
     python3 - "\${result_tsv}" "${sample_id}_optitype.txt" <<'PY'
 import csv, sys
 with open(sys.argv[1], encoding="utf-8") as handle:
-    row = next(csv.DictReader(handle, delimiter="\t"))
+    row = next(csv.DictReader(handle, delimiter="\\t"))
 with open(sys.argv[2], "w", encoding="utf-8") as out:
-    out.write("Gene\tAllele1\tAllele2\n")
+    out.write("Gene\\tAllele1\\tAllele2\\n")
     for gene in ("A", "B", "C"):
-        out.write(f"HLA-{gene}\t{row.get(gene + '1') or '-'}\t{row.get(gene + '2') or '-'}\n")
+        out.write(f"HLA-{gene}\\t{row.get(gene + '1') or '-'}\\t{row.get(gene + '2') or '-'}\\n")
 PY
     test -s ${sample_id}_optitype.txt
-    printf '"%s":\n    optitype: "container-pinned"\n' "${task.process}" > versions.yml
+    printf '"%s":\\n    optitype: "container-pinned"\\n' "${task.process}" > versions.yml
     """
 }

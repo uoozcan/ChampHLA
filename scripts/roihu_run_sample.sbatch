@@ -64,8 +64,25 @@ ledger_transition() {
     --modality "${modality}" "$@"
 }
 ledger_transition --state running --job-id "${SLURM_JOB_ID}"
+reap_nextflow_children() {
+  # Nextflow submits each process as its own Slurm job named nf-<PROCESS>_(<tag>), and
+  # they survive the parent. Cancel only those carrying this sample's tag, so a
+  # concurrently running sample is never affected.
+  local orphans owner
+  # USER can be unset in a batch shell, and this runs under `set -u` inside the trap.
+  owner=${USER:-$(whoami)}
+  orphans=$(squeue -h -u "${owner}" -o '%i %j' 2>/dev/null \
+    | awk -v tag="(${sample_id}" '$2 ~ /^nf-/ && index($2, tag) {print $1}')
+  if [[ -n "${orphans}" ]]; then
+    echo "reaping nextflow child jobs for ${sample_id}: ${orphans}" >&2
+    # shellcheck disable=SC2086
+    scancel ${orphans} 2>/dev/null || true
+  fi
+}
+
 on_failure() {
   local code=$?
+  reap_nextflow_children
   ledger_transition --state failed --exit-code "${code}" || true
   quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/${modality}/${sample_id}.${SLURM_JOB_ID}
   mkdir -p "$(dirname "${quarantine}")"

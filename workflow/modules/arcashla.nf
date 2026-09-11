@@ -37,14 +37,14 @@ import json, sys
 with open(sys.argv[1], encoding="utf-8") as handle:
     data = json.load(handle)
 with open(sys.argv[2], "w", encoding="utf-8") as out:
-    out.write("Gene\tAllele1\tAllele2\n")
+    out.write("Gene\\tAllele1\\tAllele2\\n")
     for gene in ("A", "B", "C"):
         alleles = data.get(gene) or []
         a1 = alleles[0] if len(alleles) > 0 else "-"
         a2 = alleles[1] if len(alleles) > 1 else "-"
-        out.write(f"HLA-{gene}\t{a1}\t{a2}\n")
+        out.write(f"HLA-{gene}\\t{a1}\\t{a2}\\n")
 PY
     test -s ${sample_id}_arcashla.txt
-    printf '"%s":\n    arcashla: "container-pinned"\n' "${task.process}" > versions.yml
+    printf '"%s":\\n    arcashla: "container-pinned"\\n' "${task.process}" > versions.yml
     """
 }

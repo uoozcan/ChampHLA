@@ -128,3 +128,25 @@ def test_no_early_exit_readers_in_pipelines(path: Path):
         if re.search(r"\|\s*awk[^|]*\bexit\b", line):
             offenders.append(f"{path.name}:{number}: awk with exit after a pipe")
     assert not offenders, offenders
+
+@pytest.mark.parametrize("path", NF_FILES, ids=lambda p: p.name)
+def test_nested_language_escapes_are_doubled(path: Path):
+    """Inside a script block a *valid* Groovy escape is as wrong as an invalid one.
+
+    Groovy interprets \\t and \\n and substitutes a real tab or newline before the shell,
+    or a nested Python heredoc, ever sees the text. OptiType solved its ILP and then died
+    parsing its own result because of this:
+
+        out.write("Gene<TAB>Allele1<TAB>Allele2<NEWLINE>
+        SyntaxError: EOL while scanning string literal
+
+    test_backslashes_are_valid_groovy_escapes catches the opposite mistake. Both rules are
+    needed: a backslash in a script block must be doubled whichever kind it is.
+    """
+    offenders = []
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        for match in re.finditer(r"(?<!\\)\\([ntr])", line):
+            offenders.append(
+                f"{path.name}:{number}: single-backslash escape in {line.strip()[:70]}"
+            )
+    assert not offenders, offenders

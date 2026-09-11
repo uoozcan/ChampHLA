@@ -40,7 +40,7 @@ process KOURAMI {
     python3 ${projectDir}/bin/parse_kourami_results.py --input ${sample_id}.kourami.result \
         --sample ${sample_id} --output ${sample_id}_kourami.txt
     test -s ${sample_id}_kourami.txt
-    printf '"%s":\n    kourami: "0.9.6"\n' "${task.process}" > versions.yml
+    printf '"%s":\\n    kourami: "0.9.6"\\n' "${task.process}" > versions.yml
     rm -f ${sample_id}.panel.sam ${sample_id}.panel.bam ${sample_id}.panel.bam.bai \
         ${sample_id}._hla_1.fq.gz ${sample_id}._hla_2.fq.gz
     """

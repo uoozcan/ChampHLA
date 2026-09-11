@@ -32,6 +32,6 @@ process T1K_FASTQ {
     fi
     python3 ${projectDir}/bin/parse_t1k_results.py "\${genotype}" ${sample_id}_t1k.txt
     test -s ${sample_id}_t1k.txt
-    printf '"%s":\n    t1k: "1.0.9-r251"\n' "${task.process}" > versions.yml
+    printf '"%s":\\n    t1k: "1.0.9-r251"\\n' "${task.process}" > versions.yml
     """
 }

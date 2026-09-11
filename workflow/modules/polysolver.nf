@@ -33,7 +33,7 @@ process POLYSOLVER {
     python3 ${projectDir}/bin/parse_polysolver_results.py --input "\${native}" \
         --sample ${sample_id} --output ${sample_id}_polysolver.txt
     test -s ${sample_id}_polysolver.txt
-    printf '"%s":\n    polysolver: "v4"\n' "${task.process}" > versions.yml
+    printf '"%s":\\n    polysolver: "v4"\\n' "${task.process}" > versions.yml
     rm -f ${sample_id}_namesort.bam ${sample_id}_fixmate.bam \
         ${sample_id}_fixed.bam ${sample_id}_fixed.bam.bai
     """

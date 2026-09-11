@@ -41,7 +41,7 @@ process HLAHD {
     native=${sample_id}/${sample_id}/result/${sample_id}_final.result.txt
     test -s "\${native}"
     cp "\${native}" ${sample_id}_hlahd.txt
-    printf '"%s":\n    hlahd: "1.4.0"\n' "${task.process}" > versions.yml
+    printf '"%s":\\n    hlahd: "1.4.0"\\n' "${task.process}" > versions.yml
     rm -f hla_region.bam unmapped.bam merged.bam sorted.bam R1.fastq R2.fastq
     """
 }
@@ -86,7 +86,7 @@ process HLAHD_FASTQ {
     native=${sample_id}/${sample_id}/result/${sample_id}_final.result.txt
     test -s "\${native}"
     cp "\${native}" ${sample_id}_hlahd.txt
-    printf '"%s":\n    hlahd: "1.4.0"\n' "${task.process}" > versions.yml
+    printf '"%s":\\n    hlahd: "1.4.0"\\n' "${task.process}" > versions.yml
     rm -f R1.fastq R2.fastq
     """
 }

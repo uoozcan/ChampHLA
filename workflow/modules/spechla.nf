@@ -14,7 +14,10 @@ process SPECHLA {
     script:
     """
     set -euo pipefail
-    test -x ${params.spechla_path}/script/whole/SpecHLA.sh
+    # Guarded with -r, not -x: the wrapper is invoked as `bash <script>` below, which
+    # needs only read permission. The deployed wrapper is mode 660, so an -x guard
+    # aborted the process under `set -e` with no output at all.
+    test -r ${params.spechla_path}/script/whole/SpecHLA.sh
     mkdir -p ${sample_id}
     samtools quickcheck -v ${bam}
     samtools view -H ${bam} > hla_header.sam
@@ -39,7 +42,7 @@ process SPECHLA {
         echo "SpecHLA produced no native result" >&2
         exit 4
     fi
-    printf '"%s":\n    spechla: "1.0.7-deployed-wrapper"\n' "${task.process}" > versions.yml
+    printf '"%s":\\n    spechla: "1.0.7-deployed-wrapper"\\n' "${task.process}" > versions.yml
     rm -f ${sample_id}/hla_region.bam ${sample_id}/namesort.bam \
         ${sample_id}/R1.fastq.gz ${sample_id}/R2.fastq.gz
     """

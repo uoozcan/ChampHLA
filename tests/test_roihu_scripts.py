@@ -213,3 +213,28 @@ def test_resource_usage_does_not_depend_on_gnu_time():
     # How each number was obtained must be recorded, not implied.
     assert "elapsed_source=" in text
     assert "peak_memory_source=" in text
+
+
+def test_failure_path_reaps_nextflow_child_jobs():
+    """Nextflow submits each process as its own Slurm job, and they survive the parent.
+
+    An nf-POLYSOLVER outlived its parent by 31 minutes on one attempt and 82 on the next,
+    consuming allocation for a run whose output was already quarantined.
+    """
+    text = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert "reap_nextflow_children" in text
+    # Reaping must happen before the quarantine move, while the job is still identifiable.
+    assert text.index("reap_nextflow_children\n") < text.index("mv \"${sample_root}\" \"${quarantine}\"")
+    # Only this sample's children, never a concurrently running sample's.
+    assert 'tag="(${sample_id}"' in text
+    # USER can be unset in a batch shell and this runs under set -u.
+    assert "owner=${USER:-$(whoami)}" in text
+
+
+def test_spechla_guard_matches_how_the_wrapper_is_invoked():
+    """The deployed wrapper is mode 660. `test -x` aborted the process with no output,
+    while the module invokes it as `bash <script>`, which needs only read permission."""
+    text = (ROOT / "workflow/modules/spechla.nf").read_text(encoding="utf-8")
+    assert "test -r ${params.spechla_path}/script/whole/SpecHLA.sh" in text
+    assert "test -x ${params.spechla_path}" not in text
+    assert "bash ${params.spechla_path}/script/whole/SpecHLA.sh" in text
