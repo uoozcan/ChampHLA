@@ -105,3 +105,26 @@ def test_locked_files_have_no_carriage_returns():
         if path.is_file() and b"\r\n" in path.read_bytes()
     ]
     assert not offenders, offenders
+
+@pytest.mark.parametrize("path", MODULE_FILES, ids=lambda p: p.name)
+def test_no_early_exit_readers_in_pipelines(path: Path):
+    """Every script block runs under `set -euo pipefail`.
+
+    A reader that exits early closes the pipe, the writer takes SIGPIPE, and pipefail
+    turns that into a failed command. This killed EXTRACT_HLA_AND_CONVERT with exit 141
+    and SPECHLA_BAM with exit 1 and an empty stderr, on the first run that got far enough
+    to execute processes at all.
+
+    The offending readers are `grep -q`, `head -n`, and an `awk` program containing
+    `exit`, when any of them is on the right-hand side of a pipe. Reading a file directly
+    is fine, which is why `awk 'NR==2{...; exit}' R1.fastq` is not flagged.
+    """
+    offenders = []
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if re.search(r"\|\s*grep\s+-[A-Za-z]*q", line):
+            offenders.append(f"{path.name}:{number}: grep -q after a pipe")
+        if re.search(r"\|\s*head\b", line):
+            offenders.append(f"{path.name}:{number}: head after a pipe")
+        if re.search(r"\|\s*awk[^|]*\bexit\b", line):
+            offenders.append(f"{path.name}:{number}: awk with exit after a pipe")
+    assert not offenders, offenders

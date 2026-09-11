@@ -50,8 +50,9 @@ process EXTRACT_HLA_AND_CONVERT {
     if [ ! -f "${bam}.bai" ] && [ ! -f "${bam.baseName}.bai" ]; then
         samtools index -@ ${task.cpus} ${bam}
     fi
-    samtools view -H ${bam} | grep -Eq '^@SQ.*SN:(chr6|6)[[:space:]]'
-    chr=\$(samtools view -H ${bam} | awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}')
+    samtools view -H ${bam} > hla_header.sam
+    grep -E '^@SQ.*SN:(chr6|6)[[:space:]]' hla_header.sam > /dev/null
+    chr=\$(awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}' hla_header.sam)
     samtools view -@ ${task.cpus} -b ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" \
         > ${sample_id}.hla.bam
     samtools sort -n -@ ${task.cpus} ${sample_id}.hla.bam -o ${sample_id}.namesort.bam

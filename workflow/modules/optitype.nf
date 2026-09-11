@@ -27,7 +27,7 @@ process OPTITYPE_FASTQ {
     test -s R1.fastq
     test -s R2.fastq
     OptiTypePipeline.py -i R1.fastq R2.fastq ${type_flag} -v -o ${sample_id} -p ${sample_id}
-    result_tsv=\$(find ${sample_id} -type f -name '*_result.tsv' -size +0c | head -n 1)
+    result_tsv=\$(find ${sample_id} -type f -name '*_result.tsv' -size +0c -print -quit)
     test -n "\${result_tsv}"
     python3 - "\${result_tsv}" "${sample_id}_optitype.txt" <<'PY'
 import csv, sys

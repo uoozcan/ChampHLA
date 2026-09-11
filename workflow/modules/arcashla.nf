@@ -29,7 +29,7 @@ process ARCASHLA_FASTQ {
     export PYTHONPATH="\$(pwd)/arcas_patch:\${PYTHONPATH:-}"
     arcasHLA genotype ${sample_id}/${sample_id}.1.fq.gz ${sample_id}/${sample_id}.2.fq.gz \
         -o ${sample_id} -t ${task.cpus} --min_count 75 -v
-    genotype_json=\$(find ${sample_id} -type f -name '*.genotype.json' -size +0c | head -n 1)
+    genotype_json=\$(find ${sample_id} -type f -name '*.genotype.json' -size +0c -print -quit)
     test -n "\${genotype_json}"
     cp "\${genotype_json}" ${sample_id}_arcashla.json
     python3 - "\${genotype_json}" "${sample_id}_arcashla.txt" <<'PY'
