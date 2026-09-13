@@ -238,3 +238,47 @@ def test_spechla_guard_matches_how_the_wrapper_is_invoked():
     assert "test -r ${params.spechla_path}/script/whole/SpecHLA.sh" in text
     assert "test -x ${params.spechla_path}" not in text
     assert "bash ${params.spechla_path}/script/whole/SpecHLA.sh" in text
+
+
+def test_failure_path_releases_work_and_records_its_size():
+    """Work survived every failure, which is how 122 GB accumulated over eight attempts."""
+    text = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert "WORK_SIZE_AT_FAILURE" in text, "work size is not recorded before release"
+    assert 'rm -rf "${work_root}"' in text
+    # Size must be recorded before the directory goes, or the measurement is lost.
+    assert text.index("WORK_SIZE_AT_FAILURE") < text.index('rm -rf "${work_root}"')
+    # Debugging runs in full_scale keep their evidence.
+    assert text.index('CHAMPHLA_EXECUTION_MODE:-full_scale}" == sequential_low_storage') > 0
+
+
+def test_ledger_write_failure_is_surfaced_not_swallowed():
+    """A full filesystem left a row reading `running` while the job had failed."""
+    text = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert "LEDGER WRITE FAILED" in text
+    assert "LEDGER_WRITE_FAILED" in text
+    assert "ledger_failed=1" in text
+
+
+def test_batch_wave_slices_the_manifest_deterministically():
+    text = (ROOT / "scripts/roihu_submit_wave.sh").read_text(encoding="utf-8")
+    assert "batch)" in text
+    assert "offset=$((batch_index * batch_size))" in text
+    # Batch artefacts must not collide with each other.
+    assert "${modality}_${label}.tsv" in text
+    assert "${modality}_${label}.ledger.tsv" in text
+    # A batch may not start while the previous one has unvalidated rows.
+    assert "unvalidated samples" in text
+    # Only one sample in flight, as for the pilots.
+    assert "execution_mode=sequential_low_storage" in text
+
+
+def test_polysolver_receives_an_extract_not_the_whole_bam():
+    """POLYSOLVER sorts its input twice; on the full exome BAM that used 35 GB."""
+    text = (ROOT / "workflow/modules/polysolver.nf").read_text(encoding="utf-8")
+    assert "polysolver_input.bam" in text
+    assert "samtools merge -f polysolver_input.bam" in text
+    # Unmapped reads are part of the method, not an optimisation detail.
+    assert "samtools view -b -f 4" in text
+    # The sorts must run on the extract, never on the incoming BAM.
+    assert "sort -n polysolver_input.bam" in text
+    assert "sort -n ${bam}" not in text

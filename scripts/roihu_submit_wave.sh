@@ -5,7 +5,9 @@ CODE_ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
 manifest=${1:?usage: roihu_submit_wave.sh MANIFEST MODALITY pilot|capacity|production}
 modality=${2:?usage: roihu_submit_wave.sh MANIFEST MODALITY pilot|capacity|production}
-wave=${3:?usage: roihu_submit_wave.sh MANIFEST MODALITY pilot|capacity|production}
+wave=${3:?usage: roihu_submit_wave.sh MANIFEST MODALITY pilot|capacity|production|batch [SIZE INDEX]}
+batch_size=${4:-0}
+batch_index=${5:-0}
 export PYTHONPATH=${CHAMPHLA_CODE_ROOT}/src
 
 audit=${CHAMPHLA_RUN_ROOT}/manifests/$(basename "${manifest}").audit.json
@@ -36,6 +38,27 @@ case "${wave}" in
     concurrency=1
     execution_mode=sequential_low_storage
     ;;
+  batch)
+    # A batch is a deterministic slice of this modality's rows in frozen-manifest order.
+    [[ "${batch_size}" =~ ^[1-9][0-9]*$ ]] || { echo "batch requires SIZE >= 1" >&2; exit 2; }
+    [[ "${batch_index}" =~ ^[0-9]+$ ]] || { echo "batch requires INDEX >= 0" >&2; exit 2; }
+    limit=${batch_size}
+    concurrency=1
+    execution_mode=sequential_low_storage
+    # Only one sample is in flight at a time, so the gate is asked about a batch-sized
+    # target rather than the whole cohort.
+    printf '{"%s": %s}\n' "${modality}" "${batch_size}" \
+      > "${CHAMPHLA_RUN_ROOT}/manifests/${modality}_batch${batch_index}.targets.json"
+    test -s "${CHAMPHLA_RUN_ROOT}/storage_gate.json"
+    python3 -c 'import json,sys; g=json.load(open(sys.argv[1])); assert g["passed"] is True, g["execution_mode"]' \
+      "${CHAMPHLA_RUN_ROOT}/storage_gate.json"
+    # A batch may not start while the previous one still has unvalidated rows.
+    previous=${CHAMPHLA_RUN_ROOT}/manifests/${modality}_batch$((batch_index - 1)).ledger.tsv
+    if [[ "${batch_index}" -gt 0 && -f "${previous}" ]]; then
+      python3 -c 'import csv,sys; rows=list(csv.DictReader(open(sys.argv[1]),delimiter="\t")); bad=[r["sample_id"] for r in rows if r["state"] not in {"validated","frozen"}]; assert not bad, "previous batch has unvalidated samples: " + ",".join(sorted(set(bad)))' \
+        "${previous}"
+    fi
+    ;;
   capacity)
     limit=10
     test -s "${CHAMPHLA_RUN_ROOT}/storage_gate.json"
@@ -59,8 +82,16 @@ case "${wave}" in
   *) echo "Unknown wave: ${wave}" >&2; exit 2 ;;
 esac
 
-subset=${CHAMPHLA_RUN_ROOT}/manifests/${modality}_${wave}.tsv
-awk -F '\t' -v modality="${modality}" -v limit="${limit}" 'BEGIN{OFS="\t"} NR==1{print;next} $4==modality && count<limit{print;count++}' "${manifest}" > "${subset}"
+label=${wave}
+offset=0
+if [[ "${wave}" == batch ]]; then
+  label=batch${batch_index}
+  offset=$((batch_index * batch_size))
+fi
+subset=${CHAMPHLA_RUN_ROOT}/manifests/${modality}_${label}.tsv
+awk -F '\t' -v modality="${modality}" -v limit="${limit}" -v offset="${offset}" \
+  'BEGIN{OFS="\t"} NR==1{print;next} $4==modality{ if (seen++ < offset) next; if (count<limit){print;count++} }' \
+  "${manifest}" > "${subset}"
 records=$(( $(wc -l < "${subset}") - 1 ))
 [[ ${records} -gt 0 ]]
 if [[ "${wave}" == production && "${manifest}" == *same_resource* ]]; then
@@ -68,7 +99,7 @@ if [[ "${wave}" == production && "${manifest}" == *same_resource* ]]; then
     "${CHAMPHLA_CODE_ROOT}/configs/roihu_storage_targets.json" "${modality}")
   [[ "${records}" -eq "${expected}" ]]
 fi
-ledger=${CHAMPHLA_RUN_ROOT}/manifests/${modality}_${wave}.ledger.tsv
+ledger=${CHAMPHLA_RUN_ROOT}/manifests/${modality}_${label}.ledger.tsv
 test ! -e "${ledger}"
 python3 -c 'from champhla_confirmation.cli import initialize_run_ledger_main; raise SystemExit(initialize_run_ledger_main())' \
   --manifest "${subset}" --output "${ledger}" --job-id "submission_pending"
@@ -82,13 +113,13 @@ if [[ "${execution_mode}" == sequential_low_storage ]]; then
       dependency=(--dependency="afterok:${previous_job}")
     fi
     stage_job=$(sbatch --parsable "${dependency[@]}" --array="${task_id}" \
-      --output="${CHAMPHLA_RUN_ROOT}/logs/stage_${modality}_${wave}_%A_%a.out" \
-      --error="${CHAMPHLA_RUN_ROOT}/logs/stage_${modality}_${wave}_%A_%a.err" \
+      --output="${CHAMPHLA_RUN_ROOT}/logs/stage_${modality}_${label}_%A_%a.out" \
+      --error="${CHAMPHLA_RUN_ROOT}/logs/stage_${modality}_${label}_%A_%a.err" \
       "${CHAMPHLA_CODE_ROOT}/scripts/roihu_stage_inputs.sbatch" "${subset}")
     caller_job=$(sbatch --parsable --dependency="afterok:${stage_job}" --array="${task_id}" \
       --export=ALL,CHAMPHLA_EXECUTION_MODE=sequential_low_storage \
-      --output="${CHAMPHLA_RUN_ROOT}/logs/callers_${modality}_${wave}_%A_%a.out" \
-      --error="${CHAMPHLA_RUN_ROOT}/logs/callers_${modality}_${wave}_%A_%a.err" \
+      --output="${CHAMPHLA_RUN_ROOT}/logs/callers_${modality}_${label}_%A_%a.out" \
+      --error="${CHAMPHLA_RUN_ROOT}/logs/callers_${modality}_${label}_%A_%a.err" \
       "${CHAMPHLA_CODE_ROOT}/scripts/roihu_run_sample.sbatch" "${subset}")
     caller_jobs+=("${caller_job}")
     previous_job=${caller_job}
@@ -97,13 +128,13 @@ if [[ "${execution_mode}" == sequential_low_storage ]]; then
     "${execution_mode}" "${caller_jobs[*]}" "${records}" "${subset}" "${ledger}"
 else
   stage_job=$(sbatch --parsable --array="1-${records}%${concurrency}" \
-    --output="${CHAMPHLA_RUN_ROOT}/logs/stage_${modality}_${wave}_%A_%a.out" \
-    --error="${CHAMPHLA_RUN_ROOT}/logs/stage_${modality}_${wave}_%A_%a.err" \
+    --output="${CHAMPHLA_RUN_ROOT}/logs/stage_${modality}_${label}_%A_%a.out" \
+    --error="${CHAMPHLA_RUN_ROOT}/logs/stage_${modality}_${label}_%A_%a.err" \
     "${CHAMPHLA_CODE_ROOT}/scripts/roihu_stage_inputs.sbatch" "${subset}")
   caller_job=$(sbatch --parsable --dependency="afterok:${stage_job}" --array="1-${records}%${concurrency}" \
     --export=ALL,CHAMPHLA_EXECUTION_MODE=full_scale \
-    --output="${CHAMPHLA_RUN_ROOT}/logs/callers_${modality}_${wave}_%A_%a.out" \
-    --error="${CHAMPHLA_RUN_ROOT}/logs/callers_${modality}_${wave}_%A_%a.err" \
+    --output="${CHAMPHLA_RUN_ROOT}/logs/callers_${modality}_${label}_%A_%a.out" \
+    --error="${CHAMPHLA_RUN_ROOT}/logs/callers_${modality}_${label}_%A_%a.err" \
     "${CHAMPHLA_CODE_ROOT}/scripts/roihu_run_sample.sbatch" "${subset}")
   printf 'execution_mode=%s stage_job=%s caller_job=%s records=%s subset=%s ledger=%s\n' \
     "${execution_mode}" "${stage_job}" "${caller_job}" "${records}" "${subset}" "${ledger}"

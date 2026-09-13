@@ -19,7 +19,23 @@ process POLYSOLVER {
     ulimit -s unlimited
     export SAMTOOLS_DIR=/home/polysolver/binaries
     export _JAVA_OPTIONS="-Djava.io.tmpdir=\$(pwd)/picard_tmp"
-    /home/polysolver/binaries/samtools sort -n ${bam} ${sample_id}_namesort
+
+    # POLYSOLVER sorts its input twice. Handed the whole exome BAM that produced a 35 GB
+    # work directory and exhausted the allocation, so it is given the HLA region plus
+    # unmapped reads instead, exactly as HLAHD_BAM does. The unmapped reads matter:
+    # POLYSOLVER uses them to recover HLA reads that failed to map to the reference.
+    if [ ! -f "${bam}.bai" ] && [ ! -f "${bam.baseName}.bai" ]; then
+        samtools index ${bam}
+    fi
+    samtools view -H ${bam} > hla_header.sam
+    grep -E '^@SQ.*SN:(chr6|6)[[:space:]]' hla_header.sam > /dev/null
+    chr=\$(awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}' hla_header.sam)
+    samtools view -b -h ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" > hla_region.bam
+    samtools view -b -f 4 ${bam} > unmapped.bam
+    samtools merge -f polysolver_input.bam hla_region.bam unmapped.bam
+    rm -f hla_region.bam unmapped.bam
+
+    /home/polysolver/binaries/samtools sort -n polysolver_input.bam ${sample_id}_namesort
     /home/polysolver/binaries/samtools fixmate ${sample_id}_namesort.bam ${sample_id}_fixmate.bam
     /home/polysolver/binaries/samtools sort ${sample_id}_fixmate.bam ${sample_id}_fixed
     /home/polysolver/binaries/samtools index ${sample_id}_fixed.bam
@@ -35,6 +51,6 @@ process POLYSOLVER {
     test -s ${sample_id}_polysolver.txt
     printf '"%s":\\n    polysolver: "v4"\\n' "${task.process}" > versions.yml
     rm -f ${sample_id}_namesort.bam ${sample_id}_fixmate.bam \
-        ${sample_id}_fixed.bam ${sample_id}_fixed.bam.bai
+        ${sample_id}_fixed.bam ${sample_id}_fixed.bam.bai polysolver_input.bam
     """
 }

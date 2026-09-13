@@ -82,13 +82,38 @@ reap_nextflow_children() {
 
 on_failure() {
   local code=$?
+  local work_root=${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}
   reap_nextflow_children
-  ledger_transition --state failed --exit-code "${code}" || true
+
+  # A ledger write can fail for reasons that have nothing to do with this job: a full
+  # filesystem already left one row reading "running" while the job had failed. Keep going
+  # so the quarantine still happens, but make the desync visible instead of inferred.
+  local ledger_failed=
+  ledger_transition --state failed --exit-code "${code}" || ledger_failed=1
+
   quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/${modality}/${sample_id}.${SLURM_JOB_ID}
   mkdir -p "$(dirname "${quarantine}")"
   test ! -e "${quarantine}"
   if [[ -d "${sample_root}" ]]; then
     mv "${sample_root}" "${quarantine}"
+  fi
+  if [[ -n "${ledger_failed}" ]]; then
+    echo "LEDGER WRITE FAILED for ${modality}/${sample_id}; ledger is out of sync" >&2
+    mkdir -p "${quarantine}"
+    printf 'state=failed exit_code=%s job_id=%s\n' "${code}" "${SLURM_JOB_ID}" \
+      > "${quarantine}/LEDGER_WRITE_FAILED"
+  fi
+
+  # Record the work size before releasing it, so the storage measurement survives the
+  # cleanup. Work is reproducible from the frozen inputs; leaving it behind on every
+  # failure is what filled the allocation.
+  if [[ -d "${work_root}" ]]; then
+    mkdir -p "${quarantine}"
+    du -sb "${work_root}" 2>/dev/null | awk '{print "failed_work_bytes=" $1}' \
+      > "${quarantine}/WORK_SIZE_AT_FAILURE" || true
+    if [[ "${CHAMPHLA_EXECUTION_MODE:-full_scale}" == sequential_low_storage ]]; then
+      rm -rf "${work_root}"
+    fi
   fi
   exit "${code}"
 }

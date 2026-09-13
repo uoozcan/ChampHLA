@@ -263,6 +263,13 @@ def transition_run_record(row: dict[str, str], new_state: str, **updates: str) -
             raise ValueError(f"{new_state} requires exit_code=0 and an output SHA-256")
     if new_state == "resubmitted" and not updated.get("supersedes_job_id"):
         raise ValueError("resubmitted requires supersedes_job_id")
+    if new_state == "resubmitted":
+        # A new attempt inherits none of the previous attempt's measurements. Without this
+        # a stale exit_code survives and makes the row self-contradictory.
+        for field in ("exit_code", "runtime_seconds", "peak_memory_bytes",
+                      "peak_disk_bytes", "retained_disk_bytes", "output_sha256"):
+            if field not in updates:
+                updated[field] = ""
     return updated
 
 

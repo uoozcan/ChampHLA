@@ -1,0 +1,36 @@
+{
+  "schema_version": "champhla-method-change-1",
+  "date": "2026-09-13",
+  "decision": "POLYSOLVER receives an HLA-region plus unmapped extract instead of the full alignment",
+  "status": "ACTIVE",
+  "kind": "method change discovered through operational need, not prespecified",
+  "problem": {
+    "summary": "POLYSOLVER sorts its input twice and exhausted the project allocation.",
+    "detail": "The module ran `samtools sort -n`, `fixmate`, then `samtools sort` on the whole 10.4 GB exome BAM. One sample produced a 35 GB work directory with 110 sort chunks and filled the 250 GiB allocation to 0 bytes free. Its bundled samtools then segfaulted reading back temp files that had been truncated mid-write.",
+    "measured_work_dir_bytes": 35000000000,
+    "measured_input_bam_bytes": 10435725474
+  },
+  "change": {
+    "before": "POLYSOLVER input = full alignment produced by CRAM_TO_BAM",
+    "after": "POLYSOLVER input = chr6 MHC window merged with unmapped reads",
+    "implementation": "workflow/modules/polysolver.nf, mirroring the extraction HLAHD_BAM already performs",
+    "expected_work_dir_bytes": 1000000000
+  },
+  "unmapped_reads_retained": {
+    "decision": "included",
+    "why": "POLYSOLVER uses unmapped reads to recover HLA reads that failed to map to the reference. Excluding them would change which alleles it can call, making this a larger method change than necessary. Including them keeps the change as small as the storage constraint allows."
+  },
+  "comparability_caveat": {
+    "statement": "This changes what the caller sees, so it is a method change and not only a storage fix.",
+    "affected_historical_result": "The frozen registry records POLYSOLVER at 357/390 on WES. That number was produced from full-alignment input.",
+    "consequence": "POLYSOLVER results produced after this change are not directly comparable with that figure. Any comparison across the boundary must say which input each side used.",
+    "required_before_claiming": "If a corrected run reports POLYSOLVER accuracy, the manuscript must state that its input differs from the historical configuration, or re-run the historical configuration for a matched comparison."
+  },
+  "discovery_path": "Found by running the pipeline, not by prespecification: the allocation filled and POLYSOLVER segfaulted on truncated sort chunks. Disclosed here rather than folded into a commit message, per CLAUDE.md.",
+  "authorised_by": "author, 2026-09-13, in response to the measured storage exhaustion",
+  "alternatives_rejected": {
+    "more_quota": "Author chose batched execution within the existing allocation instead.",
+    "region_only_without_unmapped": "Smaller still, but drops reads POLYSOLVER is designed to use; rejected as a larger method change.",
+    "reduce_the_reserve": "The 100 GiB reserve is kept; base usage is reclaimed instead."
+  }
+}
