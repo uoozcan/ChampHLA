@@ -6,11 +6,11 @@
   "nextflow": "25.10.2-standalone",
   "csc_module_stack": "bio-apps/v202603",
   "caller_database_releases": {
-    "HLA-HD": "UNRESOLVED_ACTIVE_BUNDLE",
+    "HLA-HD": "3.15.0",
     "Kourami": "3.24.0",
-    "OptiType": "UNRESOLVED_BUNDLED_REFERENCE",
-    "POLYSOLVER": "UNRESOLVED_FILENAME_SUGGESTS_3.10.0",
-    "SpecHLA": "UNRESOLVED_MIXED_COMPONENT_RELEASES",
+    "OptiType": "3.13.1",
+    "POLYSOLVER": "3.11.0",
+    "SpecHLA": "HETEROGENEOUS: 3.38.0 + 3.51.0",
     "T1K": "3.63.0",
     "ArcasHLA": "3.40.0"
   },

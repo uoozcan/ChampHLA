@@ -8,9 +8,10 @@ Nextflow work, native outputs, truth, and evaluation. Historical
 
 ## Manual blockers
 
-No production prediction is authorized until all are true:
+No capacity or production prediction is authorized until all are true:
 
-1. The author renews the CSC certificate and manually signs
+1. The renewed CSC certificate is active. After all six technical-pilot samples
+   and the three-modality storage gate pass, the author manually signs
    `decisions/20260908_consensus_primary_amendment.json` with name and UTC time.
 2. The existing GitHub remote is supplied. Local, GitHub, and Roihu point to
    the same reviewed commit and tracked-tree SHA-256.
@@ -38,15 +39,35 @@ unknown roles/modalities, and reference incompatibility.
 
 ```bash
 freeze_run_manifest --manifest RUN.tsv --expected-counts configs/roihu_storage_targets.json --output RUN.freeze.json
-bash scripts/roihu_submit_wave.sh RUN.tsv wgs pilot
-bash scripts/roihu_submit_wave.sh RUN.tsv wes pilot
-bash scripts/roihu_submit_wave.sh RUN.tsv rnaseq pilot
+bash scripts/roihu_submit_wave.sh RUN.tsv wgs pilot pilot-wgs-20260914a
+bash scripts/roihu_submit_wave.sh RUN.tsv wes pilot pilot-wes-20260914a
+bash scripts/roihu_submit_wave.sh RUN.tsv rnaseq pilot pilot-rna-20260914a
 ```
 
-After the two-sample pilots finish, populate their ledger disk fields and run
-`assess_roihu_storage`. Scaling requires the modality-specific 95th percentile
-and at least `1.25 × projected peak + 100 GiB`. Then run `capacity` (10 samples)
-and only afterward `production`. Production enforces 137 WGS, 130 WES, and 107
+Each submission requires a lowercase safe `run_id`; subsets, ledgers, logs,
+output/work roots, quarantine evidence, and batch-chain records are namespaced
+by it. Pilot ledgers have `run_role=technical_pilot`; capacity ledgers have
+`capacity_validation`; only `production` can enter canonical collection.
+
+After all three two-sample pilots finish, assess their three ledgers together:
+
+```bash
+assess_roihu_storage \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wgs-20260914a_wgs_pilot.ledger.tsv" \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wes-20260914a_wes_pilot.ledger.tsv" \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-rna-20260914a_rnaseq_pilot.ledger.tsv" \
+  --targets configs/roihu_storage_targets.json \
+  --environment-inventory "$CHAMPHLA_RUN_ROOT/environment_inventory.json" \
+  --output "$CHAMPHLA_RUN_ROOT/storage_gate.json"
+```
+
+The assessor collapses caller rows to one measurement per sample, requires two
+validated samples per modality, and rejects inconsistent runtime, memory, peak,
+or retained measurements. Scaling requires the modality-specific nearest-rank
+95th percentile and either the full-scale or sequential policy with the 100-GiB
+reserve. The author signs only after this gate passes. Then run `capacity` (10
+samples) and deterministic production `batch` waves (size 10); both re-run their
+samples and require the signature. Production enforces 137 WGS, 130 WES, and 107
 RNA samples for a same-resource manifest. Expected caller-locus records are
 2,055, 1,950, and 1,284; expected plurality rows total 1,122.
 
@@ -60,7 +81,9 @@ lineage.
 
 ## Same-resource closure
 
-Collect native outputs and require exactly 5,289 caller-locus records. Generate
+Collect native outputs with the matching production ledger and require exactly
+5,289 caller-locus records. Canonical collection rejects pilot or capacity
+roles, unvalidated ledger rows, a mismatched matrix, or a mismatched run identity. Generate
 `SimplePluralityLex` and all frozen comparators without truth. Audit every WGS
 row and create a stratified 50-record packet—ten records per caller spanning
 partial, high-field, homozygous, heterozygous, and missing cases where present.

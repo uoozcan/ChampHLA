@@ -114,6 +114,18 @@ sources remain visible and cannot enter denominators.
 
 ## S9. Runtime and resource reporting
 
+The corrected WES configuration gives POLYSOLVER a chromosome-6 HLA-region plus
+unmapped-read extract to satisfy the frozen storage policy. This changes the
+caller input relative to the historical full-alignment configuration, so new
+results are reported separately and are not directly comparable with the
+historical 357/390 result. A second, technical compatibility correction derives
+a wrapper whose three hg38 interval tokens use `6` or `chr6` exactly as declared
+by the BAM header; it does not change the genomic intervals. The transformation
+verifies the pinned source SHA-256, substitutes exactly three contig tokens when
+needed, applies the temporary-directory relocation separately, and records the
+derived wrapper hash. Both changes are disclosed independently in the decision
+records.
+
 The corrected execution manifest records caller wall time, CPU time, peak
 memory, scheduler status, input bytes, output bytes, container digest, command,
 and reference checksums. Empty output or an absent scheduler process is an

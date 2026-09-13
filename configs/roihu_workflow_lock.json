@@ -3,6 +3,8 @@
     "workflow/bin/parse_kourami_results.py": "484d0dc3ce846c6b7922aa54cfeac2a6d1ceb761e1be547d4b44d9543b816224",
     "workflow/bin/parse_polysolver_results.py": "0bc82c2a849fd215c35cf2ce8f6a0da9f7791f3249afe3651ca9d1c8704f000d",
     "workflow/bin/parse_t1k_results.py": "56be8f9b3db5be495dd440c423552b54f2101ea8dc5d36c08c16d9bf7aa85506",
+    "workflow/bin/patch_polysolver_wrapper.py": "23303b9e9a32df2dc910658209553a2a479eb1625995c30efcbbc909ea1992f6",
+    "workflow/conf/polysolver_wrapper_patch.json": "eb904bedeacb7c223f836c112c7c9aa173113b04c799a4cf226b76ba5e691afa",
     "workflow/conf/roihu_params.yaml": "dfee8724a652fd233804554b780bb37e7e57f31ad09aea8c22ec72eed3a03d71",
     "workflow/main.nf": "fe0eb0f5131e0805710f099d0549314e5633463850980a34c92f08c5a0c7738e",
     "workflow/modules/arcashla.nf": "6336d6946dbdd392bed164e0d06cf7fa44853f97006e85e32f518da80e0c2694",
@@ -10,10 +12,10 @@
     "workflow/modules/hlahd.nf": "a9740ed22ced741c3451ac974c0d590f9a30e3ddcb6e72cd6b6907ffcb1e4229",
     "workflow/modules/kourami.nf": "5d94732199d4425b049e391792e9631ff41bf627150f4b975868944c2aa99495",
     "workflow/modules/optitype.nf": "23d80067ffc6a780ae2b6bdeec8b0b5f030d625bc90ce149813f71f510dd1fa8",
-    "workflow/modules/polysolver.nf": "2f6d91d4fc4b754867869b658e028d4b3424e23dd5aee8a39253a9ac4f416602",
+    "workflow/modules/polysolver.nf": "2fec618d6fb08c7e7119e745f5bf3ae7599cc4827d6a9030c0b85cc6b9dfb831",
     "workflow/modules/spechla.nf": "a806198e69a93f609c088f2565a347b2eb530f0387582ceeceaa6e4be2107874",
     "workflow/modules/t1k.nf": "3c881e22a12d4d546576964421788895fb151bed78cb927dfa5dec888c97caae",
-    "workflow/nextflow.config": "4dc8fcef5b6231daa105c7a17a0dfbfa2025f9a9bfed02661640224ccc011a17"
+    "workflow/nextflow.config": "846f1a23ae6435c08da27ce9e6ea48091690ac317a9d96bb4e57157c4e028d28"
   },
   "policy": "exact files; POSIX paths; masked-success constructs forbidden",
   "schema_version": "champhla-workflow-lock-1",

@@ -1,0 +1,57 @@
+{
+  "schema_version": "champhla-technical-compatibility-correction-1",
+  "date": "2026-09-14",
+  "status": "IMPLEMENTED_PENDING_TECHNICAL_PILOT",
+  "decision": "Derive a hash-verified POLYSOLVER wrapper whose three hg38 interval tokens match the input BAM contig convention",
+  "classification": "technical contig-compatibility correction",
+  "separate_method_change": "decisions/20260913_polysolver_input_change.json",
+  "method_boundary": {
+    "unchanged": "The same three hg38 genomic intervals, caller database, caller algorithm, and region-plus-unmapped input policy are retained.",
+    "changed": "Only the literal chromosome prefix in the three hg38 interval arguments changes from 6 to chr6 when the BAM header declares chr6.",
+    "historical_caveat": "New POLYSOLVER results remain not directly comparable with the historical 357/390 result because of the separately disclosed region-plus-unmapped input change. This compatibility correction does not remove that caveat."
+  },
+  "failed_pilot_closure": {
+    "run_role": "pre-control technical calibration; invalid",
+    "sample": "HG00096",
+    "stage_job": {"job_id": "1299320", "state": "COMPLETED", "exit_code": "0:0"},
+    "caller_job": {"job_id": "1299321", "state": "FAILED", "exit_code": "1:0", "elapsed": "00:23:51"},
+    "polysolver_attempts": [
+      {"job_id": "1299463", "state": "FAILED", "exit_code": "1:0", "elapsed": "00:07:08"},
+      {"job_id": "1299564", "state": "FAILED", "exit_code": "1:0", "elapsed": "00:06:51"}
+    ],
+    "dependent_hg00097_jobs": [
+      {"job_id": "1299323", "state": "CANCELLED", "elapsed": "00:00:00"},
+      {"job_id": "1299324", "state": "CANCELLED", "elapsed": "00:00:00"}
+    ],
+    "promotion_rule": "No output from this failed run, including its four successful caller tasks, may enter a pilot, capacity, production, or registry artifact."
+  },
+  "diagnosis": {
+    "bam_header_contig": "chr6",
+    "wrapper_hg38_contig": "6",
+    "reads_in_first_hg38_interval_using_chr6": 3261,
+    "reads_in_first_hg38_interval_using_6": 0,
+    "first_hg38_interval": "29941260-29945884",
+    "source_wrapper_sha256": "bcc2c4c5a1c7b2f3547111002aa2f4e7e244115aac3dd2c263f0b47d9e7b7fab"
+  },
+  "implementation": {
+    "spec": "workflow/conf/polysolver_wrapper_patch.json",
+    "transformer": "workflow/bin/patch_polysolver_wrapper.py",
+    "module": "workflow/modules/polysolver.nf",
+    "transformation_version": "polysolver-hg38-contig-compatibility-1",
+    "requirements": [
+      "verify the source wrapper SHA-256",
+      "accept exactly contig 6 or chr6 detected from the BAM header",
+      "change exactly three frozen hg38 interval tokens for chr6 and zero for 6",
+      "apply the temporary-directory substitution independently and exactly once",
+      "emit and revalidate the derived-wrapper SHA-256 and transformation audit"
+    ]
+  },
+  "compact_evidence_sha256": {
+    "logs/callers_wes_pilot_1299321_1.err": "847a133aac668d0bed0c540f85d923b534b62bcf83612aaee981a65069853ae5",
+    "logs/callers_wes_pilot_1299321_1.out": "51bb160d03a6da24c89dd54b68f388098fd2ab38f258d8e32793a152effc7885",
+    "quarantine/wes/HG00096.1299321/launch/.nextflow.log": "624d27b1c1847990054b29f4a8696e8c244ab341fb9a8a1237caed99f0379739",
+    "quarantine/wes/HG00096.1299321/pre_run_sha256.txt": "2f3ceae71acc896663fc52d16803777657a4d9d31b7e22c0319c3e9606b38750",
+    "quarantine/wes/HG00096.1299321/samplesheet.csv": "defa9b7516e02569bd2f33c3256aa47a0860140d370d1f9592bfacdf226c8198",
+    "quarantine/wes/HG00096.1299321/WORK_SIZE_AT_FAILURE": "2e5fbb758088ddbb34bdb0167d7f95767a14081d06cc2767e8e8ffe291dd1a03"
+  }
+}

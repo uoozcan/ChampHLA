@@ -93,6 +93,11 @@ def test_canonical_workflow_is_fail_closed_and_submission_validates_lock():
     assert "mv \"${stage_root}\" \"${sample_root}\"" in stage
     assert "sequential_low_storage" in submit
     assert 'afterok:${previous_job}' in submit
+    assert "CHAMPHLA_RUN_ID" in submit
+    assert "CHAMPHLA_RUN_ROLE" in submit
+    assert 'run_role=technical_pilot' in submit
+    assert 'run_role=capacity_validation' in submit
+    assert 'run_role=production' in submit
     assert "pilot_retained" not in submit
     retry = (ROOT / "scripts" / "roihu_retry_sample.sh").read_text(encoding="utf-8")
     assert "--hold" in retry
@@ -164,7 +169,8 @@ def test_prune_refuses_outside_the_project_input_root():
 def test_pilot_wave_runs_in_the_mode_production_will_use():
     """Otherwise the pilot's retained figure describes a state that never persists."""
     text = (ROOT / "scripts/roihu_submit_wave.sh").read_text(encoding="utf-8")
-    pilot = text[text.index("  pilot)"):text.index("  capacity)")]
+    start = text.index("  pilot)\n    # Pilots")
+    pilot = text[start:text.index("  batch)", start)]
     assert "execution_mode=sequential_low_storage" in pilot
 
 
@@ -264,12 +270,40 @@ def test_batch_wave_slices_the_manifest_deterministically():
     assert "batch)" in text
     assert "offset=$((batch_index * batch_size))" in text
     # Batch artefacts must not collide with each other.
-    assert "${modality}_${label}.tsv" in text
-    assert "${modality}_${label}.ledger.tsv" in text
+    assert "${artifact_prefix}.tsv" in text
+    assert "${artifact_prefix}.ledger.tsv" in text
     # A batch may not start while the previous one has unvalidated rows.
     assert "unvalidated samples" in text
     # Only one sample in flight, as for the pilots.
     assert "execution_mode=sequential_low_storage" in text
+    assert "chain_afterok" in text
+
+
+def test_capacity_and_every_production_form_require_author_signature():
+    text = (ROOT / "scripts/roihu_submit_wave.sh").read_text(encoding="utf-8")
+    runner = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert 'if [[ "${run_role}" != technical_pilot ]]' in text
+    assert 'a["status"] == "SIGNED_BY_AUTHOR"' in text
+    assert 'production|batch) run_role=production' in text
+    assert 'if [[ "${run_role}" != technical_pilot ]]' in runner
+    assert 'a["status"] == "SIGNED_BY_AUTHOR"' in runner
+
+
+def test_nextflow_retries_only_transient_termination_statuses():
+    text = (ROOT / "workflow/nextflow.config").read_text(encoding="utf-8")
+    assert "task.exitStatus in [137, 143]" in text
+    assert "task.attempt <= 2 ? 'retry' : 'terminate'" in text
+    assert "task.attempt <= 2 ? 'retry'" not in text.replace(
+        "task.exitStatus in [137, 143] && task.attempt <= 2 ? 'retry'", ""
+    )
+
+
+def test_run_outputs_and_work_are_namespaced_by_run_identity():
+    runner = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    prune = (ROOT / "scripts/roihu_prune_sample_work.sh").read_text(encoding="utf-8")
+    for text in (runner, prune):
+        assert "caller_outputs/${run_id}/${run_role}/${modality}/${sample_id}" in text
+        assert "work/${run_id}/${run_role}/${modality}/${sample_id}" in text
 
 
 def test_polysolver_receives_an_extract_not_the_whole_bam():

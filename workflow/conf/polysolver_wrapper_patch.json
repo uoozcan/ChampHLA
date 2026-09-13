@@ -1,0 +1,14 @@
+{
+  "schema_version": "champhla-polysolver-wrapper-patch-1",
+  "transformation_version": "polysolver-hg38-contig-compatibility-1",
+  "source_path": "/home/polysolver/scripts/shell_call_hla_type",
+  "source_sha256": "bcc2c4c5a1c7b2f3547111002aa2f4e7e244115aac3dd2c263f0b47d9e7b7fab",
+  "temporary_directory_token": "TMP_DIR=/home/polysolver",
+  "hg38_interval_tokens": [
+    "6:29941260-29945884",
+    "6:31353872-31357187",
+    "6:31268749-31272105"
+  ],
+  "expected_temporary_directory_substitutions": 1,
+  "expected_hg38_contig_substitutions_for_chr6": 3
+}

@@ -15,6 +15,7 @@ from champhla_confirmation.roihu import (
     build_cleanup_plan,
     build_nci60_run_manifest,
     build_same_resource_run_manifest,
+    collect_run_outputs,
     directory_tree_identity,
     freeze_workflow_lock,
     initialize_run_ledger,
@@ -50,8 +51,12 @@ def test_truth_free_manifest_and_ledger(tmp_path: Path):
     write_tsv(manifest, [manifest_row()], MANIFEST_FIELDS)
     assert audit_run_manifest(manifest)["passed"] is True
     ledger = tmp_path / "ledger.tsv"
-    rows = initialize_run_ledger(manifest, ledger, "deadbeef")
+    rows = initialize_run_ledger(
+        manifest, ledger, "pilot-wes-001", "technical_pilot", "deadbeef",
+    )
     assert len(rows) == 5
+    assert {row["run_id"] for row in rows} == {"pilot-wes-001"}
+    assert {row["run_role"] for row in rows} == {"technical_pilot"}
     running = transition_run_record(
         transition_run_record(rows[0], "submitted", job_id="1"), "running"
     )
@@ -75,7 +80,9 @@ def test_truth_free_manifest_and_ledger(tmp_path: Path):
     assert frozen["expected_plurality_rows"] == 3
     with pytest.raises(ValueError, match="expected 2 unique samples"):
         freeze_run_manifest(manifest, tmp_path / "bad-freeze.json", {"wes": 2})
-    submitted = initialize_run_ledger(manifest, ledger, "deadbeef", "123")
+    submitted = initialize_run_ledger(
+        manifest, ledger, "pilot-wes-001", "technical_pilot", "deadbeef", "123",
+    )
     assert all(row["state"] == "submitted" for row in submitted)
     transition_run_sample(ledger, "C", "S1", "wes", "running")
     transition_run_sample(
@@ -103,27 +110,39 @@ def test_manifest_rejects_truth_duplicates_reference_and_missing_pair(tmp_path: 
 
 
 def test_storage_and_cleanup_are_fail_closed(tmp_path: Path):
-    ledger = tmp_path / "ledger.tsv"
-    rows = []
+    ledgers = []
     for modality in ("wgs", "wes", "rnaseq"):
-        row = {field: "" for field in RUN_LEDGER_FIELDS}
-        row.update({
-            "modality": modality, "state": "validated",
-            "peak_disk_bytes": "1000", "retained_disk_bytes": "500",
-        })
-        rows.append(row)
-    write_tsv(ledger, rows, list(RUN_LEDGER_FIELDS))
-    result = assess_storage(ledger, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3)
+        ledger = tmp_path / f"{modality}.tsv"
+        rows = []
+        for sample in ("S1", "S2"):
+            for caller in __import__("champhla_confirmation.panels", fromlist=["PANELS"]).PANELS[modality]:
+                row = {field: "" for field in RUN_LEDGER_FIELDS}
+                row.update({
+                    "run_id": f"pilot-{modality}-001", "run_role": "technical_pilot",
+                    "cohort": "C", "sample_id": sample, "caller": caller,
+                    "modality": modality, "state": "validated", "runtime_seconds": "10",
+                    "peak_memory_bytes": "200", "peak_disk_bytes": "1000",
+                    "retained_disk_bytes": "500",
+                })
+                rows.append(row)
+        write_tsv(ledger, rows, list(RUN_LEDGER_FIELDS))
+        ledgers.append(ledger)
+    result = assess_storage(
+        ledgers, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3,
+    )
     assert result["passed"] is True
     assert result["execution_mode"] == "full_scale"
     assert result["availability_source"] == "project_allocation"
+    assert result["validated_pilot_samples_by_modality"] == {
+        "rnaseq": 2, "wes": 2, "wgs": 2,
+    }
     rejected = assess_storage(
-        ledger, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3,
+        ledgers, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3,
         availability_source="filesystem_global",
     )
     assert rejected["passed"] is False
     low_space = assess_storage(
-        ledger, {"wgs": 1_000_000, "wes": 1, "rnaseq": 1},
+        ledgers, {"wgs": 1_000_000, "wes": 1, "rnaseq": 1},
         100 * 1024 ** 3 + 600_000_000,
     )
     assert low_space["full_scale_passed"] is False
@@ -141,6 +160,57 @@ def test_storage_and_cleanup_are_fail_closed(tmp_path: Path):
     plan = build_cleanup_plan(run_root, valid, tmp_path / "cleanup2.json")
     assert plan["executable"] is True
     assert (run_root / "work" / "temporary").exists()
+
+
+def test_run_identity_and_storage_measurements_are_fail_closed(tmp_path: Path):
+    manifest = tmp_path / "manifest.tsv"
+    write_tsv(manifest, [manifest_row()], MANIFEST_FIELDS)
+    with pytest.raises(ValueError, match="run_id"):
+        initialize_run_ledger(manifest, tmp_path / "ledger.tsv", "BAD ID", "technical_pilot")
+    with pytest.raises(ValueError, match="run_role"):
+        initialize_run_ledger(manifest, tmp_path / "ledger.tsv", "valid-run", "pilot")
+
+    ledgers = []
+    from champhla_confirmation.panels import PANELS
+    for modality in ("wgs", "wes", "rnaseq"):
+        rows = []
+        for sample in ("S1", "S2"):
+            for caller in PANELS[modality]:
+                row = {field: "" for field in RUN_LEDGER_FIELDS}
+                row.update({
+                    "run_id": f"pilot-{modality}", "run_role": "technical_pilot",
+                    "cohort": "C", "sample_id": sample, "modality": modality,
+                    "caller": caller, "state": "validated", "runtime_seconds": "1",
+                    "peak_memory_bytes": "2", "peak_disk_bytes": "100",
+                    "retained_disk_bytes": "10",
+                })
+                rows.append(row)
+        path = tmp_path / f"{modality}.tsv"
+        write_tsv(path, rows, list(RUN_LEDGER_FIELDS))
+        ledgers.append(path)
+    rows = read_tsv(ledgers[1])
+    rows[0]["peak_disk_bytes"] = "101"
+    write_tsv(ledgers[1], rows, list(RUN_LEDGER_FIELDS))
+    result = assess_storage(ledgers, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3)
+    assert result["passed"] is False
+    assert any("inconsistent peak_disk_bytes" in failure for failure in result["failures"])
+    with pytest.raises(ValueError, match="exactly three"):
+        assess_storage(ledgers[:2], {"wgs": 1, "wes": 1}, 200 * 1024 ** 3)
+
+
+def test_canonical_collection_rejects_nonproduction_run_role(tmp_path: Path):
+    manifest = tmp_path / "manifest.tsv"
+    write_tsv(manifest, [manifest_row()], MANIFEST_FIELDS)
+    ledger = tmp_path / "ledger.tsv"
+    initialize_run_ledger(
+        manifest, ledger, "pilot-wes-001", "technical_pilot", "deadbeef", "1",
+    )
+    summary = collect_run_outputs(
+        tmp_path / "callers", manifest, [ledger], tmp_path / "calls.tsv",
+        tmp_path / "summary.json",
+    )
+    assert summary["passed"] is False
+    assert "canonical collection requires run_role=production" in summary["failures"]
 
 
 def test_hprc_truth_requires_dual_method_concordance(tmp_path: Path):
@@ -283,6 +353,8 @@ def test_workflow_lock_detects_changes_and_masked_success(tmp_path: Path):
         "main.nf": "nextflow.enable.dsl = 2\n",
         "nextflow.config": "process.errorStrategy = 'terminate'\n",
         "conf/roihu_params.yaml": "hlahd_db: /app/hlahd.1.4.0\n",
+        "conf/polysolver_wrapper_patch.json": "{}\n",
+        "bin/patch_polysolver_wrapper.py": "print('fixture')\n",
     }
     for module in ("arcashla", "bam_to_fastq", "hlahd", "kourami", "optitype",
                    "polysolver", "spechla", "t1k"):

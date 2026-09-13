@@ -30,6 +30,37 @@ apptainer exec "${CHAMPHLA_CONTAINER_ROOT}/hlahd.sif" \
   test -d /app/hlahd.1.4.0/dictionary
 apptainer exec "${CHAMPHLA_CONTAINER_ROOT}/hlahd.sif" \
   test -d /app/hlahd.1.4.0/freq_data
+
+# Reconstruct both permitted POLYSOLVER wrapper variants inside the pinned container.
+# This validates the source hash, exact three-token chr6 correction, independent TMP
+# substitution, and the derived-wrapper audit without writing into the Git checkout.
+patch_tmp=$(mktemp -d "${CHAMPHLA_RUN_ROOT}/polysolver-preflight.XXXXXX")
+cleanup_patch_tmp() {
+  rm -rf "${patch_tmp}"
+}
+trap cleanup_patch_tmp EXIT
+for contig in 6 chr6; do
+  output=${patch_tmp}/wrapper.${contig}
+  audit=${patch_tmp}/audit.${contig}.json
+  apptainer exec \
+    --bind "${CHAMPHLA_CODE_ROOT}:${CHAMPHLA_CODE_ROOT}:ro" \
+    --bind "${patch_tmp}:${patch_tmp}" \
+    "${CHAMPHLA_CONTAINER_ROOT}/polysolver.sif" \
+    python3 "${CHAMPHLA_CODE_ROOT}/workflow/bin/patch_polysolver_wrapper.py" \
+      --source /home/polysolver/scripts/shell_call_hla_type \
+      --output "${output}" --audit "${audit}" \
+      --spec "${CHAMPHLA_CODE_ROOT}/workflow/conf/polysolver_wrapper_patch.json" \
+      --contig "${contig}" --tmp-dir /frozen/picard_tmp
+  apptainer exec \
+    --bind "${CHAMPHLA_CODE_ROOT}:${CHAMPHLA_CODE_ROOT}:ro" \
+    --bind "${patch_tmp}:${patch_tmp}" \
+    "${CHAMPHLA_CONTAINER_ROOT}/polysolver.sif" \
+    python3 "${CHAMPHLA_CODE_ROOT}/workflow/bin/patch_polysolver_wrapper.py" --verify-only \
+      --source /home/polysolver/scripts/shell_call_hla_type \
+      --output "${output}" --audit "${audit}" \
+      --spec "${CHAMPHLA_CODE_ROOT}/workflow/conf/polysolver_wrapper_patch.json" \
+      --contig "${contig}" --tmp-dir /frozen/picard_tmp
+done
 python3 --version
 samtools --version | head -n 1
 nextflow -version

@@ -6,7 +6,8 @@ HLA genotyping from short-read sequencing is sensitive to assay design,
 reference representation, and caller-specific failure modes. We present
 ChampHLA, an auditable workflow that executes compatible caller panels,
 preserves native evidence, harmonises complete, partial, and missing calls, and
-applies pair-level plurality consensus as a selection-free default. The
+applies ChampHLA-Consensus, a pair-level plurality consensus, as a
+selection-free default. The
 plurality rule itself is intentionally simple and is not claimed as a novel
 voting algorithm. The contributions are its reproducible implementation, a
 truth-blind evidence architecture, cross-assay benchmarking, and explicit tests

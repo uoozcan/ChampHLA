@@ -9,6 +9,7 @@ process POLYSOLVER {
     output:
     tuple val(sample_id), path("${sample_id}_polysolver.txt"), emit: results
     path("${sample_id}_polysolver_raw/winners.hla.nofreq.txt"), emit: raw
+    path "polysolver_wrapper_transform.json", emit: wrapper_audit
     path "versions.yml", emit: versions
 
     script:
@@ -28,8 +29,10 @@ process POLYSOLVER {
         /home/polysolver/binaries/samtools index ${bam}
     fi
     /home/polysolver/binaries/samtools view -H ${bam} > hla_header.sam
-    grep -E '^@SQ.*SN:(chr6|6)[[:space:]]' hla_header.sam > /dev/null
-    chr=\$(awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}' hla_header.sam)
+    has_chr6=\$(awk '/^@SQ.*SN:chr6[[:space:]]/{found=1} END{print found+0}' hla_header.sam)
+    has_6=\$(awk '/^@SQ.*SN:6[[:space:]]/{found=1} END{print found+0}' hla_header.sam)
+    [ "\$((has_chr6 + has_6))" -eq 1 ]
+    if [ "\${has_chr6}" -eq 1 ]; then chr=chr6; else chr=6; fi
     /home/polysolver/binaries/samtools view -b -h ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" > hla_region.bam
     /home/polysolver/binaries/samtools view -b -f 4 ${bam} > unmapped.bam
     /home/polysolver/binaries/samtools merge -f polysolver_input.bam hla_region.bam unmapped.bam
@@ -39,9 +42,22 @@ process POLYSOLVER {
     /home/polysolver/binaries/samtools fixmate ${sample_id}_namesort.bam ${sample_id}_fixmate.bam
     /home/polysolver/binaries/samtools sort ${sample_id}_fixmate.bam ${sample_id}_fixed
     /home/polysolver/binaries/samtools index ${sample_id}_fixed.bam
-    sed "s|TMP_DIR=/home/polysolver|TMP_DIR=\$(pwd)/picard_tmp|g" \
-        /home/polysolver/scripts/shell_call_hla_type > patched_shell_call_hla_type
-    chmod +x patched_shell_call_hla_type
+    # The pinned wrapper hard-codes three hg38 intervals on contig `6`. Derive a wrapper
+    # for the BAM's observed convention, while separately relocating its temporary files.
+    # The transformer verifies the immutable source and exact substitution counts.
+    python3 ${projectDir}/bin/patch_polysolver_wrapper.py \
+        --source /home/polysolver/scripts/shell_call_hla_type \
+        --output patched_shell_call_hla_type \
+        --audit polysolver_wrapper_transform.json \
+        --spec ${projectDir}/conf/polysolver_wrapper_patch.json \
+        --contig "\${chr}" --tmp-dir "\$(pwd)/picard_tmp"
+    test -s polysolver_wrapper_transform.json
+    python3 ${projectDir}/bin/patch_polysolver_wrapper.py --verify-only \
+        --source /home/polysolver/scripts/shell_call_hla_type \
+        --output patched_shell_call_hla_type \
+        --audit polysolver_wrapper_transform.json \
+        --spec ${projectDir}/conf/polysolver_wrapper_patch.json \
+        --contig "\${chr}" --tmp-dir "\$(pwd)/picard_tmp"
     bash patched_shell_call_hla_type ${sample_id}_fixed.bam Unknown 0 ${build} STDFQ 0 \
         ${sample_id}_polysolver_raw
     native=${sample_id}_polysolver_raw/winners.hla.nofreq.txt

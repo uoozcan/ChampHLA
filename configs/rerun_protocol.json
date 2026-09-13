@@ -36,7 +36,7 @@
     "HLA-HD": "pin command, reference bundle, container digest, threads and memory before execution",
     "Kourami": "pin command, graph/reference bundle, container digest, threads and memory before execution",
     "OptiType": "pin command, data type, container digest, threads and memory before execution",
-    "POLYSOLVER": "pin command, reference bundle, container digest, threads and memory before execution",
+    "POLYSOLVER": "IPD-IMGT/HLA 3.11.0; pinned container and wrapper source; region-plus-unmapped input; audited hg38 6/chr6 wrapper compatibility transform v1; threads and memory frozen by workflow",
     "SpecHLA": "pin command, Git commit, wrapper checksum, threads and memory before execution",
     "T1K": "pin command, index checksum, container digest, threads and memory before execution",
     "ArcasHLA": "pin command, reference bundle, container digest, threads and memory before execution"

@@ -15,7 +15,16 @@ set -eo pipefail
 CODE_ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
 export PYTHONPATH=${CHAMPHLA_CODE_ROOT}/src
-manifest=${1:?usage: roihu_run_sample.sbatch MANIFEST}
+manifest=${1:?usage: roihu_run_sample.sbatch MANIFEST LEDGER}
+ledger=${2:?usage: roihu_run_sample.sbatch MANIFEST LEDGER}
+run_id=${CHAMPHLA_RUN_ID:?CHAMPHLA_RUN_ID is required}
+run_role=${CHAMPHLA_RUN_ROLE:?CHAMPHLA_RUN_ROLE is required}
+[[ "${run_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]]
+[[ "${run_role}" =~ ^(technical_pilot|capacity_validation|production)$ ]]
+if [[ "${run_role}" != technical_pilot ]]; then
+  python3 -c 'import json,sys; a=json.load(open(sys.argv[1])); assert a["status"] == "SIGNED_BY_AUTHOR" and a["signed_by"] and a["signed_at_utc"]' \
+    "${CHAMPHLA_CODE_ROOT}/decisions/20260908_consensus_primary_amendment.json"
+fi
 line_number=$((SLURM_ARRAY_TASK_ID + 1))
 # Tab is IFS whitespace, so `IFS=$'\t' read` collapses runs of tabs and silently drops
 # empty columns, shifting every later field. RNA rows have no index, so index_uri and
@@ -40,12 +49,12 @@ read_layout=${_row[10]}
 independence_stratum=${_row[11]}
 evidence_role=${_row[12]}
 input_root=${CHAMPHLA_INPUT_ROOT}/${modality}/${sample_id}
-sample_root=${CHAMPHLA_RUN_ROOT}/caller_outputs/${modality}/${sample_id}
-wave=$(basename "${manifest}" .tsv)
-ledger=${CHAMPHLA_RUN_ROOT}/manifests/${wave}.ledger.tsv
+sample_root=${CHAMPHLA_RUN_ROOT}/caller_outputs/${run_id}/${run_role}/${modality}/${sample_id}
+work_root=${CHAMPHLA_RUN_ROOT}/work/${run_id}/${run_role}/${modality}/${sample_id}
+test -f "${ledger}"
 test -f "${input_root}/STAGE_COMPLETE"
 test ! -e "${sample_root}/CALLERS_COMPLETE"
-mkdir -p "${sample_root}/results" "${sample_root}/launch" "${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}"
+mkdir -p "${sample_root}/results" "${sample_root}/launch" "${work_root}"
 test -s "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
 python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["passed"] is True' \
   "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
@@ -100,7 +109,6 @@ reap_nextflow_children() {
 
 on_failure() {
   local code=$?
-  local work_root=${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}
   reap_nextflow_children
 
   # A ledger write can fail for reasons that have nothing to do with this job: a full
@@ -109,7 +117,7 @@ on_failure() {
   local ledger_failed=
   ledger_transition --state failed --exit-code "${code}" || ledger_failed=1
 
-  quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/${modality}/${sample_id}.${SLURM_JOB_ID}
+  quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/${run_id}/${run_role}/${modality}/${sample_id}.${SLURM_JOB_ID}
   mkdir -p "$(dirname "${quarantine}")"
   test ! -e "${quarantine}"
   if [[ -d "${sample_root}" ]]; then
@@ -171,7 +179,8 @@ case "${modality}" in
   *) echo "Unsupported modality: ${modality}" >&2; exit 2 ;;
 esac
 
-sha256sum "${sample_root}/samplesheet.csv" "${manifest}" \
+printf 'run_id=%s\nrun_role=%s\n' "${run_id}" "${run_role}" > "${sample_root}/run_identity.txt"
+sha256sum "${sample_root}/samplesheet.csv" "${sample_root}/run_identity.txt" "${manifest}" \
   "${CHAMPHLA_RUN_ROOT}/environment_inventory.json" \
   "${CHAMPHLA_CODE_ROOT}/configs/comparator_manifest.json" \
   "${CHAMPHLA_CODE_ROOT}/configs/rerun_protocol.json" \
@@ -183,8 +192,8 @@ cd "${sample_root}/launch"
 # Both sources are recorded so a reader can tell how each number was obtained.
 run_started=${SECONDS}
 nextflow run "${CHAMPHLA_PIPELINE_ROOT}/main.nf" \
-  -name "plurality_${modality}_${sample_id}_${SLURM_JOB_ID}" \
-  -w "${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}" \
+  -name "plurality_${run_id}_${modality}_${sample_id}_${SLURM_JOB_ID}" \
+  -w "${work_root}" \
   -params-file "${CHAMPHLA_PIPELINE_ROOT}/conf/roihu_params.yaml" \
   --input_samplesheet "${sample_root}/samplesheet.csv" --input_type "${input_type_effective}" \
   --tools "${tools}" --seq_type "${seq_type}" --run_modality "${modality}" \
@@ -239,14 +248,14 @@ peak_kb=$(awk -F= '$1=="peak_memory_kbytes"{print $2}' "${sample_root}/resource_
 peak_memory=$((peak_kb * 1024))
 # Peak is measured while everything is still on disk, so it reflects the true
 # high-water mark for this sample.
-peak_disk=$(du -sb "${input_root}" "${sample_root}" "${CHAMPHLA_RUN_ROOT}/work/${modality}/${sample_id}" | awk '{sum+=$1} END{print sum}')
+peak_disk=$(du -sb "${input_root}" "${sample_root}" "${work_root}" | awk '{sum+=$1} END{print sum}')
 
 # Release before measuring what is retained. The storage gate multiplies retained
 # bytes by the full cohort size, so a figure taken before the release would
 # describe a state that never persists and would make the projection meaningless.
 if [[ "${CHAMPHLA_EXECUTION_MODE:-full_scale}" == sequential_low_storage ]]; then
   bash "${CHAMPHLA_CODE_ROOT}/scripts/roihu_prune_sample_work.sh" \
-    "${CHAMPHLA_RUN_ROOT}" "${modality}" "${sample_id}"
+    "${CHAMPHLA_RUN_ROOT}" "${run_id}" "${run_role}" "${modality}" "${sample_id}"
 fi
 retained_disk=$(du -sb "${input_root}" "${sample_root}" | awk '{sum+=$1} END{print sum}')
 

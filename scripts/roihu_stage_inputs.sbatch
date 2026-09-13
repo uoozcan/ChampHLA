@@ -18,6 +18,10 @@ set -eo pipefail
 CODE_ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
 manifest=${1:?usage: roihu_stage_inputs.sbatch MANIFEST}
+run_id=${CHAMPHLA_RUN_ID:?CHAMPHLA_RUN_ID is required}
+run_role=${CHAMPHLA_RUN_ROLE:?CHAMPHLA_RUN_ROLE is required}
+[[ "${run_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]]
+[[ "${run_role}" =~ ^(technical_pilot|capacity_validation|production)$ ]]
 line_number=$((SLURM_ARRAY_TASK_ID + 1))
 # Tab is IFS whitespace, so `IFS=$'\t' read` collapses runs of tabs and silently drops
 # empty columns, shifting every later field. RNA rows have no index, so index_uri and
@@ -48,7 +52,7 @@ if [[ -z "${sample_id:-}" || -z "${modality:-}" ]]; then
 fi
 sample_root=${CHAMPHLA_INPUT_ROOT}/${modality}/${sample_id}
 stage_root=${sample_root}.staging.${SLURM_JOB_ID}
-quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/staging/${modality}/${sample_id}.${SLURM_JOB_ID}
+quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/staging/${run_id}/${run_role}/${modality}/${sample_id}.${SLURM_JOB_ID}
 
 # Staging is idempotent. A batch that is re-run after a partial failure will find its
 # earlier inputs still in place, and re-downloading a verified input wastes the transfer

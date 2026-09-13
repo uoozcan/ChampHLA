@@ -33,6 +33,8 @@ INDEPENDENCE_STRATA = {"new_library_overlap", "donor_independent", "not_applicab
 EXPECTED_REFERENCE = {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"}
 HEX64 = re.compile(r"^[0-9a-fA-F]{64}$")
 HEX32 = re.compile(r"^[0-9a-fA-F]{32}$")
+SAFE_RUN_ID = re.compile(r"^[a-z0-9][a-z0-9._-]{2,63}$")
+RUN_ROLES = {"technical_pilot", "capacity_validation", "production"}
 WORKFLOW_FORBIDDEN = (
     "errorStrategy 'ignore'",
     "? 'retry' : 'ignore'",
@@ -43,7 +45,8 @@ WORKFLOW_FORBIDDEN = (
 )
 
 RUN_LEDGER_FIELDS = (
-    "cohort", "sample_id", "donor_id", "modality", "caller", "state", "job_id",
+    "run_id", "run_role", "cohort", "sample_id", "donor_id", "modality", "caller",
+    "state", "job_id",
     "git_commit", "manifest_sha256", "exit_code", "runtime_seconds",
     "peak_memory_bytes", "peak_disk_bytes", "retained_disk_bytes", "output_sha256", "attempt",
     "supersedes_job_id", "updated_at_utc",
@@ -187,8 +190,17 @@ def freeze_run_manifest(path: str | Path, output: str | Path,
     return payload
 
 
+def validate_run_identity(run_id: str, run_role: str) -> None:
+    if not SAFE_RUN_ID.fullmatch(run_id):
+        raise ValueError("run_id must match ^[a-z0-9][a-z0-9._-]{2,63}$")
+    if run_role not in RUN_ROLES:
+        raise ValueError(f"unsupported run_role {run_role!r}")
+
+
 def initialize_run_ledger(manifest_path: str | Path, output: str | Path,
-                          git_commit: str = "", job_id: str = "") -> list[dict[str, str]]:
+                          run_id: str, run_role: str, git_commit: str = "",
+                          job_id: str = "") -> list[dict[str, str]]:
+    validate_run_identity(run_id, run_role)
     audit = audit_run_manifest(manifest_path)
     if not audit["passed"]:
         raise ValueError(f"run manifest failed: {audit['failures']}")
@@ -202,6 +214,7 @@ def initialize_run_ledger(manifest_path: str | Path, output: str | Path,
         modality = source["modality"].lower()
         for caller in PANELS[modality]:
             rows.append({
+                "run_id": run_id, "run_role": run_role,
                 "cohort": source["cohort"], "sample_id": source["sample_id"],
                 "donor_id": source["donor_id"], "modality": modality, "caller": caller,
                 "state": "submitted" if job_id else "pending", "job_id": job_id,
@@ -280,26 +293,94 @@ def _nearest_rank(values: list[int], quantile: float) -> int:
     return ordered[max(0, math.ceil(quantile * len(ordered)) - 1)]
 
 
-def assess_storage(pilot_ledger: str | Path, targets: dict[str, int],
+def assess_storage(pilot_ledgers: list[str | Path] | tuple[str | Path, ...],
+                   targets: dict[str, int],
                    available_bytes: int, output: str | Path | None = None,
                    availability_source: str = "project_allocation",
                    environment_inventory_sha256: str = "") -> dict:
-    rows = read_tsv(pilot_ledger)
-    by_modality: dict[str, list[int]] = {}
-    retained_by_modality: dict[str, list[int]] = {}
-    for row in rows:
-        if row.get("state") not in {"validated", "frozen"}:
-            continue
-        value = int(row.get("peak_disk_bytes", "0") or 0)
-        if value > 0:
-            by_modality.setdefault(row["modality"], []).append(value)
-        retained = int(row.get("retained_disk_bytes", "0") or 0)
-        if retained > 0:
-            retained_by_modality.setdefault(row["modality"], []).append(retained)
-    missing = sorted(
-        modality for modality in targets
-        if not by_modality.get(modality) or not retained_by_modality.get(modality)
+    paths = [Path(path) for path in pilot_ledgers]
+    if len(paths) != 3:
+        raise ValueError("storage gate requires exactly three modality pilot ledgers")
+    if set(targets) != set(EXPECTED_REFERENCE):
+        raise ValueError("storage gate targets must contain exactly wgs, wes, and rnaseq")
+    failures: list[str] = []
+    grouped: dict[tuple[str, str, str, str], list[dict[str, str]]] = defaultdict(list)
+    ledger_hashes = []
+    ledger_modalities = []
+    for path in paths:
+        if not path.is_file():
+            raise ValueError(f"pilot ledger missing: {path}")
+        ledger_hashes.append({"path": path.name, "sha256": sha256(path)})
+        ledger_rows = read_tsv(path)
+        modalities = {row.get("modality", "") for row in ledger_rows}
+        if len(modalities) != 1:
+            raise ValueError(f"pilot ledger must contain exactly one modality: {path}")
+        ledger_modalities.append(next(iter(modalities)))
+        for row in ledger_rows:
+            grouped[(row.get("run_id", ""), row.get("cohort", ""),
+                     row.get("modality", ""), row.get("sample_id", ""))].append(row)
+    if set(ledger_modalities) != set(EXPECTED_REFERENCE):
+        raise ValueError("pilot ledgers must represent wgs, wes, and rnaseq exactly once")
+
+    by_modality: dict[str, list[int]] = defaultdict(list)
+    retained_by_modality: dict[str, list[int]] = defaultdict(list)
+    sample_measurements = []
+    seen_samples: set[tuple[str, str, str]] = set()
+    measure_fields = (
+        "runtime_seconds", "peak_memory_bytes", "peak_disk_bytes", "retained_disk_bytes",
     )
+    for (run_id, cohort, modality, sample_id), rows in sorted(grouped.items()):
+        label = f"{modality}:{cohort}:{sample_id}"
+        sample_key = (cohort, modality, sample_id)
+        if sample_key in seen_samples:
+            failures.append(f"{label}: duplicated across pilot run IDs")
+            continue
+        seen_samples.add(sample_key)
+        if not run_id or any(row.get("run_id") != run_id for row in rows):
+            failures.append(f"{label}: missing or inconsistent run_id")
+        if any(row.get("run_role") != "technical_pilot" for row in rows):
+            failures.append(f"{label}: storage evidence is not technical_pilot")
+        expected_callers = set(PANELS.get(modality, ()))
+        observed_callers = {row.get("caller", "") for row in rows}
+        if len(rows) != len(expected_callers) or observed_callers != expected_callers:
+            failures.append(f"{label}: incomplete or duplicate caller rows")
+        if any(row.get("state") not in {"validated", "frozen"} for row in rows):
+            failures.append(f"{label}: not every caller row is validated")
+        values: dict[str, int] = {}
+        for field in measure_fields:
+            observed = {row.get(field, "") for row in rows}
+            if len(observed) != 1:
+                failures.append(f"{label}: inconsistent {field} across caller rows")
+                continue
+            try:
+                value = int(next(iter(observed)))
+            except (TypeError, ValueError):
+                value = 0
+            if value <= 0:
+                failures.append(f"{label}: {field} must be positive")
+            values[field] = value
+        if any(failure.startswith(label + ":") for failure in failures):
+            continue
+        peak = values["peak_disk_bytes"]
+        retained = values["retained_disk_bytes"]
+        if retained > peak:
+            failures.append(f"{label}: retained disk exceeds peak disk")
+            continue
+        by_modality[modality].append(peak)
+        retained_by_modality[modality].append(retained)
+        sample_measurements.append({
+            "run_id": run_id, "cohort": cohort, "modality": modality,
+            "sample_id": sample_id, **values,
+            "transient_disk_bytes": peak - retained,
+        })
+    missing = sorted(
+        modality for modality in targets if len(by_modality.get(modality, [])) != 2
+    )
+    for modality in missing:
+        failures.append(
+            f"{modality}: requires exactly two validated pilot samples; "
+            f"observed {len(by_modality.get(modality, []))}"
+        )
     p95 = {modality: _nearest_rank(values, 0.95) for modality, values in by_modality.items()}
     retained_p95 = {
         modality: _nearest_rank(values, 0.95)
@@ -319,9 +400,9 @@ def assess_storage(pilot_ledger: str | Path, targets: dict[str, int],
         retained_projected + math.ceil(1.25 * max(transient_p95.values(), default=0)) + reserve
     )
     source_valid = availability_source == "project_allocation"
-    full_scale_passed = source_valid and not missing and int(available_bytes) >= required
+    full_scale_passed = source_valid and not failures and int(available_bytes) >= required
     sequential_passed = (
-        source_valid and not missing and int(available_bytes) >= sequential_required
+        source_valid and not failures and int(available_bytes) >= sequential_required
     )
     execution_mode = (
         "full_scale" if full_scale_passed
@@ -329,7 +410,7 @@ def assess_storage(pilot_ledger: str | Path, targets: dict[str, int],
         else "blocked"
     )
     result = {
-        "schema_version": "champhla-roihu-storage-gate-2",
+        "schema_version": "champhla-roihu-storage-gate-3",
         "passed": full_scale_passed or sequential_passed,
         "full_scale_passed": full_scale_passed,
         "sequential_low_storage_passed": sequential_passed,
@@ -345,8 +426,15 @@ def assess_storage(pilot_ledger: str | Path, targets: dict[str, int],
         "observed_available_bytes": int(available_bytes),
         "availability_source": availability_source,
         "environment_inventory_sha256": environment_inventory_sha256,
+        "pilot_ledgers": ledger_hashes,
+        "pilot_sample_measurements": sample_measurements,
+        "validated_pilot_samples_by_modality": {
+            modality: len(values) for modality, values in sorted(by_modality.items())
+        },
         "missing_pilot_modalities": missing,
-        "failures": ([] if source_valid else ["availability must come from project allocation"]),
+        "failures": failures + (
+            [] if source_valid else ["availability must come from project allocation"]
+        ),
         "policy": (
             "full scale: available >= 1.25 * summed peak + 100 GiB; "
             "sequential: available >= projected retained + 1.25 * largest transient + 100 GiB"
@@ -473,6 +561,8 @@ def validate_workflow_lock(lock_path: str | Path, project_root: str | Path) -> d
                     failures.append(f"workflow forbidden token {token!r}: {relative}")
     required = {
         "workflow/main.nf", "workflow/nextflow.config", "workflow/conf/roihu_params.yaml",
+        "workflow/conf/polysolver_wrapper_patch.json",
+        "workflow/bin/patch_polysolver_wrapper.py",
         *{f"workflow/modules/{name}.nf" for name in (
             "arcashla", "bam_to_fastq", "hlahd", "kourami", "optitype",
             "polysolver", "spechla", "t1k",
@@ -496,7 +586,7 @@ def freeze_workflow_lock(project_root: str | Path, workflow_root: str | Path,
     workflow.relative_to(project)
     selected = sorted(
         item for item in workflow.rglob("*")
-        if item.is_file() and item.suffix in {".nf", ".config", ".yaml", ".py"}
+        if item.is_file() and item.suffix in {".nf", ".config", ".yaml", ".json", ".py"}
     )
     files = {item.relative_to(project).as_posix(): sha256(item) for item in selected}
     payload = {
@@ -688,19 +778,55 @@ CALLER_SUFFIX = {
 
 
 def collect_run_outputs(caller_root: str | Path, manifest_path: str | Path,
-                        output: str | Path, summary_output: str | Path) -> dict:
+                        ledger_paths: list[str | Path] | tuple[str | Path, ...],
+                        output: str | Path,
+                        summary_output: str | Path) -> dict:
     manifest_audit = audit_run_manifest(manifest_path)
     if not manifest_audit["passed"]:
         raise ValueError(f"run manifest failed: {manifest_audit['failures']}")
     root = Path(caller_root)
     output_rows = []
     failures = []
+    paths = [Path(path) for path in ledger_paths]
+    if not paths:
+        raise ValueError("at least one production ledger is required")
+    ledger_rows = [row for path in paths for row in read_tsv(path)]
+    if not ledger_rows:
+        raise ValueError("run ledger is empty")
+    run_ids = {row.get("run_id", "") for row in ledger_rows}
+    run_roles = {row.get("run_role", "") for row in ledger_rows}
+    if len(run_ids) != 1 or not next(iter(run_ids), ""):
+        failures.append("ledger_run_id_not_unique")
+    if run_roles != {"production"}:
+        failures.append("canonical collection requires run_role=production")
+    if any(row.get("state") not in {"validated", "frozen"} for row in ledger_rows):
+        failures.append("ledger_contains_unvalidated_rows")
+    if any(row.get("manifest_sha256") != manifest_audit["source_sha256"]
+           for row in ledger_rows):
+        failures.append("ledger_manifest_hash_mismatch")
+    run_id = next(iter(run_ids), "")
+    expected_ledger_keys = {
+        (sample["cohort"], sample["sample_id"], sample["modality"], caller)
+        for sample in read_tsv(manifest_path) for caller in PANELS[sample["modality"]]
+    }
+    observed_ledger_keys = [
+        (row.get("cohort", ""), row.get("sample_id", ""), row.get("modality", ""),
+         row.get("caller", "")) for row in ledger_rows
+    ]
+    if (len(observed_ledger_keys) != len(expected_ledger_keys)
+            or set(observed_ledger_keys) != expected_ledger_keys):
+        failures.append("ledger_production_matrix_mismatch")
     for sample in read_tsv(manifest_path):
         modality = sample["modality"]
         sample_id = sample["sample_id"]
         sample_root = root / modality / sample_id
         if not (sample_root / "CALLERS_COMPLETE").is_file():
             failures.append(f"{modality}:{sample_id}:completion_marker_missing")
+            continue
+        identity = sample_root / "run_identity.txt"
+        expected_identity = f"run_id={run_id}\nrun_role=production\n"
+        if not identity.is_file() or identity.read_text(encoding="utf-8") != expected_identity:
+            failures.append(f"{modality}:{sample_id}:run_identity_mismatch")
             continue
         validation_path = sample_root / "caller_output_validation.tsv"
         validation = read_tsv(validation_path) if validation_path.is_file() else []
@@ -725,6 +851,7 @@ def collect_run_outputs(caller_root: str | Path, manifest_path: str | Path,
                     continue
                 output_rows.append({
                     "cohort": sample["cohort"], "subject": sample_id,
+                    "run_id": run_id, "run_role": "production",
                     "donor": sample["donor_id"],
                     "independence_stratum": sample["independence_stratum"],
                     "evidence_role": sample["evidence_role"], "modality": modality,
@@ -740,9 +867,13 @@ def collect_run_outputs(caller_root: str | Path, manifest_path: str | Path,
                                       row["gene"], row["caller"]),
     ))
     summary = {
-        "schema_version": "champhla-roihu-native-output-collection-1",
+        "schema_version": "champhla-roihu-native-output-collection-2",
         "passed": passed, "truth_blind": True, "expected_records": expected,
         "observed_records": len(output_rows), "manifest_sha256": sha256(manifest_path),
+        "ledger_sha256": [
+            {"path": path.name, "sha256": sha256(path)} for path in paths
+        ], "run_id": run_id,
+        "run_role": "production",
         "output_sha256": sha256(output), "failures": failures,
         "partial_records": sum(row["call_status"] == "partial" for row in output_rows),
         "missing_records": sum(row["call_status"] == "missing" for row in output_rows),

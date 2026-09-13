@@ -440,10 +440,16 @@ def initialize_run_ledger_main() -> int:
     parser = argparse.ArgumentParser(description="Create the caller-level Roihu run ledger")
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--run-id", required=True)
+    parser.add_argument("--run-role", required=True,
+                        choices=("technical_pilot", "capacity_validation", "production"))
     parser.add_argument("--git-commit", default="")
     parser.add_argument("--job-id", default="")
     args = parser.parse_args()
-    rows = initialize_run_ledger(args.manifest, args.output, args.git_commit, args.job_id)
+    rows = initialize_run_ledger(
+        args.manifest, args.output, args.run_id, args.run_role,
+        args.git_commit, args.job_id,
+    )
     print(f"run ledger records={len(rows)}")
     return 0
 
@@ -571,7 +577,8 @@ def validate_workflow_lock_main() -> int:
 
 def assess_roihu_storage_main() -> int:
     parser = argparse.ArgumentParser(description="Apply the pilot-derived Roihu storage gate")
-    parser.add_argument("--pilot-ledger", required=True)
+    parser.add_argument("--pilot-ledger", required=True, action="append",
+                        help="repeat exactly once for each WGS, WES, and RNA pilot ledger")
     parser.add_argument("--targets", required=True, help="JSON mapping modality to sample count")
     parser.add_argument("--environment-inventory", required=True)
     parser.add_argument("--output", required=True)
@@ -616,10 +623,14 @@ def collect_roihu_outputs_main() -> int:
     parser = argparse.ArgumentParser(description="Collect and reparse complete Roihu caller outputs")
     parser.add_argument("--caller-root", required=True)
     parser.add_argument("--manifest", required=True)
+    parser.add_argument("--ledger", required=True, action="append",
+                        help="repeat for each deterministic production batch ledger")
     parser.add_argument("--output", required=True)
     parser.add_argument("--summary", required=True)
     args = parser.parse_args()
-    result = collect_run_outputs(args.caller_root, args.manifest, args.output, args.summary)
+    result = collect_run_outputs(
+        args.caller_root, args.manifest, args.ledger, args.output, args.summary,
+    )
     print(f"caller collection passed={result['passed']} records={result['observed_records']}")
     return 0 if result["passed"] else 2
 

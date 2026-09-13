@@ -13,15 +13,19 @@
 # always retained.
 set -euo pipefail
 
-run_root=${1:?usage: roihu_prune_sample_work.sh RUN_ROOT MODALITY SAMPLE}
-modality=${2:?usage: roihu_prune_sample_work.sh RUN_ROOT MODALITY SAMPLE}
-sample_id=${3:?usage: roihu_prune_sample_work.sh RUN_ROOT MODALITY SAMPLE}
+run_root=${1:?usage: roihu_prune_sample_work.sh RUN_ROOT RUN_ID RUN_ROLE MODALITY SAMPLE}
+run_id=${2:?usage: roihu_prune_sample_work.sh RUN_ROOT RUN_ID RUN_ROLE MODALITY SAMPLE}
+run_role=${3:?usage: roihu_prune_sample_work.sh RUN_ROOT RUN_ID RUN_ROLE MODALITY SAMPLE}
+modality=${4:?usage: roihu_prune_sample_work.sh RUN_ROOT RUN_ID RUN_ROLE MODALITY SAMPLE}
+sample_id=${5:?usage: roihu_prune_sample_work.sh RUN_ROOT RUN_ID RUN_ROLE MODALITY SAMPLE}
 [[ "${run_root}" == /scratch/project_2008084/champhla_plurality_runs* ]]
+[[ "${run_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]]
+[[ "${run_role}" =~ ^(technical_pilot|capacity_validation|production)$ ]]
 [[ "${modality}" =~ ^(wgs|wes|rnaseq)$ ]]
 [[ "${sample_id}" =~ ^[A-Za-z0-9._-]+$ ]]
 
-sample_root=${run_root}/caller_outputs/${modality}/${sample_id}
-work_root=${run_root}/work/${modality}/${sample_id}
+sample_root=${run_root}/caller_outputs/${run_id}/${run_role}/${modality}/${sample_id}
+work_root=${run_root}/work/${run_id}/${run_role}/${modality}/${sample_id}
 test -f "${sample_root}/CALLERS_COMPLETE"
 test -s "${sample_root}/caller_output_validation.tsv"
 test -s "${sample_root}/prediction_files_sha256.txt"

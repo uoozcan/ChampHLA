@@ -29,8 +29,8 @@
       "threads": 4,
       "memory": "process_high; Slurm sample envelope 180 GiB",
       "artifact_sha256": "8fb9fa5ec3392c282f02374e1a42a51cc30e1adb3cc7e7a6d96791b0bc593810",
-      "source_sha256": "eaf561d22ded19d919d8ea9528953a5eaed186aa704b2cce61f6d16238fd64e9",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "source_sha256": "a9740ed22ced741c3451ac974c0d590f9a30e3ddcb6e72cd6b6907ffcb1e4229",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "reference_artifacts": [
         {
           "artifact_id": "HLA_gene.split.txt",
@@ -60,8 +60,8 @@
       "threads": 4,
       "memory": "process_high; Java 10 GiB; Slurm sample envelope 180 GiB",
       "artifact_sha256": "c267052e9621579b569110b07c64fc916a968b1a9fa0776681c8dd31fe44d3c9",
-      "source_sha256": "d46ca2941c0ef4df3c5ae04c63f349eb4d5c3c6a2c598083854f5d84d26a7f74",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "source_sha256": "5d94732199d4425b049e391792e9631ff41bf627150f4b975868944c2aa99495",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "reference_artifacts": [
         {
           "artifact_id": "db/VERSION.txt",
@@ -97,8 +97,8 @@
       "threads": 4,
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "7f3f32904a25bd6936e38de1092acb307b5239567b8923c4526aac1007c5684a",
-      "source_sha256": "7bfd890f8e1a060deb566691f4e308e113931a649562431750648459654fd10d",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "source_sha256": "23d80067ffc6a780ae2b6bdeec8b0b5f030d625bc90ce149813f71f510dd1fa8",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "reference_artifacts": [
         {
           "artifact_id": "data/alleles.h5",
@@ -128,12 +128,12 @@
       "deployable": true,
       "primary_family": true,
       "disposition_reason": "included in each compatible intended-use panel; database release established from content against pinned official per-release allele lists",
-      "command": "bash patched_shell_call_hla_type {fixed_bam} Unknown 0 hg38 STDFQ 0 {output_dir}",
+      "command": "patch_polysolver_wrapper.py --source {pinned_wrapper} --contig {bam_header_6_or_chr6} --tmp-dir {sample_tmp}; bash {derived_wrapper} {region_plus_unmapped_fixed_bam} Unknown 0 hg38 STDFQ 0 {output_dir}",
       "threads": 4,
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "b4f39a6dd86d138d8ec15a73cf4b2d33fbc069c84c3b7de4117b4892b65767da",
-      "source_sha256": "25f813010aa9454f34ac30321aa11c27545e33f40ca540a0ca88fbbe6cb8b461",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "source_sha256": "2fec618d6fb08c7e7119e745f5bf3ae7599cc4827d6a9030c0b85cc6b9dfb831",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "reference_artifacts": [
         {
           "artifact_id": "a_complete.3100.new.eb.fasta",
@@ -146,6 +146,14 @@
         {
           "artifact_id": "c_complete.3100.new.eb.fasta",
           "sha256": "627198757d834acc160952a9ae23c80b8e6da52d15d2fcc8892933a73a9bc6d7"
+        },
+        {
+          "artifact_id": "scripts/shell_call_hla_type (immutable source)",
+          "sha256": "bcc2c4c5a1c7b2f3547111002aa2f4e7e244115aac3dd2c263f0b47d9e7b7fab"
+        },
+        {
+          "artifact_id": "workflow/conf/polysolver_wrapper_patch.json",
+          "sha256": "eb904bedeacb7c223f836c112c7c9aa173113b04c799a4cf226b76ba5e691afa"
         }
       ]
     },
@@ -168,8 +176,8 @@
       "threads": 4,
       "memory": "process_high; Slurm sample envelope 180 GiB",
       "artifact_sha256": "77c7b6ef5ad704d0731c6895aca367081f39ca6529206be18070e319ae94ba2b",
-      "source_sha256": "95864b6c6bd1e360e7f4b609b776eb18552aeacaf91ceb1b3b8695605314de4b",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "source_sha256": "a806198e69a93f609c088f2565a347b2eb530f0387582ceeceaa6e4be2107874",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "reference_artifacts": [
         {
           "artifact_id": "db/HLA/Allelelist.txt",
@@ -209,8 +217,8 @@
       "threads": 4,
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "e34c4433021cc21c16a54c8ce6bef6d8b1bd367dddc2920afd4053d053b44c3c",
-      "source_sha256": "8f9e416a6c9babb6e80648b0eb43521999a13b4becb3007dbd74dd6f8164d55f",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "source_sha256": "3c881e22a12d4d546576964421788895fb151bed78cb927dfa5dec888c97caae",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "reference_artifacts": [
         {
           "artifact_id": "hla.dat",
@@ -244,8 +252,8 @@
       "threads": 4,
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "60c42737ccb8c0fa91beef256437028b64d75451ca16e4bf90bb849ba0b6c05c",
-      "source_sha256": "764a69320fa314257ccbb49c57e91ecb24bee28526bb74a6f7d387a024887dbe",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "source_sha256": "6336d6946dbdd392bed164e0d06cf7fa44853f97006e85e32f518da80e0c2694",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "reference_artifacts": [
         {
           "artifact_id": "dat/IMGTHLA/hla.dat",
@@ -262,7 +270,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "method_id": "ChampionChallenger",
       "kind": "integration",
       "modalities": [
@@ -291,7 +299,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "method_id": "TwoThirdsGuardedCC",
       "kind": "integration",
       "modalities": [
@@ -320,7 +328,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "method_id": "MVFlooredCC",
       "kind": "integration",
       "modalities": [
@@ -353,7 +361,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "method_id": "SimpleTwoThirdsConsensus",
       "kind": "abstaining_baseline",
       "modalities": [
@@ -382,7 +390,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "method_id": "MetaConsensus",
       "kind": "historical_ablation",
       "modalities": [
@@ -411,7 +419,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "method_id": "BestSingleTool_nestedCV",
       "kind": "historical_selection",
       "modalities": [
@@ -510,7 +518,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "3d7616c7d79191d2836b8c42cb021f5b78a02c6af9253bfebe78a686d578df4e",
+      "workflow_hash": "08e0803caeaf2398d988036743c6f9ddac7061e16811ce6223e22144a77c28c1",
       "method_id": "CandidateSetOracle",
       "kind": "oracle",
       "modalities": [
