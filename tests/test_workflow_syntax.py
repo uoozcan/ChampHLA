@@ -190,3 +190,20 @@ def test_embedded_python_avoids_f_strings(path: Path):
         if re.search(r"""\bf["']""", line)
     ]
     assert not offenders, offenders
+
+
+def test_polysolver_never_calls_bare_samtools():
+    """Tool availability is per-container.
+
+    The POLYSOLVER image has no bare `samtools` on PATH; it ships
+    /home/polysolver/binaries/samtools (0.1.18-dev), which is why every original line in
+    the module calls it by absolute path. An extraction block copied from another module
+    used the bare name and died with exit 127, `samtools: command not found`.
+    """
+    text = (ROOT / "workflow/modules/polysolver.nf").read_text(encoding="utf-8")
+    offenders = [
+        f"{number}: {line.strip()[:80]}"
+        for number, line in enumerate(text.splitlines(), 1)
+        if re.search(r"(?<![/\w])samtools ", line) and "binaries/samtools" not in line
+    ]
+    assert not offenders, offenders

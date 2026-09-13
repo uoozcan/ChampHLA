@@ -10,7 +10,7 @@
     "workflow/modules/hlahd.nf": "a9740ed22ced741c3451ac974c0d590f9a30e3ddcb6e72cd6b6907ffcb1e4229",
     "workflow/modules/kourami.nf": "5d94732199d4425b049e391792e9631ff41bf627150f4b975868944c2aa99495",
     "workflow/modules/optitype.nf": "23d80067ffc6a780ae2b6bdeec8b0b5f030d625bc90ce149813f71f510dd1fa8",
-    "workflow/modules/polysolver.nf": "c365dd6de8408e7428d0731aaa5f4c5a065cd2347de71c75642447623e50910f",
+    "workflow/modules/polysolver.nf": "2f6d91d4fc4b754867869b658e028d4b3424e23dd5aee8a39253a9ac4f416602",
     "workflow/modules/spechla.nf": "a806198e69a93f609c088f2565a347b2eb530f0387582ceeceaa6e4be2107874",
     "workflow/modules/t1k.nf": "3c881e22a12d4d546576964421788895fb151bed78cb927dfa5dec888c97caae",
     "workflow/nextflow.config": "4dc8fcef5b6231daa105c7a17a0dfbfa2025f9a9bfed02661640224ccc011a17"

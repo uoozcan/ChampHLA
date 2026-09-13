@@ -25,14 +25,14 @@ process POLYSOLVER {
     # unmapped reads instead, exactly as HLAHD_BAM does. The unmapped reads matter:
     # POLYSOLVER uses them to recover HLA reads that failed to map to the reference.
     if [ ! -f "${bam}.bai" ] && [ ! -f "${bam.baseName}.bai" ]; then
-        samtools index ${bam}
+        /home/polysolver/binaries/samtools index ${bam}
     fi
-    samtools view -H ${bam} > hla_header.sam
+    /home/polysolver/binaries/samtools view -H ${bam} > hla_header.sam
     grep -E '^@SQ.*SN:(chr6|6)[[:space:]]' hla_header.sam > /dev/null
     chr=\$(awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}' hla_header.sam)
-    samtools view -b -h ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" > hla_region.bam
-    samtools view -b -f 4 ${bam} > unmapped.bam
-    samtools merge -f polysolver_input.bam hla_region.bam unmapped.bam
+    /home/polysolver/binaries/samtools view -b -h ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" > hla_region.bam
+    /home/polysolver/binaries/samtools view -b -f 4 ${bam} > unmapped.bam
+    /home/polysolver/binaries/samtools merge -f polysolver_input.bam hla_region.bam unmapped.bam
     rm -f hla_region.bam unmapped.bam
 
     /home/polysolver/binaries/samtools sort -n polysolver_input.bam ${sample_id}_namesort
