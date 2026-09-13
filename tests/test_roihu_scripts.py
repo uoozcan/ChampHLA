@@ -293,9 +293,38 @@ def test_staging_is_idempotent_for_a_verified_input():
     text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
     assert "already staged and verified" in text
     # Reuse is conditional on the completion marker and on the checksums still matching.
-    assert "STAGE_COMPLETE" in text and "sha256sum --check --status staged_files_sha256.txt" in text
+    assert "STAGE_COMPLETE" in text
+    assert "sha256sum --check --status" in text
     # An unverifiable stage is quarantined, never silently reused.
     assert "failed verification; quarantining" in text
     assert 'mv "${sample_root}" "${quarantine}.unverified"' in text
     # The reuse check must precede the guard it replaces.
     assert text.index("already staged and verified") < text.index('test ! -e "${sample_root}"')
+
+
+def test_staged_checksums_use_relative_names():
+    """The staging directory is renamed at the end of staging.
+
+    Absolute paths recorded against `<sample>.staging.<jobid>` never exist afterwards, so
+    `sha256sum --check` could never succeed and the reuse path quarantined good inputs and
+    re-downloaded them. The record must survive the rename.
+    """
+    text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
+    # Generated from inside the directory, by relative name.
+    assert "cd \"${stage_root}\" && find . -maxdepth 1" in text
+    assert r"-printf '%P\0'" in text
+    # The old absolute-path form must be gone.
+    assert 'find "${stage_root}" -maxdepth 1 -type f ! -name staged_files_sha256.txt -print0' not in text
+    # Verification tolerates the legacy absolute-path records already on disk.
+    assert "sed 's|  .*/|  |' staged_files_sha256.txt" in text
+
+
+def test_staging_rename_would_invalidate_absolute_checksums():
+    """Guard the invariant directly: the record is written before the rename.
+
+    Anything absolute in it is therefore stale by construction.
+    """
+    text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
+    written = text.index("staged_files_sha256.txt )")
+    renamed = text.index('mv "${stage_root}" "${sample_root}"')
+    assert written < renamed, "checksums must be written before the directory is renamed"

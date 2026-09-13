@@ -55,8 +55,11 @@ quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/staging/${modality}/${sample_id}.${SL
 # without changing anything. Accept an existing stage only if it is complete and every
 # file still matches the checksum recorded when it was staged.
 if [[ -e "${sample_root}" ]]; then
+  # Strip any leading directory so both the relative format written now and the legacy
+  # absolute-path format verify against the files where they actually are.
   if [[ -f "${sample_root}/STAGE_COMPLETE" && -s "${sample_root}/staged_files_sha256.txt" ]] \
-     && (cd "${sample_root}" && sha256sum --check --status staged_files_sha256.txt); then
+     && (cd "${sample_root}" && sed 's|  .*/|  |' staged_files_sha256.txt \
+         | sha256sum --check --status); then
     echo "already staged and verified: ${modality}/${sample_id}"
     exit 0
   fi
@@ -188,8 +191,9 @@ else
   exit 3
 fi
 
-find "${stage_root}" -maxdepth 1 -type f ! -name staged_files_sha256.txt -print0 \
-  | sort -z | xargs -0 sha256sum > "${stage_root}/staged_files_sha256.txt"
+# Relative names, so the record still verifies after the directory is renamed below.
+( cd "${stage_root}" && find . -maxdepth 1 -type f ! -name staged_files_sha256.txt -printf '%P\0' \
+  | sort -z | xargs -0 sha256sum > staged_files_sha256.txt )
 test -s "${stage_root}/staged_files_sha256.txt"
 touch "${stage_root}/STAGE_COMPLETE"
 mv "${stage_root}" "${sample_root}"
