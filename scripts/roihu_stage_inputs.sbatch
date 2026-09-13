@@ -49,6 +49,22 @@ fi
 sample_root=${CHAMPHLA_INPUT_ROOT}/${modality}/${sample_id}
 stage_root=${sample_root}.staging.${SLURM_JOB_ID}
 quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/staging/${modality}/${sample_id}.${SLURM_JOB_ID}
+
+# Staging is idempotent. A batch that is re-run after a partial failure will find its
+# earlier inputs still in place, and re-downloading a verified input wastes the transfer
+# without changing anything. Accept an existing stage only if it is complete and every
+# file still matches the checksum recorded when it was staged.
+if [[ -e "${sample_root}" ]]; then
+  if [[ -f "${sample_root}/STAGE_COMPLETE" && -s "${sample_root}/staged_files_sha256.txt" ]] \
+     && (cd "${sample_root}" && sha256sum --check --status staged_files_sha256.txt); then
+    echo "already staged and verified: ${modality}/${sample_id}"
+    exit 0
+  fi
+  # Present but not verifiable: a broken stage, not a resumable one.
+  echo "existing stage for ${modality}/${sample_id} failed verification; quarantining" >&2
+  mkdir -p "$(dirname "${quarantine}")"
+  mv "${sample_root}" "${quarantine}.unverified"
+fi
 test ! -e "${sample_root}"
 test ! -e "${stage_root}"
 test ! -e "${quarantine}"

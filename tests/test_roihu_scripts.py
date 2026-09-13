@@ -282,3 +282,20 @@ def test_polysolver_receives_an_extract_not_the_whole_bam():
     # The sorts must run on the extract, never on the incoming BAM.
     assert "sort -n polysolver_input.bam" in text
     assert "sort -n ${bam}" not in text
+
+
+def test_staging_is_idempotent_for_a_verified_input():
+    """A batch re-run after a partial failure finds its earlier inputs still in place.
+
+    `test ! -e "${sample_root}"` aborted in under a second in exactly that state, which
+    would have forced a 5.3 GB re-download to reach a state already reached.
+    """
+    text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
+    assert "already staged and verified" in text
+    # Reuse is conditional on the completion marker and on the checksums still matching.
+    assert "STAGE_COMPLETE" in text and "sha256sum --check --status staged_files_sha256.txt" in text
+    # An unverifiable stage is quarantined, never silently reused.
+    assert "failed verification; quarantining" in text
+    assert 'mv "${sample_root}" "${quarantine}.unverified"' in text
+    # The reuse check must precede the guard it replaces.
+    assert text.index("already staged and verified") < text.index('test ! -e "${sample_root}"')
