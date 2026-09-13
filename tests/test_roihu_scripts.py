@@ -328,3 +328,20 @@ def test_staging_rename_would_invalidate_absolute_checksums():
     written = text.index("staged_files_sha256.txt )")
     renamed = text.index('mv "${stage_root}" "${sample_root}"')
     assert written < renamed, "checksums must be written before the directory is renamed"
+
+
+def test_task_diagnostics_survive_the_work_release():
+    """Reclaiming work must not destroy the record of why a task failed.
+
+    Nextflow keeps each task's stderr, stdout and script in its work directory; the parent
+    log holds only a truncated excerpt. Pruning work without copying these first left a
+    POLYSOLVER failure undiagnosable.
+    """
+    text = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert "preserve_task_diagnostics" in text
+    for name in (".command.err", ".command.log", ".command.sh", ".exitcode"):
+        assert name in text, f"{name} is not preserved"
+    # Copy must happen before the release, or it preserves nothing.
+    assert text.index('preserve_task_diagnostics "${work_root}"') < text.index('rm -rf "${work_root}"')
+    # Capped, so a runaway log cannot defeat the reclamation.
+    assert "tail -c 1000000" in text

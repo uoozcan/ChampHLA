@@ -64,6 +64,24 @@ ledger_transition() {
     --modality "${modality}" "$@"
 }
 ledger_transition --state running --job-id "${SLURM_JOB_ID}"
+preserve_task_diagnostics() {
+  # Nextflow keeps each task's stderr, stdout and script in its work directory, and the
+  # parent log records only a truncated excerpt. Releasing work without copying these
+  # first leaves a failure undiagnosable, so they are saved into the quarantine. Each is
+  # capped, so an enormous log cannot defeat the point of reclaiming the space.
+  local work_root=$1 dest=$2 task rel name
+  [[ -d "${work_root}" ]] || return 0
+  mkdir -p "${dest}"
+  while IFS= read -r -d '' task; do
+    rel=$(basename "$(dirname "${task}")")$(basename "${task}")
+    for name in .command.sh .command.err .command.log .command.out .exitcode; do
+      if [[ -f "${task}/${name}" ]]; then
+        tail -c 1000000 "${task}/${name}" > "${dest}/${rel}${name}" 2>/dev/null || true
+      fi
+    done
+  done < <(find "${work_root}" -mindepth 2 -maxdepth 2 -type d -print0 2>/dev/null)
+}
+
 reap_nextflow_children() {
   # Nextflow submits each process as its own Slurm job named nf-<PROCESS>_(<tag>), and
   # they survive the parent. Cancel only those carrying this sample's tag, so a
@@ -111,6 +129,7 @@ on_failure() {
     mkdir -p "${quarantine}"
     du -sb "${work_root}" 2>/dev/null | awk '{print "failed_work_bytes=" $1}' \
       > "${quarantine}/WORK_SIZE_AT_FAILURE" || true
+    preserve_task_diagnostics "${work_root}" "${quarantine}/work_diagnostics"
     if [[ "${CHAMPHLA_EXECUTION_MODE:-full_scale}" == sequential_low_storage ]]; then
       rm -rf "${work_root}"
     fi
