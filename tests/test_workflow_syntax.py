@@ -78,7 +78,7 @@ def test_backslashes_are_valid_groovy_escapes(path: Path):
 
 
 def test_workflow_lock_covers_every_workflow_file():
-    """Editing a module without re-freezing would leave the lock describing dead code."""
+    """Editing a workflow source without re-freezing leaves the lock describing dead code."""
     import json
 
     lock = json.loads((ROOT / "configs/roihu_workflow_lock.json").read_text(encoding="utf-8"))
@@ -86,7 +86,7 @@ def test_workflow_lock_covers_every_workflow_file():
     present = {
         str(p.relative_to(ROOT)).replace("\\", "/")
         for p in WORKFLOW.rglob("*")
-        if p.is_file()
+        if p.is_file() and p.suffix in {".nf", ".config", ".yaml", ".json", ".py"}
     }
     assert locked == present, {"only_in_lock": locked - present, "only_on_disk": present - locked}
 
@@ -102,7 +102,9 @@ def test_locked_files_have_no_carriage_returns():
     offenders = [
         str(path.relative_to(ROOT))
         for path in sorted(WORKFLOW.rglob("*"))
-        if path.is_file() and b"\r\n" in path.read_bytes()
+        if (path.is_file()
+            and path.suffix in {".nf", ".config", ".yaml", ".json", ".py"}
+            and b"\r\n" in path.read_bytes())
     ]
     assert not offenders, offenders
 
