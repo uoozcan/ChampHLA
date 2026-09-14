@@ -14,6 +14,18 @@
     "one_time_truth_join": true,
     "overwrite_joined_outputs": false
   },
+  "remote_cram_transport": {
+    "implementation_version": "stage-transport-v2",
+    "maximum_attempts": 2,
+    "attempt_timeout_seconds": 18000,
+    "backoff_seconds": 60,
+    "retry_scope": "allowlisted remote transport failures only",
+    "attempt_directories_unique": true,
+    "attempt_ledger_immutable": true,
+    "source_checksum_semantics": "declared upstream identity; not locally verified for streamed full CRAM",
+    "derived_hla_bam_sha256_required": true,
+    "failed_attempts_quarantined": true
+  },
   "modalities": {
     "wgs": {
       "input": "full CRAM",

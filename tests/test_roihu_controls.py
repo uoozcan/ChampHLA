@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -19,10 +20,19 @@ from champhla_confirmation.roihu import (
     directory_tree_identity,
     freeze_workflow_lock,
     initialize_run_ledger,
+    reconcile_terminal_run_sample,
     freeze_run_manifest,
     transition_run_record,
     transition_run_sample,
     validate_workflow_lock,
+)
+from champhla_confirmation.staging import (
+    build_run_disposition,
+    classify_stage_failure,
+    initialize_stage_ledger,
+    transition_stage_attempt,
+    validate_certificate_pair,
+    finalize_sample,
 )
 from champhla_recovery.recount import independent_recount
 
@@ -44,6 +54,120 @@ def manifest_row(modality="wes", sample="S1"):
         "read_layout": "paired", "independence_stratum": "new_library_overlap",
         "evidence_role": "same_resource_confirmation",
     }
+
+
+@pytest.mark.parametrize("message", [
+    "Container header CRC32 failure", "connection reset by peer",
+    "operation timed out", "temporary failure in name resolution",
+    "HTTP response code 429", "HTTP 503 Service Unavailable",
+])
+def test_remote_stage_failure_transient_allowlist(message):
+    result = classify_stage_failure(1, message, "https://example.org/a.cram")
+    assert result["failure_class"] == "transient_transport"
+    assert result["retryable"] is True
+
+
+@pytest.mark.parametrize("message", [
+    "HTTP 403 Forbidden", "HTTP 404 Not Found", "reference mismatch",
+    "unknown contig chr6", "checksum mismatch", "no such file",
+    "some generic failure",
+])
+def test_stage_failure_deterministic(message):
+    result = classify_stage_failure(1, message, "https://example.org/a.cram")
+    assert result["failure_class"] == "deterministic"
+    assert result["retryable"] is False
+
+
+def test_remote_stage_timeout_is_retryable_but_local_timeout_is_not():
+    assert classify_stage_failure(124, "", "https://example.org/a.cram")["retryable"]
+    assert not classify_stage_failure(124, "", "/data/a.cram")["retryable"]
+
+
+def test_stage_attempt_ledger_is_append_only_and_validated(tmp_path: Path):
+    manifest = tmp_path / "manifest.tsv"
+    ledger = tmp_path / "stage.tsv"
+    write_tsv(manifest, [manifest_row()], MANIFEST_FIELDS)
+    initialize_stage_ledger(manifest, ledger, "pilot-wes-stagev2", "technical_pilot")
+    transition_stage_attempt(ledger, "C", "S1", "wes", 1, "submitted",
+                             scheduler_job_id="101")
+    transition_stage_attempt(ledger, "C", "S1", "wes", 1, "running")
+    transition_stage_attempt(ledger, "C", "S1", "wes", 1, "failed",
+                             exit_code="1", failure_class="transient_transport")
+    transition_stage_attempt(ledger, "C", "S1", "wes", 2, "submitted", True,
+                             scheduler_job_id="101", superseded_attempt="1")
+    transition_stage_attempt(ledger, "C", "S1", "wes", 2, "running")
+    with pytest.raises(ValueError, match="requires exit_code=0"):
+        transition_stage_attempt(ledger, "C", "S1", "wes", 2, "validated")
+    transition_stage_attempt(ledger, "C", "S1", "wes", 2, "validated",
+                             exit_code="0", extracted_sha256="f" * 64)
+    rows = read_tsv(ledger)
+    assert [row["state"] for row in rows] == ["failed", "validated"]
+    with pytest.raises(ValueError, match="unique"):
+        transition_stage_attempt(ledger, "C", "S1", "wes", 2, "submitted", True)
+
+
+def test_certificate_pair_detects_match_mismatch_and_expiry(tmp_path: Path, monkeypatch):
+    identity, certificate = tmp_path / "id", tmp_path / "id-cert.pub"
+    identity.write_text("private-not-reported", encoding="utf-8")
+    certificate.write_text("certificate", encoding="utf-8")
+    fingerprint = "SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    cert_fingerprint = fingerprint
+
+    def fake_run(command, **kwargs):
+        nonlocal cert_fingerprint
+        if command[1] == "-y":
+            return subprocess.CompletedProcess(command, 0, "ssh-ed25519 AAAA\n", "")
+        if command[1] == "-lf":
+            return subprocess.CompletedProcess(command, 0, f"256 {fingerprint} key (ED25519)\n", "")
+        return subprocess.CompletedProcess(
+            command, 0,
+            f"Public key: ED25519-CERT {cert_fingerprint}\n"
+            "Valid: from 2026-09-14T00:00:00 to 2026-09-16T00:00:00\n", "")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    active = 1789344000  # 2026-09-15T00:00:00 UTC
+    assert validate_certificate_pair(identity, certificate, active)["passed"] is True
+    cert_fingerprint = "SHA256:BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+    mismatch = validate_certificate_pair(identity, certificate, active)
+    assert mismatch["passed"] is False and mismatch["fingerprint_match"] is False
+    cert_fingerprint = fingerprint
+    expired = validate_certificate_pair(identity, certificate, 1789516801)
+    assert expired["passed"] is False and expired["valid_now"] is False
+
+
+def test_run_disposition_contains_operations_but_no_accuracy(tmp_path: Path):
+    manifest = tmp_path / "manifest.tsv"
+    stages, callers, output = tmp_path / "stages.tsv", tmp_path / "callers.tsv", tmp_path / "out.tsv"
+    write_tsv(manifest, [manifest_row()], MANIFEST_FIELDS)
+    initialize_stage_ledger(manifest, stages, "pilot-wes-stagev2", "technical_pilot")
+    initialize_run_ledger(manifest, callers, "pilot-wes-stagev2", "technical_pilot", "deadbeef")
+    rows = build_run_disposition([stages], [callers], output)
+    assert len(rows) == 6
+    assert {row["evidence_layer"] for row in rows} == {"staging", "caller"}
+    assert "accuracy" not in read_tsv(output)[0]
+
+
+def test_finalizer_passes_only_with_validated_stage_callers_and_marker(tmp_path: Path):
+    manifest = tmp_path / "manifest.tsv"
+    stages, callers = tmp_path / "stages.tsv", tmp_path / "callers.tsv"
+    marker = tmp_path / "CALLERS_COMPLETE"
+    write_tsv(manifest, [manifest_row()], MANIFEST_FIELDS)
+    initialize_stage_ledger(manifest, stages, "pilot-wes-stagev2", "technical_pilot")
+    initialize_run_ledger(manifest, callers, "pilot-wes-stagev2", "technical_pilot", "deadbeef")
+    transition_stage_attempt(stages, "C", "S1", "wes", 1, "submitted", scheduler_job_id="1_1")
+    transition_stage_attempt(stages, "C", "S1", "wes", 1, "running")
+    transition_stage_attempt(stages, "C", "S1", "wes", 1, "validated",
+                             exit_code="0", extracted_sha256="e" * 64)
+    transition_run_sample(callers, "C", "S1", "wes", "submitted", job_id="2_1")
+    transition_run_sample(callers, "C", "S1", "wes", "running")
+    transition_run_sample(callers, "C", "S1", "wes", "succeeded",
+                          exit_code="0", output_sha256="f" * 64)
+    transition_run_sample(callers, "C", "S1", "wes", "validated")
+    assert finalize_sample(stages, callers, "C", "S1", "wes", "COMPLETED",
+                           "COMPLETED", marker)["passed"] is False
+    marker.touch()
+    assert finalize_sample(stages, callers, "C", "S1", "wes", "COMPLETED",
+                           "COMPLETED", marker)["passed"] is True
 
 
 def test_truth_free_manifest_and_ledger(tmp_path: Path):
@@ -100,6 +224,21 @@ def test_truth_free_manifest_and_ledger(tmp_path: Path):
     assert all(row["state"] == "validated" for row in read_tsv(ledger))
 
 
+def test_terminal_reconciliation_closes_mixed_active_caller_rows(tmp_path: Path):
+    manifest, ledger = tmp_path / "manifest.tsv", tmp_path / "ledger.tsv"
+    write_tsv(manifest, [manifest_row()], MANIFEST_FIELDS)
+    rows = initialize_run_ledger(manifest, ledger, "pilot-wes-stagev2",
+                                 "technical_pilot", "deadbeef")
+    rows[0] = transition_run_record(rows[0], "submitted", job_id="100_1")
+    rows[0] = transition_run_record(rows[0], "running")
+    rows[1] = transition_run_record(rows[1], "submitted", job_id="100_1")
+    write_tsv(ledger, rows, list(RUN_LEDGER_FIELDS))
+    reconcile_terminal_run_sample(ledger, "C", "S1", "wes", "CANCELLED by dependency")
+    states = {row["state"] for row in read_tsv(ledger)}
+    assert states == {"failed", "cancelled"}
+    assert not states.intersection({"pending", "submitted", "running", "succeeded"})
+
+
 def test_manifest_rejects_truth_duplicates_reference_and_missing_pair(tmp_path: Path):
     rows = [manifest_row(), manifest_row()]
     rows[0]["truth_allele1"] = "A*01:01"
@@ -130,7 +269,7 @@ def test_storage_and_cleanup_are_fail_closed(tmp_path: Path):
                     "cohort": "C", "sample_id": sample, "caller": caller,
                     "modality": modality, "state": "validated", "runtime_seconds": "10",
                     "peak_memory_bytes": "200", "peak_disk_bytes": "1000",
-                    "retained_disk_bytes": "500",
+                    "retained_disk_bytes": "500", "git_commit": "deadbeef",
                 })
                 rows.append(row)
         write_tsv(ledger, rows, list(RUN_LEDGER_FIELDS))
@@ -144,6 +283,14 @@ def test_storage_and_cleanup_are_fail_closed(tmp_path: Path):
     assert result["validated_pilot_samples_by_modality"] == {
         "rnaseq": 2, "wes": 2, "wgs": 2,
     }
+    mixed_rows = read_tsv(ledgers[0])
+    mixed_rows[0]["git_commit"] = "different"
+    write_tsv(ledgers[0], mixed_rows, list(RUN_LEDGER_FIELDS))
+    mixed = assess_storage(ledgers, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3)
+    assert mixed["passed"] is False
+    assert any("one nonempty Git commit" in failure for failure in mixed["failures"])
+    mixed_rows[0]["git_commit"] = "deadbeef"
+    write_tsv(ledgers[0], mixed_rows, list(RUN_LEDGER_FIELDS))
     rejected = assess_storage(
         ledgers, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3,
         availability_source="filesystem_global",
@@ -372,6 +519,14 @@ def test_workflow_lock_detects_changes_and_masked_success(tmp_path: Path):
         target = workflow / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
+    for relative in (
+        "scripts/roihu_submit_wave.sh", "scripts/roihu_stage_inputs.sbatch",
+        "scripts/roihu_run_sample.sbatch", "scripts/roihu_finalize_sample.sbatch",
+        "src/champhla_confirmation/staging.py",
+    ):
+        target = project / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("# locked operational fixture\n", encoding="utf-8")
     lock = project / "lock.json"
     freeze_workflow_lock(project, workflow, lock)
     assert validate_workflow_lock(lock, project)["passed"] is True

@@ -21,6 +21,14 @@ No capacity or production prediction is authorized until all are true:
 4. `bash scripts/roihu_preflight.sh` passes and writes a clean repository,
    environment, storage, reference, software, and container inventory.
 
+Before remote administration, validate the identity/certificate pair locally;
+paths are command parameters and are never committed:
+
+```bash
+validate_ssh_certificate --identity /path/to/id_ed25519 \
+  --certificate /path/to/id_ed25519-cert.pub
+```
+
 Never place truth in a run manifest or prediction-visible directory. Never
 download CRAM/BAM/FASTQ, SIF, references, Nextflow work, or assemblies to the
 laptop.
@@ -39,9 +47,9 @@ unknown roles/modalities, and reference incompatibility.
 
 ```bash
 freeze_run_manifest --manifest RUN.tsv --expected-counts configs/roihu_storage_targets.json --output RUN.freeze.json
-bash scripts/roihu_submit_wave.sh RUN.tsv wgs pilot pilot-wgs-20260914a
-bash scripts/roihu_submit_wave.sh RUN.tsv wes pilot pilot-wes-20260914a
-bash scripts/roihu_submit_wave.sh RUN.tsv rnaseq pilot pilot-rna-20260914a
+bash scripts/roihu_submit_wave.sh RUN.tsv wes pilot pilot-wes-stagev2
+bash scripts/roihu_submit_wave.sh RUN.tsv wgs pilot pilot-wgs-stagev2
+bash scripts/roihu_submit_wave.sh RUN.tsv rnaseq pilot pilot-rna-stagev2
 ```
 
 Each submission requires a lowercase safe `run_id`; subsets, ledgers, logs,
@@ -53,9 +61,9 @@ After all three two-sample pilots finish, assess their three ledgers together:
 
 ```bash
 assess_roihu_storage \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wgs-20260914a_wgs_pilot.ledger.tsv" \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wes-20260914a_wes_pilot.ledger.tsv" \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-rna-20260914a_rnaseq_pilot.ledger.tsv" \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wgs-stagev2_wgs_pilot.ledger.tsv" \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wes-stagev2_wes_pilot.ledger.tsv" \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-rna-stagev2_rnaseq_pilot.ledger.tsv" \
   --targets configs/roihu_storage_targets.json \
   --environment-inventory "$CHAMPHLA_RUN_ROOT/environment_inventory.json" \
   --output "$CHAMPHLA_RUN_ROOT/storage_gate.json"
@@ -71,13 +79,33 @@ samples and require the signature. Production enforces 137 WGS, 130 WES, and 107
 RNA samples for a same-resource manifest. Expected caller-locus records are
 2,055, 1,950, and 1,284; expected plurality rows total 1,122.
 
-The staging job checks source/index hashes. WGS extraction is mate-aware and
+The staging job checks source/index hashes. Its sample-level ledger records the
+real held Slurm job ID before release and retains one immutable row per attempt.
+WGS extraction is mate-aware and
 uses chr6:28–34 Mb plus all HLA-A/B/C alternate contigs from the pinned
-GRCh38DH index. Caller jobs have `afterok` dependencies, reject failed/empty or
-placeholder native results, reparse all A/B/C calls, and create completion
-markers only after hashes validate. Caller-level ledgers record job, commit,
+GRCh38DH index. A streamed CRAM gets at most two five-hour attempts separated
+by 60 seconds, and only an allowlisted CRC, reset, timeout, temporary DNS, HTTP
+429, or HTTP 5xx transport failure can retry. Attempts use unique directories;
+partial outputs and stderr are quarantined. HTTP 401/403/404, reference/contig
+or checksum errors, missing/local-corrupt files, and generic exit 1 are
+deterministic. `samtools quickcheck` checks header/EOF structure; header access
+requiring a reference uses `samtools view -H --reference` separately.
+
+Caller jobs have `afterok` dependencies, reject failed/empty or placeholder
+native results, reparse all A/B/C calls, and create completion markers only
+after hashes validate. Each sample also has a lightweight `afterany` finalizer,
+which reconciles dependency cancellations and refuses to leave active ledger
+rows after terminal scheduler states. A failed finalizer prevents the next
+sequential sample. Caller-level ledgers record job, commit,
 manifest hash, state, exit, runtime, peak memory/disk, output hash, and retry
 lineage.
+
+Runs `pilot-wgs-20260914a`, `pilot-wgs-20260914b`,
+`pilot-wgs-20260914c`, and the earlier WES pilot are calibration or
+pre-transport-hardening diagnostics. They cannot enter the final storage gate
+or any performance analysis. Both WGS `stagev2` inputs must be restreamed under
+the final commit; only checksum-verified immutable raw WES/RNA inputs may be
+reused.
 
 ## Same-resource closure
 

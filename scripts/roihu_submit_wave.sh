@@ -80,7 +80,7 @@ case "${wave}" in
         "${previous}"
       previous_submission=${CHAMPHLA_RUN_ROOT}/manifests/${run_id}_${modality}_batch$((batch_index - 1)).submission.txt
       test -s "${previous_submission}"
-      chain_afterok=$(awk -F= '$1=="last_caller_job"{print $2}' "${previous_submission}")
+      chain_afterok=$(awk -F= '$1=="last_finalizer_job"{print $2}' "${previous_submission}")
       [[ "${chain_afterok}" =~ ^[0-9]+$ ]]
     fi
     ;;
@@ -124,56 +124,99 @@ if [[ "${wave}" == production && "${manifest}" == *same_resource* ]]; then
   [[ "${records}" -eq "${expected}" ]]
 fi
 ledger=${CHAMPHLA_RUN_ROOT}/manifests/${artifact_prefix}.ledger.tsv
+stage_ledger=${CHAMPHLA_RUN_ROOT}/manifests/${artifact_prefix}.stage_ledger.tsv
 submission_record=${CHAMPHLA_RUN_ROOT}/manifests/${artifact_prefix}.submission.txt
 test ! -e "${ledger}"
+test ! -e "${stage_ledger}"
 test ! -e "${submission_record}"
 python3 -c 'from champhla_confirmation.cli import initialize_run_ledger_main; raise SystemExit(initialize_run_ledger_main())' \
   --manifest "${subset}" --output "${ledger}" --run-id "${run_id}" \
-  --run-role "${run_role}" --job-id "submission_pending"
+  --run-role "${run_role}"
+python3 -c 'from champhla_confirmation.cli import initialize_stage_ledger_main; raise SystemExit(initialize_stage_ledger_main())' \
+  --manifest "${subset}" --output "${stage_ledger}" --run-id "${run_id}" \
+  --run-role "${run_role}"
 
 if [[ "${execution_mode}" == sequential_low_storage ]]; then
   previous_job=${chain_afterok}
   caller_jobs=()
+  stage_jobs=()
+  finalizer_jobs=()
   for task_id in $(seq 1 "${records}"); do
     dependency=()
     if [[ -n "${previous_job}" ]]; then
       dependency=(--dependency="afterok:${previous_job}")
     fi
-    stage_job=$(sbatch --parsable "${dependency[@]}" --array="${task_id}" \
+    stage_job=$(sbatch --parsable --hold --kill-on-invalid-dep=yes "${dependency[@]}" --array="${task_id}" \
       --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
       --output="${CHAMPHLA_RUN_ROOT}/logs/stage_${artifact_prefix}_%A_%a.out" \
       --error="${CHAMPHLA_RUN_ROOT}/logs/stage_${artifact_prefix}_%A_%a.err" \
-      "${CHAMPHLA_CODE_ROOT}/scripts/roihu_stage_inputs.sbatch" "${subset}")
-    caller_job=$(sbatch --parsable --dependency="afterok:${stage_job}" --array="${task_id}" \
+      "${CHAMPHLA_CODE_ROOT}/scripts/roihu_stage_inputs.sbatch" "${subset}" "${stage_ledger}")
+    caller_job=$(sbatch --parsable --hold --kill-on-invalid-dep=yes --dependency="afterok:${stage_job}" --array="${task_id}" \
       --export=ALL,CHAMPHLA_EXECUTION_MODE=sequential_low_storage,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
       --output="${CHAMPHLA_RUN_ROOT}/logs/callers_${artifact_prefix}_%A_%a.out" \
       --error="${CHAMPHLA_RUN_ROOT}/logs/callers_${artifact_prefix}_%A_%a.err" \
-      "${CHAMPHLA_CODE_ROOT}/scripts/roihu_run_sample.sbatch" "${subset}" "${ledger}")
+      "${CHAMPHLA_CODE_ROOT}/scripts/roihu_run_sample.sbatch" "${subset}" "${ledger}" "${stage_ledger}")
+    finalizer_job=$(sbatch --parsable --hold --dependency="afterany:${stage_job}:${caller_job}" --array="${task_id}" \
+      --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
+      --output="${CHAMPHLA_RUN_ROOT}/logs/finalize_${artifact_prefix}_%A_%a.out" \
+      --error="${CHAMPHLA_RUN_ROOT}/logs/finalize_${artifact_prefix}_%A_%a.err" \
+      "${CHAMPHLA_CODE_ROOT}/scripts/roihu_finalize_sample.sbatch" "${subset}" "${stage_ledger}" "${ledger}" \
+      "${stage_job}" "${caller_job}")
+    mapfile -t -d $'\t' submission_row < <(printf '%s' "$(sed -n "$((task_id+1))p" "${subset}")")
+    cohort_id=${submission_row[0]}
+    sample_id=${submission_row[1]}
+    python3 -c 'from champhla_confirmation.cli import transition_stage_ledger_main; raise SystemExit(transition_stage_ledger_main())' \
+      --ledger "${stage_ledger}" --cohort "${cohort_id}" --sample "${sample_id}" --modality "${modality}" \
+      --attempt 1 --state submitted --scheduler-job-id "${stage_job}_${task_id}"
+    python3 -c 'from champhla_confirmation.cli import transition_run_ledger_main; raise SystemExit(transition_run_ledger_main())' \
+      --ledger "${ledger}" --cohort "${cohort_id}" --sample "${sample_id}" --modality "${modality}" \
+      --state submitted --job-id "${caller_job}_${task_id}"
+    scontrol release "${stage_job}" "${caller_job}" "${finalizer_job}"
+    stage_jobs+=("${stage_job}")
     caller_jobs+=("${caller_job}")
-    previous_job=${caller_job}
+    finalizer_jobs+=("${finalizer_job}")
+    previous_job=${finalizer_job}
   done
   {
     printf 'run_id=%s\nrun_role=%s\nwave=%s\n' "${run_id}" "${run_role}" "${wave}"
-    printf 'last_caller_job=%s\ncaller_jobs=%s\n' "${previous_job}" "${caller_jobs[*]}"
-    printf 'subset_sha256=%s\nledger=%s\n' "$(sha256sum "${subset}" | cut -d ' ' -f 1)" "${ledger}"
+    printf 'last_finalizer_job=%s\nstage_jobs=%s\ncaller_jobs=%s\nfinalizer_jobs=%s\n' "${previous_job}" "${stage_jobs[*]}" "${caller_jobs[*]}" "${finalizer_jobs[*]}"
+    printf 'subset_sha256=%s\nledger=%s\nstage_ledger=%s\n' "$(sha256sum "${subset}" | cut -d ' ' -f 1)" "${ledger}" "${stage_ledger}"
   } > "${submission_record}"
   printf 'execution_mode=%s caller_jobs=%s records=%s subset=%s ledger=%s\n' \
     "${execution_mode}" "${caller_jobs[*]}" "${records}" "${subset}" "${ledger}"
 else
-  stage_job=$(sbatch --parsable --array="1-${records}%${concurrency}" \
+  stage_job=$(sbatch --parsable --hold --array="1-${records}%${concurrency}" \
     --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
     --output="${CHAMPHLA_RUN_ROOT}/logs/stage_${artifact_prefix}_%A_%a.out" \
     --error="${CHAMPHLA_RUN_ROOT}/logs/stage_${artifact_prefix}_%A_%a.err" \
-    "${CHAMPHLA_CODE_ROOT}/scripts/roihu_stage_inputs.sbatch" "${subset}")
-  caller_job=$(sbatch --parsable --dependency="afterok:${stage_job}" --array="1-${records}%${concurrency}" \
+    "${CHAMPHLA_CODE_ROOT}/scripts/roihu_stage_inputs.sbatch" "${subset}" "${stage_ledger}")
+  caller_job=$(sbatch --parsable --hold --kill-on-invalid-dep=yes --dependency="afterok:${stage_job}" --array="1-${records}%${concurrency}" \
     --export=ALL,CHAMPHLA_EXECUTION_MODE=full_scale,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
     --output="${CHAMPHLA_RUN_ROOT}/logs/callers_${artifact_prefix}_%A_%a.out" \
     --error="${CHAMPHLA_RUN_ROOT}/logs/callers_${artifact_prefix}_%A_%a.err" \
-    "${CHAMPHLA_CODE_ROOT}/scripts/roihu_run_sample.sbatch" "${subset}" "${ledger}")
+    "${CHAMPHLA_CODE_ROOT}/scripts/roihu_run_sample.sbatch" "${subset}" "${ledger}" "${stage_ledger}")
+  finalizer_job=$(sbatch --parsable --hold --dependency="afterany:${stage_job}:${caller_job}" --array="1-${records}%${concurrency}" \
+    --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
+    --output="${CHAMPHLA_RUN_ROOT}/logs/finalize_${artifact_prefix}_%A_%a.out" \
+    --error="${CHAMPHLA_RUN_ROOT}/logs/finalize_${artifact_prefix}_%A_%a.err" \
+    "${CHAMPHLA_CODE_ROOT}/scripts/roihu_finalize_sample.sbatch" "${subset}" "${stage_ledger}" "${ledger}" \
+    "${stage_job}" "${caller_job}")
+  python3 - "${subset}" "${stage_ledger}" "${ledger}" "${modality}" "${stage_job}" "${caller_job}" <<'PY'
+import csv, sys
+from champhla_confirmation.staging import transition_stage_attempt
+from champhla_confirmation.roihu import transition_run_sample
+manifest, stages, callers, modality, stage_job, caller_job = sys.argv[1:]
+for index, row in enumerate(csv.DictReader(open(manifest), delimiter="\t"), 1):
+    transition_stage_attempt(stages, row["cohort"], row["sample_id"], modality, 1,
+                             "submitted", scheduler_job_id=f"{stage_job}_{index}")
+    transition_run_sample(callers, row["cohort"], row["sample_id"], modality,
+                          "submitted", job_id=f"{caller_job}_{index}")
+PY
+  scontrol release "${stage_job}" "${caller_job}" "${finalizer_job}"
   {
     printf 'run_id=%s\nrun_role=%s\nwave=%s\n' "${run_id}" "${run_role}" "${wave}"
-    printf 'stage_job=%s\nlast_caller_job=%s\n' "${stage_job}" "${caller_job}"
-    printf 'subset_sha256=%s\nledger=%s\n' "$(sha256sum "${subset}" | cut -d ' ' -f 1)" "${ledger}"
+    printf 'stage_job=%s\nlast_caller_job=%s\nfinalizer_job=%s\n' "${stage_job}" "${caller_job}" "${finalizer_job}"
+    printf 'subset_sha256=%s\nledger=%s\nstage_ledger=%s\n' "$(sha256sum "${subset}" | cut -d ' ' -f 1)" "${ledger}" "${stage_ledger}"
   } > "${submission_record}"
   printf 'execution_mode=%s stage_job=%s caller_job=%s records=%s subset=%s ledger=%s\n' \
     "${execution_mode}" "${stage_job}" "${caller_job}" "${records}" "${subset}" "${ledger}"

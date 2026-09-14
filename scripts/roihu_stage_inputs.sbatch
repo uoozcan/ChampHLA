@@ -17,7 +17,8 @@ set -eo pipefail
 
 CODE_ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
-manifest=${1:?usage: roihu_stage_inputs.sbatch MANIFEST}
+manifest=${1:?usage: roihu_stage_inputs.sbatch MANIFEST STAGE_LEDGER}
+stage_ledger=${2:?usage: roihu_stage_inputs.sbatch MANIFEST STAGE_LEDGER}
 run_id=${CHAMPHLA_RUN_ID:?CHAMPHLA_RUN_ID is required}
 run_role=${CHAMPHLA_RUN_ROLE:?CHAMPHLA_RUN_ROLE is required}
 [[ "${run_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]]
@@ -53,6 +54,17 @@ fi
 sample_root=${CHAMPHLA_INPUT_ROOT}/${modality}/${sample_id}
 stage_root=${sample_root}.staging.${SLURM_JOB_ID}
 quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/staging/${run_id}/${run_role}/${modality}/${sample_id}.${SLURM_JOB_ID}
+attempt=1
+stage_started=${SECONDS}
+scheduler_task_id=${SLURM_ARRAY_JOB_ID:-${SLURM_JOB_ID}}_${SLURM_ARRAY_TASK_ID}
+export PYTHONPATH=${CHAMPHLA_CODE_ROOT}/src
+
+stage_transition() {
+  python3 -c 'from champhla_confirmation.cli import transition_stage_ledger_main; raise SystemExit(transition_stage_ledger_main())' \
+    --ledger "${stage_ledger}" --cohort "${cohort}" --sample "${sample_id}" \
+    --modality "${modality}" --attempt "${attempt}" "$@"
+}
+stage_transition --state running --scheduler-job-id "${scheduler_task_id}"
 
 # Staging is idempotent. A batch that is re-run after a partial failure will find its
 # earlier inputs still in place, and re-downloading a verified input wastes the transfer
@@ -61,10 +73,14 @@ quarantine=${CHAMPHLA_RUN_ROOT}/quarantine/staging/${run_id}/${run_role}/${modal
 if [[ -e "${sample_root}" ]]; then
   # Strip any leading directory so both the relative format written now and the legacy
   # absolute-path format verify against the files where they actually are.
-  if [[ -f "${sample_root}/STAGE_COMPLETE" && -s "${sample_root}/staged_files_sha256.txt" ]] \
+  if [[ "${modality}" != wgs && -f "${sample_root}/STAGE_COMPLETE" && -s "${sample_root}/staged_files_sha256.txt" ]] \
      && (cd "${sample_root}" && sed 's|  .*/|  |' staged_files_sha256.txt \
          | sha256sum --check --status); then
     echo "already staged and verified: ${modality}/${sample_id}"
+    staged_hash=$(sha256sum "${sample_root}/staged_files_sha256.txt" | cut -d ' ' -f 1)
+    stage_transition --state validated --exit-code 0 --extracted-sha256 "${staged_hash}" \
+      --runtime-seconds "$((SECONDS-stage_started))" --peak-storage-bytes "$(du -sb "${sample_root}" | cut -f1)" \
+      --source-checksum-verified true --index-checksum-verified true
     exit 0
   fi
   # Present but not verifiable: a broken stage, not a resumable one.
@@ -78,10 +94,13 @@ test ! -e "${quarantine}"
 mkdir -p "${stage_root}"
 on_stage_failure() {
   local code=$?
+  set +e
   mkdir -p "$(dirname "${quarantine}")"
   if [[ -d "${stage_root}" ]]; then
     mv "${stage_root}" "${quarantine}"
   fi
+  stage_transition --state failed --exit-code "${code}" --failure-class deterministic \
+    --runtime-seconds "$((SECONDS-stage_started))" --peak-storage-bytes 0
   exit "${code}"
 }
 trap on_stage_failure ERR
@@ -152,9 +171,88 @@ elif [[ "${modality}" == wgs ]]; then
 
   tmp_bam=${stage_root}/${sample_id}.mate_aware_hla.unsorted.bam
   final_bam=${stage_root}/${sample_id}.mate_aware_hla.bam
-  samtools view --threads "${SLURM_CPUS_PER_TASK}" --reference "${reference}" \
-    --fetch-pairs --target-file "${regions}" --bam --output "${tmp_bam}" \
-    -X "${input_uri}" "${idx}"
+  max_attempts=${CHAMPHLA_STAGE_MAX_ATTEMPTS:-2}
+  attempt_timeout=${CHAMPHLA_STAGE_ATTEMPT_TIMEOUT_SECONDS:-18000}
+  retry_backoff=${CHAMPHLA_STAGE_RETRY_BACKOFF_SECONDS:-60}
+  [[ "${max_attempts}" -eq 2 && "${attempt_timeout}" -eq 18000 ]]
+  extraction_ok=false
+  for attempt in $(seq 1 "${max_attempts}"); do
+    attempt_root=${stage_root}/attempt_${attempt}
+    test ! -e "${attempt_root}"
+    mkdir -p "${attempt_root}"
+    attempt_bam=${attempt_root}/${sample_id}.mate_aware_hla.unsorted.bam
+    attempt_stderr=${attempt_root}/samtools.stderr
+    attempt_started=${SECONDS}
+    if [[ "${attempt}" -gt 1 ]]; then
+      stage_transition --state submitted --append-attempt --scheduler-job-id "${scheduler_task_id}" \
+        --superseded-attempt "$((attempt-1))"
+      stage_transition --state running --scheduler-job-id "${scheduler_task_id}"
+    fi
+    set +e
+    timeout --signal=TERM "${attempt_timeout}" samtools view \
+      --threads "${SLURM_CPUS_PER_TASK}" --reference "${reference}" \
+      --fetch-pairs --target-file "${regions}" --bam --output "${attempt_bam}" \
+      -X "${input_uri}" "${idx}" 2>"${attempt_stderr}"
+    extraction_code=$?
+    set -e
+    if [[ "${extraction_code}" -eq 0 ]]; then
+      mv "${attempt_bam}" "${tmp_bam}"
+      mv "${attempt_stderr}" "${stage_root}/extraction_attempt_${attempt}.stderr"
+      rmdir "${attempt_root}"
+      python3 - "${stage_root}/extraction_attempt_${attempt}.json" "${scheduler_task_id}" \
+        "${attempt}" "${input_uri}" "${index_uri}" "$((SECONDS-attempt_started))" <<'PY'
+import json, sys
+path, job, attempt, source, index, runtime = sys.argv[1:]
+with open(path, "w", encoding="utf-8", newline="\n") as handle:
+    json.dump({"schema_version": "champhla-stage-attempt-1", "scheduler_job_id": job,
+               "attempt": int(attempt), "state": "succeeded", "exit_code": 0,
+               "source_uri": source, "index_uri": index,
+               "runtime_seconds": int(runtime)}, handle, indent=2, sort_keys=True)
+    handle.write("\n")
+PY
+      extraction_ok=true
+      break
+    fi
+    classification=${attempt_root}/classification.json
+    python3 -c 'from champhla_confirmation.cli import classify_stage_failure_main; raise SystemExit(classify_stage_failure_main())' \
+      --exit-code "${extraction_code}" --stderr "${attempt_stderr}" \
+      --source-uri "${input_uri}" --output "${classification}"
+    failure_class=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["failure_class"])' "${classification}")
+    retryable=$(python3 -c 'import json,sys; print(str(json.load(open(sys.argv[1]))["retryable"]).lower())' "${classification}")
+    partial_size=$(du -sb "${attempt_root}" | cut -f1)
+    partial_bam_hash=""
+    if [[ -f "${attempt_bam}" ]]; then partial_bam_hash=$(sha256sum "${attempt_bam}" | cut -d ' ' -f 1); fi
+    python3 - "${attempt_root}/attempt_audit.json" "${scheduler_task_id}" "${attempt}" \
+      "${input_uri}" "${index_uri}" "${extraction_code}" "${failure_class}" \
+      "$((SECONDS-attempt_started))" "${partial_size}" "${partial_bam_hash}" <<'PY'
+import json, sys
+path, job, attempt, source, index, code, kind, runtime, size, partial_hash = sys.argv[1:]
+with open(path, "w", encoding="utf-8", newline="\n") as handle:
+    json.dump({"schema_version": "champhla-stage-attempt-1", "scheduler_job_id": job,
+               "attempt": int(attempt), "state": "failed", "exit_code": int(code),
+               "failure_class": kind, "source_uri": source, "index_uri": index,
+               "runtime_seconds": int(runtime), "partial_bytes": int(size),
+               "partial_bam_sha256": partial_hash, "cleanup_eligible": False},
+              handle, indent=2, sort_keys=True)
+    handle.write("\n")
+PY
+    partial_hash=$(find "${attempt_root}" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -d ' ' -f 1)
+    attempt_quarantine=${quarantine}.attempt${attempt}
+    test ! -e "${attempt_quarantine}"
+    mv "${attempt_root}" "${attempt_quarantine}"
+    stage_transition --state failed --exit-code "${extraction_code}" \
+      --failure-class "${failure_class}" --extracted-sha256 "${partial_hash}" \
+      --runtime-seconds "$((SECONDS-stage_started))" --peak-storage-bytes "${partial_size}"
+    if [[ "${retryable}" != true || "${attempt}" -eq "${max_attempts}" ]]; then
+      context_quarantine=${quarantine}.context
+      test ! -e "${context_quarantine}"
+      mv "${stage_root}" "${context_quarantine}"
+      trap - ERR
+      exit "${extraction_code}"
+    fi
+    sleep "${retry_backoff}"
+  done
+  [[ "${extraction_ok}" == true ]]
   samtools quickcheck -v "${tmp_bam}"
   samtools sort --threads "${SLURM_CPUS_PER_TASK}" -o "${final_bam}" "${tmp_bam}"
   samtools index --threads "${SLURM_CPUS_PER_TASK}" "${final_bam}"
@@ -201,4 +299,15 @@ fi
 test -s "${stage_root}/staged_files_sha256.txt"
 touch "${stage_root}/STAGE_COMPLETE"
 mv "${stage_root}" "${sample_root}"
+staged_hash=$(sha256sum "${sample_root}/staged_files_sha256.txt" | cut -d ' ' -f 1)
+if [[ "${modality}" == wgs ]]; then
+  staged_hash=$(sha256sum "${sample_root}/${sample_id}.mate_aware_hla.bam" | cut -d ' ' -f 1)
+  source_verified=false
+else
+  source_verified=true
+fi
+stage_transition --state validated --exit-code 0 --extracted-sha256 "${staged_hash}" \
+  --runtime-seconds "$((SECONDS-stage_started))" --peak-storage-bytes "$(du -sb "${sample_root}" | cut -f1)" \
+  --source-checksum-verified "${source_verified}" \
+  --index-checksum-verified "$([[ -n "${index_uri}" ]] && printf true || printf not_applicable)"
 trap - ERR

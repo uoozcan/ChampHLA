@@ -165,8 +165,15 @@ family. The candidate oracle is descriptive and separate.
 
 ### Corrected rerun and release control
 
-WGS, WES, and RNA-seq are rerun end to end after the partial-call correction.
-Execution fails closed for missing processes, empty outputs, resource
+The corrected same-resource WGS, WES, and RNA-seq lanes are rerun end to end
+after the partial-call correction. Remote WGS CRAM extraction permits two
+five-hour attempts only for allowlisted transport failures. Each attempt has an
+immutable staging-ledger row and separate stderr; unsuccessful attempts and
+their partial BAMs are quarantined and excluded. Because full CRAMs are
+streamed rather than retained, their manifest checksums are recorded as
+upstream-declared identities, not as locally verified values; extracted HLA
+BAMs and indexes are hashed locally. Execution fails closed for missing
+processes, empty outputs, resource
 mismatches, or incomplete caller/locus records. WGS additionally requires a
 complete native-output audit and named stratified human review before truth can
 be joined. Code, configurations, panels, predictions, and provenance are then
@@ -182,13 +189,14 @@ The data also show why a cross-assay conclusion cannot be inferred from WES and
 RNA-seq alone: input construction and caller compatibility can dominate the WGS
 comparison.
 
-The revised architecture turns that limitation into a testable boundary. If
-the corrected prospective WGS, WES, and RNA-seq lanes all satisfy the margin,
-the conclusion will be that plurality was not materially exceeded across the
-evaluated HLA short-read assays. If valid WGS fails, plurality will be described
-as a strong WES/RNA-seq default with a demonstrated WGS limitation. If WGS
-integrity fails again, the paper will remain a software and benchmark report
-without a finalized cross-assay performance claim.
+The revised architecture turns that limitation into a testable boundary. The
+corrected same-resource WGS, WES, and RNA-seq lanes can establish benchmark
+readiness, but cannot establish prospective noninferiority. The predeclared
+two-percentage-point noninferiority conclusion is reserved for genuinely
+prospective, donor-independent cohorts. If valid corrected WGS underperforms,
+plurality will be described as a strong WES/RNA-seq default with a demonstrated
+WGS limitation. If WGS integrity fails again, the paper will remain a software
+and benchmark report without a finalized cross-assay performance claim.
 
 The scope is restricted to research-only HLA-A/B/C typing from the evaluated
 short-read designs. Class II loci, long reads, single-cell pseudobulk,

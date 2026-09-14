@@ -15,8 +15,9 @@ set -eo pipefail
 CODE_ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 source "${CHAMPHLA_PATH_CONFIG:-${CODE_ROOT}/configs/roihu_paths.env}"
 export PYTHONPATH=${CHAMPHLA_CODE_ROOT}/src
-manifest=${1:?usage: roihu_run_sample.sbatch MANIFEST LEDGER}
-ledger=${2:?usage: roihu_run_sample.sbatch MANIFEST LEDGER}
+manifest=${1:?usage: roihu_run_sample.sbatch MANIFEST LEDGER STAGE_LEDGER}
+ledger=${2:?usage: roihu_run_sample.sbatch MANIFEST LEDGER STAGE_LEDGER}
+stage_ledger=${3:?usage: roihu_run_sample.sbatch MANIFEST LEDGER STAGE_LEDGER}
 run_id=${CHAMPHLA_RUN_ID:?CHAMPHLA_RUN_ID is required}
 run_role=${CHAMPHLA_RUN_ROLE:?CHAMPHLA_RUN_ROLE is required}
 [[ "${run_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]]
@@ -52,7 +53,18 @@ input_root=${CHAMPHLA_INPUT_ROOT}/${modality}/${sample_id}
 sample_root=${CHAMPHLA_RUN_ROOT}/caller_outputs/${run_id}/${run_role}/${modality}/${sample_id}
 work_root=${CHAMPHLA_RUN_ROOT}/work/${run_id}/${run_role}/${modality}/${sample_id}
 test -f "${ledger}"
+test -f "${stage_ledger}"
 test -f "${input_root}/STAGE_COMPLETE"
+python3 - "${stage_ledger}" "${cohort}" "${sample_id}" "${modality}" <<'PY'
+import csv, sys
+ledger, cohort, sample, modality = sys.argv[1:]
+rows = [r for r in csv.DictReader(open(ledger), delimiter="\t")
+        if (r["cohort"], r["sample_id"], r["modality"]) == (cohort, sample, modality)]
+assert rows, "missing staging ledger row"
+latest = max(rows, key=lambda r: int(r["attempt"]))
+assert latest["state"] == "validated", "staging ledger is not validated"
+assert latest["extracted_sha256"], "staging ledger lacks extracted hash"
+PY
 test ! -e "${sample_root}/CALLERS_COMPLETE"
 mkdir -p "${sample_root}/results" "${sample_root}/launch" "${work_root}"
 test -s "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
@@ -72,7 +84,8 @@ ledger_transition() {
     --ledger "${ledger}" --cohort "${cohort}" --sample "${sample_id}" \
     --modality "${modality}" "$@"
 }
-ledger_transition --state running --job-id "${SLURM_JOB_ID}"
+scheduler_task_id=${SLURM_ARRAY_JOB_ID:-${SLURM_JOB_ID}}_${SLURM_ARRAY_TASK_ID}
+ledger_transition --state running --job-id "${scheduler_task_id}"
 preserve_task_diagnostics() {
   # Nextflow keeps each task's stderr, stdout and script in its work directory, and the
   # parent log records only a truncated excerpt. Releasing work without copying these

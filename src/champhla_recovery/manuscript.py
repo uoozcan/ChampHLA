@@ -26,6 +26,21 @@ NUMERIC_RESULT_RE = re.compile(
     r"\b0\.\d{3,}\b|[+−-]\d+(?:\.\d+)?\s*(?:percentage\s+)?points?\b)",
     re.I,
 )
+SAME_RESOURCE_MISLABEL_RE = re.compile(
+    r"\bprospective same[- ]resource\b|"
+    r"\bsame[- ]resource (?:evidence|lanes?|cohorts?|results?) "
+    r"(?:(?:is|are|was|were) )?(?:prospective|independent)\b", re.I,
+)
+PILOT_PERFORMANCE_RE = re.compile(
+    r"\bpilot\b[^.\n]*(?:\d+\s*/\s*\d+|\d+(?:\.\d+)?\s*%|"
+    r"(?:accuracy|performance)(?: estimate)?\s*(?:was|is|=|of))",
+    re.I,
+)
+TRANSPORT_METHOD_LIMITATION_RE = re.compile(
+    r"(?:transport|CRC)[^.\n]*(?:demonstrat(?:e|es|ed)|show(?:s|ed)?|indicat(?:e|es|ed))"
+    r"[^.\n]*(?:plurality|consensus|WGS)[^.\n]*(?:accuracy|performance|limitation)",
+    re.I,
+)
 
 
 def extract_docx_text(path: str) -> str:
@@ -70,6 +85,12 @@ def audit_claims(manuscript: str, registry_path: str, claims_path: str, output: 
         failures.append("manuscript contains a historical invalid-WGS performance number")
     if OVERCLAIM_RE.search(audited_text):
         failures.append("manuscript contains an unsupported universal or equivalence claim")
+    if SAME_RESOURCE_MISLABEL_RE.search(audited_text):
+        failures.append("same-resource evidence is mislabeled as prospective or independent")
+    if PILOT_PERFORMANCE_RE.search(audited_text):
+        failures.append("pilot output is presented as a performance estimate")
+    if TRANSPORT_METHOD_LIMITATION_RE.search(audited_text):
+        failures.append("transport failure is presented as a method or WGS performance limitation")
     main_refs = RESULT_REF_RE.findall(text)
     supplement_refs = RESULT_REF_RE.findall(supplement_text)
     diagnostic_invalid_refs = []
@@ -103,6 +124,17 @@ def audit_claims(manuscript: str, registry_path: str, claims_path: str, output: 
         r"(?ims)^## Abstract\s*$\n(.*?)(?=^##\s+|\Z)", text,
     )
     abstract = abstract_match.group(1) if abstract_match else ""
+    amendment = Path(root or ".") / "decisions" / "20260908_consensus_primary_amendment.json"
+    if amendment.is_file():
+        status = json.loads(amendment.read_text(encoding="utf-8")).get("status")
+        headline = abstract + "\n" + "\n".join(
+            p for p in re.split(r"\n\s*\n", text)
+            if re.search(r"(?i)^## (?:conclusion|discussion)", p.strip())
+        )
+        if status != "SIGNED_BY_AUTHOR" and re.search(
+                r"\b(?:not materially exceeded|demonstrat(?:e|ed|es)|confirm(?:ed|s)?|superior)\b",
+                headline, re.I):
+            failures.append("unsigned amendment cannot support headline performance language")
     for result_id in RESULT_REF_RE.findall(abstract):
         if result_id in registry and registry[result_id].get("abstract_allowed") != "1":
             failures.append(f"abstract cites a result not allowed in the abstract: {result_id}")

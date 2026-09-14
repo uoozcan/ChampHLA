@@ -98,6 +98,12 @@ def test_canonical_workflow_is_fail_closed_and_submission_validates_lock():
     assert 'run_role=technical_pilot' in submit
     assert 'run_role=capacity_validation' in submit
     assert 'run_role=production' in submit
+    assert "submission_pending" not in submit
+    assert "--hold" in submit
+    assert "scontrol release" in submit
+    assert "roihu_finalize_sample.sbatch" in submit
+    assert 'afterany:${stage_job}:${caller_job}' in submit
+    assert "--kill-on-invalid-dep=yes" in submit
     assert "pilot_retained" not in submit
     retry = (ROOT / "scripts" / "roihu_retry_sample.sh").read_text(encoding="utf-8")
     assert "--hold" in retry
@@ -128,6 +134,37 @@ def test_wgs_staging_streams_and_never_writes_the_source_cram():
     assert 'verify_one "${index_checksum}"' in wgs
     # Remote sources only; a local path would silently defeat the point.
     assert '"${input_uri}" == https://*' in wgs
+
+
+def test_wgs_transport_retry_is_inside_staging_job_and_bounded():
+    text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")
+    assert "CHAMPHLA_STAGE_MAX_ATTEMPTS:-2" in text
+    assert "CHAMPHLA_STAGE_ATTEMPT_TIMEOUT_SECONDS:-18000" in text
+    assert "CHAMPHLA_STAGE_RETRY_BACKOFF_SECONDS:-60" in text
+    assert "timeout --signal=TERM" in text
+    assert "classify_stage_failure_main" in text
+    assert "scontrol requeue" not in text
+    assert "samtools.stderr" in text
+    assert "attempt_quarantine" in text
+
+
+def test_quickcheck_never_receives_unsupported_reference_option():
+    for path in (ROOT / "scripts").iterdir():
+        if path.suffix not in {".sh", ".sbatch"}:
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if "samtools quickcheck" in line:
+                assert "--reference" not in line
+
+
+def test_caller_requires_validated_staging_ledger_before_completion():
+    runner = (ROOT / "scripts/roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert 'latest["state"] == "validated"' in runner
+    assert "STAGE_LEDGER" in runner
+    finalizer = (ROOT / "scripts/roihu_finalize_sample.sbatch").read_text(encoding="utf-8")
+    assert "afterany" not in finalizer  # dependency is assigned by the submitter
+    assert "CALLERS_COMPLETE" in finalizer
+    assert "finalize_sample" in finalizer
 
 
 def test_streamed_wgs_records_that_the_source_checksum_was_not_reverified():

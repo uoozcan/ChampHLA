@@ -50,7 +50,15 @@ from .roihu import (
     initialize_run_ledger,
     inventory_environment,
     transition_run_sample,
+    reconcile_terminal_run_sample,
     validate_workflow_lock,
+)
+from .staging import (
+    build_run_disposition,
+    classify_stage_failure,
+    initialize_stage_ledger,
+    transition_stage_attempt,
+    validate_certificate_pair,
 )
 from .schema import (
     explode_candidate_rows,
@@ -485,6 +493,94 @@ def transition_run_ledger_main() -> int:
     transition_run_sample(
         args.ledger, args.cohort, args.sample, args.modality, args.state, **updates,
     )
+    return 0
+
+
+def initialize_stage_ledger_main() -> int:
+    parser = argparse.ArgumentParser(description="Create the sample-level staging ledger")
+    parser.add_argument("--manifest", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--run-id", required=True)
+    parser.add_argument("--run-role", required=True,
+                        choices=("technical_pilot", "capacity_validation", "production"))
+    args = parser.parse_args()
+    rows = initialize_stage_ledger(args.manifest, args.output, args.run_id, args.run_role)
+    print(f"stage ledger records={len(rows)}")
+    return 0
+
+
+def reconcile_run_ledger_main() -> int:
+    parser = argparse.ArgumentParser(description="Close stale caller rows after terminal Slurm state")
+    parser.add_argument("--ledger", required=True)
+    parser.add_argument("--cohort", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--modality", required=True)
+    parser.add_argument("--scheduler-state", required=True)
+    args = parser.parse_args()
+    reconcile_terminal_run_sample(args.ledger, args.cohort, args.sample,
+                                  args.modality, args.scheduler_state)
+    return 0
+
+
+def transition_stage_ledger_main() -> int:
+    parser = argparse.ArgumentParser(description="Transition one immutable staging attempt")
+    parser.add_argument("--ledger", required=True)
+    parser.add_argument("--cohort", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--modality", required=True)
+    parser.add_argument("--attempt", required=True, type=int)
+    parser.add_argument("--state", required=True)
+    parser.add_argument("--append-attempt", action="store_true")
+    for flag in ("scheduler-job-id", "failure-class", "exit-code", "extracted-sha256",
+                 "runtime-seconds", "peak-storage-bytes", "source-checksum-verified",
+                 "index-checksum-verified", "superseded-attempt"):
+        parser.add_argument("--" + flag, default="")
+    args = parser.parse_args()
+    updates = {key: value for key, value in vars(args).items()
+               if key not in {"ledger", "cohort", "sample", "modality", "attempt",
+                              "state", "append_attempt"} and value != ""}
+    transition_stage_attempt(args.ledger, args.cohort, args.sample, args.modality,
+                             args.attempt, args.state, args.append_attempt, **updates)
+    return 0
+
+
+def classify_stage_failure_main() -> int:
+    parser = argparse.ArgumentParser(description="Classify a staging failure conservatively")
+    parser.add_argument("--exit-code", required=True, type=int)
+    parser.add_argument("--stderr", required=True)
+    parser.add_argument("--source-uri", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    result = classify_stage_failure(
+        args.exit_code, Path(args.stderr).read_text(encoding="utf-8", errors="replace"),
+        args.source_uri,
+    )
+    write_json(args.output, result)
+    print(result["failure_class"])
+    return 0
+
+
+def validate_ssh_certificate_main() -> int:
+    parser = argparse.ArgumentParser(description="Validate an SSH identity/certificate pair")
+    parser.add_argument("--identity", required=True)
+    parser.add_argument("--certificate", required=True)
+    parser.add_argument("--output")
+    args = parser.parse_args()
+    result = validate_certificate_pair(args.identity, args.certificate)
+    if args.output:
+        write_json(args.output, result)
+    print(f"certificate passed={result['passed']}")
+    return 0 if result["passed"] else 2
+
+
+def build_run_disposition_main() -> int:
+    parser = argparse.ArgumentParser(description="Build the non-performance run-disposition table")
+    parser.add_argument("--stage-ledger", action="append", default=[])
+    parser.add_argument("--caller-ledger", action="append", default=[])
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    rows = build_run_disposition(args.stage_ledger, args.caller_ledger, args.output)
+    print(f"run disposition records={len(rows)}")
     return 0
 
 

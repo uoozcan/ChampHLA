@@ -9,7 +9,8 @@ BM-003	benchmark	Results	RNA-seq plurality development accuracy uses the fixed e
 BM-004	benchmark	Ablations	RefFormer failed its frozen retention gate.	supported	REFFORMER_GATE	Retain as a negative historical ablation.
 BM-005	benchmark	Ablations	EvidenceGatedCC failed its development gate.	supported	EGCC_GATE	Retain as a negative historical ablation.
 BM-006	benchmark	WGS	Historical WGS values are invalid and diagnostic only.	supported	DEV_WGS_CONSENSUS	Permit only in the supplement with explicit invalid labeling.
-BM-007	benchmark	Conclusion	Cross-assay performance wording depends on a valid corrected prospective rerun.	pending		Resolve from three_modality_claim_ready.
+BM-007	benchmark	Conclusion	Cross-assay performance wording depends on valid corrected same-resource benchmarking and separate prospective donor-independent validation.	pending		Resolve same_resource_benchmark_ready and independent_three_modality_claim_ready separately.
+BM-008	benchmark	Methods	Remote CRAM transport attempts are provenance-tracked and excluded from performance evidence.	supported		Generate the disposition table from staging and caller ledgers.
 METHOD-001	method	Status	The Guarded CC method manuscript is superseded and retained only for provenance.	supported		Do not reactivate as the primary manuscript.
 SHARED-001	shared	Methods	A native missing second allele remains partial and never implies homozygosity.	supported		Enforced by parser and harmonisation tests.
 SHARED-002	shared	Methods	Donor-independent and overlapping-donor evidence is not pooled.	supported		Enforced by the generic evaluator.

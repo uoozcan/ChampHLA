@@ -1,0 +1,56 @@
+{
+  "schema_version": "champhla-technical-decision-1",
+  "decision_id": "20260914_remote_cram_transport_hardening",
+  "date_utc": "2026-09-14",
+  "status": "IMPLEMENTED_AWAITING_FINAL_COMMIT_VALIDATION",
+  "scope": "truth-free remote WGS CRAM staging and operational evidence",
+  "trigger": {
+    "run_id": "pilot-wgs-20260914b",
+    "sample_id": "HG00097",
+    "stage_job_id": "1322836",
+    "failure": "samtools reported a CRAM container-header CRC32 failure while streaming the public source",
+    "classification": "transient infrastructure transport failure",
+    "performance_eligible": false
+  },
+  "diagnostic_run": {
+    "run_id": "pilot-wgs-20260914c",
+    "role": "technical_diagnostic_pre_transport_hardening",
+    "disposition": "allowed to finish; every row must become validated, failed, or cancelled",
+    "storage_gate_eligible": false,
+    "performance_eligible": false,
+    "reason": "the run predates transport-hardening commit and cannot validate that implementation"
+  },
+  "correction": {
+    "implementation_version": "stage-transport-v2",
+    "attempts": 2,
+    "attempt_timeout_seconds": 18000,
+    "backoff_seconds": 60,
+    "retry_location": "within the still-running staging allocation",
+    "transient_allowlist": [
+      "CRAM/container CRC failure",
+      "connection reset",
+      "timeout",
+      "temporary DNS failure",
+      "HTTP 429",
+      "HTTP 5xx"
+    ],
+    "deterministic_examples": [
+      "reference or contig mismatch",
+      "checksum mismatch",
+      "HTTP 401/403/404",
+      "missing or locally corrupt file",
+      "unclassified exit 1"
+    ],
+    "slurm_policy": "never requeue a failed dependency; held jobs receive recorded IDs before release and an afterany sample finalizer reconciles terminal states",
+    "source_identity_policy": "streamed full-CRAM checksums remain declared upstream identities; extracted BAMs and indexes are locally verified and hashed"
+  },
+  "authoritative_pilots": [
+    "pilot-wes-stagev2",
+    "pilot-wgs-stagev2",
+    "pilot-rna-stagev2"
+  ],
+  "manual_gates_unchanged": [
+    "author signature after the six-sample storage gate passes",
+    "named approval of the 50-record WGS review packet"
+  ]
+}

@@ -88,6 +88,11 @@ def test_workflow_lock_covers_every_workflow_file():
         for p in WORKFLOW.rglob("*")
         if p.is_file() and p.suffix in {".nf", ".config", ".yaml", ".json", ".py", ".sh"}
     }
+    present.update({
+        "scripts/roihu_submit_wave.sh", "scripts/roihu_stage_inputs.sbatch",
+        "scripts/roihu_run_sample.sbatch", "scripts/roihu_finalize_sample.sbatch",
+        "src/champhla_confirmation/staging.py",
+    })
     assert locked == present, {"only_in_lock": locked - present, "only_on_disk": present - locked}
 
 def test_locked_files_have_no_carriage_returns():

@@ -83,7 +83,8 @@ reads, alignments, containers, reference bundles, AGC assemblies, or Nextflow
 work directories; `.gitignore` enforces those classes. Only compact text,
 figures, logs, checksums, tests, and release archives return to the laptop.
 
-CSC access was renewed and verified on 2026-09-09. Install the exact reviewed
+CSC access is short-lived and must be validated as a matching, currently valid
+identity/certificate pair before each remote administration session. Install the exact reviewed
 commit at `/scratch/project_2008084/champhla_plurality`, create the external
 roots defined in `configs/roihu_paths.env`, and run:
 

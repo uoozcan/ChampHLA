@@ -267,6 +267,52 @@ def transition_run_sample(ledger_path: str | Path, cohort: str, sample_id: str,
         lock_path.rmdir()
 
 
+def reconcile_terminal_run_sample(ledger_path: str | Path, cohort: str, sample_id: str,
+                                  modality: str, scheduler_state: str) -> list[dict[str, str]]:
+    """Close every nonterminal caller row after Slurm reaches a terminal state."""
+    path = Path(ledger_path)
+    lock_path = path.with_suffix(path.suffix + ".lockdir")
+    deadline = time.monotonic() + 30
+    while True:
+        try:
+            lock_path.mkdir()
+            break
+        except FileExistsError:
+            if time.monotonic() >= deadline:
+                raise TimeoutError(f"timed out acquiring run-ledger lock: {lock_path}")
+            time.sleep(.05)
+    try:
+        rows = read_tsv(path)
+        matched = 0
+        now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        for index, row in enumerate(rows):
+            if (row.get("cohort"), row.get("sample_id"), row.get("modality")) != (
+                    cohort, sample_id, modality):
+                continue
+            matched += 1
+            state = row.get("state", "")
+            if state in {"validated", "frozen", "failed", "cancelled", "quarantined"}:
+                continue
+            if state == "pending":
+                row = transition_run_record(row, "submitted", job_id="scheduler_unrecorded")
+                state = "submitted"
+            target = ("cancelled" if state == "submitted" and
+                      scheduler_state.upper().startswith("CANCELLED") else "failed")
+            rows[index] = transition_run_record(
+                row, target, exit_code=scheduler_state or "terminal_unknown",
+                updated_at_utc=now,
+            )
+        expected = len(PANELS.get(modality, ()))
+        if matched != expected:
+            raise ValueError(f"expected {expected} ledger rows, matched {matched}")
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        write_tsv(temporary, rows, list(RUN_LEDGER_FIELDS))
+        os.replace(temporary, path)
+        return rows
+    finally:
+        lock_path.rmdir()
+
+
 def transition_run_record(row: dict[str, str], new_state: str, **updates: str) -> dict[str, str]:
     old_state = row.get("state", "")
     if new_state not in STATE_TRANSITIONS.get(old_state, set()):
@@ -308,6 +354,7 @@ def assess_storage(pilot_ledgers: list[str | Path] | tuple[str | Path, ...],
     grouped: dict[tuple[str, str, str, str], list[dict[str, str]]] = defaultdict(list)
     ledger_hashes = []
     ledger_modalities = []
+    commits: set[str] = set()
     for path in paths:
         if not path.is_file():
             raise ValueError(f"pilot ledger missing: {path}")
@@ -318,10 +365,15 @@ def assess_storage(pilot_ledgers: list[str | Path] | tuple[str | Path, ...],
             raise ValueError(f"pilot ledger must contain exactly one modality: {path}")
         ledger_modalities.append(next(iter(modalities)))
         for row in ledger_rows:
+            if "diagnostic" in row.get("run_id", "") or "pre_transport" in row.get("run_id", ""):
+                failures.append(f"{path.name}: diagnostic run cannot enter the storage gate")
+            commits.add(row.get("git_commit", ""))
             grouped[(row.get("run_id", ""), row.get("cohort", ""),
                      row.get("modality", ""), row.get("sample_id", ""))].append(row)
     if set(ledger_modalities) != set(EXPECTED_REFERENCE):
         raise ValueError("pilot ledgers must represent wgs, wes, and rnaseq exactly once")
+    if len(commits) != 1 or not next(iter(commits), "").strip():
+        failures.append("pilot ledgers must share one nonempty Git commit")
 
     by_modality: dict[str, list[int]] = defaultdict(list)
     retained_by_modality: dict[str, list[int]] = defaultdict(list)
@@ -569,6 +621,9 @@ def validate_workflow_lock(lock_path: str | Path, project_root: str | Path) -> d
             "arcashla", "bam_to_fastq", "hlahd", "kourami", "optitype",
             "polysolver", "spechla", "t1k",
         )},
+        "scripts/roihu_submit_wave.sh", "scripts/roihu_stage_inputs.sbatch",
+        "scripts/roihu_run_sample.sbatch", "scripts/roihu_finalize_sample.sbatch",
+        "src/champhla_confirmation/staging.py",
     }
     missing_required = sorted(required - set(files))
     if missing_required:
@@ -590,6 +645,13 @@ def freeze_workflow_lock(project_root: str | Path, workflow_root: str | Path,
         item for item in workflow.rglob("*")
         if item.is_file() and item.suffix in {".nf", ".config", ".yaml", ".json", ".py", ".sh"}
     )
+    operational = [project / relative for relative in (
+        "scripts/roihu_submit_wave.sh", "scripts/roihu_stage_inputs.sbatch",
+        "scripts/roihu_run_sample.sbatch", "scripts/roihu_finalize_sample.sbatch",
+        "src/champhla_confirmation/staging.py",
+    )]
+    selected.extend(item for item in operational if item.is_file())
+    selected = sorted(set(selected))
     files = {item.relative_to(project).as_posix(): sha256(item) for item in selected}
     payload = {
         "schema_version": "champhla-workflow-lock-1", "status": "FROZEN",

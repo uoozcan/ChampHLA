@@ -61,3 +61,46 @@ def test_manuscript_rejects_placeholder_and_invalid_wgs_number(tmp_path: Path):
     result = audit_claims(str(manuscript), str(registry), str(claims), str(tmp_path / "audit.json"), str(tmp_path))
     assert result["submission_ready"] is False
     assert any("invalid-WGS" in failure for failure in result["failures"])
+
+
+def test_claim_audit_rejects_evidence_role_and_transport_misstatements(tmp_path: Path):
+    registry = _registry(tmp_path)
+    claims = tmp_path / "claims.tsv"
+    claims.write_text(
+        "claim_id\tdraft\tsection\tclaim\tstatus\tevidence_result_id\taction\n"
+        "C1\tbenchmark\tResults\tVerified\tsupported\tGOOD\tretain\n",
+        encoding="utf-8",
+    )
+    manuscript_dir = tmp_path / "benchmark"
+    manuscript_dir.mkdir()
+    cases = {
+        "same-resource evidence is prospective.": "mislabeled",
+        "The pilot accuracy was high.": "pilot output",
+        "The CRC transport error demonstrates a WGS accuracy limitation.": "transport failure",
+    }
+    for index, (sentence, expected) in enumerate(cases.items()):
+        manuscript = manuscript_dir / f"case{index}.md"
+        manuscript.write_text("# Results\n" + sentence + "\n", encoding="utf-8")
+        result = audit_claims(str(manuscript), str(registry), str(claims),
+                              str(tmp_path / f"audit{index}.json"), str(tmp_path))
+        assert any(expected in failure for failure in result["failures"])
+
+
+def test_unsigned_amendment_rejects_headline_performance_language(tmp_path: Path):
+    registry = _registry(tmp_path)
+    claims = tmp_path / "claims.tsv"
+    claims.write_text(
+        "claim_id\tdraft\tsection\tclaim\tstatus\tevidence_result_id\taction\n"
+        "C1\tbenchmark\tAbstract\tVerified\tsupported\tGOOD\tretain\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "decisions").mkdir()
+    (tmp_path / "decisions" / "20260908_consensus_primary_amendment.json").write_text(
+        '{"status":"UNSIGNED_AWAITING_AUTHOR"}\n', encoding="utf-8")
+    manuscript_dir = tmp_path / "benchmark"
+    manuscript_dir.mkdir()
+    manuscript = manuscript_dir / "manuscript.md"
+    manuscript.write_text("## Abstract\nThe benchmark demonstrates superiority.\n", encoding="utf-8")
+    result = audit_claims(str(manuscript), str(registry), str(claims),
+                          str(tmp_path / "audit.json"), str(tmp_path))
+    assert any("unsigned amendment" in failure for failure in result["failures"])
