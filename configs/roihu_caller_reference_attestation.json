@@ -6,6 +6,14 @@
   "source_commit": "109215b899b771ddb231f902172f5d6f50078e2c",
   "production_ready": true,
   "policy": "Every deployable caller requires an exact executable artifact, active database component hashes, and an established database release. An inferred filename or repository-wide release is insufficient.",
+  "technical_compatibility_artifacts": [
+    {
+      "artifact_id": "workflow/bin/detect_chr6_contig.sh",
+      "sha256": "ff3bc39c764bdf89a84681eed6fa27cf932255846b58c393fc40960ae05bb7e9",
+      "purpose": "Parse literal SAM fields and require exactly one primary chromosome-6 contig named 6 or chr6; avoids the pinned HLA-HD image's mawk 1.3.3 tab-character-class defect.",
+      "affected_callers": ["HLA-HD", "Kourami", "POLYSOLVER", "SpecHLA"]
+    }
+  ],
   "callers": {
     "HLA-HD": {
       "version": "1.4.0",

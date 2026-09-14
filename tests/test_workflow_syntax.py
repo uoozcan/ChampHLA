@@ -86,7 +86,7 @@ def test_workflow_lock_covers_every_workflow_file():
     present = {
         str(p.relative_to(ROOT)).replace("\\", "/")
         for p in WORKFLOW.rglob("*")
-        if p.is_file() and p.suffix in {".nf", ".config", ".yaml", ".json", ".py"}
+        if p.is_file() and p.suffix in {".nf", ".config", ".yaml", ".json", ".py", ".sh"}
     }
     assert locked == present, {"only_in_lock": locked - present, "only_on_disk": present - locked}
 

@@ -109,6 +109,13 @@ def test_canonical_workflow_is_fail_closed_and_submission_validates_lock():
     assert "find \"${work_root}\" -depth -type f -delete" in prune
 
 
+def test_preflight_exercises_chr6_detector_inside_pinned_hlahd_image():
+    text = (ROOT / "scripts" / "roihu_preflight.sh").read_text(encoding="utf-8")
+    assert "workflow/bin/detect_chr6_contig.sh" in text
+    assert '"${CHAMPHLA_CONTAINER_ROOT}/hlahd.sif"' in text
+    assert "header.ambiguous.sam" in text
+
+
 def test_wgs_staging_streams_and_never_writes_the_source_cram():
     """A 30x CRAM is ~18 GB and no caller sees it; 137 of them do not fit the allocation."""
     text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")

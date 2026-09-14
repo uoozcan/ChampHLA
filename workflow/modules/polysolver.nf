@@ -29,10 +29,7 @@ process POLYSOLVER {
         /home/polysolver/binaries/samtools index ${bam}
     fi
     /home/polysolver/binaries/samtools view -H ${bam} > hla_header.sam
-    has_chr6=\$(awk '/^@SQ.*SN:chr6[[:space:]]/{found=1} END{print found+0}' hla_header.sam)
-    has_6=\$(awk '/^@SQ.*SN:6[[:space:]]/{found=1} END{print found+0}' hla_header.sam)
-    [ "\$((has_chr6 + has_6))" -eq 1 ]
-    if [ "\${has_chr6}" -eq 1 ]; then chr=chr6; else chr=6; fi
+    chr=\$(bash ${projectDir}/bin/detect_chr6_contig.sh hla_header.sam)
     /home/polysolver/binaries/samtools view -b -h ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" > hla_region.bam
     /home/polysolver/binaries/samtools view -b -f 4 ${bam} > unmapped.bam
     /home/polysolver/binaries/samtools merge -f polysolver_input.bam hla_region.bam unmapped.bam

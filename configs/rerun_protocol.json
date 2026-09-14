@@ -41,6 +41,12 @@
     "T1K": "pin command, index checksum, container digest, threads and memory before execution",
     "ArcasHLA": "pin command, reference bundle, container digest, threads and memory before execution"
   },
+  "bam_contig_compatibility": {
+    "policy": "Every BAM region extraction uses the workflow-locked literal-field detector and requires exactly one primary chromosome-6 name, 6 or chr6.",
+    "detector": "workflow/bin/detect_chr6_contig.sh",
+    "detector_sha256": "ff3bc39c764bdf89a84681eed6fa27cf932255846b58c393fc40960ae05bb7e9",
+    "decision_record": "decisions/20260914_wgs_contig_detector_compatibility.json"
+  },
   "fail_closed": [
     "missing process or nonzero exit",
     "missing or empty native caller output",

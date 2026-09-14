@@ -25,8 +25,7 @@ process HLAHD {
         samtools index ${bam}
     fi
     samtools view -H ${bam} > hla_header.sam
-    grep -E '^@SQ.*SN:(chr6|6)[[:space:]]' hla_header.sam > /dev/null
-    chr=\$(awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}' hla_header.sam)
+    chr=\$(bash ${projectDir}/bin/detect_chr6_contig.sh hla_header.sam)
     samtools view -b -h ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" > hla_region.bam
     samtools view -b -f 4 ${bam} > unmapped.bam
     samtools merge -f merged.bam hla_region.bam unmapped.bam

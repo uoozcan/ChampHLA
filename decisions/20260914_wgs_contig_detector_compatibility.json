@@ -1,0 +1,37 @@
+{
+  "schema_version": "champhla-technical-decision-1",
+  "decision_id": "20260914_wgs_contig_detector_compatibility",
+  "date_utc": "2026-09-14",
+  "status": "IMPLEMENTED_TECHNICAL_CORRECTION",
+  "scope": "truth-free WGS technical pilot only",
+  "failed_run": {
+    "run_id": "pilot-wgs-20260914a",
+    "sample_id": "HG00096",
+    "stage_job_id": "1302425",
+    "caller_job_id": "1302426",
+    "stage_result": "COMPLETED exit 0 after 02:39:56",
+    "caller_result": "FAILED exit 1 after 00:00:58",
+    "downstream_result": "HG00097 stage and caller jobs cancelled by afterok dependency; its submitted ledger rows are reconciled to the terminal cancelled state with caller job 1302428 after deployment of the audited state transition",
+    "evidence": {
+      "policy": "Roihu logs and quarantine remain under the run ID and job ID; no output is eligible for a canonical matrix.",
+      "stage_stderr_sha256": "e567ddf1307d4d501a4f04ccf73fac16a685148e3f551aecb63bbbefece07646",
+      "caller_stderr_sha256": "dfc545616dd26a0cc9a1ada8535c0879864a9fe140e9357e8944e6bef28f5a36",
+      "caller_stdout_sha256": "051b428085dd0d6adaf96788864a33e685ab249842df181d3068d5cce27c19da",
+      "nextflow_log_sha256": "16fafe5bf4ba1f56f17614e862bf73de82cfff78eb5abafda51118bd4315f491",
+      "hlahd_command_stderr_sha256": "95749e236907464dccd010cc40138a41006504745a18f9a60f12d5aed3b76963"
+    }
+  },
+  "root_cause": {
+    "component": "shared chromosome-6 SAM-header detector",
+    "finding": "The pinned HLA-HD image contains mawk 1.3.3 (1996). Its [[:space:]] character class did not match the literal tab after SN:chr6 in the real SAM header, although the preceding grep guard found chr6. The resulting empty shell variable produced the invalid region :28000000-34000000.",
+    "bam_header": "The validated staged BAM contains the exact primary contig SN:chr6 and no primary SN:6.",
+    "affected_modules": ["HLA-HD", "Kourami", "SpecHLA", "POLYSOLVER", "optional EXTRACT_HLA_AND_CONVERT"]
+  },
+  "correction": {
+    "type": "technical container-compatibility correction",
+    "implementation": "A frozen Bash helper parses literal tab-separated SAM fields and accepts exactly one primary contig named 6 or chr6. Alternate-contig names do not satisfy the detector. Every region-extracting module uses the same helper.",
+    "scientific_method_change": false,
+    "truth_used": false,
+    "rerun_required": "All two-sample technical pilots must pass from one clean, identically deployed commit before the storage gate is evaluated."
+  }
+}

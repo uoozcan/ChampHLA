@@ -1,5 +1,6 @@
 {
   "files": {
+    "workflow/bin/detect_chr6_contig.sh": "ff3bc39c764bdf89a84681eed6fa27cf932255846b58c393fc40960ae05bb7e9",
     "workflow/bin/parse_kourami_results.py": "484d0dc3ce846c6b7922aa54cfeac2a6d1ceb761e1be547d4b44d9543b816224",
     "workflow/bin/parse_polysolver_results.py": "0bc82c2a849fd215c35cf2ce8f6a0da9f7791f3249afe3651ca9d1c8704f000d",
     "workflow/bin/parse_t1k_results.py": "56be8f9b3db5be495dd440c423552b54f2101ea8dc5d36c08c16d9bf7aa85506",
@@ -8,12 +9,12 @@
     "workflow/conf/roihu_params.yaml": "dfee8724a652fd233804554b780bb37e7e57f31ad09aea8c22ec72eed3a03d71",
     "workflow/main.nf": "fe0eb0f5131e0805710f099d0549314e5633463850980a34c92f08c5a0c7738e",
     "workflow/modules/arcashla.nf": "6336d6946dbdd392bed164e0d06cf7fa44853f97006e85e32f518da80e0c2694",
-    "workflow/modules/bam_to_fastq.nf": "12f054cfdf6e8e617f37b321d5e7ae824bf63e2d24e8f49a776a8254b9b4124a",
-    "workflow/modules/hlahd.nf": "a9740ed22ced741c3451ac974c0d590f9a30e3ddcb6e72cd6b6907ffcb1e4229",
-    "workflow/modules/kourami.nf": "5d94732199d4425b049e391792e9631ff41bf627150f4b975868944c2aa99495",
+    "workflow/modules/bam_to_fastq.nf": "13c930105a8893f6ddca2d4b0879b1212c7b623440ad00170916bb999659c4e9",
+    "workflow/modules/hlahd.nf": "2782bf569c601749ea7ae16173fe0887165e402de15077e096a3b2dd9923c0ae",
+    "workflow/modules/kourami.nf": "638d60eefac50a23de2ee9e8cf321e607732e8720161719a820f5a098607032a",
     "workflow/modules/optitype.nf": "23d80067ffc6a780ae2b6bdeec8b0b5f030d625bc90ce149813f71f510dd1fa8",
-    "workflow/modules/polysolver.nf": "2fec618d6fb08c7e7119e745f5bf3ae7599cc4827d6a9030c0b85cc6b9dfb831",
-    "workflow/modules/spechla.nf": "a806198e69a93f609c088f2565a347b2eb530f0387582ceeceaa6e4be2107874",
+    "workflow/modules/polysolver.nf": "d6bce201ff42882ef5b11f56da31d2ba62ab1e4d454698e13b548eea4ea25975",
+    "workflow/modules/spechla.nf": "6380fa7d03f189e4f3e6fa9cce94c6856514d52d476891c05a7fab89c7000368",
     "workflow/modules/t1k.nf": "3c881e22a12d4d546576964421788895fb151bed78cb927dfa5dec888c97caae",
     "workflow/nextflow.config": "846f1a23ae6435c08da27ce9e6ea48091690ac317a9d96bb4e57157c4e028d28"
   },

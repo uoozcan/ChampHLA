@@ -51,8 +51,7 @@ process EXTRACT_HLA_AND_CONVERT {
         samtools index -@ ${task.cpus} ${bam}
     fi
     samtools view -H ${bam} > hla_header.sam
-    grep -E '^@SQ.*SN:(chr6|6)[[:space:]]' hla_header.sam > /dev/null
-    chr=\$(awk '/^@SQ.*SN:chr6[[:space:]]/{print "chr6"; exit} /^@SQ.*SN:6[[:space:]]/{print "6"; exit}' hla_header.sam)
+    chr=\$(bash ${projectDir}/bin/detect_chr6_contig.sh hla_header.sam)
     samtools view -@ ${task.cpus} -b ${bam} "\${chr}:${params.hla_region_start}-${params.hla_region_end}" \
         > ${sample_id}.hla.bam
     samtools sort -n -@ ${task.cpus} ${sample_id}.hla.bam -o ${sample_id}.namesort.bam

@@ -39,6 +39,32 @@ cleanup_patch_tmp() {
   rm -rf "${patch_tmp}"
 }
 trap cleanup_patch_tmp EXIT
+
+# Exercise the shared detector inside the oldest affected caller image.  This is
+# deliberately a literal-tab SAM header: mawk 1.3.3 in this image caused the WGS
+# pilot failure that the field-based Bash detector corrects.
+for contig in 6 chr6; do
+  header=${patch_tmp}/header.${contig}.sam
+  printf '@HD\tVN:1.6\n@SQ\tSN:%s\tLN:170805979\n@SQ\tSN:chr6_GL000250v2_alt\tLN:4672374\n' \
+    "${contig}" > "${header}"
+  observed=$(apptainer exec \
+    --bind "${CHAMPHLA_CODE_ROOT}:${CHAMPHLA_CODE_ROOT}:ro" \
+    --bind "${patch_tmp}:${patch_tmp}:ro" \
+    "${CHAMPHLA_CONTAINER_ROOT}/hlahd.sif" \
+    bash "${CHAMPHLA_CODE_ROOT}/workflow/bin/detect_chr6_contig.sh" "${header}")
+  [[ "${observed}" == "${contig}" ]]
+done
+ambiguous_header=${patch_tmp}/header.ambiguous.sam
+printf '@SQ\tSN:6\tLN:170805979\n@SQ\tSN:chr6\tLN:170805979\n' > "${ambiguous_header}"
+if apptainer exec \
+  --bind "${CHAMPHLA_CODE_ROOT}:${CHAMPHLA_CODE_ROOT}:ro" \
+  --bind "${patch_tmp}:${patch_tmp}:ro" \
+  "${CHAMPHLA_CONTAINER_ROOT}/hlahd.sif" \
+  bash "${CHAMPHLA_CODE_ROOT}/workflow/bin/detect_chr6_contig.sh" "${ambiguous_header}"; then
+  echo "chromosome-6 detector accepted an ambiguous header" >&2
+  exit 2
+fi
+
 for contig in 6 chr6; do
   output=${patch_tmp}/wrapper.${contig}
   audit=${patch_tmp}/audit.${contig}.json

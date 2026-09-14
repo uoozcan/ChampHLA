@@ -67,6 +67,14 @@ def test_truth_free_manifest_and_ledger(tmp_path: Path):
     )
     assert transition_run_record(succeeded, "validated")["state"] == "validated"
 
+    cancelled = transition_run_record(rows[1], "submitted", job_id="1302428")
+    cancelled = transition_run_record(
+        cancelled, "cancelled", exit_code="dependency_cancelled",
+    )
+    assert cancelled["state"] == "cancelled"
+    with pytest.raises(ValueError, match="invalid run-ledger transition"):
+        transition_run_record(cancelled, "running")
+
     failed = transition_run_record(running, "failed", exit_code="1")
     with pytest.raises(ValueError, match="supersedes_job_id"):
         transition_run_record(failed, "resubmitted", job_id="2", attempt="2")
@@ -354,6 +362,7 @@ def test_workflow_lock_detects_changes_and_masked_success(tmp_path: Path):
         "nextflow.config": "process.errorStrategy = 'terminate'\n",
         "conf/roihu_params.yaml": "hlahd_db: /app/hlahd.1.4.0\n",
         "conf/polysolver_wrapper_patch.json": "{}\n",
+        "bin/detect_chr6_contig.sh": "#!/bin/bash\nprintf 'chr6\\n'\n",
         "bin/patch_polysolver_wrapper.py": "print('fixture')\n",
     }
     for module in ("arcashla", "bam_to_fastq", "hlahd", "kourami", "optitype",

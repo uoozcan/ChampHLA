@@ -53,13 +53,14 @@ RUN_LEDGER_FIELDS = (
 )
 STATE_TRANSITIONS = {
     "pending": {"submitted"},
-    "submitted": {"running", "failed"},
+    "submitted": {"running", "failed", "cancelled"},
     "running": {"succeeded", "failed"},
     "succeeded": {"validated", "failed"},
     "failed": {"resubmitted", "quarantined"},
     "resubmitted": {"running", "failed"},
     "validated": {"frozen", "quarantined"},
     "frozen": set(),
+    "cancelled": set(),
     "quarantined": set(),
 }
 
@@ -554,7 +555,7 @@ def validate_workflow_lock(lock_path: str | Path, project_root: str | Path) -> d
         observed = sha256(source)
         if not HEX64.fullmatch(str(expected)) or observed != expected:
             failures.append(f"workflow hash mismatch: {relative}")
-        if source.suffix in {".nf", ".config"}:
+        if source.suffix in {".nf", ".config", ".sh"}:
             content = source.read_text(encoding="utf-8", errors="strict")
             for token in WORKFLOW_FORBIDDEN:
                 if token in content:
@@ -562,6 +563,7 @@ def validate_workflow_lock(lock_path: str | Path, project_root: str | Path) -> d
     required = {
         "workflow/main.nf", "workflow/nextflow.config", "workflow/conf/roihu_params.yaml",
         "workflow/conf/polysolver_wrapper_patch.json",
+        "workflow/bin/detect_chr6_contig.sh",
         "workflow/bin/patch_polysolver_wrapper.py",
         *{f"workflow/modules/{name}.nf" for name in (
             "arcashla", "bam_to_fastq", "hlahd", "kourami", "optitype",
@@ -586,7 +588,7 @@ def freeze_workflow_lock(project_root: str | Path, workflow_root: str | Path,
     workflow.relative_to(project)
     selected = sorted(
         item for item in workflow.rglob("*")
-        if item.is_file() and item.suffix in {".nf", ".config", ".yaml", ".json", ".py"}
+        if item.is_file() and item.suffix in {".nf", ".config", ".yaml", ".json", ".py", ".sh"}
     )
     files = {item.relative_to(project).as_posix(): sha256(item) for item in selected}
     payload = {
