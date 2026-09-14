@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 import subprocess
 
@@ -8,6 +9,10 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "workflow" / "bin" / "detect_chr6_contig.sh"
+requires_posix_bash = pytest.mark.skipif(
+    os.name == "nt",
+    reason="The production helper executes inside Linux/Apptainer; Windows bash.exe is a WSL launcher",
+)
 
 
 def run_detector(tmp_path: Path, header: str) -> subprocess.CompletedProcess[str]:
@@ -19,6 +24,7 @@ def run_detector(tmp_path: Path, header: str) -> subprocess.CompletedProcess[str
 
 
 @pytest.mark.parametrize("contig", ["6", "chr6"])
+@requires_posix_bash
 def test_detector_accepts_exact_primary_contig_with_real_sam_tabs(tmp_path: Path, contig: str):
     result = run_detector(
         tmp_path,
@@ -38,6 +44,7 @@ def test_detector_accepts_exact_primary_contig_with_real_sam_tabs(tmp_path: Path
         "@SQ\tSN:chr6_GL000250v2_alt\tLN:10\n",
     ],
 )
+@requires_posix_bash
 def test_detector_rejects_missing_ambiguous_or_alt_only_headers(tmp_path: Path, header: str):
     result = run_detector(tmp_path, header)
     assert result.returncode == 2
@@ -45,6 +52,8 @@ def test_detector_rejects_missing_ambiguous_or_alt_only_headers(tmp_path: Path, 
 
 
 def test_every_region_extract_uses_the_frozen_detector():
+    assert SCRIPT.is_file()
+    assert SCRIPT.read_bytes().startswith(b"#!/bin/bash\n")
     modules = {
         "hlahd.nf": 1,
         "kourami.nf": 1,
