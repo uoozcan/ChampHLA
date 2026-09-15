@@ -1,13 +1,12 @@
 {
   "schema_version": "champhla-goal-state-1",
   "objective": "complete_pipeline_validation_figures_and_manuscript",
-  "repository_commit": "DIRTY:9b95de2ab8f63362e1062bcc62502a83765dd835",
-  "git_tree_oid": "22ea2f9861eea1b1dae40942177b8bf57cfdf77c",
-  "phase": "reviewed_candidate_preparation_before_final_technical_pilots",
+  "repository_commit": "DIRTY:bcaa96133bd37c24431623e87161690f6f609a78",
+  "git_tree_oid": "e174dc5d59edbdd23ae75dd2fc5b52e7aa99e0b5",
+  "phase": "approval_packet_ready_before_final_technical_pilots",
   "status": "ACTIVE",
-  "last_verified_utc": "2026-09-15T22:38:30Z",
+  "last_verified_utc": "2026-09-15T23:16:00Z",
   "open_issue_ids": [
-    "GOAL-001",
     "WF-001",
     "WF-002",
     "WF-003",
@@ -47,12 +46,11 @@
     "DATA-007"
   ],
   "last_commands": [
-    "git status --short --branch",
-    "git rev-parse HEAD^{tree}",
-    "ssh roihu-cpu: .venv/bin/python -m pytest -q -p no:cacheprovider tests/test_consensus.py",
-    "ssh roihu-cpu: .venv/bin/pytest -q -p no:cacheprovider (229 passed, 3 skipped)",
-    "ssh roihu-cpu: .venv/bin/python -m pytest -q -p no:cacheprovider (229 passed, 3 skipped)",
-    "ssh roihu-cpu: squeue/sacct for stagev3 pilot jobs"
+    "python3 -m pytest selected fail-closed suite (127 passed)",
+    "validate_workflow_lock (49 files; passed)",
+    "validate_comparator_manifest(require_frozen=True) (passed)",
+    "validate_hprc_truth_protocol(require_frozen=True) (blocked as designed)",
+    "read-only Roihu Git/manifest/storage/job inventory"
   ],
   "last_verified_artifacts": [
     "docs/CHAMPHLA_COMPLETION_GOAL_PROMPT.md",
@@ -61,7 +59,11 @@
     "configs/roihu_caller_reference_attestation.json",
     "artifacts/goal/baseline_artifact_map.tsv",
     "manuscripts/benchmark/manuscript.md",
-    "manuscripts/benchmark/supplementary.md"
+    "manuscripts/benchmark/supplementary.md",
+    "manuscripts/submission/submission_manifest.tsv",
+    "artifacts/submission_docx_parity.json",
+    "decisions/20260909_public_validation_gap_assessment.json",
+    "reports/HUMAN_ACTION_REQUIRED.md"
   ],
   "current_runs": {
     "pilot-wes-stagev3": "validated_calibration_superseded_by_commit_change",
@@ -71,5 +73,5 @@
     "pilot-rna-stagev4": "pending_reviewed_commit_and_scoped_approval",
     "pilot-wgs-stagev4": "pending_reviewed_commit_and_scoped_approval"
   },
-  "next_action": "Finish the local candidate audit, create a reversible reviewed commit, and write the exact push/CI/Roihu synchronization/preflight/six-sample stagev4 authorization packet. No remote job is submitted before explicit scoped approval."
+  "next_action": "Await exact approval `APPROVE STAGEV4 PILOT PACKET bcaa961`; then push the reviewed candidate, require four green CI jobs, synchronize Roihu, run both supported pytest entrypoints and preflight, and execute the six sequential stagev4 technical-pilot samples."
 }

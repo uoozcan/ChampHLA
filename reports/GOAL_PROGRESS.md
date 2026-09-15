@@ -222,7 +222,7 @@ for GitHub push/CI, Roihu synchronization and preflight, followed by exactly six
 stagev4 technical-pilot samples. The amendment remains unsigned until the
 post-pilot storage gate passes.
 
-## 2026-09-15T23:18:00Z — public independent-cohort search repeated
+## 2026-09-15T23:16:00Z — public independent-cohort search repeated
 
 The required bounded pre-submission search was repeated against primary papers
 and official repository records without opening any controlled dataset. No
@@ -243,7 +243,7 @@ and sources are versioned in
 DATA-007 remain genuine external evidence gaps rather than benchmark-release
 failures.
 
-## 2026-09-15T23:42:00Z — HPRC truth gate corrected before acquisition
+## 2026-09-15T23:16:00Z — HPRC truth gate corrected before acquisition
 
 A static audit found that the HPRC protocol validator treated
 `source_commit` as a SHA-256 field, which would reject a normal 40-character

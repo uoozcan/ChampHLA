@@ -61,7 +61,7 @@
   },
   "reopen_rule": "Repeat the bounded official-repository search before submission or when a newly public cohort is nominated; preserve the same truth and sample-size criteria.",
   "repeat_search": {
-    "searched_at_utc": "2026-09-15T23:18:00Z",
+    "searched_at_utc": "2026-09-15T23:16:00Z",
     "scope": "primary publications and official CDC, ENA/SRA/GEO, ENCODE, DICE/dbGaP, and study-repository records; no controlled data accessed",
     "criteria_unchanged": true,
     "candidate_dispositions": [
