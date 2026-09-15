@@ -243,6 +243,25 @@ and sources are versioned in
 DATA-007 remain genuine external evidence gaps rather than benchmark-release
 failures.
 
+## 2026-09-15T23:42:00Z — HPRC truth gate corrected before acquisition
+
+A static audit found that the HPRC protocol validator treated
+`source_commit` as a SHA-256 field, which would reject a normal 40-character
+Git commit, while the assembly-truth builder did not itself require the
+protocol to be frozen. Both defects are corrected before any HPRC download or
+execution. Frozen protocols now accept exact 40- or 64-character Git commits,
+require an immutable AGC file rather than a directory URL, and continue to
+require SHA-256 identities for archives, tool artifacts, wrappers, and
+references. The truth builder requires the frozen protocol as an input, records
+its hash, rejects ambiguous Boolean audit fields, and cannot run on the current
+draft protocol.
+
+The regenerated 49-file workflow lock is
+`e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3`,
+and all comparator workflow hashes agree with it. The selected local suite now
+passes 127 tests. HPRC remains correctly blocked on separately authorized tool,
+reference, and AGC acquisition; no remote data or software was accessed.
+
 ## 2026-09-15T17:21:49Z — access restored; WGS stagev3 failed closed
 
 The user explicitly authorized read-only Roihu access. The existing CSC

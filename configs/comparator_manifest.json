@@ -5,7 +5,7 @@
   "provenance_attestation": "configs/roihu_caller_reference_attestation.json",
   "workflow_lock": {
     "path": "configs/roihu_workflow_lock.json",
-    "sha256": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35"
+    "sha256": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3"
   },
   "blocking_methods": [],
   "comparators": [
@@ -34,7 +34,7 @@
       "memory": "process_high; Slurm sample envelope 180 GiB",
       "artifact_sha256": "8fb9fa5ec3392c282f02374e1a42a51cc30e1adb3cc7e7a6d96791b0bc593810",
       "source_sha256": "2782bf569c601749ea7ae16173fe0887165e402de15077e096a3b2dd9923c0ae",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "reference_artifacts": [
         {
           "artifact_id": "HLA_gene.split.txt",
@@ -65,7 +65,7 @@
       "memory": "process_high; Java 10 GiB; Slurm sample envelope 180 GiB",
       "artifact_sha256": "c267052e9621579b569110b07c64fc916a968b1a9fa0776681c8dd31fe44d3c9",
       "source_sha256": "638d60eefac50a23de2ee9e8cf321e607732e8720161719a820f5a098607032a",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "reference_artifacts": [
         {
           "artifact_id": "db/VERSION.txt",
@@ -102,7 +102,7 @@
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "7f3f32904a25bd6936e38de1092acb307b5239567b8923c4526aac1007c5684a",
       "source_sha256": "23d80067ffc6a780ae2b6bdeec8b0b5f030d625bc90ce149813f71f510dd1fa8",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "reference_artifacts": [
         {
           "artifact_id": "data/alleles.h5",
@@ -137,7 +137,7 @@
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "b4f39a6dd86d138d8ec15a73cf4b2d33fbc069c84c3b7de4117b4892b65767da",
       "source_sha256": "d6bce201ff42882ef5b11f56da31d2ba62ab1e4d454698e13b548eea4ea25975",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "reference_artifacts": [
         {
           "artifact_id": "a_complete.3100.new.eb.fasta",
@@ -181,7 +181,7 @@
       "memory": "process_high; Slurm sample envelope 180 GiB",
       "artifact_sha256": "77c7b6ef5ad704d0731c6895aca367081f39ca6529206be18070e319ae94ba2b",
       "source_sha256": "6380fa7d03f189e4f3e6fa9cce94c6856514d52d476891c05a7fab89c7000368",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "reference_artifacts": [
         {
           "artifact_id": "db/HLA/Allelelist.txt",
@@ -222,7 +222,7 @@
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "e34c4433021cc21c16a54c8ce6bef6d8b1bd367dddc2920afd4053d053b44c3c",
       "source_sha256": "3c881e22a12d4d546576964421788895fb151bed78cb927dfa5dec888c97caae",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "reference_artifacts": [
         {
           "artifact_id": "hla.dat",
@@ -257,7 +257,7 @@
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "60c42737ccb8c0fa91beef256437028b64d75451ca16e4bf90bb849ba0b6c05c",
       "source_sha256": "6336d6946dbdd392bed164e0d06cf7fa44853f97006e85e32f518da80e0c2694",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "reference_artifacts": [
         {
           "artifact_id": "dat/IMGTHLA/hla.dat",
@@ -274,7 +274,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "ChampionChallenger",
       "kind": "integration",
       "modalities": [
@@ -303,7 +303,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "TwoThirdsGuardedCC",
       "kind": "integration",
       "modalities": [
@@ -332,7 +332,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "MVFlooredCC",
       "kind": "integration",
       "modalities": [
@@ -365,7 +365,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "SimpleTwoThirdsConsensus",
       "kind": "abstaining_baseline",
       "modalities": [
@@ -394,7 +394,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "MetaConsensus",
       "kind": "historical_ablation",
       "modalities": [
@@ -423,7 +423,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "BestSingleTool_nestedCV",
       "kind": "historical_selection",
       "modalities": [
@@ -452,7 +452,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "WeightedConsensus",
       "kind": "historical_ablation",
       "modalities": [
@@ -484,7 +484,7 @@
       "imgt_hla_version": "historical",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "RefFormer",
       "kind": "historical_ablation",
       "modalities": [
@@ -517,7 +517,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "EvidenceGatedCC",
       "kind": "historical_ablation",
       "modalities": [
@@ -549,7 +549,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
+      "workflow_hash": "e8d7b33f5ccb4f5b69fd03083ba5f7046c33342c03b317f74911019cce4a36f3",
       "method_id": "CandidateSetOracle",
       "kind": "oracle",
       "modalities": [

@@ -45,6 +45,29 @@ MANIFEST_FIELDS = [
 ]
 
 
+def frozen_hprc_protocol(path: Path) -> Path:
+    methods = []
+    for index, method in enumerate(("HLA-ASM", "Immuannot"), 1):
+        methods.append({
+            "method": method, "version": "1.0.0", "source_commit": str(index) * 40,
+            "artifact_sha256": str(index + 2) * 64,
+            "wrapper_sha256": str(index + 4) * 64,
+            "reference_artifacts": [{
+                "artifact_id": f"{method} reference", "sha256": str(index + 6) * 64,
+            }],
+        })
+    path.write_text(json.dumps({
+        "schema_version": "champhla-hprc-assembly-truth-protocol-2",
+        "status": "FROZEN", "target_subjects": 120,
+        "assembly_access": {
+            "format": "AGC", "official_archive": "https://example.org/hprc-r2.agc",
+            "archive_artifact_sha256": "a" * 64,
+        },
+        "methods": methods,
+    }), encoding="utf-8")
+    return path
+
+
 def manifest_row(modality="wes", sample="S1"):
     return {
         "cohort": "C", "sample_id": sample, "donor_id": sample, "modality": modality,
@@ -430,13 +453,33 @@ def test_hprc_truth_requires_dual_method_concordance(tmp_path: Path):
     calls = tmp_path / "assembly.tsv"
     write_tsv(calls, rows)
     truth = tmp_path / "truth.tsv"
-    summary = build_hprc_assembly_truth(calls, truth, tmp_path / "audit.json")
+    protocol = frozen_hprc_protocol(tmp_path / "protocol.json")
+    summary = build_hprc_assembly_truth(calls, protocol, truth, tmp_path / "audit.json")
     assert summary["resolved_loci"] == 3
+    assert summary["frozen_protocol_sha256"]
     rows[-1]["allele"] = "C*03:01"
     write_tsv(calls, rows)
-    summary = build_hprc_assembly_truth(calls, truth, tmp_path / "audit.json")
+    summary = build_hprc_assembly_truth(calls, protocol, truth, tmp_path / "audit.json")
     assert summary["resolved_loci"] == 2
     assert next(row for row in read_tsv(truth) if row["gene"] == "C")["truth_status"] == "unresolved"
+
+
+def test_hprc_truth_rejects_draft_protocol_and_ambiguous_booleans(tmp_path: Path):
+    calls = tmp_path / "assembly.tsv"
+    row = {
+        "sample_id": "HG1", "haplotype": "1", "gene": "A", "method": "HLA-ASM",
+        "allele": "A*01:01", "exon2_complete": "maybe", "exon3_complete": "yes",
+        "equally_supported_conflict": "no", "source_sha256": "a" * 64,
+    }
+    write_tsv(calls, [row])
+    draft = tmp_path / "draft.json"
+    draft.write_text((Path(__file__).parents[1] / "configs/hprc_truth_protocol.json").read_text(),
+                     encoding="utf-8")
+    with pytest.raises(ValueError, match="protocol is not executable"):
+        build_hprc_assembly_truth(calls, draft, tmp_path / "truth.tsv", tmp_path / "audit.json")
+    protocol = frozen_hprc_protocol(tmp_path / "protocol.json")
+    with pytest.raises(ValueError, match="invalid exon2_complete boolean"):
+        build_hprc_assembly_truth(calls, protocol, tmp_path / "truth.tsv", tmp_path / "audit.json")
 
 
 def test_independent_recount_does_not_pool_strata(tmp_path: Path):

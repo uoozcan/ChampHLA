@@ -158,6 +158,9 @@ AGC archive, HLA-ASM, Immuannot, and wrappers are pinned. Extract one subject's
 two haplotypes at a time. `build_hprc_assembly_truth` accepts a locus only when
 both haplotypes are complete, both methods agree at two-field resolution,
 coding exons 2/3 are gap-free, and no equal conflicting allele remains.
+The truth builder requires `--protocol` and independently rejects a draft,
+directory-valued AGC source, unresolved Git commit, or drifting artifact,
+wrapper, and reference hash before reading method calls.
 
 Independent WES ≥89 and RNA ≥130 with direct complete A/B/C truth remain
 blocked if the bounded public search finds no qualifying cohorts. Do not lower

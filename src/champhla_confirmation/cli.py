@@ -723,10 +723,13 @@ def plan_roihu_cleanup_main() -> int:
 def build_hprc_assembly_truth_main() -> int:
     parser = argparse.ArgumentParser(description="Build conservative dual-method HPRC assembly truth")
     parser.add_argument("--calls", required=True)
+    parser.add_argument("--protocol", required=True)
     parser.add_argument("--truth-output", required=True)
     parser.add_argument("--audit-output", required=True)
     args = parser.parse_args()
-    result = build_hprc_assembly_truth(args.calls, args.truth_output, args.audit_output)
+    result = build_hprc_assembly_truth(
+        args.calls, args.protocol, args.truth_output, args.audit_output,
+    )
     print(f"HPRC truth resolved={result['resolved_loci']} unresolved={result['unresolved_loci']}")
     return 0
 

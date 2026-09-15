@@ -5,15 +5,30 @@ from pathlib import Path
 import re
 
 from .io import canonical_allele, read_tsv, sha256, write_json, write_tsv
+from .manifests import validate_hprc_truth_protocol
 from .panels import GENES
 
 
 TRUTH_METHODS = {"HLA-ASM", "Immuannot"}
 HEX64 = re.compile(r"^[0-9a-fA-F]{64}$")
+TRUE_VALUES = {"1", "true", "yes"}
+FALSE_VALUES = {"0", "false", "no"}
 
 
-def build_hprc_assembly_truth(calls_path: str | Path, truth_output: str | Path,
-                              audit_output: str | Path) -> dict:
+def _boolean(value: str, field: str, identity: str) -> bool:
+    normalized = str(value).strip().lower()
+    if normalized in TRUE_VALUES:
+        return True
+    if normalized in FALSE_VALUES:
+        return False
+    raise ValueError(f"{identity} has invalid {field} boolean: {value!r}")
+
+
+def build_hprc_assembly_truth(calls_path: str | Path, protocol_path: str | Path,
+                              truth_output: str | Path, audit_output: str | Path) -> dict:
+    protocol_failures = validate_hprc_truth_protocol(str(protocol_path), require_frozen=True)
+    if protocol_failures:
+        raise ValueError("HPRC truth protocol is not executable: " + "; ".join(protocol_failures))
     rows = read_tsv(calls_path)
     required = {
         "sample_id", "haplotype", "gene", "method", "allele", "exon2_complete",
@@ -23,6 +38,9 @@ def build_hprc_assembly_truth(calls_path: str | Path, truth_output: str | Path,
         raise ValueError(f"assembly truth calls missing columns: {sorted(required - set(rows[0]) if rows else required)}")
     indexed = defaultdict(list)
     for row in rows:
+        sample_id = row.get("sample_id", "").strip()
+        if not sample_id:
+            raise ValueError("assembly truth call has empty sample_id")
         gene = row["gene"].replace("HLA-", "").upper()
         if gene not in GENES:
             continue
@@ -34,8 +52,12 @@ def build_hprc_assembly_truth(calls_path: str | Path, truth_output: str | Path,
             raise ValueError(f"unsupported assembly haplotype: {haplotype}")
         if not HEX64.fullmatch(row.get("source_sha256", "")):
             raise ValueError(f"invalid assembly source SHA-256 for {row['sample_id']} {method}")
-        indexed[(row["sample_id"], gene, method, haplotype)].append(row)
-    samples = sorted({row["sample_id"] for row in rows})
+        identity = f"{sample_id} {gene} {method} haplotype {haplotype}"
+        _boolean(row["exon2_complete"], "exon2_complete", identity)
+        _boolean(row["exon3_complete"], "exon3_complete", identity)
+        _boolean(row["equally_supported_conflict"], "equally_supported_conflict", identity)
+        indexed[(sample_id, gene, method, haplotype)].append(row)
+    samples = sorted({row["sample_id"].strip() for row in rows})
     truth_rows, audit_rows = [], []
     for sample in samples:
         for gene in GENES:
@@ -51,11 +73,12 @@ def build_hprc_assembly_truth(calls_path: str | Path, truth_output: str | Path,
                         continue
                     row = matches[0]
                     source_hashes.add(row["source_sha256"])
-                    if row["exon2_complete"].lower() not in {"1", "true", "yes"}:
+                    identity = f"{sample} {gene} {method} haplotype {haplotype}"
+                    if not _boolean(row["exon2_complete"], "exon2_complete", identity):
                         reasons.append(f"{method}:haplotype_{haplotype}:exon2_incomplete")
-                    if row["exon3_complete"].lower() not in {"1", "true", "yes"}:
+                    if not _boolean(row["exon3_complete"], "exon3_complete", identity):
                         reasons.append(f"{method}:haplotype_{haplotype}:exon3_incomplete")
-                    if row["equally_supported_conflict"].lower() in {"1", "true", "yes"}:
+                    if _boolean(row["equally_supported_conflict"], "equally_supported_conflict", identity):
                         reasons.append(f"{method}:haplotype_{haplotype}:conflicting_allele")
                     try:
                         alleles.append(canonical_allele(row["allele"], gene))
@@ -91,6 +114,7 @@ def build_hprc_assembly_truth(calls_path: str | Path, truth_output: str | Path,
         "resolved_loci": sum(row["truth_status"] == "resolved" for row in truth_rows),
         "unresolved_loci": sum(row["truth_status"] != "resolved" for row in truth_rows),
         "input_sha256": sha256(calls_path), "truth_sha256": sha256(truth_output),
+        "frozen_protocol_sha256": sha256(protocol_path),
         "audit_tsv_sha256": sha256(Path(audit_output).with_suffix(".tsv")),
         "passed_120_subject_roster": len(samples) == 120,
     }

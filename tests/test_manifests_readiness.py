@@ -251,6 +251,26 @@ def test_hprc_execution_remains_blocked_until_tools_and_archive_are_pinned():
     assert "HPRC truth protocol is not FROZEN" in failures
 
 
+def test_hprc_frozen_protocol_accepts_git_commit_and_rejects_directory_archive(tmp_path: Path):
+    source = json.loads((ROOT / "configs/hprc_truth_protocol.json").read_text(encoding="utf-8"))
+    source["status"] = "FROZEN"
+    source["assembly_access"]["archive_artifact_sha256"] = "a" * 64
+    for index, method in enumerate(source["methods"], 1):
+        method["version"] = "1.0.0"
+        method["source_commit"] = str(index) * 40
+        method["artifact_sha256"] = str(index + 2) * 64
+        method["wrapper_sha256"] = str(index + 4) * 64
+        for reference in method["reference_artifacts"]:
+            reference["sha256"] = str(index + 6) * 64
+    protocol = tmp_path / "protocol.json"
+    protocol.write_text(json.dumps(source), encoding="utf-8")
+    failures = validate_hprc_truth_protocol(str(protocol), require_frozen=True)
+    assert failures == ["HPRC official archive must identify one immutable file, not a directory"]
+    source["assembly_access"]["official_archive"] += "hprc-r2.agc"
+    protocol.write_text(json.dumps(source), encoding="utf-8")
+    assert validate_hprc_truth_protocol(str(protocol), require_frozen=True) == []
+
+
 def test_release_audit_fails_closed_on_unfinished_external_work(tmp_path: Path):
     result = audit_release_readiness(
         str(ROOT), str(ROOT / "configs" / "release_requirements.json"),

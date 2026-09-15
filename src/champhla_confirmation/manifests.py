@@ -26,6 +26,7 @@ UNRESOLVED_MARKERS = {
     "not established", "repository-wide",
 }
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
+GIT_COMMIT = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
 
 
 def _has_unresolved(value: object) -> bool:
@@ -256,17 +257,23 @@ def validate_hprc_truth_protocol(path: str, require_frozen: bool = True) -> list
     if require_frozen and not HEX64.fullmatch(
             str(access.get("archive_artifact_sha256", "")).lower()):
         failures.append("HPRC AGC archive SHA-256 is unresolved")
+    if require_frozen and str(access.get("official_archive", "")).endswith("/"):
+        failures.append("HPRC official archive must identify one immutable file, not a directory")
     methods = data.get("methods", [])
     by_name = {row.get("method"): row for row in methods if isinstance(row, dict)}
     if set(by_name) != {"HLA-ASM", "Immuannot"}:
         failures.append("HPRC truth protocol must contain exactly HLA-ASM and Immuannot")
     for name in ("HLA-ASM", "Immuannot"):
         row = by_name.get(name, {})
-        for field in ("version", "source_commit", "artifact_sha256", "wrapper_sha256"):
+        version = row.get("version", "")
+        if require_frozen and _has_unresolved(version):
+            failures.append(f"{name}.version is unresolved")
+        source_commit = str(row.get("source_commit", "")).lower()
+        if require_frozen and not GIT_COMMIT.fullmatch(source_commit):
+            failures.append(f"{name}.source_commit is not an exact Git commit")
+        for field in ("artifact_sha256", "wrapper_sha256"):
             value = row.get(field, "")
-            if require_frozen and field == "version" and _has_unresolved(value):
-                failures.append(f"{name}.{field} is unresolved")
-            if require_frozen and field != "version" and not HEX64.fullmatch(str(value).lower()):
+            if require_frozen and not HEX64.fullmatch(str(value).lower()):
                 failures.append(f"{name}.{field} is not an exact SHA-256")
         references = row.get("reference_artifacts", [])
         if not isinstance(references, list) or not references:
