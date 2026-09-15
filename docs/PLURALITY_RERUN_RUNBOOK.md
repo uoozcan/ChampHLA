@@ -47,9 +47,9 @@ unknown roles/modalities, and reference incompatibility.
 
 ```bash
 freeze_run_manifest --manifest RUN.tsv --expected-counts configs/roihu_storage_targets.json --output RUN.freeze.json
-bash scripts/roihu_submit_wave.sh RUN.tsv wes pilot pilot-wes-stagev2
-bash scripts/roihu_submit_wave.sh RUN.tsv wgs pilot pilot-wgs-stagev2
-bash scripts/roihu_submit_wave.sh RUN.tsv rnaseq pilot pilot-rna-stagev2
+bash scripts/roihu_submit_wave.sh RUN.tsv wes pilot pilot-wes-stagev3
+bash scripts/roihu_submit_wave.sh RUN.tsv wgs pilot pilot-wgs-stagev3
+bash scripts/roihu_submit_wave.sh RUN.tsv rnaseq pilot pilot-rna-stagev3
 ```
 
 Each submission requires a lowercase safe `run_id`; subsets, ledgers, logs,
@@ -61,9 +61,9 @@ After all three two-sample pilots finish, assess their three ledgers together:
 
 ```bash
 assess_roihu_storage \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wgs-stagev2_wgs_pilot.ledger.tsv" \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wes-stagev2_wes_pilot.ledger.tsv" \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-rna-stagev2_rnaseq_pilot.ledger.tsv" \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wgs-stagev3_wgs_pilot.ledger.tsv" \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wes-stagev3_wes_pilot.ledger.tsv" \
+  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-rna-stagev3_rnaseq_pilot.ledger.tsv" \
   --targets configs/roihu_storage_targets.json \
   --environment-inventory "$CHAMPHLA_RUN_ROOT/environment_inventory.json" \
   --output "$CHAMPHLA_RUN_ROOT/storage_gate.json"
@@ -84,8 +84,9 @@ real held Slurm job ID before release and retains one immutable row per attempt.
 WGS extraction is mate-aware and
 uses chr6:28–34 Mb plus all HLA-A/B/C alternate contigs from the pinned
 GRCh38DH index. A streamed CRAM gets at most two five-hour attempts separated
-by 60 seconds, and only an allowlisted CRC, reset, timeout, temporary DNS, HTTP
-429, or HTTP 5xx transport failure can retry. Attempts use unique directories;
+by 60 seconds, and only an allowlisted CRC, remote seek/EOF-close, reset,
+timeout, temporary DNS, HTTP 429, or HTTP 5xx transport failure can retry.
+Attempts use unique directories;
 partial outputs and stderr are quarantined. HTTP 401/403/404, reference/contig
 or checksum errors, missing/local-corrupt files, and generic exit 1 are
 deterministic. `samtools quickcheck` checks header/EOF structure; header access
@@ -103,9 +104,10 @@ lineage.
 Runs `pilot-wgs-20260914a`, `pilot-wgs-20260914b`,
 `pilot-wgs-20260914c`, and the earlier WES pilot are calibration or
 pre-transport-hardening diagnostics. They cannot enter the final storage gate
-or any performance analysis. Both WGS `stagev2` inputs must be restreamed under
-the final commit; only checksum-verified immutable raw WES/RNA inputs may be
-reused.
+or any performance analysis. The `stagev2` series is also calibration evidence:
+it exposed a Bash `ERR`-trap path that bypassed the intended WGS transport
+classifier. Both WGS `stagev3` inputs must be restreamed under the corrective
+final commit; only checksum-verified immutable raw WES/RNA inputs may be reused.
 
 ## Same-resource closure
 

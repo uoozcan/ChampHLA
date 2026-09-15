@@ -142,6 +142,8 @@ def test_wgs_transport_retry_is_inside_staging_job_and_bounded():
     assert "CHAMPHLA_STAGE_ATTEMPT_TIMEOUT_SECONDS:-18000" in text
     assert "CHAMPHLA_STAGE_RETRY_BACKOFF_SECONDS:-60" in text
     assert "timeout --signal=TERM" in text
+    assert 'if timeout --signal=TERM' in text
+    assert "extraction_code=$?" in text
     assert "classify_stage_failure_main" in text
     assert "scontrol requeue" not in text
     assert "samtools.stderr" in text
@@ -162,9 +164,11 @@ def test_caller_requires_validated_staging_ledger_before_completion():
     assert 'latest["state"] == "validated"' in runner
     assert "STAGE_LEDGER" in runner
     finalizer = (ROOT / "scripts/roihu_finalize_sample.sbatch").read_text(encoding="utf-8")
-    assert "afterany" not in finalizer  # dependency is assigned by the submitter
+    assert "#SBATCH --dependency" not in finalizer  # assigned by the submitter
     assert "CALLERS_COMPLETE" in finalizer
     assert "finalize_sample" in finalizer
+    assert "for poll in $(seq 1 12)" in finalizer
+    assert "sleep 5" in finalizer
 
 
 def test_streamed_wgs_records_that_the_source_checksum_was_not_reverified():

@@ -39,6 +39,8 @@ TRANSIENT_PATTERNS = (
     r"operation timed out", r"temporary failure in name resolution",
     r"could not resolve host", r"\bHTTP[^\n]*429\b", r"\b429\b[^\n]*HTTP",
     r"\bHTTP[^\n]*5\d\d\b", r"\b5\d\d\b[^\n]*HTTP",
+    r"seek at offset \d+ failed", r"error closing [\"']https?://",
+    r"EOF marker is absent",
 )
 
 

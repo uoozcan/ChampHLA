@@ -60,6 +60,9 @@ def manifest_row(modality="wes", sample="S1"):
     "Container header CRC32 failure", "connection reset by peer",
     "operation timed out", "temporary failure in name resolution",
     "HTTP response code 429", "HTTP 503 Service Unavailable",
+    "Seek at offset 12003535533 failed",
+    'samtools view: error closing "https://example.org/a.cram": -1',
+    "EOF marker is absent. The input is probably truncated",
 ])
 def test_remote_stage_failure_transient_allowlist(message):
     result = classify_stage_failure(1, message, "https://example.org/a.cram")

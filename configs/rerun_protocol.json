@@ -15,11 +15,11 @@
     "overwrite_joined_outputs": false
   },
   "remote_cram_transport": {
-    "implementation_version": "stage-transport-v2",
+    "implementation_version": "stage-transport-v3",
     "maximum_attempts": 2,
     "attempt_timeout_seconds": 18000,
     "backoff_seconds": 60,
-    "retry_scope": "allowlisted remote transport failures only",
+    "retry_scope": "allowlisted remote transport failures only, including remote seek/EOF-close failures",
     "attempt_directories_unique": true,
     "attempt_ledger_immutable": true,
     "source_checksum_semantics": "declared upstream identity; not locally verified for streamed full CRAM",

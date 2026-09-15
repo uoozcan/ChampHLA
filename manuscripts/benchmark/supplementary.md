@@ -140,9 +140,11 @@ and caller ledgers. It reports run identifier and role, sample, modality,
 attempt, scheduler job, terminal state, failure class, and supersession without
 reporting pilot accuracy. The pre-hardening HG00097 CRAM CRC event is retained
 as an infrastructure transport diagnostic. It is neither a caller result nor
-evidence of a plurality or WGS accuracy limitation. Only the final-commit
-`stagev2` pilots may enter the storage assessment; no pilot enters a performance
-table or result registry.
+evidence of a plurality or WGS accuracy limitation. The first hardened pilot
+exposed a shell-control defect that bypassed classification and retry; its
+successful WES/RNA samples remain calibration evidence because the corrective
+commit changed. Only one set of final-commit pilots may enter the storage
+assessment; no pilot enters a performance table or result registry.
 
 ## S10. Count reconciliation and reproducibility
 

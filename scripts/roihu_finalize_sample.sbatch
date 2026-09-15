@@ -20,10 +20,20 @@ mapfile -t -d $'\t' _row < <(printf '%s' "$(sed -n "${line_number}p" "${manifest
 [[ ${#_row[@]} -eq 13 ]]
 cohort=${_row[0]}; sample_id=${_row[1]}; modality=${_row[3]}
 
-stage_state=$(sacct -j "${stage_job}_${SLURM_ARRAY_TASK_ID}" --noheader --parsable2 --format=State \
-  | head -1 | cut -d'|' -f1 | cut -d+ -f1)
-caller_state=$(sacct -j "${caller_job}_${SLURM_ARRAY_TASK_ID}" --noheader --parsable2 --format=State \
-  | head -1 | cut -d'|' -f1 | cut -d+ -f1)
+scheduler_state() {
+  local job=$1 observed= poll
+  # afterany may release before accounting is queryable. Bound the wait to one
+  # minute and never leave an active ledger row merely because sacct lagged.
+  for poll in $(seq 1 12); do
+    observed=$(sacct -j "${job}_${SLURM_ARRAY_TASK_ID}" --noheader --parsable2 --format=State \
+      | head -1 | cut -d'|' -f1 | cut -d+ -f1)
+    if [[ -n "${observed}" ]]; then printf '%s\n' "${observed}"; return 0; fi
+    sleep 5
+  done
+  printf 'terminal_unknown\n'
+}
+stage_state=$(scheduler_state "${stage_job}")
+caller_state=$(scheduler_state "${caller_job}")
 completion=${CHAMPHLA_RUN_ROOT}/caller_outputs/${CHAMPHLA_RUN_ID}/${CHAMPHLA_RUN_ROLE}/${modality}/${sample_id}/CALLERS_COMPLETE
 python3 - "${stage_ledger}" "${caller_ledger}" "${cohort}" "${sample_id}" "${modality}" \
   "${stage_state}" "${caller_state}" "${completion}" <<'PY'

@@ -1,10 +1,10 @@
 {
   "files": {
-    "scripts/roihu_finalize_sample.sbatch": "15e053c56d91b4b936d4c6f8bfe427e614de11c39e6486fd5aea1fed32cfa3c6",
+    "scripts/roihu_finalize_sample.sbatch": "0d3d16bb1c92fc995cdf22d7b23b8066759859c5de24ecdcb4272b6420ef6ca9",
     "scripts/roihu_run_sample.sbatch": "3d28d398f3df851345a1f090bfb478a2dfd0f077936d326ce94e42bd73146db5",
-    "scripts/roihu_stage_inputs.sbatch": "4c520053c636a21e10ff85eabc0ce701410df9bdfed5c08d947235c07ae114f3",
+    "scripts/roihu_stage_inputs.sbatch": "add7e9dac9b4f7f08b82444f753d3bd398b280fe6964896a8cbe1e848d351355",
     "scripts/roihu_submit_wave.sh": "803ddbe8eee9041f177d654180a83469c3c997e8dac6b8c92478d45d37500550",
-    "src/champhla_confirmation/staging.py": "386f5ed66c8846c6a05a28e4634c606375827d2e11ffc6f03ab72328222b9ca0",
+    "src/champhla_confirmation/staging.py": "3342e4673b9b0b4779451a56ccad66dc9c1fe512d0fb54ba62af9b7ad9e4d4d9",
     "workflow/bin/detect_chr6_contig.sh": "ff3bc39c764bdf89a84681eed6fa27cf932255846b58c393fc40960ae05bb7e9",
     "workflow/bin/parse_kourami_results.py": "484d0dc3ce846c6b7922aa54cfeac2a6d1ceb761e1be547d4b44d9543b816224",
     "workflow/bin/parse_polysolver_results.py": "0bc82c2a849fd215c35cf2ce8f6a0da9f7791f3249afe3651ca9d1c8704f000d",

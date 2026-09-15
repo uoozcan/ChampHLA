@@ -2,7 +2,7 @@
   "schema_version": "champhla-technical-decision-1",
   "decision_id": "20260914_remote_cram_transport_hardening",
   "date_utc": "2026-09-14",
-  "status": "IMPLEMENTED_AWAITING_FINAL_COMMIT_VALIDATION",
+  "status": "IMPLEMENTED_V2_DEFECT_FOUND_STAGEV3_REQUIRED",
   "scope": "truth-free remote WGS CRAM staging and operational evidence",
   "trigger": {
     "run_id": "pilot-wgs-20260914b",
@@ -44,10 +44,19 @@
     "slurm_policy": "never requeue a failed dependency; held jobs receive recorded IDs before release and an afterany sample finalizer reconciles terminal states",
     "source_identity_policy": "streamed full-CRAM checksums remain declared upstream identities; extracted BAMs and indexes are locally verified and hashed"
   },
-  "authoritative_pilots": [
-    "pilot-wes-stagev2",
-    "pilot-wgs-stagev2",
-    "pilot-rna-stagev2"
+  "stagev2_disposition": {
+    "wes": "two samples validated; calibration only because the final storage-gate commit changes",
+    "rnaseq": "two samples validated; calibration only because the final storage-gate commit changes",
+    "wgs": "HG00096 validated; HG00097 failed before retry because the Bash ERR trap intercepted samtools exit 1",
+    "root_cause": "set +e does not suppress an ERR trap; the failed samtools command had to be evaluated directly as an if condition",
+    "secondary_finding": "remote seek/EOF-close failures were not classified as allowlisted remote transport errors",
+    "performance_eligible": false,
+    "storage_gate_eligible": false
+  },
+  "authoritative_pilots_after_correction": [
+    "pilot-wes-stagev3",
+    "pilot-wgs-stagev3",
+    "pilot-rna-stagev3"
   ],
   "manual_gates_unchanged": [
     "author signature after the six-sample storage gate passes",

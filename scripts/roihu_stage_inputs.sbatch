@@ -188,13 +188,17 @@ elif [[ "${modality}" == wgs ]]; then
         --superseded-attempt "$((attempt-1))"
       stage_transition --state running --scheduler-job-id "${scheduler_task_id}"
     fi
-    set +e
-    timeout --signal=TERM "${attempt_timeout}" samtools view \
-      --threads "${SLURM_CPUS_PER_TASK}" --reference "${reference}" \
-      --fetch-pairs --target-file "${regions}" --bam --output "${attempt_bam}" \
-      -X "${input_uri}" "${idx}" 2>"${attempt_stderr}"
-    extraction_code=$?
-    set -e
+    # A failing command triggers ERR even when errexit is temporarily disabled.
+    # Test it as the condition itself so the trap cannot bypass classification
+    # and the bounded in-allocation retry.
+    if timeout --signal=TERM "${attempt_timeout}" samtools view \
+        --threads "${SLURM_CPUS_PER_TASK}" --reference "${reference}" \
+        --fetch-pairs --target-file "${regions}" --bam --output "${attempt_bam}" \
+        -X "${input_uri}" "${idx}" 2>"${attempt_stderr}"; then
+      extraction_code=0
+    else
+      extraction_code=$?
+    fi
     if [[ "${extraction_code}" -eq 0 ]]; then
       mv "${attempt_bam}" "${tmp_bam}"
       mv "${attempt_stderr}" "${stage_root}/extraction_attempt_${attempt}.stderr"
