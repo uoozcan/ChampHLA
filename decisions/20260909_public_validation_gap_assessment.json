@@ -59,5 +59,61 @@
     "criteria_relaxed": false,
     "independent_three_modality_claim_ready": false
   },
-  "reopen_rule": "Repeat the bounded official-repository search before submission or when a newly public cohort is nominated; preserve the same truth and sample-size criteria."
+  "reopen_rule": "Repeat the bounded official-repository search before submission or when a newly public cohort is nominated; preserve the same truth and sample-size criteria.",
+  "repeat_search": {
+    "searched_at_utc": "2026-09-15T23:18:00Z",
+    "scope": "primary publications and official CDC, ENA/SRA/GEO, ENCODE, DICE/dbGaP, and study-repository records; no controlled data accessed",
+    "criteria_unchanged": true,
+    "candidate_dispositions": [
+      {
+        "candidate": "1000 Genomes Phase 3 WES benchmark (829 subjects)",
+        "modality": "wes",
+        "disposition": "same_resource_not_independent",
+        "reason": "all 829 WES samples and their laboratory HLA labels are from 1000 Genomes; 154 subjects were also used in original caller papers, so this cannot satisfy a donor-independent lane",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9679531/"
+      },
+      {
+        "candidate": "GeT-RM exome benchmark (108 cell lines)",
+        "modality": "wes",
+        "disposition": "raw_exomes_private",
+        "reason": "the direct multi-method HLA genotypes are public and exceed the donor minimum, but the xHLA study explicitly describes the 108-sample exome dataset as private; CDC currently links public WGS for only 70 reference samples, which is a different assay and below the WES minimum",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5544337/",
+        "official_truth_source": "https://www.cdc.gov/lab-quality/php/get-rm/reference-materials.html"
+      },
+      {
+        "candidate": "Finnish Red Cross Blood Service MHC capture cohort",
+        "modality": "wes",
+        "disposition": "wrong_assay",
+        "reason": "93-94 individuals meet the numerical scale and have clinical HLA typing, but sequencing used a dedicated 4-Mbp MHC capture rather than whole-exome sequencing",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5733459/"
+      },
+      {
+        "candidate": "AFGR MKK RNA-seq",
+        "modality": "rnaseq",
+        "disposition": "controlled_truth_and_post_qc_underpowered",
+        "reason": "public RNA-seq exists, but high-resolution HLA truth is controlled; after RNA-seq QC only 126 donor-independent MKK samples remain, below the predeclared minimum of 130. The additional AFGR subjects are 1000 Genomes donors and cannot be pooled into an independent stratum",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11108778/"
+      },
+      {
+        "candidate": "FNLCR PBMC RNA-seq",
+        "modality": "rnaseq",
+        "disposition": "controlled_and_underpowered",
+        "reason": "96 subjects have direct Sanger HLA calls, but both the cohort size and controlled dbGaP access fail the public >=130-donor requirement",
+        "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9883133/"
+      },
+      {
+        "candidate": "DICE sorted-cell RNA-seq",
+        "modality": "rnaseq",
+        "disposition": "controlled_and_underpowered",
+        "reason": "individual-level RNA-seq/genotypes require dbGaP access and the cohort contains 91 donors, below the minimum",
+        "source": "https://dice-database.org/downloads"
+      }
+    ],
+    "outcome": {
+      "independent_wes": "BLOCKED_NO_QUALIFYING_PUBLIC_COHORT",
+      "independent_rnaseq": "BLOCKED_NO_QUALIFYING_PUBLIC_COHORT",
+      "criteria_relaxed": false,
+      "independent_three_modality_claim_ready": false
+    }
+  }
 }

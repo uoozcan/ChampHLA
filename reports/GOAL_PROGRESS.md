@@ -222,6 +222,27 @@ for GitHub push/CI, Roihu synchronization and preflight, followed by exactly six
 stagev4 technical-pilot samples. The amendment remains unsigned until the
 post-pilot storage gate passes.
 
+## 2026-09-15T23:18:00Z — public independent-cohort search repeated
+
+The required bounded pre-submission search was repeated against primary papers
+and official repository records without opening any controlled dataset. No
+qualifying public donor-independent WES or RNA-seq cohort was found, and no
+criterion was relaxed. The superficially promising 829-subject WES benchmark is
+entirely 1000 Genomes and therefore same-resource. GeT-RM supplies public direct
+HLA truth for 108 cell lines, but its 108-sample exome benchmark was explicitly
+private; the currently linked public sequencing is WGS for 70 samples, not the
+required WES lane. The Finnish 93-94-subject dataset uses dedicated MHC capture,
+not WES.
+
+For RNA-seq, public AFGR reads do not close the gate: independent MKK retains
+126 samples after QC and the high-resolution truth is controlled, while the
+remaining AFGR subjects overlap 1000 Genomes and cannot be pooled. FNLCR has 96
+controlled subjects and DICE has 91 controlled donors. The exact dispositions
+and sources are versioned in
+`decisions/20260909_public_validation_gap_assessment.json`; DATA-006 and
+DATA-007 remain genuine external evidence gaps rather than benchmark-release
+failures.
+
 ## 2026-09-15T17:21:49Z — access restored; WGS stagev3 failed closed
 
 The user explicitly authorized read-only Roihu access. The existing CSC

@@ -210,6 +210,20 @@ def test_bibliographic_dois_are_not_misclassified_as_unregistered_results(tmp_pa
     )
     assert "main numerical result lacks a registry reference" not in result["failures"]
 
+
+def test_public_validation_gap_repeat_search_preserves_locked_minima():
+    decision = json.loads(
+        (ROOT / "decisions/20260909_public_validation_gap_assessment.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert decision["prospective_minima"] == {"wes_donors": 89, "rnaseq_donors": 130}
+    repeat = decision["repeat_search"]
+    assert repeat["criteria_unchanged"] is True
+    assert len(repeat["candidate_dispositions"]) >= 6
+    assert repeat["outcome"] == decision["outcome"]
+    assert all(row["disposition"] for row in repeat["candidate_dispositions"])
+
 def test_abstaining_rule_is_excluded_from_the_always_call_family():
     """Holm runs within the always-call family; the abstaining rule is reported separately."""
     manifest = json.loads(
