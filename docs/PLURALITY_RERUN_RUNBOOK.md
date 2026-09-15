@@ -18,8 +18,10 @@ No capacity or production prediction is authorized until all are true:
 3. `configs/comparator_manifest.json` contains observed versions and immutable
    hashes for every intended-use caller and frozen integration artifact, and
    its status is `FROZEN`. A missing required caller stops production.
-4. `bash scripts/roihu_preflight.sh` passes and writes a clean repository,
-   environment, storage, reference, software, and container inventory.
+4. `bash scripts/roihu_preflight.sh EVIDENCE_ID` passes and writes immutable,
+   versioned repository, environment, storage, reference, software, and
+   container evidence. `roihu_promote_preflight.sh` must explicitly select it;
+   a preflight run never promotes itself.
 
 Before remote administration, validate the identity/certificate pair locally;
 paths are command parameters and are never committed:
@@ -47,9 +49,11 @@ unknown roles/modalities, and reference incompatibility.
 
 ```bash
 freeze_run_manifest --manifest RUN.tsv --expected-counts configs/roihu_storage_targets.json --output RUN.freeze.json
-bash scripts/roihu_submit_wave.sh RUN.tsv wes pilot pilot-wes-stagev3
-bash scripts/roihu_submit_wave.sh RUN.tsv wgs pilot pilot-wgs-stagev3
-bash scripts/roihu_submit_wave.sh RUN.tsv rnaseq pilot pilot-rna-stagev3
+bash scripts/roihu_preflight.sh pre-stagev4-YYYYMMDDTHHMMSSz
+bash scripts/roihu_promote_preflight.sh pre-stagev4-YYYYMMDDTHHMMSSz
+bash scripts/roihu_submit_wave.sh RUN.tsv wes pilot pilot-wes-stagev4
+bash scripts/roihu_submit_wave.sh RUN.tsv wgs pilot pilot-wgs-stagev4
+bash scripts/roihu_submit_wave.sh RUN.tsv rnaseq pilot pilot-rna-stagev4
 ```
 
 Each submission requires a lowercase safe `run_id`; subsets, ledgers, logs,
@@ -57,16 +61,19 @@ output/work roots, quarantine evidence, and batch-chain records are namespaced
 by it. Pilot ledgers have `run_role=technical_pilot`; capacity ledgers have
 `capacity_validation`; only `production` can enter canonical collection.
 
-After all three two-sample pilots finish, assess their three ledgers together:
+After all three two-sample pilots finish, create and promote a new post-pilot
+inventory. The storage gate rejects a stale inventory or one captured before
+the accepted pilots. Assess the three final-commit ledgers together and then
+promote the immutable gate explicitly:
 
 ```bash
-assess_roihu_storage \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wgs-stagev3_wgs_pilot.ledger.tsv" \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-wes-stagev3_wes_pilot.ledger.tsv" \
-  --pilot-ledger "$CHAMPHLA_RUN_ROOT/manifests/pilot-rna-stagev3_rnaseq_pilot.ledger.tsv" \
-  --targets configs/roihu_storage_targets.json \
-  --environment-inventory "$CHAMPHLA_RUN_ROOT/environment_inventory.json" \
-  --output "$CHAMPHLA_RUN_ROOT/storage_gate.json"
+bash scripts/roihu_preflight.sh post-stagev4-YYYYMMDDTHHMMSSz
+bash scripts/roihu_promote_preflight.sh post-stagev4-YYYYMMDDTHHMMSSz
+bash scripts/roihu_assess_storage.sh gate-stagev4-YYYYMMDDTHHMMSSz \
+  "$CHAMPHLA_RUN_ROOT/manifests/pilot-wgs-stagev4_wgs_pilot.ledger.tsv" \
+  "$CHAMPHLA_RUN_ROOT/manifests/pilot-wes-stagev4_wes_pilot.ledger.tsv" \
+  "$CHAMPHLA_RUN_ROOT/manifests/pilot-rna-stagev4_rnaseq_pilot.ledger.tsv"
+bash scripts/roihu_promote_storage_gate.sh gate-stagev4-YYYYMMDDTHHMMSSz
 ```
 
 The assessor collapses caller rows to one measurement per sample, requires two
@@ -85,7 +92,8 @@ WGS extraction is mate-aware and
 uses chr6:28–34 Mb plus all HLA-A/B/C alternate contigs from the pinned
 GRCh38DH index. A streamed CRAM gets at most two five-hour attempts separated
 by 60 seconds, and only an allowlisted CRC, remote seek/EOF-close, reset,
-timeout, temporary DNS, HTTP 429, or HTTP 5xx transport failure can retry.
+timeout, temporary DNS, HTTP 429/5xx, or quoted `error reading file
+"http(s)://..."` transport failure can retry.
 Attempts use unique directories;
 partial outputs and stderr are quarantined. HTTP 401/403/404, reference/contig
 or checksum errors, missing/local-corrupt files, and generic exit 1 are
@@ -129,9 +137,11 @@ the donor-independent three-modality gate.
 
 Cleanup remains a dry-run until the prediction freeze validates. Execution may
 delete only listed `work/` and `tmp/` paths. Failed results go to quarantine.
-Use `scripts/roihu_export_compact.sh` to create a checksummed allow-listed
-archive; genomic inputs, containers, references, assemblies, and work data are
-excluded.
+Use `scripts/roihu_export_compact.sh` to create a checksummed archive from the
+explicit `roihu_compact_export` profile in `configs/release_allowlist.json`.
+The generated immutable export manifest is revalidated before archiving;
+truth-bearing paths, secrets, unreviewed files, genomic inputs, containers,
+references, assemblies, quarantine, native payloads, and work data fail closed.
 
 ## Independent validation lanes
 
@@ -160,6 +170,9 @@ noninferiority gate.
 Both `pytest -q` and `python -m pytest -q` must pass on Roihu Python 3.11.15 and
 GitHub Ubuntu/Windows for the identical commit. Regenerate registry rows,
 manuscript tables, independent recount, main/supplement claim audits, and the
-release-readiness report. A staged benchmark release may proceed when its own
-gate passes even while independent three-modality confirmation remains visibly
-blocked.
+release-readiness report. `audit_goal_completion` is a separate, stricter
+12-clause audit and cannot pass until all donor-independent lanes, figures,
+submission DOCX files, named reviews, and the extracted release archive pass.
+A staged benchmark release may proceed when its own gate passes even while
+independent three-modality confirmation remains visibly blocked, but that is
+not completion of the full research goal.

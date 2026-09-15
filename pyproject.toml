@@ -12,6 +12,7 @@ dependencies = []
 [project.optional-dependencies]
 test = ["pytest==8.3.5"]
 refformer-cpu = ["numpy==1.26.4", "torch==2.6.0"]
+publication = ["matplotlib==3.7.5", "Pillow==10.4.0"]
 
 [project.scripts]
 build_subject_exposure_ledger = "champhla_recovery.cli:build_subject_exposure_ledger_main"
@@ -59,7 +60,14 @@ resolve_same_resource_index_checksums = "champhla_confirmation.cli:resolve_same_
 build_hprc_run_manifest = "champhla_confirmation.cli:build_hprc_run_manifest_main"
 validate_hprc_truth_protocol = "champhla_confirmation.cli:validate_hprc_truth_protocol_main"
 freeze_release_bundle = "champhla_recovery.cli:freeze_release_bundle_main"
+build_compact_export_manifest = "champhla_recovery.cli:build_compact_export_manifest_main"
+verify_compact_export_manifest = "champhla_recovery.cli:verify_compact_export_manifest_main"
+create_release_archive = "champhla_recovery.cli:create_release_archive_main"
+verify_release_archive = "champhla_recovery.cli:verify_release_archive_main"
 audit_release_readiness = "champhla_recovery.cli:audit_release_readiness_main"
+audit_goal_completion = "champhla_recovery.cli:audit_goal_completion_main"
+validate_figure_manifest = "champhla_recovery.cli:validate_figure_manifest_main"
+build_submission_package = "champhla_recovery.cli:build_submission_package_main"
 join_truth_once = "champhla_confirmation.cli:join_external_truth_main"
 evaluate_confirmation = "champhla_confirmation.cli:evaluate_confirmation_main"
 render_manuscript_tables = "champhla_recovery.cli:render_manuscript_tables_main"

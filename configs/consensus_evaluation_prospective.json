@@ -1,6 +1,8 @@
 {
   "schema_version": "plurality-evaluation-design-1",
-  "status": "PREDECLARED_PENDING_AUTHOR_SIGNATURE_AND_COMPARATOR_FREEZE",
+  "status": "PREDECLARED_PENDING_AUTHOR_SIGNATURE",
+  "comparator_manifest": "configs/comparator_manifest.json",
+  "comparator_manifest_status": "FROZEN",
   "reference_method": "SimplePluralityLex",
   "prospective": true,
   "valid_modalities": [

@@ -3,6 +3,10 @@
   "status": "FROZEN",
   "selection_policy": "Include every assay-compatible method in the frozen rerun design. Performance is never an inclusion or exclusion criterion. The oracle and nondeployable historical analyses are outside modality-local Holm families.",
   "provenance_attestation": "configs/roihu_caller_reference_attestation.json",
+  "workflow_lock": {
+    "path": "configs/roihu_workflow_lock.json",
+    "sha256": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35"
+  },
   "blocking_methods": [],
   "comparators": [
     {
@@ -30,7 +34,7 @@
       "memory": "process_high; Slurm sample envelope 180 GiB",
       "artifact_sha256": "8fb9fa5ec3392c282f02374e1a42a51cc30e1adb3cc7e7a6d96791b0bc593810",
       "source_sha256": "2782bf569c601749ea7ae16173fe0887165e402de15077e096a3b2dd9923c0ae",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "reference_artifacts": [
         {
           "artifact_id": "HLA_gene.split.txt",
@@ -61,7 +65,7 @@
       "memory": "process_high; Java 10 GiB; Slurm sample envelope 180 GiB",
       "artifact_sha256": "c267052e9621579b569110b07c64fc916a968b1a9fa0776681c8dd31fe44d3c9",
       "source_sha256": "638d60eefac50a23de2ee9e8cf321e607732e8720161719a820f5a098607032a",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "reference_artifacts": [
         {
           "artifact_id": "db/VERSION.txt",
@@ -98,7 +102,7 @@
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "7f3f32904a25bd6936e38de1092acb307b5239567b8923c4526aac1007c5684a",
       "source_sha256": "23d80067ffc6a780ae2b6bdeec8b0b5f030d625bc90ce149813f71f510dd1fa8",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "reference_artifacts": [
         {
           "artifact_id": "data/alleles.h5",
@@ -133,7 +137,7 @@
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "b4f39a6dd86d138d8ec15a73cf4b2d33fbc069c84c3b7de4117b4892b65767da",
       "source_sha256": "d6bce201ff42882ef5b11f56da31d2ba62ab1e4d454698e13b548eea4ea25975",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "reference_artifacts": [
         {
           "artifact_id": "a_complete.3100.new.eb.fasta",
@@ -177,7 +181,7 @@
       "memory": "process_high; Slurm sample envelope 180 GiB",
       "artifact_sha256": "77c7b6ef5ad704d0731c6895aca367081f39ca6529206be18070e319ae94ba2b",
       "source_sha256": "6380fa7d03f189e4f3e6fa9cce94c6856514d52d476891c05a7fab89c7000368",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "reference_artifacts": [
         {
           "artifact_id": "db/HLA/Allelelist.txt",
@@ -218,7 +222,7 @@
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "e34c4433021cc21c16a54c8ce6bef6d8b1bd367dddc2920afd4053d053b44c3c",
       "source_sha256": "3c881e22a12d4d546576964421788895fb151bed78cb927dfa5dec888c97caae",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "reference_artifacts": [
         {
           "artifact_id": "hla.dat",
@@ -253,7 +257,7 @@
       "memory": "process_medium; Slurm sample envelope 180 GiB",
       "artifact_sha256": "60c42737ccb8c0fa91beef256437028b64d75451ca16e4bf90bb849ba0b6c05c",
       "source_sha256": "6336d6946dbdd392bed164e0d06cf7fa44853f97006e85e32f518da80e0c2694",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "reference_artifacts": [
         {
           "artifact_id": "dat/IMGTHLA/hla.dat",
@@ -270,7 +274,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "ChampionChallenger",
       "kind": "integration",
       "modalities": [
@@ -299,7 +303,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "TwoThirdsGuardedCC",
       "kind": "integration",
       "modalities": [
@@ -328,7 +332,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "MVFlooredCC",
       "kind": "integration",
       "modalities": [
@@ -361,7 +365,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 1,
       "memory": "1 GiB",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "SimpleTwoThirdsConsensus",
       "kind": "abstaining_baseline",
       "modalities": [
@@ -390,7 +394,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "MetaConsensus",
       "kind": "historical_ablation",
       "modalities": [
@@ -419,7 +423,7 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "BestSingleTool_nestedCV",
       "kind": "historical_selection",
       "modalities": [
@@ -448,30 +452,39 @@
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "WeightedConsensus",
       "kind": "historical_ablation",
       "modalities": [
         "wes",
         "rnaseq"
       ],
-      "version": "artifact-only",
-      "artifact_pin": "not-imported",
-      "configuration": "historical artifact",
+      "version": "archived-decision-record-v1",
+      "artifact_pin": "decision-record-sha256",
+      "configuration": "artifacts/source_results/final_internal_decision.json",
       "deployable": false,
       "primary_family": false,
-      "disposition_reason": "supplemental ablation; no canonical frozen inference bundle",
+      "disposition_reason": "supplemental historical ablation outside the deployable family; the original executable bundle is unavailable, while the immutable decision record and source report preserve the evaluated result",
       "command": "historical-only",
-      "artifact_sha256": "",
-      "source_sha256": "",
-      "reference_artifacts": []
+      "artifact_sha256": "64ec94e43fd3b88a032e4fefbdcc3b8318547dd63f12dad4334e0238deecae53",
+      "source_sha256": "5dcce5abbb5e130a184719c8649af40bcce0ded5e632c88e9e82d8e706b37df8",
+      "reference_artifacts": [
+        {
+          "artifact_id": "artifacts/source_results/final_internal_decision.json",
+          "sha256": "64ec94e43fd3b88a032e4fefbdcc3b8318547dd63f12dad4334e0238deecae53"
+        },
+        {
+          "artifact_id": "provenance/source_reports/baseline_ladder_findings.md",
+          "sha256": "5dcce5abbb5e130a184719c8649af40bcce0ded5e632c88e9e82d8e706b37df8"
+        }
+      ]
     },
     {
       "reference_build": "GRCh38DH",
       "imgt_hla_version": "historical",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "RefFormer",
       "kind": "historical_ablation",
       "modalities": [
@@ -479,46 +492,64 @@
         "wes",
         "rnaseq"
       ],
-      "version": "artifact-only",
-      "artifact_pin": "ablation-artifacts",
-      "configuration": "ablations/refformer",
+      "version": "archived-publication-assessment-v1",
+      "artifact_pin": "publication-assessment-sha256",
+      "configuration": "artifacts/source_results/publication_assessment.json",
       "deployable": false,
       "primary_family": false,
-      "disposition_reason": "negative supplemental ablation, not an operating method",
+      "disposition_reason": "negative supplemental historical ablation outside the deployable family; no prospective operating method is claimed, and the immutable publication assessment plus source report preserve the result",
       "command": "historical-only",
-      "artifact_sha256": "",
-      "source_sha256": "",
-      "reference_artifacts": []
+      "artifact_sha256": "73f256c7f7e4c9e5a6e5d7d4a2835b93845955723d324eef515ff37b042263e7",
+      "source_sha256": "af6ac18774a80384541e26f33852bb6b95b65cf937f1ec8cab5500d1a666d7ad",
+      "reference_artifacts": [
+        {
+          "artifact_id": "artifacts/source_results/publication_assessment.json",
+          "sha256": "73f256c7f7e4c9e5a6e5d7d4a2835b93845955723d324eef515ff37b042263e7"
+        },
+        {
+          "artifact_id": "provenance/source_reports/refformer_publication_assessment.md",
+          "sha256": "af6ac18774a80384541e26f33852bb6b95b65cf937f1ec8cab5500d1a666d7ad"
+        }
+      ]
     },
     {
       "reference_build": "not_applicable",
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "EvidenceGatedCC",
       "kind": "historical_ablation",
       "modalities": [
         "wes",
         "rnaseq"
       ],
-      "version": "artifact-only",
-      "artifact_pin": "not-imported",
-      "configuration": "historical artifact",
+      "version": "archived-decision-record-v1",
+      "artifact_pin": "decision-record-sha256",
+      "configuration": "artifacts/source_results/final_internal_decision.json",
       "deployable": false,
       "primary_family": false,
-      "disposition_reason": "supplemental ablation; no canonical frozen inference bundle",
+      "disposition_reason": "supplemental historical ablation outside the deployable family; the original executable bundle is unavailable, while the immutable decision record and source report preserve the evaluated result",
       "command": "historical-only",
-      "artifact_sha256": "",
-      "source_sha256": "",
-      "reference_artifacts": []
+      "artifact_sha256": "64ec94e43fd3b88a032e4fefbdcc3b8318547dd63f12dad4334e0238deecae53",
+      "source_sha256": "11a0d0ed2554b6cc26d9948cdd1f30503b04e59399fd6b7ab5a36caca620da7a",
+      "reference_artifacts": [
+        {
+          "artifact_id": "artifacts/source_results/final_internal_decision.json",
+          "sha256": "64ec94e43fd3b88a032e4fefbdcc3b8318547dd63f12dad4334e0238deecae53"
+        },
+        {
+          "artifact_id": "provenance/source_reports/egcc_final_report.md",
+          "sha256": "11a0d0ed2554b6cc26d9948cdd1f30503b04e59399fd6b7ab5a36caca620da7a"
+        }
+      ]
     },
     {
       "reference_build": "not_applicable",
       "imgt_hla_version": "not_applicable",
       "threads": 0,
       "memory": "not_applicable",
-      "workflow_hash": "cbe7fe64f1b3acdea849c9162ed1e6da06a4c28066a2c3364495c58c4827a669",
+      "workflow_hash": "e0401c163f35ace48301e636210ccb07599f58e960a9502ca8ea65dc6ed59d35",
       "method_id": "CandidateSetOracle",
       "kind": "oracle",
       "modalities": [
@@ -535,7 +566,12 @@
       "command": "evaluation-only",
       "artifact_sha256": "4e217601c1c00117ca8c855af4d322c17a27e57cd258ac2ac9070e8c5d91033c",
       "source_sha256": "4e217601c1c00117ca8c855af4d322c17a27e57cd258ac2ac9070e8c5d91033c",
-      "reference_artifacts": []
+      "reference_artifacts": [
+        {
+          "artifact_id": "src/champhla_confirmation/evaluation.py",
+          "sha256": "4e217601c1c00117ca8c855af4d322c17a27e57cd258ac2ac9070e8c5d91033c"
+        }
+      ]
     }
   ],
   "release_resolution_record": "artifacts/db_release_resolution/db_release_resolution.json",

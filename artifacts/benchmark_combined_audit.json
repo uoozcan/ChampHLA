@@ -7,8 +7,8 @@
   ],
   "draft_route": "benchmark",
   "failures": [],
-  "manuscript": "D:/Users/uonur/Downloads/champhla_publication_candidate_stage/manuscripts/benchmark/manuscript.md",
-  "manuscript_sha256": "fd468785b262f0908bf3538d8aa117fbce1cbe7fcebed41950bd3e3f28cc5d19",
+  "manuscript": "manuscripts/benchmark/manuscript.md",
+  "manuscript_sha256": "253fa45ab1958bf05a21bc76725fa45ac6d0067e586736d7bdcc7ce20451b404",
   "result_references": [
     "DEV_RNA_CONSENSUS",
     "DEV_TT_RNA_BASE",
@@ -16,6 +16,7 @@
     "DEV_TT_WES_BASE",
     "DEV_TT_WES_GCC",
     "DEV_WES_CONSENSUS",
+    "DEV_WES_POLYSOLVER_FULL_ALIGNMENT",
     "DEV_WGS_CONSENSUS",
     "DEV_WGS_LEGACY_BASE",
     "DEV_WGS_LEGACY_GCC",
@@ -27,11 +28,11 @@
   ],
   "schema_version": "manuscript-claim-audit-1",
   "submission_ready": false,
-  "supplement": "D:/Users/uonur/Downloads/champhla_publication_candidate_stage/manuscripts/benchmark/supplementary.md",
-  "supplement_sha256": "57ab83717e3d566f09c63146b38d3365aed762ad9cb287a91dfd43b99a13e08d",
-  "supplement_word_count": 925,
+  "supplement": "manuscripts/benchmark/supplementary.md",
+  "supplement_sha256": "1f2da51a92e5a6ec403bcf74f959d7f7aae8e54d83cffedd375f0074b0cfb7f8",
+  "supplement_word_count": 1150,
   "warnings": [
     "pending claim: BM-007"
   ],
-  "word_count": 1553
+  "word_count": 2101
 }

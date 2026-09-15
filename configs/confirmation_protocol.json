@@ -9,7 +9,12 @@
   "modalities": ["wgs", "wes", "rnaseq"],
   "method_rule": "one equal vote per complete canonical caller pair; partial and missing calls do not vote; maximum pair support wins; exact top ties are resolved lexicographically; no complete pair yields no_evidence",
   "partial_call_rule": "retain one resolvable allele with call_status partial; never infer homozygosity from a missing second allele",
-  "imgt_hla_version": "3.59.0",
+  "imgt_hla_release_policy": {
+    "authority": "caller-specific component evidence",
+    "attestation": "configs/roihu_caller_reference_attestation.json",
+    "global_release": null,
+    "note": "The frozen panel intentionally contains caller databases from different releases; no repository-wide IPD-IMGT/HLA version is asserted."
+  },
   "genome_reference_by_modality": {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"},
   "bootstrap_iterations": 100000,
   "random_seed": 20260831,

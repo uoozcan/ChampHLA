@@ -9,7 +9,7 @@ from .imgt_release import (
     NO_MATCH,
     caller_release_summary,
 )
-from .io import read_json
+from .io import read_json, sha256
 from .panels import MODALITIES, canonical_method
 from .panels import PANELS
 
@@ -69,14 +69,14 @@ def validate_comparator_manifest(path: str, require_frozen: bool = False) -> lis
             failures.append(f"{label}.threads must be a non-negative integer")
         if not isinstance(row["reference_artifacts"], list):
             failures.append(f"{label}.reference_artifacts must be a list")
-        if require_frozen and row["deployable"]:
+        if require_frozen:
             for field in ("version", "artifact_pin", "reference_build",
                           "imgt_hla_version", "configuration", "memory"):
                 if _has_unresolved(row[field]):
                     failures.append(f"{label}.{field} is unresolved")
             if not str(row["command"]).strip():
                 failures.append(f"{label}.command is empty")
-            if row["threads"] < 1:
+            if row["deployable"] and row["threads"] < 1:
                 failures.append(f"{label}.threads must be positive when deployable")
             for field in ("artifact_sha256", "source_sha256", "workflow_hash"):
                 if not HEX64.fullmatch(str(row[field]).lower()):
@@ -96,7 +96,35 @@ def validate_comparator_manifest(path: str, require_frozen: bool = False) -> lis
         failures.append("comparator manifest status is not FROZEN")
     if require_frozen:
         failures.extend(_cross_check_attestation(manifest, path))
+        failures.extend(_cross_check_workflow_lock(manifest, path))
     return sorted(set(failures))
+
+
+def _cross_check_workflow_lock(manifest: dict, manifest_path: str) -> list[str]:
+    reference = manifest.get("workflow_lock", {})
+    relative = str(reference.get("path", ""))
+    expected = str(reference.get("sha256", "")).lower()
+    if not relative or not HEX64.fullmatch(expected):
+        return ["frozen comparator manifest has no exact workflow-lock reference"]
+    root = Path(manifest_path).resolve().parent.parent
+    candidate = Path(relative)
+    if candidate.is_absolute() or ".." in candidate.parts:
+        return ["comparator workflow-lock path is unsafe"]
+    lock = (root / candidate).resolve()
+    try:
+        lock.relative_to(root)
+    except ValueError:
+        return ["comparator workflow-lock path escapes the repository"]
+    if not lock.is_file():
+        return [f"comparator workflow lock not found: {relative}"]
+    observed = sha256(lock)
+    failures = []
+    if observed != expected:
+        failures.append("comparator workflow-lock checksum drifted")
+    for row in manifest.get("comparators", []):
+        if str(row.get("workflow_hash", "")).lower() != expected:
+            failures.append(f"{row.get('method_id', 'unknown')}.workflow_hash disagrees with workflow lock")
+    return failures
 
 
 def _cross_check_attestation(manifest: dict, manifest_path: str) -> list[str]:

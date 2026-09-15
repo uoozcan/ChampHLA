@@ -3,6 +3,11 @@ set -eo pipefail
 
 ROOT=${CHAMPHLA_CODE_ROOT:-/scratch/project_2008084/champhla_plurality}
 PATH_CONFIG=${CHAMPHLA_PATH_CONFIG:-${ROOT}/configs/roihu_paths.env}
+evidence_id=${1:?usage: roihu_preflight.sh EVIDENCE_ID}
+[[ "${evidence_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]] || {
+  echo "unsafe evidence_id: ${evidence_id}" >&2
+  exit 2
+}
 
 export CSC_ENV_INIT_NON_INTERACTIVE=yes
 source /etc/profile.d/zz-csc-env.sh
@@ -17,6 +22,11 @@ test -d "${CHAMPHLA_CODE_ROOT}"
 test -d "${CHAMPHLA_RUN_ROOT}"
 test -d "${CHAMPHLA_INPUT_ROOT}"
 test -d "${CHAMPHLA_TRUTH_ROOT}"
+preflight_parent=${CHAMPHLA_RUN_ROOT}/preflight
+preflight_root=${preflight_parent}/${evidence_id}
+mkdir -p "${preflight_parent}"
+test ! -e "${preflight_root}"
+mkdir "${preflight_root}"
 test -s "${CHAMPHLA_REFERENCE_ROOT}/genomes/GRCh38_full_analysis_set_plus_decoy_hla.fa"
 test -s "${CHAMPHLA_REFERENCE_ROOT}/genomes/GRCh38_full_analysis_set_plus_decoy_hla.fa.fai"
 test -s "${CHAMPHLA_REFERENCE_ROOT}/t1k_hlaidx/_dna_seq.fa"
@@ -101,12 +111,17 @@ export PYTHONPATH="${CHAMPHLA_CODE_ROOT}/src"
 python3 -c 'from champhla_confirmation.cli import validate_workflow_lock_main; raise SystemExit(validate_workflow_lock_main())' \
   --project-root "${CHAMPHLA_CODE_ROOT}" \
   --lock "${CHAMPHLA_CODE_ROOT}/configs/roihu_workflow_lock.json" \
-  --output "${CHAMPHLA_RUN_ROOT}/workflow_lock_audit.json"
+  --output "${preflight_root}/workflow_lock_audit.json"
 python3 -c 'from champhla_confirmation.manifests import validate_caller_reference_attestation; import sys; failures=validate_caller_reference_attestation(sys.argv[1], True); assert not failures, failures' \
   "${CHAMPHLA_CODE_ROOT}/configs/roihu_caller_reference_attestation.json"
 python3 -c 'from champhla_confirmation.cli import audit_roihu_environment_main; raise SystemExit(audit_roihu_environment_main())' \
   --site-config "${CHAMPHLA_CODE_ROOT}/configs/roihu_site.json" \
-  --output "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
+  --evidence-id "${evidence_id}" \
+  --output "${preflight_root}/environment_inventory.json"
+
+(cd "${preflight_root}" && sha256sum workflow_lock_audit.json \
+  environment_inventory.json > evidence.sha256)
+printf 'preflight evidence created but not promoted: %s\n' "${preflight_root}"
 
 sha256sum "${CHAMPHLA_CODE_ROOT}/configs/confirmation_protocol.json" \
   "${CHAMPHLA_CODE_ROOT}/configs/runtime_versions.json" \

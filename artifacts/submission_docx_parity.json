@@ -1,0 +1,20 @@
+{
+  "failures": [],
+  "figure_order_valid": true,
+  "main": {
+    "failures": [],
+    "figure_order_valid": true,
+    "structure_valid": true,
+    "text_parity": true
+  },
+  "passed": true,
+  "schema_version": "champhla-submission-parity-1",
+  "structure_valid": true,
+  "supplement": {
+    "failures": [],
+    "figure_order_valid": true,
+    "structure_valid": true,
+    "text_parity": true
+  },
+  "text_parity": true
+}

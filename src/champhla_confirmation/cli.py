@@ -51,6 +51,7 @@ from .roihu import (
     inventory_environment,
     transition_run_sample,
     reconcile_terminal_run_sample,
+    validate_environment_inventory,
     validate_workflow_lock,
 )
 from .staging import (
@@ -587,9 +588,10 @@ def build_run_disposition_main() -> int:
 def audit_roihu_environment_main() -> int:
     parser = argparse.ArgumentParser(description="Inventory Roihu tools, storage, and frozen artifacts")
     parser.add_argument("--site-config", required=True)
+    parser.add_argument("--evidence-id", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
-    result = inventory_environment(args.site_config, args.output)
+    result = inventory_environment(args.site_config, args.output, args.evidence_id)
     print(f"Roihu environment passed={result['passed']} failures={len(result['failures'])}")
     return 0 if result["passed"] else 2
 
@@ -677,17 +679,31 @@ def assess_roihu_storage_main() -> int:
                         help="repeat exactly once for each WGS, WES, and RNA pilot ledger")
     parser.add_argument("--targets", required=True, help="JSON mapping modality to sample count")
     parser.add_argument("--environment-inventory", required=True)
+    parser.add_argument("--evidence-id", required=True)
+    parser.add_argument("--inventory-max-age-seconds", type=int, default=3600)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
+    if Path(args.output).exists():
+        raise ValueError(f"storage gate output already exists: {args.output}")
+    latest_pilot_update = max(
+        row.get("updated_at_utc", "")
+        for ledger in args.pilot_ledger for row in read_tsv(ledger)
+    )
+    inventory_failures = validate_environment_inventory(
+        args.environment_inventory,
+        max_age_seconds=args.inventory_max_age_seconds,
+        not_before_utc=latest_pilot_update,
+    )
+    if inventory_failures:
+        raise ValueError(f"storage gate environment inventory failed: {inventory_failures}")
     inventory = read_json(args.environment_inventory)
-    if not inventory.get("passed"):
-        raise ValueError("storage gate requires a passed environment inventory")
     project_storage = inventory.get("project_storage", {})
     if not project_storage.get("filesystem_global_space_ignored"):
         raise ValueError("environment inventory does not contain project-allocation accounting")
     result = assess_storage(
         args.pilot_ledger, read_json(args.targets), project_storage.get("free_bytes", 0),
         args.output, "project_allocation", sha256(args.environment_inventory),
+        args.evidence_id,
     )
     print(f"storage gate passed={result['passed']} required={result['required_available_bytes']}")
     return 0 if result["passed"] else 2

@@ -43,6 +43,11 @@ TRANSPORT_METHOD_LIMITATION_RE = re.compile(
 )
 
 
+def _without_reference_section(text: str) -> str:
+    """Bibliographic years, pages, and DOIs are not performance results."""
+    return re.split(r"(?im)^## References\s*$", text, maxsplit=1)[0]
+
+
 def extract_docx_text(path: str) -> str:
     with zipfile.ZipFile(path) as archive:
         root = ElementTree.fromstring(archive.read("word/document.xml"))
@@ -110,7 +115,8 @@ def audit_claims(manuscript: str, registry_path: str, claims_path: str, output: 
                     )
                 else:
                     diagnostic_invalid_refs.append(result_id)
-    for label, content in (("main", text), ("supplement", supplement_text)):
+    for label, content in (("main", _without_reference_section(text)),
+                           ("supplement", _without_reference_section(supplement_text))):
         for paragraph in re.split(r"\n\s*\n", content):
             if NUMERIC_RESULT_RE.search(paragraph) and not RESULT_REF_RE.search(paragraph):
                 failures.append(f"{label} numerical result lacks a registry reference")

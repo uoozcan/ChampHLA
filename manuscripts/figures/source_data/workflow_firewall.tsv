@@ -1,0 +1,31 @@
+record_type	id	label	x	y	category	from	to	style
+node	inputs	"Truth-free inputs
+WGS / WES / RNASEQ"	0.1	0.68	input			solid
+node	callers	"Assay-compatible
+caller panels"	0.3	0.68	process			solid
+node	native	"Native outputs
+and source hashes"	0.5	0.68	evidence			solid
+node	harmonise	"Complete / partial / missing
+harmonisation"	0.7	0.68	process			solid
+node	plurality	"Pair-level plurality
+SimplePluralityLex"	0.9	0.68	primary			solid
+node	freeze	"Prediction freeze
+code + inputs + outputs"	0.78	0.41	freeze			solid
+node	truth	"Segregated truth
+no prediction access"	0.18	0.18	truth			solid
+node	join	"One-time non-overwriting
+truth join"	0.42	0.18	join			solid
+node	evaluate	"Donor-clustered evaluation
+and independent recount"	0.66	0.18	evaluation			solid
+node	registry	"Result registry →
+tables, figures, prose"	0.9	0.18	report			solid
+edge	inputs_callers				flow	inputs	callers	solid
+edge	callers_native				flow	callers	native	solid
+edge	native_harmonise				flow	native	harmonise	solid
+edge	harmonise_plurality				flow	harmonise	plurality	solid
+edge	plurality_freeze				flow	plurality	freeze	solid
+edge	freeze_join				flow	freeze	join	solid
+edge	truth_join				flow	truth	join	solid
+edge	join_evaluate				flow	join	evaluate	solid
+edge	evaluate_registry				flow	evaluate	registry	solid
+edge	truth_callers				flow	truth	callers	forbidden

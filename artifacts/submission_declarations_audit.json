@@ -1,0 +1,7 @@
+{
+  "missing_sections": [],
+  "passed": false,
+  "policy": "automation must not infer author identity, contributions, conflicts, funding, ethics, or acknowledgements",
+  "schema_version": "champhla-declarations-audit-1",
+  "unresolved_author_markers": 6
+}

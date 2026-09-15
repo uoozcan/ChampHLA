@@ -344,7 +344,10 @@ def assess_storage(pilot_ledgers: list[str | Path] | tuple[str | Path, ...],
                    targets: dict[str, int],
                    available_bytes: int, output: str | Path | None = None,
                    availability_source: str = "project_allocation",
-                   environment_inventory_sha256: str = "") -> dict:
+                   environment_inventory_sha256: str = "",
+                   evidence_id: str = "") -> dict:
+    if evidence_id and not SAFE_RUN_ID.fullmatch(evidence_id):
+        raise ValueError(f"unsafe storage-gate evidence_id: {evidence_id!r}")
     paths = [Path(path) for path in pilot_ledgers]
     if len(paths) != 3:
         raise ValueError("storage gate requires exactly three modality pilot ledgers")
@@ -377,6 +380,7 @@ def assess_storage(pilot_ledgers: list[str | Path] | tuple[str | Path, ...],
 
     by_modality: dict[str, list[int]] = defaultdict(list)
     retained_by_modality: dict[str, list[int]] = defaultdict(list)
+    transient_by_modality: dict[str, list[int]] = defaultdict(list)
     sample_measurements = []
     seen_samples: set[tuple[str, str, str]] = set()
     measure_fields = (
@@ -421,6 +425,7 @@ def assess_storage(pilot_ledgers: list[str | Path] | tuple[str | Path, ...],
             continue
         by_modality[modality].append(peak)
         retained_by_modality[modality].append(retained)
+        transient_by_modality[modality].append(peak - retained)
         sample_measurements.append({
             "run_id": run_id, "cohort": cohort, "modality": modality,
             "sample_id": sample_id, **values,
@@ -445,9 +450,12 @@ def assess_storage(pilot_ledgers: list[str | Path] | tuple[str | Path, ...],
     )
     reserve = 100 * 1024 ** 3
     required = math.ceil(1.25 * projected) + reserve
+    # Peak and retained maxima can belong to different samples. Subtracting the
+    # two marginal p95 values can therefore understate the transient headroom.
+    # Preserve the within-sample pairing first, then take the modality p95.
     transient_p95 = {
-        modality: max(0, p95.get(modality, 0) - retained_p95.get(modality, 0))
-        for modality in targets
+        modality: _nearest_rank(transient_by_modality[modality], 0.95)
+        for modality in targets if transient_by_modality.get(modality)
     }
     sequential_required = (
         retained_projected + math.ceil(1.25 * max(transient_p95.values(), default=0)) + reserve
@@ -463,7 +471,9 @@ def assess_storage(pilot_ledgers: list[str | Path] | tuple[str | Path, ...],
         else "blocked"
     )
     result = {
-        "schema_version": "champhla-roihu-storage-gate-3",
+        "schema_version": "champhla-roihu-storage-gate-4",
+        "evidence_id": evidence_id,
+        "created_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "passed": full_scale_passed or sequential_passed,
         "full_scale_passed": full_scale_passed,
         "sequential_low_storage_passed": sequential_passed,
@@ -621,8 +631,17 @@ def validate_workflow_lock(lock_path: str | Path, project_root: str | Path) -> d
             "arcashla", "bam_to_fastq", "hlahd", "kourami", "optitype",
             "polysolver", "spechla", "t1k",
         )},
-        "scripts/roihu_submit_wave.sh", "scripts/roihu_stage_inputs.sbatch",
+        "scripts/roihu_preflight.sh", "scripts/roihu_submit_wave.sh",
+        "scripts/roihu_stage_inputs.sbatch",
         "scripts/roihu_run_sample.sbatch", "scripts/roihu_finalize_sample.sbatch",
+        "scripts/roihu_promote_preflight.sh", "scripts/roihu_assess_storage.sh",
+        "scripts/roihu_promote_storage_gate.sh",
+        "src/champhla_confirmation/cli.py",
+        "src/champhla_confirmation/io.py",
+        "src/champhla_confirmation/manifests.py",
+        "src/champhla_confirmation/panels.py",
+        "src/champhla_confirmation/parsers.py",
+        "src/champhla_confirmation/roihu.py",
         "src/champhla_confirmation/staging.py",
     }
     missing_required = sorted(required - set(files))
@@ -646,10 +665,14 @@ def freeze_workflow_lock(project_root: str | Path, workflow_root: str | Path,
         if item.is_file() and item.suffix in {".nf", ".config", ".yaml", ".json", ".py", ".sh"}
     )
     operational = [project / relative for relative in (
-        "scripts/roihu_submit_wave.sh", "scripts/roihu_stage_inputs.sbatch",
+        "scripts/roihu_preflight.sh", "scripts/roihu_submit_wave.sh",
+        "scripts/roihu_stage_inputs.sbatch",
         "scripts/roihu_run_sample.sbatch", "scripts/roihu_finalize_sample.sbatch",
+        "scripts/roihu_promote_preflight.sh", "scripts/roihu_assess_storage.sh",
+        "scripts/roihu_promote_storage_gate.sh",
         "src/champhla_confirmation/staging.py",
     )]
+    operational.extend(sorted((project / "src" / "champhla_confirmation").glob("*.py")))
     selected.extend(item for item in operational if item.is_file())
     selected = sorted(set(selected))
     files = {item.relative_to(project).as_posix(): sha256(item) for item in selected}
@@ -717,7 +740,10 @@ def _repository_identity(project_root: Path) -> dict:
     }
 
 
-def inventory_environment(site_config: str | Path, output: str | Path) -> dict:
+def inventory_environment(site_config: str | Path, output: str | Path,
+                          evidence_id: str) -> dict:
+    if not SAFE_RUN_ID.fullmatch(evidence_id):
+        raise ValueError(f"unsafe environment evidence_id: {evidence_id!r}")
     config = read_json(site_config)
     roots = {name: Path(value).resolve() for name, value in config["roots"].items()}
     files = {}
@@ -800,7 +826,9 @@ def inventory_environment(site_config: str | Path, output: str | Path) -> dict:
         if runtime_name and not files.get("references", {}).get(runtime_name, {}).get("present"):
             failures.append(f"reference_design:{modality}:runtime_fasta_missing")
     result = {
-        "schema_version": "champhla-roihu-environment-inventory-1",
+        "schema_version": "champhla-roihu-environment-inventory-2",
+        "evidence_id": evidence_id,
+        "created_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "passed": not failures,
         "hostname": os.uname().nodename,
         "tools": tools,
@@ -832,6 +860,81 @@ def inventory_environment(site_config: str | Path, output: str | Path) -> dict:
     }
     write_json(output, result)
     return result
+
+
+def _parse_utc_timestamp(value: str, label: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (AttributeError, TypeError, ValueError) as error:
+        raise ValueError(f"{label} is not an ISO-8601 timestamp") from error
+    if parsed.tzinfo is None:
+        raise ValueError(f"{label} has no timezone")
+    return parsed.astimezone(timezone.utc)
+
+
+def validate_environment_inventory(path: str | Path, *,
+                                   project_root: str | Path | None = None,
+                                   max_age_seconds: int | None = None,
+                                   not_before_utc: str = "",
+                                   now_utc: str = "") -> list[str]:
+    """Validate one immutable, versioned project-allocation observation."""
+    inventory = read_json(path)
+    failures: list[str] = []
+    if inventory.get("schema_version") != "champhla-roihu-environment-inventory-2":
+        failures.append("environment inventory schema is not version 2")
+    evidence_id = str(inventory.get("evidence_id", ""))
+    if not SAFE_RUN_ID.fullmatch(evidence_id):
+        failures.append("environment inventory evidence_id is unsafe or missing")
+    try:
+        created = _parse_utc_timestamp(
+            str(inventory.get("created_at_utc", "")), "created_at_utc",
+        )
+    except ValueError as error:
+        failures.append(str(error))
+        created = None
+    if created is not None and not_before_utc:
+        try:
+            if created < _parse_utc_timestamp(not_before_utc, "not_before_utc"):
+                failures.append("environment inventory predates the pilot evidence")
+        except ValueError as error:
+            failures.append(str(error))
+    if created is not None and max_age_seconds is not None:
+        if max_age_seconds <= 0:
+            failures.append("environment inventory max age must be positive")
+        else:
+            try:
+                now = _parse_utc_timestamp(now_utc, "now_utc") if now_utc else datetime.now(timezone.utc)
+                age = (now - created).total_seconds()
+                if age < -300:
+                    failures.append("environment inventory timestamp is in the future")
+                elif age > max_age_seconds:
+                    failures.append("environment inventory is stale")
+            except ValueError as error:
+                failures.append(str(error))
+    if not inventory.get("passed"):
+        failures.append("environment inventory did not pass")
+    storage = inventory.get("project_storage", {})
+    if not storage.get("filesystem_global_space_ignored"):
+        failures.append("environment inventory lacks project-allocation accounting")
+    try:
+        if int(storage.get("free_bytes", 0)) <= 0:
+            failures.append("environment inventory free_bytes is not positive")
+    except (TypeError, ValueError):
+        failures.append("environment inventory free_bytes is invalid")
+    repository = inventory.get("repository", {})
+    if not repository.get("clean") or not repository.get("commit"):
+        failures.append("environment inventory repository identity is not clean and complete")
+    if project_root is not None:
+        observed = _repository_identity(Path(project_root).resolve())
+        for field in ("commit", "tracked_tree_sha256"):
+            if repository.get(field) != observed.get(field):
+                failures.append(f"environment inventory repository {field} drifted")
+        if not observed.get("clean"):
+            failures.append("current repository is dirty")
+    workflow = inventory.get("workflow_lock", {})
+    if not workflow.get("passed"):
+        failures.append("environment inventory workflow lock did not pass")
+    return failures
 
 
 CALLER_SUFFIX = {

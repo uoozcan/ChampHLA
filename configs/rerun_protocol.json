@@ -6,7 +6,11 @@
     "python": "3.11.15",
     "samtools": "1.21",
     "reference_builds": {"wgs": "GRCh38DH", "wes": "GRCh38DH", "rnaseq": "GRCh37"},
-    "imgt_hla_version": "3.59.0"
+    "imgt_hla_release_policy": {
+      "authority": "configs/roihu_caller_reference_attestation.json",
+      "global_release": null,
+      "note": "Caller-specific database releases are authoritative; the panel does not share one IPD-IMGT/HLA release."
+    }
   },
   "truth_firewall": {
     "runtime_truth_columns_forbidden": true,
@@ -19,7 +23,7 @@
     "maximum_attempts": 2,
     "attempt_timeout_seconds": 18000,
     "backoff_seconds": 60,
-    "retry_scope": "allowlisted remote transport failures only, including remote seek/EOF-close failures",
+    "retry_scope": "allowlisted remote transport failures only, including CRC, timeout, reset, DNS, HTTP 429/5xx, remote seek/EOF-close, and quoted http(s) remote-read failures",
     "attempt_directories_unique": true,
     "attempt_ledger_immutable": true,
     "source_checksum_semantics": "declared upstream identity; not locally verified for streamed full CRAM",

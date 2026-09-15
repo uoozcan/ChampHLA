@@ -4,13 +4,21 @@ import argparse
 
 from .assays import build_assay_manifest
 from .exposure import build_exposure_ledger
+from .figures import validate_figure_manifest
 from .manuscript import audit_claims, write_docx_text, write_source_issue_register
 from .provenance import build_originals_manifest
 from .registry import render_tables, validate_registry
-from .release import freeze_release
-from .readiness import audit_release_readiness
+from .release import (
+    build_compact_export_manifest,
+    create_release_archive,
+    freeze_release,
+    verify_compact_export_manifest,
+    verify_release_archive,
+)
+from .readiness import audit_goal_completion, audit_release_readiness
 from .recount import independent_recount
 from .rosters import freeze_rosters
+from .submission import build_submission_package
 from .truth import prepare_locked_truth
 
 
@@ -54,10 +62,61 @@ def freeze_release_bundle_main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Checksum the compact release candidate")
     parser.add_argument("--project-root", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--policy")
     args = parser.parse_args(argv)
-    result = freeze_release(args.project_root, args.output)
-    print(f"release files={result['file_count']} git_dirty={result['git_dirty']}")
+    result = freeze_release(args.project_root, args.output, args.policy)
+    print(
+        f"release files={result['file_count']} git_dirty={result['git_dirty']} "
+        f"valid={result['valid']} violations={len(result['violations'])}"
+    )
+    return 0 if result["valid"] else 2
+
+
+def build_compact_export_manifest_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Build a path-aware compact Roihu export manifest")
+    parser.add_argument("--root", required=True)
+    parser.add_argument("--run-id", required=True)
+    parser.add_argument("--policy", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--list-output", required=True)
+    args = parser.parse_args(argv)
+    result = build_compact_export_manifest(
+        args.root, args.run_id, args.policy, args.output, args.list_output,
+    )
+    print(f"compact files={result['file_count']} valid={result['valid']}")
+    return 0 if result["valid"] else 2
+
+
+def verify_compact_export_manifest_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Verify compact export files against their manifest")
+    parser.add_argument("--root", required=True)
+    parser.add_argument("--manifest", required=True)
+    args = parser.parse_args(argv)
+    failures = verify_compact_export_manifest(args.root, args.manifest)
+    for failure in failures:
+        print(failure)
+    return 0 if not failures else 2
+
+
+def create_release_archive_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Create a deterministic archive from a valid release freeze")
+    parser.add_argument("--project-root", required=True)
+    parser.add_argument("--freeze-manifest", required=True)
+    parser.add_argument("--archive", required=True)
+    args = parser.parse_args(argv)
+    result = create_release_archive(args.project_root, args.freeze_manifest, args.archive)
+    print(f"release archive files={result['file_count']} sha256={result['archive_sha256']}")
     return 0
+
+
+def verify_release_archive_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Extract and verify a ChampHLA release archive")
+    parser.add_argument("--archive", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args(argv)
+    result = verify_release_archive(args.archive, args.output)
+    print(f"archive passed={result['passed']} failures={len(result['failures'])}")
+    return 0 if result["passed"] else 2
 
 
 def audit_release_readiness_main(argv=None) -> int:
@@ -69,6 +128,58 @@ def audit_release_readiness_main(argv=None) -> int:
     result = audit_release_readiness(args.project_root, args.config, args.output)
     print(f"release_ready={result['release_ready']} blockers={len(result['blockers'])}")
     return 0 if result["release_ready"] else 2
+
+
+def audit_goal_completion_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Evaluate the full ChampHLA completion contract")
+    parser.add_argument("--project-root", required=True)
+    parser.add_argument("--config", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args(argv)
+    result = audit_goal_completion(args.project_root, args.config, args.output)
+    print(f"completion_ready={result['completion_ready']} blockers={len(result['blockers'])}")
+    return 0 if result["completion_ready"] else 2
+
+
+def validate_figure_manifest_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Validate reproducible ChampHLA figure artifacts")
+    parser.add_argument("--project-root", required=True)
+    parser.add_argument("--manifest", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args(argv)
+    result = validate_figure_manifest(args.project_root, args.manifest, args.output)
+    print(
+        f"figures passed={result['passed']} generated={result['generated_figures']} "
+        f"blocked={len(result['blocked_figures'])} failures={len(result['failures'])}"
+    )
+    return 0 if result["passed"] else 2
+
+
+def build_submission_package_main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Build deterministic journal-neutral Markdown/DOCX files")
+    parser.add_argument("--project-root", required=True)
+    parser.add_argument("--main", required=True)
+    parser.add_argument("--supplement", required=True)
+    parser.add_argument("--bibliography", required=True)
+    parser.add_argument("--declarations", required=True)
+    parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--manifest", required=True)
+    parser.add_argument("--parity-audit", required=True)
+    parser.add_argument("--bibliography-audit", required=True)
+    parser.add_argument("--declarations-audit", required=True)
+    args = parser.parse_args(argv)
+    result = build_submission_package(
+        args.project_root, args.main, args.supplement, args.bibliography, args.declarations,
+        args.output_dir, args.manifest, args.parity_audit, args.bibliography_audit,
+        args.declarations_audit,
+    )
+    print(
+        f"submission parity={result['parity']['passed']} "
+        f"bibliography={result['bibliography']['passed']} "
+        f"declarations={result['declarations']['passed']}"
+    )
+    return 0 if (result["parity"]["passed"] and result["bibliography"]["passed"]
+                 and result["declarations"]["passed"]) else 2
 
 
 def independent_recount_main(argv=None) -> int:
@@ -155,7 +266,14 @@ def _main() -> int:
         "prepare-locked-1000g-truth": prepare_locked_1000g_truth_main,
         "freeze-extension-rosters": freeze_extension_rosters_main,
         "freeze-release-bundle": freeze_release_bundle_main,
+        "build-compact-export-manifest": build_compact_export_manifest_main,
+        "verify-compact-export-manifest": verify_compact_export_manifest_main,
+        "create-release-archive": create_release_archive_main,
+        "verify-release-archive": verify_release_archive_main,
         "audit-release-readiness": audit_release_readiness_main,
+        "audit-goal-completion": audit_goal_completion_main,
+        "validate-figure-manifest": validate_figure_manifest_main,
+        "build-submission-package": build_submission_package_main,
         "independent-recount": independent_recount_main,
         "render-manuscript-tables": render_manuscript_tables_main,
         "audit-manuscript-claims": audit_manuscript_claims_main,

@@ -1,0 +1,49 @@
+{
+  "schema_version": "champhla-goal-completion-requirements-1",
+  "paths": {
+    "benchmark_readiness": "artifacts/release_readiness.json",
+    "independent_evaluation": "artifacts/independent/evaluation/confirmation_decision.json",
+    "wgs_audit": "artifacts/corrected/wgs_audit/wgs_audit_summary.json",
+    "statistical_audit": "artifacts/final_statistical_audit.json",
+    "issue_ledger": "artifacts/goal/issue_ledger.tsv",
+    "main_claim_audit": "artifacts/benchmark_manuscript_audit.json",
+    "combined_claim_audit": "artifacts/benchmark_combined_audit.json",
+    "declarations_audit": "artifacts/submission_declarations_audit.json",
+    "bibliography_audit": "artifacts/submission_bibliography_audit.json",
+    "figure_audit": "artifacts/figure_audit.json",
+    "figure_review": "manuscripts/figures/visual_review.json",
+    "submission_audit": "artifacts/submission_docx_parity.json",
+    "submission_review": "manuscripts/submission/visual_review.json",
+    "release_freeze": "artifacts/final_release_freeze.json",
+    "archive_verification": "artifacts/final_release_archive_verification.json"
+  },
+  "independent_lanes": {
+    "wgs": {"path": "artifacts/independent/wgs/evaluation/confirmation_decision.json", "minimum_donors": 120},
+    "wes": {"path": "artifacts/independent/wes/evaluation/confirmation_decision.json", "minimum_donors": 89},
+    "rnaseq": {"path": "artifacts/independent/rnaseq/evaluation/confirmation_decision.json", "minimum_donors": 130}
+  },
+  "firewall_lanes": {
+    "same_resource": {
+      "freeze": "artifacts/corrected/prediction_freeze.json",
+      "join": "artifacts/corrected/truth_join_manifest.json"
+    },
+    "independent_wgs": {
+      "freeze": "artifacts/independent/wgs/prediction_freeze.json",
+      "join": "artifacts/independent/wgs/truth_join_manifest.json"
+    },
+    "independent_wes": {
+      "freeze": "artifacts/independent/wes/prediction_freeze.json",
+      "join": "artifacts/independent/wes/truth_join_manifest.json"
+    },
+    "independent_rnaseq": {
+      "freeze": "artifacts/independent/rnaseq/prediction_freeze.json",
+      "join": "artifacts/independent/rnaseq/truth_join_manifest.json"
+    }
+  },
+  "test_attestations": {
+    "local": "artifacts/verification/local_tests.json",
+    "roihu": "artifacts/verification/roihu_tests.json",
+    "ubuntu_ci": "artifacts/verification/ubuntu_ci.json",
+    "windows_ci": "artifacts/verification/windows_ci.json"
+  }
+}

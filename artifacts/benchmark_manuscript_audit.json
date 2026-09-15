@@ -2,8 +2,8 @@
   "diagnostic_invalid_result_references": [],
   "draft_route": "benchmark",
   "failures": [],
-  "manuscript": "D:/Users/uonur/Downloads/champhla_publication_candidate_stage/manuscripts/benchmark/manuscript.md",
-  "manuscript_sha256": "fd468785b262f0908bf3538d8aa117fbce1cbe7fcebed41950bd3e3f28cc5d19",
+  "manuscript": "manuscripts/benchmark/manuscript.md",
+  "manuscript_sha256": "253fa45ab1958bf05a21bc76725fa45ac6d0067e586736d7bdcc7ce20451b404",
   "result_references": [
     "DEV_RNA_CONSENSUS",
     "DEV_WES_CONSENSUS",
@@ -18,5 +18,5 @@
   "warnings": [
     "pending claim: BM-007"
   ],
-  "word_count": 1553
+  "word_count": 2101
 }

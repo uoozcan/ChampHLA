@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import csv
 from pathlib import Path
 
 from champhla_confirmation.freeze import validate_freeze
@@ -177,6 +178,195 @@ def audit_release_readiness(root: str, config_path: str, output: str) -> dict:
         "independent_claim_evidence": independent_path,
         "independent_claim_blockers": independent_blockers,
         "policy": "independent validation is reported separately and cannot block an honest same-resource benchmark release",
+    }
+    write_json(output, result)
+    return result
+
+
+def _passed_json(project: Path, relative: str, field: str = "passed") -> tuple[bool, dict]:
+    data = _json(project, relative)
+    return bool(data.get(field)), data
+
+
+def _read_issue_rows(path: Path) -> list[dict[str, str]]:
+    if not path.is_file():
+        return []
+    with path.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle, delimiter="\t"))
+
+
+def audit_goal_completion(root: str, config_path: str, output: str) -> dict:
+    """Audit the full research goal without weakening benchmark-release semantics."""
+    project = Path(root).resolve()
+    config = read_json(config_path)
+    if config.get("schema_version") != "champhla-goal-completion-requirements-1":
+        raise ValueError("unsupported goal-completion requirements schema")
+    paths = config["paths"]
+    gates: dict[str, dict] = {}
+
+    benchmark_ok, benchmark = _passed_json(
+        project, paths["benchmark_readiness"], "release_ready",
+    )
+    gates["same_resource_benchmark"] = {
+        "passed": benchmark_ok and bool(benchmark.get("same_resource_benchmark_ready")),
+        "evidence": paths["benchmark_readiness"],
+    }
+
+    independent_ok, independent = _passed_json(
+        project, paths["independent_evaluation"], "independent_three_modality_claim_ready",
+    )
+    lane_failures: list[str] = []
+    for modality, spec in config["independent_lanes"].items():
+        lane = _json(project, spec["path"])
+        if not lane.get("valid"):
+            lane_failures.append(f"{modality}: validation is not valid")
+        if lane.get("evidence_role") != "independent_validation":
+            lane_failures.append(f"{modality}: evidence role is not independent_validation")
+        if int(lane.get("eligible_donors", 0)) < int(spec["minimum_donors"]):
+            lane_failures.append(f"{modality}: donor minimum not met")
+        if not lane.get("truth_frozen") or not lane.get("prediction_frozen"):
+            lane_failures.append(f"{modality}: truth/prediction freeze is incomplete")
+    gates["donor_independent_three_modality"] = {
+        "passed": independent_ok and not lane_failures,
+        "evidence": paths["independent_evaluation"],
+        "failures": lane_failures,
+    }
+
+    wgs = _json(project, paths["wgs_audit"])
+    gates["wgs_native_and_named_review"] = {
+        "passed": bool(wgs.get("passed")) and bool(wgs.get("human_review_passed"))
+        and bool(wgs.get("named_reviewer")) and bool(wgs.get("reviewed_at_utc")),
+        "evidence": paths["wgs_audit"],
+    }
+
+    firewall_failures: list[str] = []
+    for lane, spec in config["firewall_lanes"].items():
+        freeze_path = project / spec["freeze"]
+        if not freeze_path.is_file():
+            firewall_failures.append(f"{lane}: prediction freeze missing")
+        else:
+            result = validate_freeze(freeze_path)
+            firewall_failures.extend(f"{lane}: {failure}" for failure in result["failures"])
+        join = _json(project, spec["join"])
+        if not (join.get("join_once") and join.get("prediction_sha256")
+                and join.get("truth_sha256") and join.get("joined_sha256")
+                and join.get("non_overwriting") is True):
+            firewall_failures.append(f"{lane}: one-time non-overwriting join is invalid")
+    gates["truth_firewall_all_lanes"] = {
+        "passed": not firewall_failures,
+        "evidence": config["firewall_lanes"],
+        "failures": firewall_failures,
+    }
+
+    statistics = _json(project, paths["statistical_audit"])
+    gates["statistics_recount_registry"] = {
+        "passed": bool(statistics.get("passed"))
+        and bool(statistics.get("independent_recount_agrees"))
+        and bool(statistics.get("registry_reconciled"))
+        and bool(statistics.get("multiplicity_valid"))
+        and bool(statistics.get("donor_clustering_valid")),
+        "evidence": paths["statistical_audit"],
+    }
+
+    try:
+        head = subprocess.run(
+            ["git", "-C", str(project), "rev-parse", "HEAD"], check=True,
+            capture_output=True, text=True,
+        ).stdout.strip()
+        tree = subprocess.run(
+            ["git", "-C", str(project), "rev-parse", "HEAD^{tree}"], check=True,
+            capture_output=True, text=True,
+        ).stdout.strip()
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        head, tree = "", ""
+    test_failures: list[str] = []
+    for environment, relative in config["test_attestations"].items():
+        attestation = _json(project, relative)
+        if not attestation.get("passed"):
+            test_failures.append(f"{environment}: tests not passed")
+        if attestation.get("commit") != head or attestation.get("tree") != tree:
+            test_failures.append(f"{environment}: commit/tree differs from release checkout")
+        if not attestation.get("pytest_entrypoint", {}).get("passed"):
+            test_failures.append(f"{environment}: pytest entrypoint did not pass")
+        if not attestation.get("python_module_entrypoint", {}).get("passed"):
+            test_failures.append(f"{environment}: python -m pytest entrypoint did not pass")
+    gates["identical_commit_verification"] = {
+        "passed": not test_failures,
+        "evidence": config["test_attestations"],
+        "failures": test_failures,
+    }
+
+    issues = _read_issue_rows(project / paths["issue_ledger"])
+    unresolved = [row.get("issue_id", "") for row in issues
+                  if row.get("status") not in {"FIXED_VERIFIED", "SUPERSEDED"}]
+    gates["issue_ledger_closed"] = {
+        "passed": bool(issues) and not unresolved,
+        "evidence": paths["issue_ledger"],
+        "unresolved": unresolved,
+    }
+
+    main = _json(project, paths["main_claim_audit"])
+    combined = _json(project, paths["combined_claim_audit"])
+    declarations = _json(project, paths["declarations_audit"])
+    bibliography = _json(project, paths["bibliography_audit"])
+    gates["manuscript_claims_declarations_references"] = {
+        "passed": bool(main.get("submission_ready"))
+        and bool(combined.get("submission_ready"))
+        and bool(declarations.get("passed")) and bool(bibliography.get("passed")),
+        "evidence": [paths["main_claim_audit"], paths["combined_claim_audit"],
+                     paths["declarations_audit"], paths["bibliography_audit"]],
+    }
+
+    figure = _json(project, paths["figure_audit"])
+    figure_review = _json(project, paths["figure_review"])
+    gates["figures_reproducible_and_reviewed"] = {
+        "passed": bool(figure.get("passed")) and bool(figure.get("registry_agreement"))
+        and bool(figure.get("source_hashes_valid")) and bool(figure.get("outputs_valid"))
+        and bool(figure_review.get("passed")) and bool(figure_review.get("named_reviewer"))
+        and bool(figure_review.get("reviewed_at_utc")),
+        "evidence": [paths["figure_audit"], paths["figure_review"]],
+    }
+
+    submission = _json(project, paths["submission_audit"])
+    submission_review = _json(project, paths["submission_review"])
+    gates["markdown_docx_submission_parity"] = {
+        "passed": bool(submission.get("passed")) and bool(submission.get("text_parity"))
+        and bool(submission.get("structure_valid")) and bool(submission.get("figure_order_valid"))
+        and bool(submission_review.get("passed")) and bool(submission_review.get("named_reviewer"))
+        and bool(submission_review.get("reviewed_at_utc")),
+        "evidence": [paths["submission_audit"], paths["submission_review"]],
+    }
+
+    release_freeze = _json(project, paths["release_freeze"])
+    archive = _json(project, paths["archive_verification"])
+    gates["release_archive_safe_and_verified"] = {
+        "passed": benchmark_ok and bool(release_freeze.get("valid"))
+        and not release_freeze.get("violations") and bool(archive.get("passed"))
+        and bool(archive.get("temporary_extraction_removed")),
+        "evidence": [paths["release_freeze"], paths["archive_verification"]],
+    }
+
+    try:
+        dirty = bool(subprocess.run(
+            ["git", "-C", str(project), "status", "--porcelain"], check=True,
+            capture_output=True, text=True,
+        ).stdout.strip())
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        dirty = True
+    gates["clean_frozen_git_state"] = {
+        "passed": bool(head) and bool(tree) and not dirty,
+        "evidence": "git HEAD, HEAD^{tree}, status --porcelain",
+        "commit": head,
+        "tree": tree,
+    }
+
+    blockers = sorted(name for name, gate in gates.items() if not gate["passed"])
+    result = {
+        "schema_version": "champhla-goal-completion-audit-1",
+        "completion_ready": not blockers,
+        "gates": gates,
+        "blockers": blockers,
+        "policy": "Full completion requires all 12 contract clauses; benchmark readiness alone is insufficient.",
     }
     write_json(output, result)
     return result

@@ -1,0 +1,11 @@
+dataset_id	role	independence_stratum	scale	truth_source	accuracy_eligible	status	pooling
+1000G_DEVELOPMENT_WES_RNA	development	not_applicable	WES 130; RNA 107 donors	2014 laboratory HLA truth	true	provisional_after_partial_call_correction	reported separately; never pooled across strata
+1000G_CORRECTED_WGS_WES_RNA	same_resource_confirmation	new_library_overlap	WGS 137; WES 130; RNA 107 donors	same frozen laboratory truth	true	blocked_pending_truth_blind_rerun	reported separately; never pooled across strata
+HPRC_RELEASE2_WGS	independent_validation	donor_independent	target 120 donors	dual-method phased-assembly truth pending	false	truth_blind_roster_feasible; independent phased-assembly truth audit required	reported separately; never pooled across strata
+NCI60_RNA	exploratory	donor_independent	11 strict subjects	independent sequence-based typing	true	eleven-subject strict pilot; underpowered for confirmation	reported separately; never pooled across strata
+CCLE_NCI60_WES_OVERLAP	exploratory	new_library_overlap	3 overlapping cell lines	complete A/B/C truth absent	false	metadata verified; complete A/B/C truth absent	reported separately; never pooled across strata
+AFGR_MKK_RNA_WGS	exploratory	donor_independent	RNA 166; WGS unresolved	controlled MiSeq truth; mapping pending	false	blocked pending authorization, WGS accession, mapping and truth audit	reported separately; never pooled across strata
+FNLCR_PBMC_RNA	exploratory	donor_independent	96 reported; controlled	controlled original Sanger truth pending	false	blocked pending controlled access and isolation of non-RNA-informed truth	reported separately; never pooled across strata
+DICE_SORTED_CELL_RNA	exploratory	donor_independent	91 reported; controlled	controlled DNA HLA file unverified	false	blocked pending controlled access, donor mapping and truth independence	reported separately; never pooled across strata
+TRANSPLANT_GERMLINE_WES	exploratory	donor_independent	donor count unresolved	match status is not allele truth	false	blocked; HLA-matched status is not allele-level truth	reported separately; never pooled across strata
+REJECTED_OR_CIRCULAR_TRUTH	invalid	not_applicable	excluded	rejected or circular	false	visible in inventory and excluded from every accuracy denominator	reported separately; never pooled across strata

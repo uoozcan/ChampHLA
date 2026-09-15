@@ -6,7 +6,7 @@ from champhla_confirmation.manifests import (
     validate_comparator_manifest,
     validate_hprc_truth_protocol,
 )
-from champhla_recovery.readiness import audit_release_readiness
+from champhla_recovery.readiness import audit_goal_completion, audit_release_readiness
 from champhla_recovery.io import sha256
 
 
@@ -17,6 +17,55 @@ def test_comparator_manifest_is_frozen_and_agrees_with_the_attestation():
     path = ROOT / "configs" / "comparator_manifest.json"
     assert validate_comparator_manifest(str(path)) == []
     assert validate_comparator_manifest(str(path), require_frozen=True) == []
+
+
+def test_frozen_historical_comparators_have_immutable_surviving_provenance():
+    """Archived methods stay visible, but an absent executable must not mean absent evidence."""
+    path = ROOT / "configs" / "comparator_manifest.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    historical = {
+        row["method_id"]: row for row in manifest["comparators"]
+        if row["kind"].startswith("historical")
+    }
+    assert {"WeightedConsensus", "RefFormer", "EvidenceGatedCC"} <= set(historical)
+    for row in historical.values():
+        assert row["deployable"] is False
+        assert len(row["artifact_sha256"]) == 64
+        assert len(row["source_sha256"]) == 64
+        assert len(row["workflow_hash"]) == 64
+        assert row["reference_artifacts"]
+        for reference in row["reference_artifacts"]:
+            candidate = ROOT / reference["artifact_id"]
+            if candidate.is_file():
+                assert sha256(candidate) == reference["sha256"]
+
+
+def test_frozen_manifest_rejects_missing_historical_provenance(tmp_path: Path):
+    path = ROOT / "configs" / "comparator_manifest.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    row = next(r for r in manifest["comparators"] if r["method_id"] == "RefFormer")
+    row["artifact_sha256"] = ""
+    row["reference_artifacts"] = []
+    forged = tmp_path / "configs" / "comparator_manifest.json"
+    forged.parent.mkdir(parents=True)
+    forged.write_text(json.dumps(manifest), encoding="utf-8")
+    manifest["provenance_attestation"] = str(
+        ROOT / "configs" / "roihu_caller_reference_attestation.json"
+    )
+    forged.write_text(json.dumps(manifest), encoding="utf-8")
+    failures = validate_comparator_manifest(str(forged), require_frozen=True)
+    assert "RefFormer.artifact_sha256 is not an exact SHA-256" in failures
+    assert "RefFormer.reference_artifacts is empty" in failures
+
+
+def test_frozen_comparator_rows_share_the_exact_current_workflow_lock():
+    path = ROOT / "configs" / "comparator_manifest.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    reference = manifest["workflow_lock"]
+    assert sha256(ROOT / reference["path"]) == reference["sha256"]
+    assert {row["workflow_hash"] for row in manifest["comparators"]} == {
+        reference["sha256"]
+    }
 
 
 def test_frozen_manifest_rejects_a_release_the_attestation_does_not_support(tmp_path: Path):
@@ -41,6 +90,30 @@ def test_caller_reference_attestation_resolves_every_caller():
     path = ROOT / "configs" / "roihu_caller_reference_attestation.json"
     assert validate_caller_reference_attestation(str(path), require_ready=True) == []
     assert validate_caller_reference_attestation(str(path), require_ready=False) == []
+
+
+def test_protocols_defer_to_caller_specific_imgt_release_evidence():
+    confirmation = json.loads((ROOT / "configs" / "confirmation_protocol.json").read_text())
+    rerun = json.loads((ROOT / "configs" / "rerun_protocol.json").read_text())
+    assert "imgt_hla_version" not in confirmation
+    assert confirmation["imgt_hla_release_policy"]["global_release"] is None
+    assert rerun["environment"]["imgt_hla_release_policy"]["global_release"] is None
+    assert "caller_reference_attestation.json" in confirmation["imgt_hla_release_policy"]["attestation"]
+
+
+def test_lifecycle_records_reflect_frozen_comparators_and_validated_polysolver_transform():
+    prospective = json.loads((ROOT / "configs" / "consensus_evaluation_prospective.json").read_text())
+    assert prospective["status"] == "PREDECLARED_PENDING_AUTHOR_SIGNATURE"
+    assert prospective["comparator_manifest_status"] == "FROZEN"
+    attestation = json.loads((ROOT / "configs" / "roihu_caller_reference_attestation.json").read_text())
+    transform = attestation["callers"]["POLYSOLVER"]["wrapper_compatibility_transform"]
+    assert transform["status"] == "FROZEN_TECHNICALLY_VALIDATED"
+    assert len(transform["technical_pilot_evidence"]) == 2
+    assert all(row["hg38_contig_substitutions"] == 3 for row in transform["technical_pilot_evidence"])
+    assert all(row["temporary_directory_substitutions"] == 1 for row in transform["technical_pilot_evidence"])
+    decision = json.loads((ROOT / "decisions" / "20260914_polysolver_contig_compatibility.json").read_text())
+    assert decision["status"] == "TECHNICALLY_VALIDATED"
+    assert "not directly comparable" in decision["method_boundary"]["historical_caveat"]
 
 
 def test_heterogeneous_database_is_resolved_not_blocked():
@@ -122,6 +195,21 @@ def test_supplement_may_cite_an_invalid_result_only_when_labelled_diagnostic(tmp
     assert any("without diagnostic labeling" in failure for failure in result["failures"])
 
 
+def test_bibliographic_dois_are_not_misclassified_as_unregistered_results(tmp_path: Path):
+    from champhla_recovery.manuscript import audit_claims
+
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text(
+        "# Title\n\n## References\n\nExample. 2020;48:D948–D955. "
+        "doi:10.1093/nar/gkz950.\n",
+        encoding="utf-8",
+    )
+    result = audit_claims(
+        str(manuscript), str(ROOT / "result_registry.tsv"),
+        str(ROOT / "manuscripts/claim_audit.tsv"), str(tmp_path / "audit.json"), str(ROOT),
+    )
+    assert "main numerical result lacks a registry reference" not in result["failures"]
+
 def test_abstaining_rule_is_excluded_from_the_always_call_family():
     """Holm runs within the always-call family; the abstaining rule is reported separately."""
     manifest = json.loads(
@@ -158,6 +246,45 @@ def test_release_audit_fails_closed_on_unfinished_external_work(tmp_path: Path):
     assert "signed_amendment" in result["blockers"]
     assert "corrected_three_modality_evaluation" in result["blockers"]
     assert result["gates"]["registry_row_validation"]["passed"] is True
+
+
+def test_full_goal_audit_is_distinct_and_fails_every_unfinished_contract_area(tmp_path: Path):
+    project = tmp_path / "empty-project"
+    project.mkdir()
+    result = audit_goal_completion(
+        str(project), str(ROOT / "configs" / "goal_completion_requirements.json"),
+        str(tmp_path / "goal-audit.json"),
+    )
+    expected = {
+        "same_resource_benchmark",
+        "donor_independent_three_modality",
+        "wgs_native_and_named_review",
+        "truth_firewall_all_lanes",
+        "statistics_recount_registry",
+        "identical_commit_verification",
+        "issue_ledger_closed",
+        "manuscript_claims_declarations_references",
+        "figures_reproducible_and_reviewed",
+        "markdown_docx_submission_parity",
+        "release_archive_safe_and_verified",
+        "clean_frozen_git_state",
+    }
+    assert set(result["gates"]) == expected
+    assert set(result["blockers"]) == expected
+    assert result["completion_ready"] is False
+
+
+def test_full_goal_requirements_keep_all_independent_minima():
+    config = json.loads((
+        ROOT / "configs" / "goal_completion_requirements.json"
+    ).read_text(encoding="utf-8"))
+    assert {
+        modality: row["minimum_donors"]
+        for modality, row in config["independent_lanes"].items()
+    } == {"wgs": 120, "wes": 89, "rnaseq": 130}
+    assert set(config["firewall_lanes"]) == {
+        "same_resource", "independent_wgs", "independent_wes", "independent_rnaseq",
+    }
 
 
 def test_generated_development_outputs_match_provenance_manifest():

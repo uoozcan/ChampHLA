@@ -21,17 +21,30 @@ case "${wave}" in
   *) echo "Unknown wave: ${wave}" >&2; exit 2 ;;
 esac
 export PYTHONPATH=${CHAMPHLA_CODE_ROOT}/src
+preflight_pointer=${CHAMPHLA_PREFLIGHT_POINTER:-${CHAMPHLA_RUN_ROOT}/preflight/CURRENT}
+test -s "${preflight_pointer}"
+test ! -L "${preflight_pointer}"
+[[ "$(wc -l < "${preflight_pointer}")" -eq 1 ]]
+preflight_evidence_id=$(sed -n '1p' "${preflight_pointer}")
+[[ "${preflight_evidence_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]] || {
+  echo "unsafe promoted preflight evidence_id" >&2
+  exit 2
+}
+preflight_root=${CHAMPHLA_RUN_ROOT}/preflight/${preflight_evidence_id}
+environment_inventory=${preflight_root}/environment_inventory.json
+workflow_lock_audit=${preflight_root}/workflow_lock_audit.json
+test -s "${environment_inventory}"
+test -s "${workflow_lock_audit}"
+python3 -c 'from champhla_confirmation.roihu import validate_environment_inventory; import sys; f=validate_environment_inventory(sys.argv[1], project_root=sys.argv[2], max_age_seconds=3600); assert not f, f' \
+  "${environment_inventory}" "${CHAMPHLA_CODE_ROOT}"
+python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["passed"] is True' \
+  "${workflow_lock_audit}"
 
 audit_label=${wave}
 if [[ "${wave}" == batch ]]; then audit_label=batch${batch_index}; fi
 audit=${CHAMPHLA_RUN_ROOT}/manifests/${run_id}_${modality}_${audit_label}.source_manifest.audit.json
 mkdir -p "${CHAMPHLA_RUN_ROOT}/manifests" "${CHAMPHLA_RUN_ROOT}/logs"
 test ! -e "${audit}"
-test -s "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
-python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["passed"] is True' \
-  "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
-python3 -c 'import json,subprocess,sys; data=json.load(open(sys.argv[1])); current=subprocess.check_output(["git","-C",sys.argv[2],"rev-parse","HEAD"],text=True).strip(); assert data["repository"]["clean"] is True and data["repository"]["commit"] == current' \
-  "${CHAMPHLA_RUN_ROOT}/environment_inventory.json" "${CHAMPHLA_CODE_ROOT}"
 python3 -c 'from champhla_confirmation.roihu import validate_workflow_lock; import sys; result=validate_workflow_lock(sys.argv[1],sys.argv[2]); assert result["passed"], result["failures"]' \
   "${CHAMPHLA_CODE_ROOT}/configs/roihu_workflow_lock.json" "${CHAMPHLA_CODE_ROOT}"
 python3 -c 'from champhla_confirmation.manifests import validate_comparator_manifest; import sys; failures=validate_comparator_manifest(sys.argv[1], True); assert not failures, failures' \
@@ -50,6 +63,16 @@ chain_afterok=
 if [[ "${run_role}" != technical_pilot ]]; then
   python3 -c 'import json,sys; a=json.load(open(sys.argv[1])); assert a["status"] == "SIGNED_BY_AUTHOR" and a["signed_by"] and a["signed_at_utc"]' \
     "${CHAMPHLA_CODE_ROOT}/decisions/20260908_consensus_primary_amendment.json"
+  storage_pointer=${CHAMPHLA_RUN_ROOT}/storage_gates/CURRENT
+  test -s "${storage_pointer}"
+  test ! -L "${storage_pointer}"
+  [[ "$(wc -l < "${storage_pointer}")" -eq 1 ]]
+  storage_gate_id=$(sed -n '1p' "${storage_pointer}")
+  [[ "${storage_gate_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]]
+  storage_gate=${CHAMPHLA_RUN_ROOT}/storage_gates/${storage_gate_id}/storage_gate.json
+  test -s "${storage_gate}"
+  python3 -c 'import hashlib,json,sys; g=json.load(open(sys.argv[1])); observed=hashlib.sha256(open(sys.argv[2],"rb").read()).hexdigest(); assert g["schema_version"] == "champhla-roihu-storage-gate-4" and g["passed"] is True and g["environment_inventory_sha256"] == observed' \
+    "${storage_gate}" "${environment_inventory}"
 fi
 case "${wave}" in
   pilot)
@@ -69,9 +92,8 @@ case "${wave}" in
     execution_mode=sequential_low_storage
     # Only one sample is in flight at a time, so the gate is asked about a batch-sized
     # target rather than the whole cohort.
-    test -s "${CHAMPHLA_RUN_ROOT}/storage_gate.json"
     python3 -c 'import json,sys; g=json.load(open(sys.argv[1])); assert g["passed"] is True, g["execution_mode"]' \
-      "${CHAMPHLA_RUN_ROOT}/storage_gate.json"
+      "${storage_gate}"
     # A batch may not start while the previous one still has unvalidated rows.
     previous=${CHAMPHLA_RUN_ROOT}/manifests/${run_id}_${modality}_batch$((batch_index - 1)).ledger.tsv
     if [[ "${batch_index}" -gt 0 ]]; then
@@ -86,19 +108,17 @@ case "${wave}" in
     ;;
   capacity)
     limit=10
-    test -s "${CHAMPHLA_RUN_ROOT}/storage_gate.json"
     execution_mode=$(python3 -c 'import json,sys; g=json.load(open(sys.argv[1])); assert g["passed"] is True; print(g["execution_mode"])' \
-      "${CHAMPHLA_RUN_ROOT}/storage_gate.json")
+      "${storage_gate}")
     concurrency=$([[ "${execution_mode}" == full_scale ]] && printf '2' || printf '1')
     ;;
   production)
-    test -s "${CHAMPHLA_RUN_ROOT}/storage_gate.json"
     python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["passed"] is True' \
-      "${CHAMPHLA_RUN_ROOT}/storage_gate.json"
+      "${storage_gate}"
     python3 -c 'import hashlib,json,sys; gate=json.load(open(sys.argv[1])); observed=hashlib.sha256(open(sys.argv[2],"rb").read()).hexdigest(); assert gate["availability_source"] == "project_allocation" and gate["environment_inventory_sha256"] == observed' \
-      "${CHAMPHLA_RUN_ROOT}/storage_gate.json" "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
+      "${storage_gate}" "${environment_inventory}"
     execution_mode=$(python3 -c 'import json,sys; g=json.load(open(sys.argv[1])); assert g["execution_mode"] in {"full_scale","sequential_low_storage"}; print(g["execution_mode"])' \
-      "${CHAMPHLA_RUN_ROOT}/storage_gate.json")
+      "${storage_gate}")
     limit=1000000
     concurrency=$([[ "${execution_mode}" == full_scale ]] && printf '4' || printf '1')
     ;;
@@ -147,17 +167,17 @@ if [[ "${execution_mode}" == sequential_low_storage ]]; then
       dependency=(--dependency="afterok:${previous_job}")
     fi
     stage_job=$(sbatch --parsable --hold --kill-on-invalid-dep=yes "${dependency[@]}" --array="${task_id}" \
-      --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
+      --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}",CHAMPHLA_ENVIRONMENT_INVENTORY="${environment_inventory}" \
       --output="${CHAMPHLA_RUN_ROOT}/logs/stage_${artifact_prefix}_%A_%a.out" \
       --error="${CHAMPHLA_RUN_ROOT}/logs/stage_${artifact_prefix}_%A_%a.err" \
       "${CHAMPHLA_CODE_ROOT}/scripts/roihu_stage_inputs.sbatch" "${subset}" "${stage_ledger}")
     caller_job=$(sbatch --parsable --hold --kill-on-invalid-dep=yes --dependency="afterok:${stage_job}" --array="${task_id}" \
-      --export=ALL,CHAMPHLA_EXECUTION_MODE=sequential_low_storage,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
+      --export=ALL,CHAMPHLA_EXECUTION_MODE=sequential_low_storage,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}",CHAMPHLA_ENVIRONMENT_INVENTORY="${environment_inventory}" \
       --output="${CHAMPHLA_RUN_ROOT}/logs/callers_${artifact_prefix}_%A_%a.out" \
       --error="${CHAMPHLA_RUN_ROOT}/logs/callers_${artifact_prefix}_%A_%a.err" \
       "${CHAMPHLA_CODE_ROOT}/scripts/roihu_run_sample.sbatch" "${subset}" "${ledger}" "${stage_ledger}")
     finalizer_job=$(sbatch --parsable --hold --dependency="afterany:${stage_job}:${caller_job}" --array="${task_id}" \
-      --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
+      --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}",CHAMPHLA_ENVIRONMENT_INVENTORY="${environment_inventory}" \
       --output="${CHAMPHLA_RUN_ROOT}/logs/finalize_${artifact_prefix}_%A_%a.out" \
       --error="${CHAMPHLA_RUN_ROOT}/logs/finalize_${artifact_prefix}_%A_%a.err" \
       "${CHAMPHLA_CODE_ROOT}/scripts/roihu_finalize_sample.sbatch" "${subset}" "${stage_ledger}" "${ledger}" \
@@ -181,22 +201,24 @@ if [[ "${execution_mode}" == sequential_low_storage ]]; then
     printf 'run_id=%s\nrun_role=%s\nwave=%s\n' "${run_id}" "${run_role}" "${wave}"
     printf 'last_finalizer_job=%s\nstage_jobs=%s\ncaller_jobs=%s\nfinalizer_jobs=%s\n' "${previous_job}" "${stage_jobs[*]}" "${caller_jobs[*]}" "${finalizer_jobs[*]}"
     printf 'subset_sha256=%s\nledger=%s\nstage_ledger=%s\n' "$(sha256sum "${subset}" | cut -d ' ' -f 1)" "${ledger}" "${stage_ledger}"
+    printf 'preflight_evidence_id=%s\nenvironment_inventory=%s\nenvironment_inventory_sha256=%s\n' \
+      "${preflight_evidence_id}" "${environment_inventory}" "$(sha256sum "${environment_inventory}" | cut -d ' ' -f 1)"
   } > "${submission_record}"
   printf 'execution_mode=%s caller_jobs=%s records=%s subset=%s ledger=%s\n' \
     "${execution_mode}" "${caller_jobs[*]}" "${records}" "${subset}" "${ledger}"
 else
   stage_job=$(sbatch --parsable --hold --array="1-${records}%${concurrency}" \
-    --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
+    --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}",CHAMPHLA_ENVIRONMENT_INVENTORY="${environment_inventory}" \
     --output="${CHAMPHLA_RUN_ROOT}/logs/stage_${artifact_prefix}_%A_%a.out" \
     --error="${CHAMPHLA_RUN_ROOT}/logs/stage_${artifact_prefix}_%A_%a.err" \
     "${CHAMPHLA_CODE_ROOT}/scripts/roihu_stage_inputs.sbatch" "${subset}" "${stage_ledger}")
   caller_job=$(sbatch --parsable --hold --kill-on-invalid-dep=yes --dependency="afterok:${stage_job}" --array="1-${records}%${concurrency}" \
-    --export=ALL,CHAMPHLA_EXECUTION_MODE=full_scale,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
+    --export=ALL,CHAMPHLA_EXECUTION_MODE=full_scale,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}",CHAMPHLA_ENVIRONMENT_INVENTORY="${environment_inventory}" \
     --output="${CHAMPHLA_RUN_ROOT}/logs/callers_${artifact_prefix}_%A_%a.out" \
     --error="${CHAMPHLA_RUN_ROOT}/logs/callers_${artifact_prefix}_%A_%a.err" \
     "${CHAMPHLA_CODE_ROOT}/scripts/roihu_run_sample.sbatch" "${subset}" "${ledger}" "${stage_ledger}")
   finalizer_job=$(sbatch --parsable --hold --dependency="afterany:${stage_job}:${caller_job}" --array="1-${records}%${concurrency}" \
-    --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}" \
+    --export=ALL,CHAMPHLA_RUN_ID="${run_id}",CHAMPHLA_RUN_ROLE="${run_role}",CHAMPHLA_ENVIRONMENT_INVENTORY="${environment_inventory}" \
     --output="${CHAMPHLA_RUN_ROOT}/logs/finalize_${artifact_prefix}_%A_%a.out" \
     --error="${CHAMPHLA_RUN_ROOT}/logs/finalize_${artifact_prefix}_%A_%a.err" \
     "${CHAMPHLA_CODE_ROOT}/scripts/roihu_finalize_sample.sbatch" "${subset}" "${stage_ledger}" "${ledger}" \
@@ -217,6 +239,8 @@ PY
     printf 'run_id=%s\nrun_role=%s\nwave=%s\n' "${run_id}" "${run_role}" "${wave}"
     printf 'stage_job=%s\nlast_caller_job=%s\nfinalizer_job=%s\n' "${stage_job}" "${caller_job}" "${finalizer_job}"
     printf 'subset_sha256=%s\nledger=%s\nstage_ledger=%s\n' "$(sha256sum "${subset}" | cut -d ' ' -f 1)" "${ledger}" "${stage_ledger}"
+    printf 'preflight_evidence_id=%s\nenvironment_inventory=%s\nenvironment_inventory_sha256=%s\n' \
+      "${preflight_evidence_id}" "${environment_inventory}" "$(sha256sum "${environment_inventory}" | cut -d ' ' -f 1)"
   } > "${submission_record}"
   printf 'execution_mode=%s stage_job=%s caller_job=%s records=%s subset=%s ledger=%s\n' \
     "${execution_mode}" "${stage_job}" "${caller_job}" "${records}" "${subset}" "${ledger}"

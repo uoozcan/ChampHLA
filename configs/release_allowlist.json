@@ -1,0 +1,82 @@
+{
+  "schema_version": "champhla-release-allowlist-1",
+  "policy": "Only explicitly named compact, reviewable evidence classes may leave Roihu or enter the DOI bundle. A filename extension is never sufficient by itself.",
+  "profiles": {
+    "repository": {
+      "max_file_bytes": 104857600,
+      "allowed_patterns": [
+        ".gitattributes", ".gitignore", ".github/**/*.yml", ".github/**/*.yaml",
+        "ORIGINALS_MANIFEST.json", "README.md", "RECOVERY_STATUS.md", "pyproject.toml",
+        "result_registry.tsv", "ablations/**/*.py", "ablations/**/*.json", "ablations/**/*.toml",
+        "artifacts/**/*.json", "artifacts/**/*.tsv", "artifacts/**/*.md", "artifacts/**/*.txt",
+        "artifacts/**/*.out", "artifacts/**/SHA256SUMS", "artifacts/**/*.SHA256SUMS",
+        "cohorts/**/*.json", "cohorts/**/*.tsv", "configs/**/*.json", "configs/**/*.tsv",
+        "configs/**/*.txt", "configs/**/*.env", "configs/**/*.config", "decisions/**/*.json",
+        "docs/**/*.md", "external/**/*.json", "external/**/*.tsv", "external/**/*.md",
+        "manuscripts/**/*.md", "manuscripts/**/*.tsv", "manuscripts/**/*.txt", "manuscripts/**/*.json",
+        "manuscripts/**/*.bib", "manuscripts/**/*.docx", "manuscripts/**/*.png",
+        "manuscripts/**/*.svg", "manuscripts/**/*.pdf", "models/**/*.json", "models/**/*.tsv",
+        "provenance/**/*.json", "provenance/**/*.tsv", "provenance/**/*.md", "provenance/**/*.txt",
+        "reports/**/*.json", "reports/**/*.tsv", "reports/**/*.md", "reports/**/*.docx",
+        "scripts/**/*.py", "scripts/**/*.sh", "scripts/**/*.sbatch", "src/**/*.py", "tests/**/*.py",
+        "truth_manifests/**/*.json", "truth_manifests/**/*.tsv", "workflow/**/*.nf",
+        "workflow/**/*.config", "workflow/**/*.json", "workflow/**/*.py", "workflow/**/*.sh",
+        "workflow/**/*.yaml", "workflow/**/*.yml"
+      ],
+      "denied_parts": [
+        "runs", "runtime_data", "truth_sealed", "roihu_inputs", "roihu_work",
+        "roihu_references", "roihu_containers", "work", ".nextflow", "containers",
+        "references", "assemblies", "quarantine"
+      ],
+      "denied_suffixes": [
+        ".bam", ".bai", ".cram", ".crai", ".sam", ".vcf", ".vcf.gz", ".bcf",
+        ".fastq", ".fastq.gz", ".fq", ".fq.gz", ".fa", ".fa.gz", ".fasta",
+        ".fasta.gz", ".fna", ".fna.gz", ".agc", ".sif", ".img", ".pem", ".key"
+      ],
+      "denied_name_patterns": [
+        "(^|/)(id_[^/]+|authorized_keys|known_hosts)(\\.|$)",
+        "(^|/)(secret|secrets|credential|credentials)(/|\\.|$)"
+      ],
+      "content_scan_suffixes": [".txt", ".md", ".json", ".tsv", ".env", ".yml", ".yaml"],
+      "content_scan_max_bytes": 5000000
+    },
+    "roihu_compact_export": {
+      "max_file_bytes": 104857600,
+      "candidate_patterns": [
+        "manifests/{run_id}_*", "logs/*{run_id}*",
+        "caller_outputs/{run_id}/**/CALLERS_COMPLETE",
+        "caller_outputs/{run_id}/**/polysolver_wrapper_transform.json",
+        "audits/{run_id}/**", "predictions/{run_id}/**", "freezes/{run_id}/**",
+        "evaluation/{run_id}/**", "review/{run_id}/**", "resource_metrics/{run_id}/**"
+      ],
+      "allowed_patterns": [
+        "manifests/{run_id}_*.tsv", "manifests/{run_id}_*.json", "manifests/{run_id}_*.txt",
+        "logs/*{run_id}*.out", "logs/*{run_id}*.err", "logs/*{run_id}*.log",
+        "caller_outputs/{run_id}/**/CALLERS_COMPLETE",
+        "caller_outputs/{run_id}/**/polysolver_wrapper_transform.json",
+        "audits/{run_id}/**/*.json", "audits/{run_id}/**/*.tsv", "audits/{run_id}/**/*.md",
+        "predictions/{run_id}/**/*.json", "predictions/{run_id}/**/*.tsv",
+        "freezes/{run_id}/**/*.json", "freezes/{run_id}/**/*.tsv",
+        "evaluation/{run_id}/**/*.json", "evaluation/{run_id}/**/*.tsv", "evaluation/{run_id}/**/*.md",
+        "review/{run_id}/**/*.json", "review/{run_id}/**/*.tsv", "review/{run_id}/**/*.md",
+        "review/{run_id}/**/*.pdf", "review/{run_id}/**/*.png", "review/{run_id}/**/*.svg",
+        "resource_metrics/{run_id}/**/*.json", "resource_metrics/{run_id}/**/*.tsv"
+      ],
+      "denied_parts": [
+        "truth", "truth_sealed", "inputs", "work", ".nextflow", "containers",
+        "references", "assemblies", "quarantine", "native_outputs"
+      ],
+      "denied_suffixes": [
+        ".bam", ".bai", ".cram", ".crai", ".sam", ".vcf", ".vcf.gz", ".bcf",
+        ".fastq", ".fastq.gz", ".fq", ".fq.gz", ".fa", ".fa.gz", ".fasta",
+        ".fasta.gz", ".fna", ".fna.gz", ".agc", ".sif", ".img", ".pem", ".key"
+      ],
+      "denied_name_patterns": [
+        "truth", "(^|/)(id_[^/]+|authorized_keys|known_hosts)(\\.|$)",
+        "(^|/)(secret|secrets|credential|credentials)(/|\\.|$)"
+      ],
+      "content_scan_suffixes": [".txt", ".md", ".json", ".tsv", ".log", ".out", ".err"],
+      "content_scan_max_bytes": 5000000
+    }
+  }
+}

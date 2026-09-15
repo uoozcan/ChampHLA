@@ -40,6 +40,7 @@ TRANSIENT_PATTERNS = (
     r"could not resolve host", r"\bHTTP[^\n]*429\b", r"\b429\b[^\n]*HTTP",
     r"\bHTTP[^\n]*5\d\d\b", r"\b5\d\d\b[^\n]*HTTP",
     r"seek at offset \d+ failed", r"error closing [\"']https?://",
+    r"error reading file [\"']https?://",
     r"EOF marker is absent",
 )
 

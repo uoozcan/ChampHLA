@@ -180,7 +180,7 @@
       ],
       "release_note": "The 3100 filename is contradicted by content: at 3.10.0 the database carries 82-130 two-field types that release had not published. It resolves to 3.11.0, filtered to complete sequences.",
       "wrapper_compatibility_transform": {
-        "status": "FROZEN_PENDING_TECHNICAL_PILOT",
+        "status": "FROZEN_TECHNICALLY_VALIDATED",
         "transformation_version": "polysolver-hg38-contig-compatibility-1",
         "spec": "workflow/conf/polysolver_wrapper_patch.json",
         "spec_sha256": "eb904bedeacb7c223f836c112c7c9aa173113b04c799a4cf226b76ba5e691afa",
@@ -190,6 +190,28 @@
         "accepted_contigs": ["6", "chr6"],
         "hg38_interval_substitutions_for_chr6": 3,
         "temporary_directory_substitutions": 1,
+        "technical_pilot_evidence": [
+          {
+            "sample_id": "HG00096",
+            "run_id": "pilot-wes-stagev3",
+            "audit_path": "/scratch/project_2008084/champhla_plurality_runs/caller_outputs/pilot-wes-stagev3/technical_pilot/wes/HG00096/results/HG00096/polysolver/polysolver_wrapper_transform.json",
+            "audit_sha256": "9866cac206cbc5285003d4a1d4c373f5e1df13bdc6b7fbb9bfa31f455b39b884",
+            "contig_convention": "chr6",
+            "derived_wrapper_sha256": "a93ef49c3b8386bfbf9d84e64c26010a1e947913d361a9325b9f07629649a927",
+            "hg38_contig_substitutions": 3,
+            "temporary_directory_substitutions": 1
+          },
+          {
+            "sample_id": "HG00097",
+            "run_id": "pilot-wes-stagev3",
+            "audit_path": "/scratch/project_2008084/champhla_plurality_runs/caller_outputs/pilot-wes-stagev3/technical_pilot/wes/HG00097/results/HG00097/polysolver/polysolver_wrapper_transform.json",
+            "audit_sha256": "d10a812c986b5b304a53b8face8f81244f19532fb8cc97508021b3d4b4397031",
+            "contig_convention": "chr6",
+            "derived_wrapper_sha256": "6dddadc41fe1b9226305d415be2b36c5761cb916ebd17596d02bb8bc3ef26f13",
+            "hg38_contig_substitutions": 3,
+            "temporary_directory_substitutions": 1
+          }
+        ],
         "runtime_audit": "Each invocation emits and revalidates source, specification, and derived-wrapper SHA-256 values before executing the caller."
       }
     },

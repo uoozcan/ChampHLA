@@ -20,6 +20,7 @@ ledger=${2:?usage: roihu_run_sample.sbatch MANIFEST LEDGER STAGE_LEDGER}
 stage_ledger=${3:?usage: roihu_run_sample.sbatch MANIFEST LEDGER STAGE_LEDGER}
 run_id=${CHAMPHLA_RUN_ID:?CHAMPHLA_RUN_ID is required}
 run_role=${CHAMPHLA_RUN_ROLE:?CHAMPHLA_RUN_ROLE is required}
+environment_inventory=${CHAMPHLA_ENVIRONMENT_INVENTORY:?CHAMPHLA_ENVIRONMENT_INVENTORY is required}
 [[ "${run_id}" =~ ^[a-z0-9][a-z0-9._-]{2,63}$ ]]
 [[ "${run_role}" =~ ^(technical_pilot|capacity_validation|production)$ ]]
 if [[ "${run_role}" != technical_pilot ]]; then
@@ -67,9 +68,9 @@ assert latest["extracted_sha256"], "staging ledger lacks extracted hash"
 PY
 test ! -e "${sample_root}/CALLERS_COMPLETE"
 mkdir -p "${sample_root}/results" "${sample_root}/launch" "${work_root}"
-test -s "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
-python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["passed"] is True' \
-  "${CHAMPHLA_RUN_ROOT}/environment_inventory.json"
+test -s "${environment_inventory}"
+python3 -c 'from champhla_confirmation.roihu import validate_environment_inventory; import sys; f=validate_environment_inventory(sys.argv[1], project_root=sys.argv[2]); assert not f, f' \
+  "${environment_inventory}" "${CHAMPHLA_CODE_ROOT}"
 
 export CSC_ENV_INIT_NON_INTERACTIVE=yes
 export NXF_OPTS='-Xms256m -Xmx4g'
@@ -194,7 +195,7 @@ esac
 
 printf 'run_id=%s\nrun_role=%s\n' "${run_id}" "${run_role}" > "${sample_root}/run_identity.txt"
 sha256sum "${sample_root}/samplesheet.csv" "${sample_root}/run_identity.txt" "${manifest}" \
-  "${CHAMPHLA_RUN_ROOT}/environment_inventory.json" \
+  "${environment_inventory}" \
   "${CHAMPHLA_CODE_ROOT}/configs/comparator_manifest.json" \
   "${CHAMPHLA_CODE_ROOT}/configs/rerun_protocol.json" \
   "${CHAMPHLA_CODE_ROOT}/configs/roihu_workflow_lock.json" \

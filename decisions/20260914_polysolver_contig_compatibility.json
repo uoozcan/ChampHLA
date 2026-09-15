@@ -1,7 +1,7 @@
 {
   "schema_version": "champhla-technical-compatibility-correction-1",
   "date": "2026-09-14",
-  "status": "IMPLEMENTED_PENDING_TECHNICAL_PILOT",
+  "status": "TECHNICALLY_VALIDATED",
   "decision": "Derive a hash-verified POLYSOLVER wrapper whose three hg38 interval tokens match the input BAM contig convention",
   "classification": "technical contig-compatibility correction",
   "separate_method_change": "decisions/20260913_polysolver_input_change.json",
@@ -45,6 +45,24 @@
       "apply the temporary-directory substitution independently and exactly once",
       "emit and revalidate the derived-wrapper SHA-256 and transformation audit"
     ]
+  },
+  "technical_pilot_validation": {
+    "run_id": "pilot-wes-stagev3",
+    "run_role": "technical_pilot",
+    "result": "Both WES samples completed all five callers. Each POLYSOLVER audit verified the pinned source/spec, chr6 convention, exactly three interval-token substitutions, and one temporary-directory substitution.",
+    "evidence": [
+      {
+        "sample_id": "HG00096",
+        "audit_sha256": "9866cac206cbc5285003d4a1d4c373f5e1df13bdc6b7fbb9bfa31f455b39b884",
+        "derived_wrapper_sha256": "a93ef49c3b8386bfbf9d84e64c26010a1e947913d361a9325b9f07629649a927"
+      },
+      {
+        "sample_id": "HG00097",
+        "audit_sha256": "d10a812c986b5b304a53b8face8f81244f19532fb8cc97508021b3d4b4397031",
+        "derived_wrapper_sha256": "6dddadc41fe1b9226305d415be2b36c5761cb916ebd17596d02bb8bc3ef26f13"
+      }
+    ],
+    "scope_boundary": "This validates only the technical wrapper transformation. The final six-sample storage pilot is rerun after later transport-control changes, and the separate region-plus-unmapped method-change caveat remains operative."
   },
   "compact_evidence_sha256": {
     "logs/callers_wes_pilot_1299321_1.err": "847a133aac668d0bed0c540f85d923b534b62bcf83612aaee981a65069853ae5",

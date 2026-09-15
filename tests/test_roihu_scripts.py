@@ -122,6 +122,52 @@ def test_preflight_exercises_chr6_detector_inside_pinned_hlahd_image():
     assert "header.ambiguous.sam" in text
 
 
+def test_preflight_evidence_is_versioned_and_explicitly_promoted():
+    preflight = (ROOT / "scripts" / "roihu_preflight.sh").read_text(encoding="utf-8")
+    promote = (ROOT / "scripts" / "roihu_promote_preflight.sh").read_text(encoding="utf-8")
+    submit = (ROOT / "scripts" / "roihu_submit_wave.sh").read_text(encoding="utf-8")
+    runner = (ROOT / "scripts" / "roihu_run_sample.sbatch").read_text(encoding="utf-8")
+    assert '${preflight_parent}/${evidence_id}' in preflight
+    assert "test ! -e \"${preflight_root}\"" in preflight
+    assert '--evidence-id "${evidence_id}"' in preflight
+    assert "preflight evidence created but not promoted" in preflight
+    assert "preflight_parent=${CHAMPHLA_RUN_ROOT}/preflight" in promote
+    assert "pointer=${preflight_parent}/CURRENT" in promote
+    assert "validate_environment_inventory" in promote
+    assert "max_age_seconds=3600" in promote
+    assert "preflight/CURRENT" in submit
+    assert "CHAMPHLA_ENVIRONMENT_INVENTORY" in submit
+    assert "validate_environment_inventory" in submit
+    assert "CHAMPHLA_ENVIRONMENT_INVENTORY:?" in runner
+    assert '${CHAMPHLA_RUN_ROOT}/environment_inventory.json' not in submit
+    assert '${CHAMPHLA_RUN_ROOT}/environment_inventory.json' not in runner
+
+
+def test_storage_gate_is_versioned_and_explicitly_promoted():
+    assess = (ROOT / "scripts" / "roihu_assess_storage.sh").read_text(encoding="utf-8")
+    promote = (ROOT / "scripts" / "roihu_promote_storage_gate.sh").read_text(encoding="utf-8")
+    submit = (ROOT / "scripts" / "roihu_submit_wave.sh").read_text(encoding="utf-8")
+    assert '${gate_parent}/${gate_id}' in assess
+    assert 'test ! -e "${gate_root}"' in assess
+    assert '--evidence-id "${gate_id}"' in assess
+    assert "storage gate created but not promoted" in assess
+    assert "pointer=${gate_parent}/CURRENT" in promote
+    assert 'g["environment_inventory_sha256"] == observed' in promote
+    assert "storage_gates/CURRENT" in submit
+    assert '${CHAMPHLA_RUN_ROOT}/storage_gate.json' not in submit
+
+
+def test_local_verification_runs_distinct_main_and_combined_claim_audits():
+    text = (ROOT / "scripts" / "run_local_verification.sh").read_text(encoding="utf-8")
+    first = text.index("--output artifacts/benchmark_manuscript_audit.json")
+    second = text.index("--output artifacts/benchmark_combined_audit.json")
+    assert first < second
+    main_invocation = text[text.rfind("audit-manuscript-claims", 0, first):first]
+    combined_invocation = text[text.rfind("audit-manuscript-claims", 0, second):second]
+    assert "--supplement" not in main_invocation
+    assert "--supplement manuscripts/benchmark/supplementary.md" in combined_invocation
+
+
 def test_wgs_staging_streams_and_never_writes_the_source_cram():
     """A 30x CRAM is ~18 GB and no caller sees it; 137 of them do not fit the allocation."""
     text = (ROOT / "scripts/roihu_stage_inputs.sbatch").read_text(encoding="utf-8")

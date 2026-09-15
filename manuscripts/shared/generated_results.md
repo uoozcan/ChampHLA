@@ -7,6 +7,7 @@
 | DEV_WGS_CONSENSUS | 1000G-development | wgs | SimplePluralityLex | invalid | invalid | 164 / 411 | 0.399027 | no |
 | DEV_TT_WES_BASE | 1000G-development | wes | SimpleTwoThirdsConsensus | development | valid | 328 / 390 | 0.841026 | no |
 | DEV_TT_WES_GCC | 1000G-development | wes | TwoThirdsGuardedCC | development | valid | 369 / 390 | 0.946154 | no |
+| DEV_WES_POLYSOLVER_FULL_ALIGNMENT | 1000G-development | wes | Caller:POLYSOLVER | development | valid | 357 / 390 | 0.915385 | no |
 | DEV_TT_RNA_BASE | 1000G-development | rnaseq | SimpleTwoThirdsConsensus | development | valid | 296 / 321 | 0.922118 | no |
 | DEV_TT_RNA_GCC | 1000G-development | rnaseq | TwoThirdsGuardedCC | development | valid | 306 / 321 | 0.953271 | no |
 | DEV_WGS_LEGACY_BASE | 1000G-development | wgs | SimpleTwoThirdsConsensus | invalid | invalid | 79 / 411 | 0.192214 | no |
@@ -23,6 +24,7 @@
 - SimplePluralityLex produced 306 correct genotypes among 321 eligible rnaseq loci in 1000G-development (development) [RESULT:DEV_RNA_CONSENSUS].
 - SimpleTwoThirdsConsensus produced 328 correct genotypes among 390 eligible wes loci in 1000G-development (development) [RESULT:DEV_TT_WES_BASE].
 - TwoThirdsGuardedCC produced 369 correct genotypes among 390 eligible wes loci in 1000G-development (development) [RESULT:DEV_TT_WES_GCC].
+- Caller:POLYSOLVER produced 357 correct genotypes among 390 eligible wes loci in 1000G-development (development) [RESULT:DEV_WES_POLYSOLVER_FULL_ALIGNMENT].
 - SimpleTwoThirdsConsensus produced 296 correct genotypes among 321 eligible rnaseq loci in 1000G-development (development) [RESULT:DEV_TT_RNA_BASE].
 - TwoThirdsGuardedCC produced 306 correct genotypes among 321 eligible rnaseq loci in 1000G-development (development) [RESULT:DEV_TT_RNA_GCC].
 - MetaConsensus produced 67 correct genotypes among 82 eligible wes loci in NCI-60 (exploratory) [RESULT:META_NCI60_WES].

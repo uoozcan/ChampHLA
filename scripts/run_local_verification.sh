@@ -46,11 +46,18 @@ expect_blocked python3 -c \
 
 expect_blocked python3 -m champhla_recovery.cli audit-manuscript-claims \
   --manuscript manuscripts/benchmark/manuscript.md \
-  --supplement manuscripts/benchmark/supplementary.md \
   --registry result_registry.tsv \
   --claims manuscripts/claim_audit.tsv \
   --root "${ROOT}" \
   --output artifacts/benchmark_manuscript_audit.json
+
+expect_blocked python3 -m champhla_recovery.cli audit-manuscript-claims \
+  --manuscript manuscripts/benchmark/manuscript.md \
+  --supplement manuscripts/benchmark/supplementary.md \
+  --registry result_registry.tsv \
+  --claims manuscripts/claim_audit.tsv \
+  --root "${ROOT}" \
+  --output artifacts/benchmark_combined_audit.json
 
 python3 -m champhla_recovery.cli audit-manuscript-claims \
   --manuscript manuscripts/method_conditional/manuscript.md \
@@ -63,5 +70,22 @@ expect_blocked python3 -m champhla_recovery.cli audit-release-readiness \
   --project-root "${ROOT}" \
   --config configs/release_requirements.json \
   --output artifacts/release_readiness.json
+
+expect_blocked python3 -m champhla_recovery.cli validate-figure-manifest \
+  --project-root "${ROOT}" \
+  --manifest manuscripts/figures/figure_manifest.tsv \
+  --output artifacts/figure_audit.json
+
+expect_blocked python3 -m champhla_recovery.cli build-submission-package \
+  --project-root "${ROOT}" \
+  --main manuscripts/benchmark/manuscript.md \
+  --supplement manuscripts/benchmark/supplementary.md \
+  --bibliography manuscripts/submission/references.bib \
+  --declarations manuscripts/submission/declarations_template.md \
+  --output-dir manuscripts/submission \
+  --manifest manuscripts/submission/submission_manifest.tsv \
+  --parity-audit artifacts/submission_docx_parity.json \
+  --bibliography-audit artifacts/submission_bibliography_audit.json \
+  --declarations-audit artifacts/submission_declarations_audit.json
 
 echo "Local verification passed; prospective manuscript/release gates remain correctly blocked."

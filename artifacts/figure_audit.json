@@ -1,0 +1,15 @@
+{
+  "blocked_figures": [
+    "MAIN-3",
+    "MAIN-4",
+    "MAIN-5"
+  ],
+  "failures": [],
+  "generated_figures": 2,
+  "generated_rows_valid": true,
+  "outputs_valid": true,
+  "passed": false,
+  "registry_agreement": false,
+  "schema_version": "champhla-figure-audit-1",
+  "source_hashes_valid": true
+}

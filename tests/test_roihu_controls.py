@@ -24,6 +24,7 @@ from champhla_confirmation.roihu import (
     freeze_run_manifest,
     transition_run_record,
     transition_run_sample,
+    validate_environment_inventory,
     validate_workflow_lock,
 )
 from champhla_confirmation.staging import (
@@ -62,6 +63,7 @@ def manifest_row(modality="wes", sample="S1"):
     "HTTP response code 429", "HTTP 503 Service Unavailable",
     "Seek at offset 12003535533 failed",
     'samtools view: error closing "https://example.org/a.cram": -1',
+    'samtools view: error reading file "https://example.org/a.cram"',
     "EOF marker is absent. The input is probably truncated",
 ])
 def test_remote_stage_failure_transient_allowlist(message):
@@ -84,6 +86,15 @@ def test_stage_failure_deterministic(message):
 def test_remote_stage_timeout_is_retryable_but_local_timeout_is_not():
     assert classify_stage_failure(124, "", "https://example.org/a.cram")["retryable"]
     assert not classify_stage_failure(124, "", "/data/a.cram")["retryable"]
+
+
+def test_generic_local_read_error_remains_deterministic():
+    result = classify_stage_failure(
+        1, 'samtools view: error reading file "/data/a.cram"',
+        "https://example.org/a.cram",
+    )
+    assert result["failure_class"] == "deterministic"
+    assert result["retryable"] is False
 
 
 def test_stage_attempt_ledger_is_append_only_and_validated(tmp_path: Path):
@@ -356,6 +367,40 @@ def test_run_identity_and_storage_measurements_are_fail_closed(tmp_path: Path):
         assess_storage(ledgers[:2], {"wgs": 1, "wes": 1}, 200 * 1024 ** 3)
 
 
+def test_sequential_storage_uses_p95_of_paired_sample_transients(tmp_path: Path):
+    """Crossed marginal maxima must not erase the larger sample transient."""
+    from champhla_confirmation.panels import PANELS
+
+    ledgers = []
+    for modality in ("wgs", "wes", "rnaseq"):
+        rows = []
+        measurements = ((1000, 900), (900, 100))
+        for sample, (peak, retained) in zip(("S1", "S2"), measurements):
+            for caller in PANELS[modality]:
+                row = {field: "" for field in RUN_LEDGER_FIELDS}
+                row.update({
+                    "run_id": f"pilot-{modality}",
+                    "run_role": "technical_pilot", "cohort": "C",
+                    "sample_id": sample, "modality": modality, "caller": caller,
+                    "state": "validated", "runtime_seconds": "1",
+                    "peak_memory_bytes": "2", "peak_disk_bytes": str(peak),
+                    "retained_disk_bytes": str(retained), "git_commit": "deadbeef",
+                })
+                rows.append(row)
+        ledger = tmp_path / f"{modality}.tsv"
+        write_tsv(ledger, rows, list(RUN_LEDGER_FIELDS))
+        ledgers.append(ledger)
+
+    result = assess_storage(
+        ledgers, {"wgs": 1, "wes": 1, "rnaseq": 1}, 200 * 1024 ** 3,
+    )
+    assert result["pilot_transient_p95_bytes_by_modality"] == {
+        "wgs": 800, "wes": 800, "rnaseq": 800,
+    }
+    expected = 2700 + 1000 + 100 * 1024 ** 3
+    assert result["sequential_required_available_bytes"] == expected
+
+
 def test_canonical_collection_rejects_nonproduction_run_role(tmp_path: Path):
     manifest = tmp_path / "manifest.tsv"
     write_tsv(manifest, [manifest_row()], MANIFEST_FIELDS)
@@ -485,6 +530,43 @@ def test_directory_tree_hash_uses_posix_relative_paths(tmp_path: Path):
     assert directory_tree_identity(root)["tree_sha256"] != first["tree_sha256"]
 
 
+def test_environment_inventory_requires_version_identity_freshness_and_post_pilot_time(tmp_path: Path):
+    path = tmp_path / "environment.json"
+    payload = {
+        "schema_version": "champhla-roihu-environment-inventory-2",
+        "evidence_id": "post-pilot-20260915t170000z",
+        "created_at_utc": "2026-09-15T17:00:00Z",
+        "passed": True,
+        "project_storage": {
+            "free_bytes": 123, "filesystem_global_space_ignored": True,
+        },
+        "repository": {
+            "clean": True, "commit": "deadbeef", "tracked_tree_sha256": "a" * 64,
+        },
+        "workflow_lock": {"passed": True},
+    }
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    assert validate_environment_inventory(
+        path, max_age_seconds=3600,
+        not_before_utc="2026-09-15T16:59:59Z",
+        now_utc="2026-09-15T17:30:00Z",
+    ) == []
+
+    payload["created_at_utc"] = "2026-09-15T16:00:00Z"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    failures = validate_environment_inventory(
+        path, max_age_seconds=3600,
+        not_before_utc="2026-09-15T16:30:00Z",
+        now_utc="2026-09-15T17:30:01Z",
+    )
+    assert "environment inventory predates the pilot evidence" in failures
+    assert "environment inventory is stale" in failures
+
+    payload.pop("evidence_id")
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    assert any("evidence_id" in failure for failure in validate_environment_inventory(path))
+
+
 @pytest.mark.skipif(os.name == "nt", reason="Windows CI does not guarantee symlink privilege")
 def test_directory_tree_hash_freezes_internal_links_and_rejects_escapes(tmp_path: Path):
     root = tmp_path / "index"
@@ -523,8 +605,13 @@ def test_workflow_lock_detects_changes_and_masked_success(tmp_path: Path):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
     for relative in (
+        "scripts/roihu_preflight.sh", "scripts/roihu_promote_preflight.sh",
+        "scripts/roihu_assess_storage.sh", "scripts/roihu_promote_storage_gate.sh",
         "scripts/roihu_submit_wave.sh", "scripts/roihu_stage_inputs.sbatch",
         "scripts/roihu_run_sample.sbatch", "scripts/roihu_finalize_sample.sbatch",
+        "src/champhla_confirmation/cli.py", "src/champhla_confirmation/io.py",
+        "src/champhla_confirmation/manifests.py", "src/champhla_confirmation/panels.py",
+        "src/champhla_confirmation/parsers.py", "src/champhla_confirmation/roihu.py",
         "src/champhla_confirmation/staging.py",
     ):
         target = project / relative
@@ -533,6 +620,9 @@ def test_workflow_lock_detects_changes_and_masked_success(tmp_path: Path):
     lock = project / "lock.json"
     freeze_workflow_lock(project, workflow, lock)
     assert validate_workflow_lock(lock, project)["passed"] is True
+    locked = json.loads(lock.read_text(encoding="utf-8"))["files"]
+    assert "src/champhla_confirmation/roihu.py" in locked
+    assert "src/champhla_confirmation/cli.py" in locked
     (workflow / "modules" / "t1k.nf").write_text("errorStrategy 'ignore'\n", encoding="utf-8")
     failures = validate_workflow_lock(lock, project)["failures"]
     assert any("hash mismatch" in failure for failure in failures)
