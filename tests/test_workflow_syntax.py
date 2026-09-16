@@ -89,9 +89,15 @@ def test_workflow_lock_covers_every_workflow_file():
         if p.is_file() and p.suffix in {".nf", ".config", ".yaml", ".json", ".py", ".sh"}
     }
     present.update({
-        "scripts/roihu_submit_wave.sh", "scripts/roihu_stage_inputs.sbatch",
-        "scripts/roihu_run_sample.sbatch", "scripts/roihu_finalize_sample.sbatch",
-        "src/champhla_confirmation/staging.py",
+        "scripts/roihu_preflight.sh", "scripts/roihu_submit_wave.sh",
+        "scripts/roihu_stage_inputs.sbatch", "scripts/roihu_run_sample.sbatch",
+        "scripts/roihu_finalize_sample.sbatch", "scripts/roihu_promote_preflight.sh",
+        "scripts/roihu_assess_storage.sh", "scripts/roihu_promote_storage_gate.sh",
+    })
+    present.update({
+        str(p.relative_to(ROOT)).replace("\\", "/")
+        for p in (ROOT / "src/champhla_confirmation").glob("*.py")
+        if p.is_file()
     })
     assert locked == present, {"only_in_lock": locked - present, "only_on_disk": present - locked}
 
