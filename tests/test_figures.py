@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from champhla_recovery.figures import REQUIRED_MAIN, validate_figure_manifest
 
 
@@ -56,6 +58,7 @@ def test_figure_pngs_are_declared_at_publication_resolution():
 
 
 def test_static_figure_generation_is_byte_deterministic(tmp_path: Path):
+    pytest.importorskip("matplotlib", reason="requires the optional publication extra")
     for relative in ("configs/confirmation_protocol.json", "configs/dataset_roles.json",
                      "manuscripts/figures/scripts/generate_static_figures.py"):
         target = tmp_path / relative
