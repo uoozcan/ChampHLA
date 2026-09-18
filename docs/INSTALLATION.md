@@ -171,6 +171,41 @@ nextflow run main.nf \
     -resume
 ```
 
+
+### 7. CSC Roihu users
+
+**Roihu is not Puhti, and `module load nextflow` does not work there.** Two things
+differ, each invisible until you hit it:
+
+1. `/etc/profile.d/zz-csc-env.sh` -- the script that defines `module` at all --
+   returns immediately when `$PS1` is unset, so in any non-interactive shell.
+   **A SLURM batch script is non-interactive**, so a job that just says
+   `module load ...` dies one second in with `module: command not found`.
+   Export `CSC_ENV_INIT_NON_INTERACTIVE=yes` *before* sourcing it.
+2. The bare name `nextflow` has no default version on Roihu, and its modulefile
+   sits behind a `bio-apps` prerequisite.
+
+Rather than remember that, source the script that encodes it:
+
+```bash
+source bin/roihu_env.sh      # nextflow 25.10.2, openjdk 17.0.11, samtools 1.21
+```
+
+Then submit through the Roihu launcher, which sources it for you. Note the
+`--export`: SLURM copies the batch script into its spool directory, so the script
+cannot find the repository from its own path.
+
+```bash
+sbatch --export=ALL,PANELHLA_HOME=/path/to/PanelHLA   /path/to/PanelHLA/slurm_panelhla_roihu.sh   wgs  /path/to/bam_dir  bam   optitype,hlahd,polysolver,kourami,spechla,t1k   /path/to/results  /path/to/work
+```
+
+A trap for whoever edits `bin/roihu_env.sh`: `module` is a shell function, so
+`module load x | head` runs it in a subshell and silently discards everything it
+set. Never pipe it.
+
+The older `slurm_*.sh` scripts in the repository root are Puhti-era and say
+`module load nextflow`; they have not been migrated.
+
 ---
 
 ## HPC Cluster (PBS/LSF)
