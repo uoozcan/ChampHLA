@@ -63,6 +63,9 @@ esac
 
 mkdir -p "${OUTDIR}" "${WORKDIR}"
 
+# Consensus is opt-in: nextflow.config sets enable_majority_voting = false. The
+# equal-weight plurality vote is this project's primary method, so a Roihu run
+# that stopped at per-tool outputs would not be end to end.
 echo "[panelhla] modality=${MODALITY} tools=${TOOLS}"
 echo "[panelhla] nextflow=$(command -v nextflow) samtools=$(command -v samtools)"
 
@@ -77,6 +80,7 @@ nextflow run "${PIPE}/main.nf" \
   --optitype_seq_type "${SEQ_TYPE}" \
   --spechla_exon_only "${EXON_ONLY}" \
   --run_modality "${MODALITY}" \
+  --enable_majority_voting \
   --outdir "${OUTDIR}" \
   --slurm_account project_2008084 \
   -profile roihu,singularity
