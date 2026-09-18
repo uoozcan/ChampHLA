@@ -15,7 +15,11 @@ Each file is tab-separated with a header line:
     C       C*07:01'  0.0         C*07:01   NA
 
 Alleles with a trailing apostrophe (') are ambiguity-flagged; stripped here.
-Alleles where BOTH confidences are NA or <= CONF_THRESHOLD (0.1) are excluded.
+
+The "Confidence" column is a P-VALUE -- seq2HLA's README describes its output as
+"a p-value for each call" -- so a SMALL value means a confident call. A locus is
+excluded only when BOTH p-values are numeric and ABOVE P_VALUE_THRESHOLD (0.1),
+i.e. when neither allele is supported. NA is unscored and never excludes.
 Non-classical Class I loci (E/F/G/H/J/K/L/P/V) and non-classical Class II (DRA)
 are excluded — only classical genes are reported.
 
@@ -31,7 +35,9 @@ import os
 import sys
 
 
-CONF_THRESHOLD = 0.1
+# seq2HLA reports a p-value per call: smaller is stronger. A locus is dropped only
+# when both alleles are ABOVE this, meaning neither call is supported.
+P_VALUE_THRESHOLD = 0.1
 
 # Only report classical HLA genes (exclude DRA and all non-classical Class I loci)
 CLASSICAL_GENES = {'A', 'B', 'C', 'DRB1', 'DQA1', 'DQB1', 'DPA1', 'DPB1'}
@@ -93,13 +99,16 @@ def parse_class_file(filepath):
                 c1 = parse_conf(c1_s)
                 c2 = parse_conf(c2_s)
 
-                # Skip only when BOTH confidences are numeric AND below threshold.
-                # If either is NA (unscored) we keep the allele.
-                c1_low = (c1 is not None and c1 <= CONF_THRESHOLD)
-                c2_low = (c2 is not None and c2 <= CONF_THRESHOLD)
-                if c1_low and c2_low:
-                    print("  Skipping {}: both allele confidences below {} (c1={:.3f}, c2={:.3f})".format(
-                        gene, CONF_THRESHOLD, c1, c2), file=sys.stderr)
+                # These are p-values, so ABOVE the threshold means unsupported. Skip
+                # only when both alleles are unsupported; NA is unscored and keeps
+                # the allele. Reading this the other way round discarded seq2HLA's
+                # best calls -- A, B and C at p < 0.05 -- and kept its weakest.
+                c1_weak = (c1 is not None and c1 > P_VALUE_THRESHOLD)
+                c2_weak = (c2 is not None and c2 > P_VALUE_THRESHOLD)
+                if c1_weak and c2_weak:
+                    print("  Skipping {}: neither allele supported, both p > {} "
+                          "(p1={:.3g}, p2={:.3g})".format(
+                              gene, P_VALUE_THRESHOLD, c1, c2), file=sys.stderr)
                     continue
 
                 # Skip loci where allele1 is 'no' (seq2HLA could not type it at all)
@@ -136,7 +145,7 @@ def main():
     with open(args.output, 'w') as out:
         out.write("# seq2HLA results for {}\n".format(args.sample))
         out.write("# Tool: seq2HLA v2.3 - Class I + II, RNA-seq\n")
-        out.write("# Confidence threshold: > {}\n".format(CONF_THRESHOLD))
+        out.write("# Excluded loci where both allele p-values > {}\n".format(P_VALUE_THRESHOLD))
         out.write("#\n")
         out.write("Gene\tAllele1\tAllele2\tReads1\tReads2\n")
 
