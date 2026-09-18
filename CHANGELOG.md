@@ -78,6 +78,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `nextflow.config`, and `check_max()` is one. Lifting the bound means migrating to
   `process.resourceLimits`.
 
+- **The consensus step called nothing.** `conf/tool_weights_{wgs,wes,rna}.json` are
+  flat `{tool: weight}` maps, but `lookup_weight()` understood only a nested runtime
+  schema and a legacy `raw_accuracy` one and returned `0.0` for everything else. On
+  a sample five callers had typed correctly, every gene came back
+  `no_call / no_nonzero_weight`. The keys also spelled tools `OptiType` and
+  `HLA-HD` while `aggregated_calls.tsv` says `optitype` and `hlahd`. Both fixed, and
+  `tests/test_majority_voting_weights.py` asserts every tool in every shipped weight
+  file resolves non-zero.
+
+- **seq2HLA's p-value filter was inverted.** Its "Confidence" column is a p-value --
+  its README says the tool reports "a p-value for each call" -- but the parser
+  skipped loci whose values were *below* 0.1, so it discarded seq2HLA's strongest
+  calls (A, B, C at p < 0.05) and kept its weakest (DQA1 at p 0.135/0.217). The
+  comparison flips and the constant is renamed `P_VALUE_THRESHOLD`.
+
+- **The consensus step never ran.** `enable_majority_voting` defaults to false, so
+  runs stopped at per-tool calls with no `aggregated_calls.tsv`. The Roihu launcher
+  now requests it; the default is unchanged for anyone wanting caller outputs alone.
+
+- `bin/roihu_env.sh` guards `set -u` while sourcing the CSC environment, which
+  dereferences `$PS1` unguarded, and `slurm_panelhla_roihu.sh` takes the repository
+  location from `PANELHLA_HOME` -- SLURM copies a batch script to its spool
+  directory, so `$BASH_SOURCE` cannot find it.
+
+### Known
+
+- `conf/tool_weights_wgs.json` has no POLYSOLVER entry, so POLYSOLVER scores zero
+  in a calibrated WGS vote. That is a missing calibrated measurement, not a code
+  defect. `tool_weights_wes.json` -- the modality the paper reports -- does include
+  it.
+- The pipeline default is `weighting = calibrated`, while the project's primary
+  method is the equal-weight plurality vote (`--weighting equal`).
+
 - `.gitattributes` pins LF for scripts, configs and workflow files. The repository
   is edited from Windows and deployed to Linux.
 
