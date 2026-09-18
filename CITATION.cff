@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+message: If you use PanelHLA, please cite the software and the accompanying paper.
+title: PanelHLA
+abstract: >-
+  A reproducible Nextflow DSL2 workflow that runs modality-appropriate HLA class-I
+  callers, harmonises their outputs to canonical two-field allele pairs, and records
+  the evidence behind every integration decision. The primary method is unweighted
+  plurality over a modality-appropriate caller panel.
+type: software
+repository-code: "https://github.com/uoozcan/PanelHLA"
+url: "https://github.com/uoozcan/PanelHLA"
+license: MIT
+version: "0.1.0"
+date-released: "TO CONFIRM - set at the tagged release"
+keywords:
+  - HLA typing
+  - consensus methods
+  - ensemble benchmarking
+  - immunogenomics
+  - reproducible workflows
+  - exome sequencing
+  - RNA sequencing
+authors:
+  - family-names: Özcan
+    given-names: Umut Onur
+  - family-names: Ikonen
+    given-names: Nemo
+  - family-names: Sergeev
+    given-names: Philipp
+  - family-names: Sinervuori
+    given-names: Ella
+  - family-names: Saeed
+    given-names: Khalid
+  - family-names: Tanoli
+    given-names: Ziaurrehman
+  - family-names: Vähä-Koskela
+    given-names: Markus
+# TO CONFIRM - author order, affiliations and ORCIDs are not yet agreed for
+# submission. The order above follows earlier internal records only.
+#
+# Note: this licence field describes PanelHLA's own code. The HLA callers the
+# workflow invokes are not redistributed here and carry their own terms, several
+# restricting commercial use. See THIRD_PARTY_NOTICES.md.
