@@ -10,13 +10,25 @@
 # exist on Roihu (2026-07-07).
 
 # ── Tool database / index paths ──────────────────────────────────────────────
-hlahd_db:      '/scratch/project_2008084/ozcanumu/hla_references/databases/hlahd_db'
+# HLA-HD's database ships INSIDE hlahd.sif, and the roihu profile runs HLA-HD in
+# that container. The host path this used to name
+# (/scratch/project_2008084/ozcanumu/hla_references/databases/hlahd_db) was never
+# migrated to Roihu and does not exist, so hlahd.sh was handed a missing
+# -f <db>/freq_data and failed on every sample. main.nf only checks the parameter is
+# non-empty, so a wrong path passed the guard.
+# Verified inside the image: dictionary/all_exon_intron_N150.fasta,
+# HLA_gene.split.txt, freq_data, bin/hlahd.sh and bowtie2 are all present.
+hlahd_db:      '/app/hlahd.1.4.0'
 t1k_hlaidx:    '/scratch/project_2008084/hla_references/t1k_hlaidx'
 
 # Reference genome (needed by Locityper; the BAM must be aligned to this build)
 reference_fasta: '/scratch/project_2008084/hla_references/genomes/GRCh38_full_analysis_set_plus_decoy_hla.fa'
 
 # Locityper locus-pangenome DB (built by bin/build_locityper_db.sh, IPD-IMGT/HLA 3.64.0)
+# NOT PRESENT ON ROIHU. This directory does not exist and the database has to be
+# built before --tools locityper can run; locityper.sif also sits in
+# /scratch/project_2008084/sif/ rather than singularity_cache_dir, so the profile
+# would not find it either. Left here to name the path the build script produces.
 locityper_db:  '/scratch/project_2008084/hla_references/locityper_db'
 
 # Immuannot reference bundle (Data-2024Feb02 from zenodo.org/records/10948964)
