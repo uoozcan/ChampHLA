@@ -10,6 +10,15 @@
 hlahd_db:      '/scratch/project_2008084/ozcanumu/hla_references/databases/hlahd_db'
 t1k_hlaidx:    '/scratch/project_2008084/hla_references/t1k_hlaidx'
 
+# ── SpecHLA (native, not containerised) ─────────────────────────────
+# The puhti profile sets container = null for the SPECHLA processes, so they run on
+# the host and the default spechla_path of '/app/SpecHLA' -- a path inside the
+# container image -- does not exist. The working slurm_giab_*.sh scripts pass these
+# two values on the command line; putting them here means a run that forgets the
+# flags no longer fails, and no longer fails silently.
+spechla_path:       '/projappl/project_2008084/SpecHLAx'
+use_local_spechla:  true
+
 # ── Samtools (host-side binary and wrapper) ───────────────────────────────────
 # samtools_bin_dir: directory containing the host samtools binary.
 #   Used as: --bind ${samtools_bin_dir}/samtools:/usr/local/bin/samtools

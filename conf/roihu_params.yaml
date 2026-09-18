@@ -25,6 +25,23 @@ locityper_db:  '/scratch/project_2008084/hla_references/locityper_db'
 # Immuannot.sh the module calls — reconcile before enabling --tools immuannot.
 immuannot_refdata: '/scratch/project_2008084/hla_references/immuannot_refdata/Data-2024Feb02'
 
+# ── SpecHLA (native, not containerised) ─────────────────────────────
+# The roihu profile sets container = null for the SPECHLA processes -- SpecHLA's
+# own wrapper launches Singularity internally, and nested container calls fail --
+# so they run on the host, where the default spechla_path of '/app/SpecHLA' (a path
+# inside the container image) does not exist.
+#
+# Without these two values SpecHLA fails on every sample. It was failing silently:
+# the process-wide errorStrategy retries twice then ignores, and the module's
+# result-parsing step used to write a "# No results generated" stub and exit 0, so
+# the run reported a 196-byte header-only file instead of an error. That is why
+# SpecHLA never produced a call in any pilot stage.
+#
+# This install is the one the working slurm_giab_*.sh scripts pass on the command
+# line; it carries both script/whole/SpecHLA.sh and a populated spechla_env.
+spechla_path:       '/projappl/project_2008084/SpecHLAx'
+use_local_spechla:  true
+
 # ── Samtools (host-side binary and wrapper) ──────────────────────────────────
 # samtools_bin_dir: directory containing the host samtools binary.
 #   Bound as: --bind ${samtools_bin_dir}/samtools:/usr/local/bin/samtools

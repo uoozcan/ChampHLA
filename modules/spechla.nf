@@ -41,6 +41,16 @@ process SPECHLA {
         export LD_LIBRARY_PATH="/usr/local/lib:\${SPECHLA_PATH}/spechla_env/lib:\${LD_LIBRARY_PATH:-}"
     fi
 
+    # Fail before doing 20 minutes of BAM work if SpecHLA is not where we were told.
+    # The default spechla_path points inside the container image; the roihu and
+    # puhti profiles run these processes natively, so it must be overridden there.
+    if [ ! -f "\${SPECHLA_PATH}/script/whole/SpecHLA.sh" ]; then
+        echo "SpecHLA not found at \${SPECHLA_PATH}/script/whole/SpecHLA.sh" >&2
+        echo "Set params.spechla_path to the SpecHLA install (a params file entry" >&2
+        echo "such as conf/roihu_params.yaml), or run this process in a container." >&2
+        exit 1
+    fi
+
     # Create output directory
     mkdir -p ${sample_id}
     trap 'rm -f ${sample_id}/hla_region.bam ${sample_id}/namesort.bam ${sample_id}/R1.fastq ${sample_id}/R2.fastq ${sample_id}/R1.fastq.gz ${sample_id}/R2.fastq.gz core.*' EXIT
@@ -88,8 +98,14 @@ process SPECHLA {
     elif [ -f "${sample_id}/${sample_id}/hla.result.txt" ]; then
         cp ${sample_id}/${sample_id}/hla.result.txt ${sample_id}_spechla.txt
     else
-        echo "# SpecHLA results for ${sample_id}" > ${sample_id}_spechla.txt
-        echo "# No results generated" >> ${sample_id}_spechla.txt
+        # Never manufacture an empty result. A "# No results generated" stub exits 0
+        # and is indistinguishable downstream from a caller that genuinely typed
+        # nothing, which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "SpecHLA produced no hla.result.txt for ${sample_id}." >&2
+        echo "Looked in ${sample_id}/ and ${sample_id}/${sample_id}/. Contents:" >&2
+        ls -la ${sample_id}/ >&2 || true
+        exit 1
     fi
 
     # Cleanup intermediate files
@@ -141,6 +157,16 @@ process SPECHLA_FASTQ {
         export LD_LIBRARY_PATH="/usr/local/lib:\${SPECHLA_PATH}/spechla_env/lib:\${LD_LIBRARY_PATH:-}"
     fi
 
+    # Fail before doing 20 minutes of BAM work if SpecHLA is not where we were told.
+    # The default spechla_path points inside the container image; the roihu and
+    # puhti profiles run these processes natively, so it must be overridden there.
+    if [ ! -f "\${SPECHLA_PATH}/script/whole/SpecHLA.sh" ]; then
+        echo "SpecHLA not found at \${SPECHLA_PATH}/script/whole/SpecHLA.sh" >&2
+        echo "Set params.spechla_path to the SpecHLA install (a params file entry" >&2
+        echo "such as conf/roihu_params.yaml), or run this process in a container." >&2
+        exit 1
+    fi
+
     # Create output directory
     mkdir -p ${sample_id}
     trap 'rm -f ${sample_id}/R1.fastq.gz ${sample_id}/R2.fastq.gz core.*' EXIT
@@ -173,8 +199,14 @@ process SPECHLA_FASTQ {
     elif [ -f "${sample_id}/${sample_id}/hla.result.txt" ]; then
         cp ${sample_id}/${sample_id}/hla.result.txt ${sample_id}_spechla.txt
     else
-        echo "# SpecHLA results for ${sample_id}" > ${sample_id}_spechla.txt
-        echo "# No results generated" >> ${sample_id}_spechla.txt
+        # Never manufacture an empty result. A "# No results generated" stub exits 0
+        # and is indistinguishable downstream from a caller that genuinely typed
+        # nothing, which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "SpecHLA produced no hla.result.txt for ${sample_id}." >&2
+        echo "Looked in ${sample_id}/ and ${sample_id}/${sample_id}/. Contents:" >&2
+        ls -la ${sample_id}/ >&2 || true
+        exit 1
     fi
 
     # Version info
