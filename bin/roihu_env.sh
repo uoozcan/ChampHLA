@@ -34,7 +34,9 @@ _panelhla_nounset=0
 case "$-" in *u*) _panelhla_nounset=1; set +u ;; esac
 # shellcheck disable=SC1091
 source /etc/profile.d/zz-csc-env.sh
-[ "${_panelhla_nounset}" = 1 ] && set -u
+# An `x && y` here would return non-zero whenever x is false, which aborts a
+# caller that uses `set -e` without `set -u`. Use a plain if.
+if [ "${_panelhla_nounset}" = 1 ]; then set -u; fi
 unset _panelhla_nounset
 
 module load bio-apps/v202603
