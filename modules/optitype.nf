@@ -88,8 +88,14 @@ with open('${sample_id}_optitype.txt', 'w') as out:
     out.write("HLA-C\\t{}\\t{}\\n".format(row.get('C1', '-'), row.get('C2', '-')))
 EOF
     else
-        echo "# OptiType results for ${sample_id}" > ${sample_id}_optitype.txt
-        echo "# No results generated" >> ${sample_id}_optitype.txt
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "OptiType produced no parsable output for ${sample_id}" >&2
+        echo "Expected a *_result.tsv. Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     # Cleanup

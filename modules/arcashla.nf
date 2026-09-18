@@ -86,8 +86,14 @@ with open(out_path, 'w') as out:
             out.write("HLA-{}\\t{}\\t{}\\n".format(gene, a1, a2))
 PYEOF
     else
-        echo "# arcasHLA results for ${sample_id}" > ${sample_id}_arcashla.txt
-        echo "# No results generated" >> ${sample_id}_arcashla.txt
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "arcasHLA produced no parsable output for ${sample_id}" >&2
+        echo "Expected a genotype JSON. Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     # Version info
@@ -178,8 +184,14 @@ with open(out_path, 'w') as out:
             out.write("HLA-{}\\t{}\\t{}\\n".format(gene, a1, a2))
 PYEOF
     else
-        echo "# arcasHLA results for ${sample_id}" > ${sample_id}_arcashla.txt
-        echo "# No results generated" >> ${sample_id}_arcashla.txt
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "arcasHLA produced no parsable output for ${sample_id}" >&2
+        echo "Expected a genotype JSON. Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     # Version info

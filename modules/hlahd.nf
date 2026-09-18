@@ -78,8 +78,14 @@ process HLAHD {
             printf '%s\t%s\t%s\t%s\t%s\n' "\${GENE}" "\${ALLELE1}" "\${ALLELE2}" "\${READS}" "\${READS}"
         done < "\${RESULT_DIR}/${sample_id}_final.result.txt" > ${sample_id}_hlahd.txt
     else
-        echo "# HLA-HD results for ${sample_id}" > ${sample_id}_hlahd.txt
-        echo "# No results generated" >> ${sample_id}_hlahd.txt
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "HLA-HD produced no parsable output for ${sample_id}" >&2
+        echo "Expected a *_final.result.txt. Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     # Version info
@@ -171,8 +177,14 @@ process HLAHD_FASTQ {
             printf '%s\t%s\t%s\t%s\t%s\n' "\${GENE}" "\${ALLELE1}" "\${ALLELE2}" "\${READS}" "\${READS}"
         done < "\${RESULT_DIR}/${sample_id}_final.result.txt" > ${sample_id}_hlahd.txt
     else
-        echo "# HLA-HD results for ${sample_id}" > ${sample_id}_hlahd.txt
-        echo "# No results generated" >> ${sample_id}_hlahd.txt
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "HLA-HD produced no parsable output for ${sample_id}" >&2
+        echo "Expected a *_final.result.txt. Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     # Cleanup

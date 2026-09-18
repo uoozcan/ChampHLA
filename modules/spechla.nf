@@ -98,9 +98,9 @@ process SPECHLA {
     elif [ -f "${sample_id}/${sample_id}/hla.result.txt" ]; then
         cp ${sample_id}/${sample_id}/hla.result.txt ${sample_id}_spechla.txt
     else
-        # Never manufacture an empty result. A "# No results generated" stub exits 0
-        # and is indistinguishable downstream from a caller that genuinely typed
-        # nothing, which is how SpecHLA produced header-only files for months
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
         # without anyone being told. Fail, and say where to look.
         echo "SpecHLA produced no hla.result.txt for ${sample_id}." >&2
         echo "Looked in ${sample_id}/ and ${sample_id}/${sample_id}/. Contents:" >&2
@@ -199,9 +199,9 @@ process SPECHLA_FASTQ {
     elif [ -f "${sample_id}/${sample_id}/hla.result.txt" ]; then
         cp ${sample_id}/${sample_id}/hla.result.txt ${sample_id}_spechla.txt
     else
-        # Never manufacture an empty result. A "# No results generated" stub exits 0
-        # and is indistinguishable downstream from a caller that genuinely typed
-        # nothing, which is how SpecHLA produced header-only files for months
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
         # without anyone being told. Fail, and say where to look.
         echo "SpecHLA produced no hla.result.txt for ${sample_id}." >&2
         echo "Looked in ${sample_id}/ and ${sample_id}/${sample_id}/. Contents:" >&2

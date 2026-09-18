@@ -53,9 +53,15 @@ process T1K_LONGREADS {
             "\${GENOTYPE_FILE}" \
             "${sample_id}_t1k.txt"
     else
-        echo "# T1K long-read results for ${sample_id} (platform: ${preset})" > ${sample_id}_t1k.txt
-        echo "# No results generated" >> ${sample_id}_t1k.txt
-        cat t1k_out/t1k_stderr.log >> ${sample_id}_t1k.txt || true
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "T1K produced no parsable output for ${sample_id}" >&2
+        echo "Expected a genotype TSV. Working directory contains:" >&2
+        ls -la . >&2 || true
+        cat t1k_out/t1k_stderr.log >&2 || true
+        exit 1
     fi
 
     cat <<-END_VERSIONS > versions.yml
@@ -117,9 +123,15 @@ process T1K_FASTQ {
             "\${GENOTYPE_FILE}" \
             "${sample_id}_t1k.txt"
     else
-        echo "# T1K results for ${sample_id}" > ${sample_id}_t1k.txt
-        echo "# No results generated" >> ${sample_id}_t1k.txt
-        cat t1k_out/t1k_stderr.log >> ${sample_id}_t1k.txt || true
+        # Never manufacture an empty result. A placeholder file exits 0 and is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- which is how SpecHLA produced header-only files for months
+        # without anyone being told. Fail, and say where to look.
+        echo "T1K produced no parsable output for ${sample_id}" >&2
+        echo "Expected a genotype TSV. Working directory contains:" >&2
+        ls -la . >&2 || true
+        cat t1k_out/t1k_stderr.log >&2 || true
+        exit 1
     fi
 
     cat <<-END_VERSIONS > versions.yml
