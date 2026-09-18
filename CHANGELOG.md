@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **SpecHLA now runs on the HPC profiles.** `params.spechla_path` defaulted to
+  `/app/SpecHLA`, a path inside the container image, while the `roihu` and `puhti`
+  profiles set `container = null` for the SPECHLA processes so they run natively on
+  the host. The command was therefore
+  `bash /app/SpecHLA/script/whole/SpecHLA.sh ...`, which exits 127. Confirmed on
+  Roihu 2026-09-18. `conf/roihu_params.yaml` and `conf/puhti_params.yaml` now carry
+  `spechla_path: /projappl/project_2008084/SpecHLAx` and
+  `use_local_spechla: true` -- the values the working `slurm_giab_*.sh` scripts
+  passed on the command line.
+
+  Verified end to end on Roihu against HG00096: SpecHLA produced a complete
+  `hla.result.txt` typing all six genes, and the class-I calls
+  (A\*01:01 / A\*29:02, B\*08:01 / B\*44:03, C\*07:01 / C\*16:01) match the 1000
+  Genomes reference typing. This is the first call SpecHLA has produced in this
+  framework.
+
+- **SpecHLA no longer manufactures an empty result.** `modules/spechla.nf` wrote
+  `# No results generated` into `${sample}_spechla.txt` and exited 0 when no
+  `hla.result.txt` was found -- the 196-byte header-only file seen in every pilot
+  stage, indistinguishable downstream from a caller that genuinely typed nothing.
+  It now fails and reports where it looked. Both processes also check that
+  `SpecHLA.sh` exists before spending twenty minutes on BAM sorting and FASTQ
+  extraction.
+
+- **The test suite runs, and CI with it.** `requirements.txt` could never be added
+  because `.gitignore` carried a blanket `*.txt`, so CI's
+  `pip install -r requirements.txt` failed before any test ran. The subprocess
+  tests and `bin/run_1000g_benchmark.py` spawned `python3` rather than the
+  interpreter running them; test fixtures hardcoded a CSC scratch path for files
+  inside the repository; and relative config paths were re-anchored when the runner
+  serialised a config into a temporary directory. 19 failures to 0.
+
+### Added
+- **Algorithm-family and correlation-aware challenger gates.**
+  `champion_challenger.override_policy.gate_mode` selects `tool_count` (default,
+  unchanged behaviour), `family_count`, `correlation` or `learned`.
+  `conf/tool_families.yaml` groups callers into alignment, assembly-graph and k-mer
+  families; a caller outside the map forms its own singleton family, so the gate
+  never merges voters silently. `conf/champion_challenger_family_gate.yaml` enables
+  it as an overlay. Reported in the manuscript as the FamilyGatedCC comparator.
+
+### Changed
+- Project renamed to **PanelHLA** throughout the documentation, and the README now
+  leads with the equal-weight plurality vote -- the primary method since the
+  2026-09-08 amendment -- rather than Champion-Challenger, which is a reported
+  ablation.
+
 ## [3.1.0] - 2026-04-19
 
 ### Added
