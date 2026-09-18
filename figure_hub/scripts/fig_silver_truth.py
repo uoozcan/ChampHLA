@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.11
 """Figure 12 — Orthogonal silver-standard truth validation (HPRC vs IMGT-allele DB).
 
-Two panels for the ChampHLA (MVHLA) manuscript §Results-6:
+Two panels for the PanelHLA (MVHLA) manuscript §Results-6:
   (A) Per-locus + overall allele concordance vs 1000G gold (HPRC pangenome DB vs
       IPD-IMGT/HLA-allele DB), 30 samples, two-field; pilot overall annotated.
   (B) Calibration: concordance vs Locityper genotype-quality threshold (HPRC rises

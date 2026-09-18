@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the champHLA July-2026 progress report as a single self-contained HTML file.
+"""Build the PanelHLA July-2026 progress report as a single self-contained HTML file.
 
 Reuses the June-2026 report's CSS (analysis/champhla_progress_report_jun2026.html), embeds every
 figure as a base64 data: URI, and renders result tables from on-disk TSVs at build time, so the
@@ -118,7 +118,7 @@ def _rate(rows):
 
 
 def core_benchmark_rows():
-    """Per-modality, all columns from the SAME samples: best single tool, MV, Weighted, ChampHLA (CC)."""
+    """Per-modality, all columns from the SAME samples: best single tool, MV, Weighted, PanelHLA (CC)."""
     out = []
     for mod in ["rna", "wes", "wgs"]:
         tables = BENCH_DIRS[mod]
@@ -160,7 +160,7 @@ def build():
         ext_rows.append([esc(cohort), esc(ctype), badge(mod), esc(n),
                          f"<strong>{pct(cc)}</strong>{star}", pct(mv), esc(truth)])
     ext_table = table(
-        ["Cohort", "Type", "Modality", "n (samples / gene-rows)", "ChampHLA (CC)", "MajorityVote", "Truth"],
+        ["Cohort", "Type", "Modality", "n (samples / gene-rows)", "PanelHLA (CC)", "MajorityVote", "Truth"],
         ext_rows,
         "Frozen 1000G-derived Champion–Challenger policy applied unchanged to six independent, non-1000G cohorts.")
 
@@ -172,7 +172,7 @@ def build():
                         f'{esc(r["best_tool"])} ({pct(r["best"])})',
                         pct(r["mv"]), pct(r["wc"]), f'<strong>{pct(r["cc"])}</strong>'])
     core_table = table(
-        ["Modality", "Gene-rows", "Best single tool", "MajorityVote", "WeightedConsensus", "ChampHLA (CC)"],
+        ["Modality", "Gene-rows", "Best single tool", "MajorityVote", "WeightedConsensus", "PanelHLA (CC)"],
         cb_rows,
         "1000G truth-backed cohort, all methods on the same samples (two-field overall correct-call rate). "
         "CC = Champion–Challenger consensus. WGS = complete wave-2 truth-backed subset (smaller n).")
@@ -212,10 +212,10 @@ def build():
     fig_acc = figure_card("figure_2_accuracy_comparison", "Accuracy comparison across tools & consensus",
                           "Per-tool vs consensus two-field accuracy across modalities.", "updated", "Updated")
     fig_ciwd = figure_card(str(CIWD_FIG), "CIWD-stratified concordance (NEW)",
-                           "ChampHLA (CC) vs Weighted vs Majority two-field concordance by allele-commonness stratum, one panel per modality. Consensus accuracy holds beyond common alleles; on RNA novel/unseen alleles CC reaches 100% where the weighted consensus drops to 50%.",
+                           "PanelHLA (CC) vs Weighted vs Majority two-field concordance by allele-commonness stratum, one panel per modality. Consensus accuracy holds beyond common alleles; on RNA novel/unseen alleles CC reaches 100% where the weighted consensus drops to 50%.",
                            "new", "New")
     fig_workflow = figure_card("figure_1_workflow_architecture", "Pipeline workflow & architecture",
-                               "End-to-end champHLA architecture: multi-tool typing → harmonisation → Champion–Challenger consensus.", "updated", "Updated")
+                               "End-to-end PanelHLA architecture: multi-tool typing → harmonisation → Champion–Challenger consensus.", "updated", "Updated")
     fig_ccmech = figure_card("figure_11a_cc_mechanism", "Champion–Challenger mechanism",
                              "How the modality-specific champion is overridden by challengers under the reliability-weighted gate.", "updated", "Updated")
     fig_mvcc = figure_card("figure_11b_mv_vs_cc", "Majority Voting vs Champion–Challenger",
@@ -249,7 +249,7 @@ def build():
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>champHLA — July 2026 Progress Report</title>
+<title>PanelHLA — July 2026 Progress Report</title>
 {css}
 </head>
 <body>
@@ -257,7 +257,7 @@ def build():
   <aside>
     <div class="brand">
       <p class="kicker">Progress Report</p>
-      <h1>champHLA</h1>
+      <h1>PanelHLA</h1>
       <p>Multi-tool HLA typing &amp; Champion–Challenger consensus</p>
     </div>
     <div class="sidebar-meta">
@@ -271,7 +271,7 @@ def build():
     <div class="hero">
       <p class="eyebrow">Update · July 2026</p>
       <h2>External validation, CWD/CIWD stratification &amp; the Roihu migration</h2>
-      <p>Since June, champHLA completed a six-cohort external validation across RNA/WES/WGS on independent
+      <p>Since June, PanelHLA completed a six-cohort external validation across RNA/WES/WGS on independent
       gold and consensus truth, added a CWD/CIWD allele-commonness stratification and QC layer, integrated
       two further tools (Locityper, Immuannot), and migrated the whole pipeline from CSC Puhti to CSC Roihu
       with a verified end-to-end run.</p>
@@ -282,14 +282,14 @@ def build():
       <p>What changed since the June report, at a glance.</p></div>
       <div class="grid metrics-grid">
         <div class="metric"><div class="label">External cohorts</div><div class="value">6</div><div class="note">RNA + WES + WGS, all non-1000G</div></div>
-        <div class="metric"><div class="label">Germline WES</div><div class="value">9/9</div><div class="note">ChampHLA perfect (GIAB gold truth)</div></div>
+        <div class="metric"><div class="label">Germline WES</div><div class="value">9/9</div><div class="note">PanelHLA perfect (GIAB gold truth)</div></div>
         <div class="metric"><div class="label">New tools</div><div class="value">+2</div><div class="note">Locityper, Immuannot</div></div>
         <div class="metric"><div class="label">CIWD catalogue</div><div class="value">3,249</div><div class="note">two-field alleles, annotation layer</div></div>
         <div class="metric"><div class="label">Roihu run</div><div class="value">~5 min</div><div class="note">verified end-to-end, 4 tools</div></div>
       </div>
       <div class="grid two-col" style="margin-top:18px;">
         <div class="callout success"><strong>Consistent finding.</strong> Across all six external arms and all three
-        modalities, ChampHLA (Champion–Challenger) matches majority voting within overlapping CIs, and is perfect
+        modalities, PanelHLA (Champion–Challenger) matches majority voting within overlapping CIs, and is perfect
         on germline WES (9/9) and near-perfect on germline RNA (8/9). Where it trails, the cause is the frozen
         modality-specific <em>champion</em> choice — recoverable — not the consensus logic.</div>
         <div class="callout warn"><strong>Infrastructure.</strong> Pipeline migrated Puhti → Roihu; OptiType,
@@ -408,7 +408,7 @@ def build():
     </section>
 
     <p style="margin-top:34px; color:var(--muted); font-size:12px;">
-      champHLA (internal: pihla) · generated 2026-07-13 · self-contained · figures embedded.
+      PanelHLA (internal: pihla) · generated 2026-07-13 · self-contained · figures embedded.
     </p>
   </main>
 </div>

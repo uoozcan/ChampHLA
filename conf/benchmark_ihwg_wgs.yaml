@@ -1,4 +1,4 @@
-# IHWG/IHIW WGS external validation (MHC reference cells) — ChampHLA / MVHLA
+# IHWG/IHIW WGS external validation (MHC reference cells) — PanelHLA / MVHLA
 # NON-1000G, study-verified (PRJNA764575, cell_line-annotated). Truth: IPD-IMGT IHIW multi-lab
 # 4-field consensus (truth_long.tsv=2f; truth_long_4field.tsv=4f). Frozen WGS CC policy.
 # n=4 homozygous MHC-reference cells (SSTO/DBB/APD/QBL); KAS116 excluded (long-read only).

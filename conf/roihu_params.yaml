@@ -1,4 +1,4 @@
-# CSC Roihu HPC — site-specific parameter overrides for PIHLA / champHLA
+# CSC Roihu HPC — site-specific parameter overrides for PIHLA / PanelHLA
 #
 # Usage:
 #   nextflow run main.nf -profile roihu,singularity -params-file conf/roihu_params.yaml [other args]

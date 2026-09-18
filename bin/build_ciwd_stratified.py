@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Build CIWD-stratified concordance + plausibility summaries for the champHLA report.
+"""Build CIWD-stratified concordance + plausibility summaries for the PanelHLA report.
 
 Reuses the vendored CIWD 3.0.0 catalogue (bin/ciwd.py, assets/ciwd_3.0.0.tsv) to annotate
 *already-harmonized* benchmark rows — no HLA-typing tool is re-run. It aggregates two outputs the
 July-2026 progress report embeds:
 
   1. summary_ciwd_stratified.tsv  — two-field concordance by (method, modality, CIWD stratum), for
-     the three consensus methods (ChampHLA/ChampionChallenger, WeightedConsensus, MajorityVote).
+     the three consensus methods (PanelHLA/ChampionChallenger, WeightedConsensus, MajorityVote).
      Answers the reviewer question "does the consensus win only on common alleles?"
   2. summary_ciwd_plausibility.tsv — per (tool, modality) QC: how often a callable call is
      biologically implausible (not-CIWD / novel), and whether such calls are error-enriched.

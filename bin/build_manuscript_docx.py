@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a Word .docx from the ChampHLA manuscript markdown, embedding figures.
+"""Build a Word .docx from the PanelHLA manuscript markdown, embedding figures.
 
 The manuscript markdown (docs/CHAMPHLA_MANUSCRIPT_V3.md) is single-line-per-paragraph
 and uses a small, regular subset of Markdown:

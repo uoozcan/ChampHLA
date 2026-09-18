@@ -1,9 +1,9 @@
 #!/usr/bin/env python3.11
-"""CIWD-stratified concordance — champHLA (MVHLA) manuscript auxiliary figure.
+"""CIWD-stratified concordance — PanelHLA (MVHLA) manuscript auxiliary figure.
 
 Reads `summary_ciwd_stratified.tsv` (written by bin/hla_benchmark.py) and plots two-field
 concordance **by CIWD 3.0.0 allele-commonness stratum** (common → intermediate → well-documented →
-not-CIWD → unknown/novel) for the ChampHLA consensus vs the baseline consensus methods, one panel per
+not-CIWD → unknown/novel) for the PanelHLA consensus vs the baseline consensus methods, one panel per
 modality. This isolates the reviewer question "does the consensus win only on easy common alleles, or
 also on rare / well-documented ones?"
 
@@ -34,9 +34,9 @@ STRATA_LABEL = {
     "common": "Common", "intermediate": "Intermediate", "well_documented": "Well-doc.",
     "not_ciwd": "Not-CIWD", "unknown": "Novel/\nunseen",
 }
-# Methods to display (label -> colour); ChampHLA highlighted.
+# Methods to display (label -> colour); PanelHLA highlighted.
 METHOD_STYLE = {
-    "ChampionChallenger": ("ChampHLA (CC)", WONG["vermil"]),
+    "ChampionChallenger": ("PanelHLA (CC)", WONG["vermil"]),
     "WeightedConsensus": ("Weighted", WONG["blue"]),
     "MajorityVote": ("Majority", WONG["sky"]),
 }

@@ -1,4 +1,4 @@
-# IHWG/IHIW reference-panel external-validation benchmark (RNA-seq) — ChampHLA / MVHLA
+# IHWG/IHIW reference-panel external-validation benchmark (RNA-seq) — PanelHLA / MVHLA
 # Independent NON-1000G cohort: IHWG reference B-LCLs. Truth: IPD-IMGT/HLA IHIW multi-lab
 # consensus, 4-field (truth_long.tsv=2-field; truth_long_4field.tsv=4-field). cell_line-verified
 # public RNA-seq. FROZEN 1000G RNA Champion-Challenger policy (no re-learning).

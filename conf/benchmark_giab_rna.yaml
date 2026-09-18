@@ -1,4 +1,4 @@
-# GIAB Ashkenazi-trio RNA external validation (HG002/HG003/HG004) — ChampHLA / MVHLA
+# GIAB Ashkenazi-trio RNA external validation (HG002/HG003/HG004) — PanelHLA / MVHLA
 # NON-1000G germline; clinical SBT gold truth (Stanford Blood Center; F1000 8:1751 Table 1;
 # HG002 cross-confirmed Chin 2020). Frozen 1000G RNA Champion-Challenger policy (no re-learning).
 truth:

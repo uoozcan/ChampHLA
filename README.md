@@ -1,10 +1,21 @@
-# ChampHLA — Champion-Challenger HLA Typing Pipeline
+# PanelHLA — Ensemble Consensus HLA Typing Pipeline
 
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A523.04.0-brightgreen.svg)](https://www.nextflow.io/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![Version](https://img.shields.io/badge/version-2.0.0-blue)
 
-A reproducible Nextflow DSL2 pipeline integrating eight HLA typing tools with benchmark-calibrated Champion-Challenger ensemble consensus, plus two orthogonal tools (Locityper, Immuannot) for silver-standard truth generation. Supports WGS, WES, RNA-seq, and long-read sequencing.
+A reproducible Nextflow DSL2 pipeline integrating eight HLA typing tools into an
+ensemble consensus call, plus two orthogonal tools (Locityper, Immuannot) for
+silver-standard truth generation. Supports WGS, WES, RNA-seq, and long-read
+sequencing.
+
+**The primary method is an equal-weight plurality vote across the per-assay caller
+panel.** In the benchmark it matched or beat the best individual caller in each
+assay without needing to know in advance which caller that would be. The
+Champion–Challenger routing policy and its variants — including the
+algorithm-family diversity gate in `conf/champion_challenger_family_gate.yaml` —
+are reported ablations: none of them significantly improved on the vote in either
+assay. They remain available and are off by default.
 
 ## Get Running in 5 Minutes
 
@@ -13,7 +24,7 @@ A reproducible Nextflow DSL2 pipeline integrating eight HLA typing tools with be
 curl -s https://get.nextflow.io | bash && mv nextflow ~/bin/
 
 # 2. Clone
-git clone https://github.com/uoozcan/ChampHLA.git && cd ChampHLA
+git clone https://github.com/uoozcan/PanelHLA.git && cd PanelHLA
 
 # 3. Test
 nextflow run main.nf -profile test,docker
@@ -48,7 +59,7 @@ In addition to the eight allele callers, two **orthogonal tools** support silver
 
 ✨ **Multi-tool Integration**: Combines results from multiple HLA typing tools  
 **Native Extended Toolset**: Includes HLA-HD, POLYSOLVER, Kourami, T1K, and Seq2HLA execution modules  
-🎯 **Consensus Calling**: Optional majority voting for improved accuracy  
+🎯 **Consensus Calling**: Equal-weight plurality vote across the caller panel  
 📊 **Flexible Input**: Supports BAM, CRAM, and FASTQ files  
 🚀 **HPC Optimized**: Pre-configured for SLURM schedulers (CSC Puhti & Roihu)  
 🐳 **Container Ready**: Docker and Singularity support  
@@ -78,8 +89,8 @@ On CSC Puhti and Roihu, the Singularity/Apptainer containers are already availab
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/uoozcan/ChampHLA.git
-cd ChampHLA
+git clone https://github.com/uoozcan/PanelHLA.git
+cd PanelHLA
 ```
 
 ### 2. Test Installation
@@ -321,7 +332,7 @@ See `docs/BENCHMARK_FIGURES.md` for the real-data benchmark interface and output
 ## 🥈 Silver-Standard Truth Generation (Locityper + Immuannot)
 
 Many WGS / long-read cohorts have **no gold HLA truth**, which blocks benchmarking the
-ensemble. ChampHLA can build a **silver-standard** truth table from two methodologically
+ensemble. PanelHLA can build a **silver-standard** truth table from two methodologically
 **orthogonal** tools — **Locityper** (read/depth-based genotyping) and **Immuannot**
 (assembly annotation) — whose *agreement* is a defensible truth signal. This is a *silver*
 standard: always validate it against gold truth before trusting it, and never benchmark a
@@ -590,7 +601,7 @@ cat results/sample_name/tool_name/*.log
 
 ## 🔬 Tool Versions
 
-The following tool versions were used in the ChampHLA benchmark (n=131 WGS / 129 WES / 107 RNA-seq samples). Container tags are pinned where available; others were pulled at benchmark time.
+The following tool versions were used in the PanelHLA benchmark (n=131 WGS / 129 WES / 107 RNA-seq samples). Container tags are pinned where available; others were pulled at benchmark time.
 
 | Tool | Version | Container / Source |
 |------|---------|-------------------|
@@ -622,23 +633,23 @@ individual tools it integrates.
 
 ### Pipeline
 
-The ChampHLA manuscript is currently in preparation. A peer-reviewed reference
+The PanelHLA manuscript is currently in preparation. A peer-reviewed reference
 will be added here upon publication. In the meantime, please cite the software:
 
 ```bibtex
-@software{champhla,
+@software{panelhla,
   author  = {Özcan, Umut Onur},
-  title   = {ChampHLA: Champion-Challenger HLA Typing Pipeline},
+  title   = {PanelHLA: Ensemble Consensus HLA Typing Pipeline},
   year    = {2025},
-  url      = {https://github.com/uoozcan/ChampHLA},
+  url      = {https://github.com/uoozcan/PanelHLA},
   version = {2.0.0}
 }
 ```
 
 ```bibtex
-@article{champhla_manuscript,
+@article{panelhla_manuscript,
   author  = {Özcan, Umut Onur and others},
-  title   = {ChampHLA: benchmark-calibrated Champion-Challenger ensemble consensus for HLA typing},
+  title   = {PanelHLA: equal-weight caller consensus is a strong default for short-read HLA class-I typing},
   journal = {},
   year    = {},
   volume  = {},

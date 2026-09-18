@@ -1,4 +1,4 @@
-# ChampHLA — Responses to Manuscript Comments
+# PanelHLA — Responses to Manuscript Comments
 
 Point-by-point responses to the co-author/reviewer comments on `CHAMPHLA_MANUSCRIPT_V3.md`. Each item is
 tagged **[ANSWER]** (conceptual question answered here), **[EDIT]** (applied to the manuscript this pass),

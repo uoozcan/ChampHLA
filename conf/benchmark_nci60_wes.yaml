@@ -1,4 +1,4 @@
-# NCI-60 external-validation benchmark (WES) — ChampHLA / MVHLA
+# NCI-60 external-validation benchmark (WES) — PanelHLA / MVHLA
 # Independent, non-1000G cohort. Truth: Adams et al. 2005 (J Transl Med 3:11, PMC555742) SBT.
 # Reads: NCI-60 exome capture, SRA SRP150855. Second modality on the same lines as the RNA pilot.
 # Framing: held-out generalisation test applying the FROZEN 1000G-derived WES Champion-Challenger

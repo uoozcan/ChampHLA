@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.11
-"""Champion-Challenger vs Majority-Voting explainer figures for the ChampHLA (MVHLA) manuscript.
+"""Champion-Challenger vs Majority-Voting explainer figures for the PanelHLA (MVHLA) manuscript.
 
 Generates three layout variants from authoritative WES truth-backed benchmark tables so the
 user can pick one for the manuscript:
@@ -375,7 +375,7 @@ def build_figure_11a(d: dict, out_dir: Path) -> None:
     fig, ax = plt.subplots(figsize=(13.0, 6.4))
     _figure_header(
         fig,
-        "Figure 11. ChampHLA Champion-Challenger consensus mechanism",
+        "Figure 11. PanelHLA Champion-Challenger consensus mechanism",
         "A benchmark champion is the default; the weighted ensemble overrides it only when all four "
         "evidence gates pass",
         PRIMARY, title_y=0.975, role_y=0.93)
@@ -430,7 +430,7 @@ def build_figure_11_combined(d: dict, out_dir: Path) -> None:
 
     _figure_header(
         fig,
-        "Figure 11. How ChampHLA's Champion-Challenger consensus works and how it differs from majority voting",
+        "Figure 11. How PanelHLA's Champion-Challenger consensus works and how it differs from majority voting",
         "(A) per-gene champion with a four-gate ensemble override   ·   (B) contrast with majority "
         "voting and the nested-CV accuracy outcome across modalities",
         PRIMARY, title_y=0.982, role_y=0.952)
@@ -458,7 +458,7 @@ def write_captions(d: dict, out_dir: Path) -> None:
         "",
         f"_Data source: {d.get('_source')} (10-fold nested cross-validation)_",
         "",
-        "**Figure 11 (combined).** How ChampHLA's Champion-Challenger consensus works and how it "
+        "**Figure 11 (combined).** How PanelHLA's Champion-Challenger consensus works and how it "
         "differs from majority voting. (A) For each HLA gene a benchmark-designated champion "
         "(selected per gene and modality out of fold; WGS: HLA-A/-B = OptiType, HLA-C = T1K) provides "
         "the default call; a reliability- and confidence-weighted ensemble (w = 0.7·reliability + "

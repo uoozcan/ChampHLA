@@ -31,7 +31,7 @@ while IFS=$'\t' read -r SAMPLE R1 R2; do
 done < "$INDEX"
 echo "[download] complete:"; du -sh "$FASTQ"
 
-# ── Run the ChampHLA pipeline (DNA/WES tools) on all lines ──
+# ── Run the PanelHLA pipeline (DNA/WES tools) on all lines ──
 cd /scratch/project_2008084/pihla-publish
 nextflow run main.nf \
   -params-file /scratch/project_2008084/pihla-publish/conf/puhti_params.yaml \

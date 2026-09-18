@@ -1,4 +1,4 @@
-# GIAB Ashkenazi-trio WES external validation (HG002/HG003/HG004) — ChampHLA / MVHLA
+# GIAB Ashkenazi-trio WES external validation (HG002/HG003/HG004) — PanelHLA / MVHLA
 # NON-1000G germline; clinical SBT gold truth (Stanford; F1000 8:1751 Table 1). Deployed WES
 # Champion-Challenger policy (A/B/C=OptiType; support 0.35/margin 0.00/tools 1).
 truth:

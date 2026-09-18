@@ -1,6 +1,6 @@
-# ChampHLA Installation Guide
+# PanelHLA Installation Guide
 
-This guide covers installing ChampHLA across different environments: HPC clusters, local Linux/macOS, and Windows via WSL2.
+This guide covers installing PanelHLA across different environments: HPC clusters, local Linux/macOS, and Windows via WSL2.
 
 ## Prerequisites
 
@@ -18,9 +18,9 @@ This guide covers installing ChampHLA across different environments: HPC cluster
 curl -s https://get.nextflow.io | bash
 mv nextflow ~/bin/   # or any directory on your PATH
 
-# 2. Clone ChampHLA
-git clone https://github.com/uoozcan/ChampHLA.git
-cd ChampHLA
+# 2. Clone PanelHLA
+git clone https://github.com/uoozcan/PanelHLA.git
+cd PanelHLA
 
 # 3. Verify with the test profile
 nextflow run main.nf -profile test,docker --help
@@ -28,7 +28,7 @@ nextflow run main.nf -profile test,docker --help
 
 ## Selecting Which Tools to Install
 
-ChampHLA integrates eight HLA typing tools, but you **do not need to install all of them**. The `--tools` parameter controls which tools run, and you only need containers and databases for the tools you select.
+PanelHLA integrates eight HLA typing tools, but you **do not need to install all of them**. The `--tools` parameter controls which tools run, and you only need containers and databases for the tools you select.
 
 | Tool | Container available | Extra database required | Modalities |
 |---|---|---|---|
@@ -73,8 +73,8 @@ mv nextflow ~/bin/
 ### 2. Clone the repository
 
 ```bash
-git clone https://github.com/uoozcan/ChampHLA.git
-cd ChampHLA
+git clone https://github.com/uoozcan/PanelHLA.git
+cd PanelHLA
 ```
 
 ### 3. Pre-pull Singularity containers
@@ -135,13 +135,13 @@ slurm_partition: 'small'
 Submit via SLURM:
 ```bash
 #!/bin/bash
-#SBATCH --job-name=champhla
+#SBATCH --job-name=panelhla
 #SBATCH --account=your_project
 #SBATCH --partition=small
 #SBATCH --time=24:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --output=logs/champhla_%j.out
+#SBATCH --output=logs/panelhla_%j.out
 
 module load java/17
 module load nextflow
@@ -175,7 +175,7 @@ nextflow run main.nf \
 
 ## HPC Cluster (PBS/LSF)
 
-ChampHLA's `slurm` profile can be adapted for PBS or LSF by changing the executor in `nextflow.config`:
+PanelHLA's `slurm` profile can be adapted for PBS or LSF by changing the executor in `nextflow.config`:
 
 ```groovy
 // For PBS/Torque:
@@ -219,8 +219,8 @@ mv nextflow /usr/local/bin/   # or ~/bin/
 ### 3. Clone and run
 
 ```bash
-git clone https://github.com/uoozcan/ChampHLA.git
-cd ChampHLA
+git clone https://github.com/uoozcan/PanelHLA.git
+cd PanelHLA
 
 # Test run
 nextflow run main.nf -profile test,docker
@@ -252,7 +252,7 @@ nextflow run main.nf \
 
 ## Windows (WSL2 + Docker Desktop)
 
-ChampHLA runs on Windows through the Windows Subsystem for Linux (WSL2).
+PanelHLA runs on Windows through the Windows Subsystem for Linux (WSL2).
 
 ### 1. Enable WSL2
 
@@ -282,8 +282,8 @@ sudo mv nextflow /usr/local/bin/
 ### 4. Clone and run
 
 ```bash
-git clone https://github.com/uoozcan/ChampHLA.git
-cd ChampHLA
+git clone https://github.com/uoozcan/PanelHLA.git
+cd PanelHLA
 
 nextflow run main.nf \
     --input /mnt/c/Users/yourname/data/bam_files/ \
@@ -301,7 +301,7 @@ Note: Store input data on the Linux filesystem (e.g., `/home/user/data/`) rather
 
 ## SpecHLA Installation
 
-SpecHLA is the only tool in ChampHLA that historically lacked a pre-built container. ChampHLA now provides two installation paths:
+SpecHLA is the only tool in PanelHLA that historically lacked a pre-built container. PanelHLA now provides two installation paths:
 
 ### Option A: Docker container (recommended)
 
@@ -329,7 +329,7 @@ cd /opt/SpecHLA
 bash install.sh
 ```
 
-Then configure ChampHLA to use the local installation:
+Then configure PanelHLA to use the local installation:
 ```bash
 nextflow run main.nf \
     --tools spechla,optitype,hlahd \

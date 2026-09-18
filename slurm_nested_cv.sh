@@ -8,7 +8,7 @@
 #SBATCH --output=/scratch/project_2008084/pihla-publish/analysis/logs/nested_cv_%j.out
 #SBATCH --error=/scratch/project_2008084/pihla-publish/analysis/logs/nested_cv_%j.err
 
-# Official held-out benchmark entry point for ChampHLA.
+# Official held-out benchmark entry point for PanelHLA.
 #
 # Reproduces the manuscript's primary (held-out, nested cross-validation) accuracy
 # numbers and figures from the harmonised benchmark tables — no HLA tools are re-run.
@@ -22,7 +22,7 @@ mkdir -p /scratch/project_2008084/pihla-publish/analysis/logs
 cd /scratch/project_2008084/pihla-publish
 module load python-data/3.12 2>/dev/null || true
 
-echo "[$(date)] ChampHLA nested-CV re-analysis"
+echo "[$(date)] PanelHLA nested-CV re-analysis"
 bash bin/reproduce_manuscript_numbers.sh
 
 # Bimodal WES+RNA Champion-Challenger (recommended-configuration check)

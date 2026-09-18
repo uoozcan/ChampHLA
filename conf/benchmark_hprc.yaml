@@ -1,10 +1,10 @@
-# GIAB/HPRC external-validation benchmark (WGS) — ChampHLA / MVHLA
+# GIAB/HPRC external-validation benchmark (WGS) — PanelHLA / MVHLA
 # Independent, NON-1000G germline cohort (GIAB PGP samples). Reads: open GIAB GRCh38 Illumina WGS
 # (chr6 MHC slice). Truth: HG002 clinical SBT gold (Chin 2020, PMC7508831); HG005/parents via Immuannot
 # on long-read assemblies (assembly-grounded, not in-silico short-read).
 # Framing: held-out generalisation test applying the FROZEN 1000G-derived WGS Champion-Challenger policy
 # (champions A=T1K, B/C=OptiType; override support=0.65, margin=0.20, tools=2) without re-learning.
-# Caveat: WGS is ChampHLA's weakest modality (1000G holdout ~0.47) — the CC-vs-MV contrast is the point.
+# Caveat: WGS is PanelHLA's weakest modality (1000G holdout ~0.47) — the CC-vs-MV contrast is the point.
 truth:
   path: /scratch/project_2008084/pihla-publish/analysis/hprc_benchmark/truth_long.tsv
   source: "HG002 clinical SBT (Chin 2020 PMC7508831); HG005/parents Immuannot (IPD-IMGT/HLA)"

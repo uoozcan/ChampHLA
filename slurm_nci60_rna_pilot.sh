@@ -9,7 +9,7 @@
 #SBATCH --error=/scratch/project_2008084/hla_calibration/logs/nci60_rna_pilot_%j.err
 
 # NCI-60 RNA-seq external-validation PILOT (4 samples with full A/B/C 2-field truth).
-# Reads: ENA PRJNA433861. Truth: Adams 2005 (PMC555742). Pipeline: ChampHLA main.nf (RNA, 6 tools).
+# Reads: ENA PRJNA433861. Truth: Adams 2005 (PMC555742). Pipeline: PanelHLA main.nf (RNA, 6 tools).
 # After this completes, build sequencing_source.tsv and run:
 #   python3 bin/run_1000g_benchmark.py --config conf/benchmark_nci60.yaml \
 #           --output-dir analysis/nci60_benchmark
@@ -31,7 +31,7 @@ while IFS=$'\t' read -r SAMPLE R1 R2; do
 done < "$INDEX"
 echo "[download] complete:"; ls -lh "$FASTQ"
 
-# ── Run the ChampHLA pipeline (RNA, 6 tools) ──
+# ── Run the PanelHLA pipeline (RNA, 6 tools) ──
 cd /scratch/project_2008084/pihla-publish
 nextflow run main.nf \
   -params-file /scratch/project_2008084/pihla-publish/conf/puhti_params.yaml \

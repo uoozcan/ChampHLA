@@ -217,7 +217,7 @@ def build_figure_1_workflow_governance(context: dict, out_dir: Path) -> None:
     ax.set_ylim(0, 6)
     ax.axis("off")
     ax.set_title(
-        "Figure 1. ChampHLA integrates modality-specific callers, benchmark-time calibration, and claim-governed evaluation",
+        "Figure 1. PanelHLA integrates modality-specific callers, benchmark-time calibration, and claim-governed evaluation",
         fontsize=12,
         fontweight="bold",
         pad=12,
@@ -326,7 +326,7 @@ def build_figure_2_wgs_anchor(context: dict, out_dir: Path) -> None:
 
     cc, mv, opti, wc = _rate("ChampionChallenger"), _rate("MajorityVote"), _rate("OptiType"), _rate("WeightedConsensus")
     note = (
-        f"ChampHLA (Champion-Challenger) = {cc:.1f}%\n"
+        f"PanelHLA (Champion-Challenger) = {cc:.1f}%\n"
         f"MajorityVote = {mv:.1f}%   (Δ = +{cc - mv:.1f} pts, McNemar p<0.0001)\n"
         f"Best single tool: OptiType = {opti:.1f}%\n"
         f"WeightedConsensus (weighting only) = {wc:.1f}%\n"
@@ -364,7 +364,7 @@ def build_figure_3_wgs_failure_modes(context: dict, out_dir: Path) -> None:
     x = np.arange(len(genes))
     w = 0.38
     ax.bar(x - w / 2, [mv[g] * 100 for g in genes], w, label="MajorityVote", color=METHOD_COLORS["MajorityVote"], edgecolor="white", zorder=3)
-    ax.bar(x + w / 2, [cc[g] * 100 for g in genes], w, label="ChampHLA (Champion-Challenger)", color=METHOD_COLORS["ChampionChallenger"], edgecolor="white", zorder=3)
+    ax.bar(x + w / 2, [cc[g] * 100 for g in genes], w, label="PanelHLA (Champion-Challenger)", color=METHOD_COLORS["ChampionChallenger"], edgecolor="white", zorder=3)
     for i, g in enumerate(genes):
         ax.text(x[i] - w / 2, mv[g] * 100 + 1.2, f"{mv[g] * 100:.1f}", ha="center", va="bottom", fontsize=7.2, color=SLATE)
         ax.text(x[i] + w / 2, cc[g] * 100 + 1.2, f"{cc[g] * 100:.1f}", ha="center", va="bottom", fontsize=7.2, color=PRIMARY)
@@ -701,8 +701,8 @@ def write_publication_captions(context: dict, out_dir: Path) -> None:
         "",
         "## Main Figures",
         "",
-        "### Figure 1. ChampHLA workflow and governance architecture",
-        "Benchmark role: methods and governance. This figure makes the benchmark hierarchy explicit inside the workflow view and supports the claim that ChampHLA is a benchmark-governed calibrated HLA ensemble framework.",
+        "### Figure 1. PanelHLA workflow and governance architecture",
+        "Benchmark role: methods and governance. This figure makes the benchmark hierarchy explicit inside the workflow view and supports the claim that PanelHLA is a benchmark-governed calibrated HLA ensemble framework.",
         "",
         "### Figure 2. Primary WGS anchor result",
         "Benchmark role: primary. Derived from `benchmark_wgs_wave2`. `OptiType` remains the best single WGS tool, routed baselines recover the same ceiling, and `WeightedConsensus` remains below that ceiling. Allowed conclusion: WGS remains tool-limited rather than consensus-limited.",
@@ -746,7 +746,7 @@ def write_publication_manifest_update(out_dir: Path) -> None:
     lines = [
         "# figures_final",
         "",
-        "This directory is the authoritative publication figure package for the current ChampHLA manuscript state.",
+        "This directory is the authoritative publication figure package for the current PanelHLA manuscript state.",
         "",
         "## Active figure family",
         "",

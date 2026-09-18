@@ -1,8 +1,8 @@
-# ChampHLA Usage Guide
+# PanelHLA Usage Guide
 
 ## Input Formats
 
-ChampHLA accepts three input methods:
+PanelHLA accepts three input methods:
 
 ### Directory scan (`--input` + `--input_type`)
 
@@ -103,7 +103,7 @@ T1K is currently the only tool with validated long-read support. Use `longreads_
 
 ## Consensus Voting
 
-Enable ensemble consensus calling with `--enable_majority_voting`. ChampHLA supports two weighting strategies:
+Enable ensemble consensus calling with `--enable_majority_voting`. PanelHLA supports two weighting strategies:
 
 ### Calibrated weights (default, recommended)
 
@@ -139,7 +139,7 @@ All tools contribute equally to the vote.
 
 ```bash
 #!/bin/bash
-#SBATCH --job-name=champhla
+#SBATCH --job-name=panelhla
 #SBATCH --account=project_XXXXXXX
 #SBATCH --partition=small
 #SBATCH --time=12:00:00
@@ -169,7 +169,7 @@ nextflow run main.nf \
 
 ```bash
 #!/bin/bash
-#SBATCH --job-name=champhla_array
+#SBATCH --job-name=panelhla_array
 #SBATCH --array=1-30
 #SBATCH --account=project_XXXXXXX
 #SBATCH --partition=small
@@ -301,7 +301,7 @@ HLA-HD requires a bowtie2-indexed database. Provide it via:
 cat .nextflow.log
 
 # SLURM job logs
-cat logs/champhla_*.out
+cat logs/panelhla_*.out
 
 # Per-tool logs within results
 cat results/sample_name/tool_name/*.log

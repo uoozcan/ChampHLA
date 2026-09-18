@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""champhla_detail_flow_cohort.py — detailed champHLA typing for the flow-cytometry cohort.
+"""champhla_detail_flow_cohort.py — detailed PanelHLA typing for the flow-cytometry cohort.
 
-For every flow-cytometry donor that champHLA (pihla) has typed, this reports the FULL
+For every flow-cytometry donor that PanelHLA (pihla) has typed, this reports the FULL
 HLA-A/B/C genotype across all modality x tool combinations (not just the binary HLA-A2
 call), the majority consensus 2-field genotype per locus, cross-tool concordance,
 zygosity, and — for locus A — the flow HLA-A2 truth and the A*02 subtype called.
@@ -178,7 +178,7 @@ def main():
 
     # ── per-locus concordance summary to stdout ──────────────────────────────────
     print("=" * 68)
-    print("champHLA detailed typing — flow-cytometry cohort")
+    print("PanelHLA detailed typing — flow-cytometry cohort")
     print("=" * 68)
     print(f"Matched donors: {len(matched)}")
     print("\nCross-tool concordance (2-field, per locus, across matched donors):")

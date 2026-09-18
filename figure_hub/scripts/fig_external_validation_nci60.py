@@ -1,12 +1,12 @@
 #!/usr/bin/env python3.11
-"""NCI-60 external-validation figure for the ChampHLA (MVHLA) manuscript (Figure 13).
+"""NCI-60 external-validation figure for the PanelHLA (MVHLA) manuscript (Figure 13).
 
 Independent, non-1000G generalisation test: the *frozen* 1000G-derived Champion-Challenger policy
 applied to the NCI-60 cancer cell-line panel (Adams 2005 SBT truth), across RNA-seq and WES.
 
 Three panels, all data-driven (regenerate to pick up the powered RNA scale-up automatically):
-  A  Overall correct-call rate, RNA vs WES, best-single / MajorityVote / ChampHLA (Wilson CIs).
-  B  Per-locus (A/B/C) ChampHLA vs MajorityVote, RNA vs WES.
+  A  Overall correct-call rate, RNA vs WES, best-single / MajorityVote / PanelHLA (Wilson CIs).
+  B  Per-locus (A/B/C) PanelHLA vs MajorityVote, RNA vs WES.
   C  WES override-gate sweep: CC accuracy vs challenger-margin at tools=2 for each support level,
      marking the frozen point (0.65/0.20/2) and the sweep optimum, with the MajorityVote reference.
 
@@ -111,7 +111,7 @@ def load_sweep(path: Path) -> pd.DataFrame:
 def panel_overall(ax, rna, wes):
     methods = [("BestSingle", "Best single tool", SINGLE_COLOR),
                ("MajorityVote", "MajorityVote", MV_COLOR),
-               ("ChampionChallenger", "ChampHLA (CC)", CC_COLOR)]
+               ("ChampionChallenger", "PanelHLA (CC)", CC_COLOR)]
     mods = [("RNA-seq", rna), ("WES", wes)]
     x = np.arange(len(mods)); w = 0.26
     for i, (mkey, mlab, col) in enumerate(methods):
@@ -182,7 +182,7 @@ def panel_sweep(ax, sweep, wes):
                 fontsize=6.5, ha="right", va="bottom")
     ax.set_xticks(x); ax.set_xticklabels([f"≥{t}" for t in tools])
     ax.set_xlabel("Supporting-tools floor (min_supporting_tools)\nat deployed support=0.35, margin=0.00")
-    ax.set_ylabel("ChampHLA correct-call rate")
+    ax.set_ylabel("PanelHLA correct-call rate")
     ax.set_ylim(0.76, 0.88)
     ax.set_title("C  WES override-gate: supporting-tools floor", loc="left", fontsize=9)
 
@@ -196,7 +196,7 @@ def build_figure(rna, wes, sweep, out_dir: Path):
     panel_sweep(fig.add_subplot(gs[0, 2]), sweep, wes)
     _figure_header(fig, "Figure 13. External validation on an independent non-1000G cohort (NCI-60): "
                         "the frozen Champion-Challenger policy generalises across modalities.")
-    _figure_footer(fig, "ChampHLA / MVHLA — NCI-60 (Adams 2005 SBT truth); frozen 1000G-derived policy.")
+    _figure_footer(fig, "PanelHLA / MVHLA — NCI-60 (Adams 2005 SBT truth); frozen 1000G-derived policy.")
     save_fig(fig, out_dir / "figure_13_external_validation_nci60")
 
 
@@ -210,16 +210,16 @@ def write_caption(rna, wes, sweep, out_dir: Path):
         o = s2.loc[s2["overall_correct_call_rate"].idxmax()]
         opt = (f"At support=0.35/margin=0.00/tools=2 the gate fires "
                f"{o['corrective_override_count']:g} corrective and {o['harmful_override_count']:g} harmful "
-               f"overrides, lifting ChampHLA to {o['overall_correct_call_rate']:.3f}.")
+               f"overrides, lifting PanelHLA to {o['overall_correct_call_rate']:.3f}.")
     cap = (
         "**Figure 13. External validation on the NCI-60 panel (independent, non-1000G).** The frozen "
-        "1000G-derived Champion-Challenger (ChampHLA) policy is applied without re-learning to NCI-60 "
+        "1000G-derived Champion-Challenger (PanelHLA) policy is applied without re-learning to NCI-60 "
         "RNA-seq and WES, scored against Adams 2005 sequence-based typing (HLA-A/B/C, 2-field). "
         f"(A) Overall correct-call rate (Wilson 95% CIs): RNA n={rna['n']}, WES n={wes['n']}; "
-        f"ChampHLA RNA {g(rna,'ChampionChallenger')} vs MajorityVote {g(rna,'MajorityVote')}; "
-        f"ChampHLA WES {g(wes,'ChampionChallenger')} vs MajorityVote {g(wes,'MajorityVote')}. "
+        f"PanelHLA RNA {g(rna,'ChampionChallenger')} vs MajorityVote {g(rna,'MajorityVote')}; "
+        f"PanelHLA WES {g(wes,'ChampionChallenger')} vs MajorityVote {g(wes,'MajorityVote')}. "
         "(B) Per-locus correct-call rate by modality. (C) WES override-gate sweep at supporting-tools=2: "
-        "the frozen margin gate (≥0.20) fires no overrides (ChampHLA≡OptiType), whereas relaxing the "
+        "the frozen margin gate (≥0.20) fires no overrides (PanelHLA≡OptiType), whereas relaxing the "
         f"margin to 0.00 recovers corrective overrides. {opt} NCI-60 are cancer lines, so loss of "
         "heterozygosity can cause apparent homozygosity; results are scored against the constitutional "
         "Adams genotype."

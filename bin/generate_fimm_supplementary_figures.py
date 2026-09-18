@@ -2,7 +2,7 @@
 """
 generate_fimm_supplementary_figures.py
 
-Generates publication-quality supplementary figures S4–S7 for the ChampHLA manuscript:
+Generates publication-quality supplementary figures S4–S7 for the PanelHLA manuscript:
 
   S4 — FIMM cross-modality HLA concordance (scRNA vs BulkRNA vs WES)
   S5 — LOH/allele dropout QC heatmap (tools × modalities)

@@ -1,7 +1,7 @@
 """
 parse_nextflow_trace_timing.py — Aggregate per-tool timing from Nextflow execution traces.
 
-Reads execution_trace.txt files produced by the ChampHLA Nextflow pipeline (trace
+Reads execution_trace.txt files produced by the PanelHLA Nextflow pipeline (trace
 enabled in nextflow.config) and computes per-tool × per-modality timing statistics
 (median wall-clock time, peak RAM, CPU utilisation) across n≥30 samples.
 

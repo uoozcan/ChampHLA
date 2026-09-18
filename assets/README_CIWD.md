@@ -1,7 +1,7 @@
 # CIWD 3.0.0 catalogue — vendored lookup tables
 
 **What this is.** A normalised, machine-readable copy of the **Common, Intermediate and
-Well-Documented (CIWD) HLA alleles, version 3.0.0** catalogue, used by the champHLA benchmark as an
+Well-Documented (CIWD) HLA alleles, version 3.0.0** catalogue, used by the PanelHLA benchmark as an
 *allele-commonness annotation layer* — **not** as a ground-truth cohort. CIWD contains no per-sample
 genotypes and no sequencing reads (it is an allele-frequency classification derived from ~8M
 donor-registry typings), so it cannot serve as benchmark truth; see

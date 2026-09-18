@@ -115,14 +115,14 @@ def fig_confusion(metrics, out):
         ax.set_xlim(0, 2); ax.set_ylim(0, 2)
         ax.set_xticks([0.5, 1.5]); ax.set_xticklabels(["A2 +", "A2 −"])
         ax.set_yticks([1.5, 0.5]); ax.set_yticklabels(["A2 +", "A2 −"])
-        ax.set_xlabel("champHLA consensus call", color=INK2)
+        ax.set_xlabel("PanelHLA consensus call", color=INK2)
         ax.set_ylabel("Flow cytometry (truth)", color=INK2)
         acc = m["accuracy"]
         ax.set_title(f"{title}\nN={m['N']}  ·  accuracy {float(acc):.2f}", fontsize=10)
         for s in ax.spines.values():
             s.set_visible(False)
         ax.tick_params(length=0)
-    fig.suptitle("HLA-A2: champHLA consensus vs flow cytometry", fontsize=12, fontweight="bold")
+    fig.suptitle("HLA-A2: PanelHLA consensus vs flow cytometry", fontsize=12, fontweight="bold")
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig(out, dpi=200); plt.close(fig)
 
@@ -165,7 +165,7 @@ def fig_sens_spec(metrics, wilson, out):
         for s in ("top", "right", "left"):
             ax.spines[s].set_visible(False)
         ax.tick_params(length=0)
-    fig.suptitle("champHLA HLA-A2 accuracy by method  (strict A*02, Wilson 95% CI)",
+    fig.suptitle("PanelHLA HLA-A2 accuracy by method  (strict A*02, Wilson 95% CI)",
                  fontsize=12, fontweight="bold")
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig(out, dpi=200); plt.close(fig)
@@ -220,7 +220,7 @@ def fig_donor_method(donors, out):
     ]
     ax.legend(handles=legend, loc="upper center", bbox_to_anchor=(0.5, -0.02),
               ncol=4, frameon=False, fontsize=8.5, handlelength=1.1)
-    ax.set_title("Per-donor HLA-A2 call by champHLA method vs flow cytometry (strict A*02)",
+    ax.set_title("Per-donor HLA-A2 call by PanelHLA method vs flow cytometry (strict A*02)",
                  fontsize=11.5, pad=34)
     fig.tight_layout()
     fig.savefig(out, dpi=200, bbox_inches="tight"); plt.close(fig)
@@ -252,13 +252,13 @@ def fig_mapping_effect(metrics, wilson, out):
     ax.legend(frameon=False, fontsize=9, loc="upper center",
               bbox_to_anchor=(0.5, -0.06), ncol=2)
     ax.set_title("Specificity drops when A*68/A*69 are counted as A2\n"
-                 "(BB7.2 cross-reactivity) — champHLA methods",
+                 "(BB7.2 cross-reactivity) — PanelHLA methods",
                  fontsize=11, fontweight="bold")
     fig.tight_layout(rect=[0, 0.04, 1, 1])
     fig.savefig(out, dpi=200); plt.close(fig)
 
 
-# ── Fig 5: champHLA cross-tool concordance (donor x locus) ───────────────────────
+# ── Fig 5: PanelHLA cross-tool concordance (donor x locus) ───────────────────────
 WARN = "#fab219"   # status: minor sub-typing difference
 
 
@@ -313,7 +313,7 @@ def fig_champhla_concordance(path_by_locus, out):
     handles = [Patch(facecolor=seen[l], label=l) for l in order if l in seen]
     ax.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.02),
               ncol=3, frameon=False, fontsize=8.3, handlelength=1.1)
-    ax.set_title("champHLA cross-tool genotype concordance (2-field)\n"
+    ax.set_title("PanelHLA cross-tool genotype concordance (2-field)\n"
                  "per donor × locus, flow-cohort samples", fontsize=11, pad=30)
     fig.tight_layout()
     fig.savefig(out, dpi=200, bbox_inches="tight"); plt.close(fig)
@@ -351,7 +351,7 @@ def fig_manuscript_14(metrics, wilson, outdir, stem="figure_14_flow_hla_a2"):
     axA.set_xlim(0, 2); axA.set_ylim(0, 2)
     axA.set_xticks([0.5, 1.5]); axA.set_xticklabels(["A2 +", "A2 −"])
     axA.set_yticks([1.5, 0.5]); axA.set_yticklabels(["A2 +", "A2 −"])
-    axA.set_xlabel("ChampHLA consensus", color=INK2)
+    axA.set_xlabel("PanelHLA consensus", color=INK2)
     axA.set_ylabel("Flow cytometry (truth)", color=INK2)
     axA.set_title(f"A  Consensus vs flow (strict A*02)\nN={m['N']} · accuracy "
                   f"{float(m['accuracy']):.2f}", fontsize=10.5, loc="left")

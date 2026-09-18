@@ -1,5 +1,5 @@
 #!/bin/bash
-# Reproduce the ChampHLA manuscript's primary and stratified numbers + figures from the
+# Reproduce the PanelHLA manuscript's primary and stratified numbers + figures from the
 # deposited harmonised benchmark tables (no HLA tools are re-run). See Data Availability.
 #
 # Regenerates, for WGS/WES/RNA:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate ChampHLA two-week progress report (Jun 15-29, 2026).
+"""Generate PanelHLA two-week progress report (Jun 15-29, 2026).
 
 Self-contained HTML with embedded base64 PNG figures, sidebar navigation,
 and CSS-variable styling following the project's existing report pattern.
@@ -209,7 +209,7 @@ def build_html():
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChampHLA Progress Report — June 2026</title>
+  <title>PanelHLA Progress Report — June 2026</title>
   <style>
     :root {{
       --bg: #f3f6fb;
@@ -373,7 +373,7 @@ def build_html():
   <aside>
     <div class="brand">
       <p class="kicker">Progress Report</p>
-      <h1>ChampHLA</h1>
+      <h1>PanelHLA</h1>
       <p>Two-week development summary<br/>June 15 &ndash; 29, 2026</p>
     </div>
     <div class="sidebar-meta">
@@ -387,7 +387,7 @@ def build_html():
   <main>
     <!-- HERO -->
     <section class="hero">
-      <p class="eyebrow">ChampHLA &middot; Majority Voting HLA Typing Pipeline</p>
+      <p class="eyebrow">PanelHLA &middot; Majority Voting HLA Typing Pipeline</p>
       <h2>Two-Week Progress Report</h2>
       <p>Summary of all new results, figures, pipeline changes, and documentation produced between June 15 and June 29, 2026. This was one of the most productive periods in the project &mdash; spanning external validation on two independent cohorts, ten new publication figures, deployment documentation, and manuscript finalisation.</p>
     </section>
@@ -437,7 +437,7 @@ def build_html():
             <table class="result-table">
               <thead><tr><th>Method</th><th>Accuracy</th><th>Score</th></tr></thead>
               <tbody>
-                <tr><td class="highlight">ChampHLA (CC)</td><td>11/12</td><td class="highlight">0.917</td></tr>
+                <tr><td class="highlight">PanelHLA (CC)</td><td>11/12</td><td class="highlight">0.917</td></tr>
                 <tr><td>MajorityVote</td><td>11/12</td><td>0.917</td></tr>
                 <tr><td>OptiType</td><td>11/12</td><td>0.917</td></tr>
                 <tr><td>HLA-HD</td><td>11/12</td><td>0.917</td></tr>
@@ -461,7 +461,7 @@ def build_html():
             <table class="result-table">
               <thead><tr><th>Method</th><th>Accuracy</th><th>Score</th></tr></thead>
               <tbody>
-                <tr><td class="highlight">ChampHLA (CC)</td><td>3/3</td><td class="highlight">1.000</td></tr>
+                <tr><td class="highlight">PanelHLA (CC)</td><td>3/3</td><td class="highlight">1.000</td></tr>
                 <tr><td>MajorityVote</td><td>3/3</td><td>1.000</td></tr>
                 <tr><td>OptiType</td><td>3/3</td><td>1.000</td></tr>
                 <tr><td>T1K</td><td>3/3</td><td>1.000</td></tr>
@@ -481,7 +481,7 @@ def build_html():
     <section id="{section_id('Pipeline Changes')}">
       <div class="section-header">
         <h2>Pipeline &amp; Infrastructure Changes</h2>
-        <p>Code changes, bug fixes, and new modules added to the ChampHLA Nextflow pipeline.</p>
+        <p>Code changes, bug fixes, and new modules added to the PanelHLA Nextflow pipeline.</p>
       </div>
       <div class="grid">
         <div class="panel changelog-card">
@@ -557,7 +557,7 @@ def build_html():
     <section id="{section_id('Documentation')}">
       <div class="section-header">
         <h2>Documentation &amp; Deployment</h2>
-        <p>New user-facing documentation created to support ChampHLA deployment and reproducibility.</p>
+        <p>New user-facing documentation created to support PanelHLA deployment and reproducibility.</p>
       </div>
       <div class="grid two-col">
         <div class="panel">
@@ -626,7 +626,7 @@ def build_html():
     </section>
 
     <footer>
-      ChampHLA Progress Report &middot; Generated {safe(generated)} &middot; Figures embedded as base64 &middot; Self-contained offline HTML
+      PanelHLA Progress Report &middot; Generated {safe(generated)} &middot; Figures embedded as base64 &middot; Self-contained offline HTML
     </footer>
   </main>
 </div>

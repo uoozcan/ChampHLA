@@ -1,6 +1,6 @@
 #!/bin/bash
 # Slice the chr6 MHC region from GIAB GRCh38 Illumina WGS BAMs (remote, no full download) and
-# emit per-sample paired FASTQ for the ChampHLA WGS pipeline. Disk-safe: only MHC reads are fetched.
+# emit per-sample paired FASTQ for the PanelHLA WGS pipeline. Disk-safe: only MHC reads are fetched.
 #
 # GRCh38 MHC window (with flank): chr6:28,477,797-33,448,354. The GIAB analysis-set BAMs use 'chr6'.
 set -euo pipefail

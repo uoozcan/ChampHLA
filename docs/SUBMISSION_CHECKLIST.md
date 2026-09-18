@@ -1,4 +1,4 @@
-# ChampHLA Manuscript — Submission Checklist
+# PanelHLA Manuscript — Submission Checklist
 
 Last updated: 2026-07-16 (supersedes the 2026-06-04 MVHLA-era checklist)
 
@@ -11,7 +11,7 @@ Target: methods/software journal (*Bioinformatics* Application Note, *GigaScienc
 - **Abstract:** full abstract + short abstract (197 words, within a 200-word limit).
 - **Headline result:** held-out 10-fold nested cross-validation; WGS Champion-Challenger 0.5012 vs MajorityVote 0.3844 (exact McNemar p<0.0001); WES/RNA parity; ablation shows the gain is routing, not weighting.
 - **Reproducibility:** `bin/reproduce_manuscript_numbers.sh`, `slurm_nested_cv.sh`; shipped `conf/tool_weights_{wgs,wes,rna}.json` regenerated from the deposited `tool_confidence_weights.tsv` so production defaults match Table 5.
-- **Repo:** https://github.com/uoozcan/ChampHLA, branch `roihu-migration-locityper-docs`.
+- **Repo:** https://github.com/uoozcan/PanelHLA, branch `roihu-migration-locityper-docs`.
 
 ## HUMAN TASKS (cannot be automated)
 

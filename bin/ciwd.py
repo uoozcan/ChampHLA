@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CIWD 3.0.0 allele-commonness lookup for the champHLA benchmark.
+"""CIWD 3.0.0 allele-commonness lookup for the PanelHLA benchmark.
 
 CIWD is an *allele-classification* catalogue (common / intermediate / well-documented /
 not-CIWD across seven population groups), **not** a ground-truth genotype dataset — it carries no

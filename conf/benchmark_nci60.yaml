@@ -1,4 +1,4 @@
-# NCI-60 external-validation benchmark (RNA-seq) — ChampHLA / MVHLA
+# NCI-60 external-validation benchmark (RNA-seq) — PanelHLA / MVHLA
 # Independent, non-1000G cohort. Truth: Adams et al. 2005 (J Transl Med 3:11, PMC555742) SBT.
 # Reads: NCI-60 RNA-seq, SRA BioProject PRJNA433861 (Reinhold 2019).
 # Framing: held-out generalisation test — applies the FROZEN 1000G-derived RNA Champion-Challenger

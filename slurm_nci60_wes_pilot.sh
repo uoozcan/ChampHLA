@@ -9,7 +9,7 @@
 #SBATCH --error=/scratch/project_2008084/hla_calibration/logs/nci60_wes_pilot_%j.err
 
 # NCI-60 WES external-validation PILOT (5 lines with full A/B/C 2-field truth).
-# Reads: SRA SRP150855 (NCI-60 exome capture). Truth: Adams 2005 (PMC555742). Pipeline: ChampHLA main.nf (DNA/WES).
+# Reads: SRA SRP150855 (NCI-60 exome capture). Truth: Adams 2005 (PMC555742). Pipeline: PanelHLA main.nf (DNA/WES).
 # Second modality on the same lines as the validated RNA pilot (NCI-H23, OVCAR-8, RPMI-8226, SK-MEL-28) + EKVX.
 # After this completes, build sequencing_source.tsv and run:
 #   python3 bin/run_1000g_benchmark.py --config conf/benchmark_nci60_wes.yaml \
@@ -32,7 +32,7 @@ while IFS=$'\t' read -r SAMPLE R1 R2; do
 done < "$INDEX"
 echo "[download] complete:"; ls -lh "$FASTQ"
 
-# ── Run the ChampHLA pipeline (DNA/WES tools) ──
+# ── Run the PanelHLA pipeline (DNA/WES tools) ──
 cd /scratch/project_2008084/pihla-publish
 nextflow run main.nf \
   -params-file /scratch/project_2008084/pihla-publish/conf/puhti_params.yaml \

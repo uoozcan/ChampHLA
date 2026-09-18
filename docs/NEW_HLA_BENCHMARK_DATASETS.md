@@ -1,6 +1,6 @@
 # New HLA Ground-Truth Datasets — Scouting Shortlist
 
-**Purpose.** The current ChampHLA / MVHLA benchmark relies entirely on 1000 Genomes truth
+**Purpose.** The current PanelHLA / MVHLA benchmark relies entirely on 1000 Genomes truth
 (Gourraud et al. 2014, IMGT/HLA 3.59.0). For the next analysis we want **independent, non-1000G**
 cohorts that pair raw **WES / WGS / RNA-seq** reads with **gold-standard HLA typing** so we can test
 generalisation of the Champion-Challenger consensus beyond 1000G.
@@ -11,13 +11,13 @@ input manifests is a separate follow-up task.
 
 **Execution status (2026-06-25):**
 - **NCI-60 RNA — DONE / VALIDATED (wave 1).** 4-line frozen-RNA-policy pilot complete (job 35255953):
-  ChampHLA=MajorityVote=0.917; the frozen CC override gate fired twice, both corrective, 0 harmful
+  PanelHLA=MajorityVote=0.917; the frozen CC override gate fired twice, both corrective, 0 harmful
   (champion-only 0.75→0.917). See `analysis/nci60_benchmark/README.md`.
 - **NCI-60 WES — RUNNING (wave 1b).** Same 5 lines, second modality; reads = open SRA **SRP150855**
   (NCI watson server was dead, but SRA hosts the exomes). Frozen WES CC policy. `conf/benchmark_nci60_wes.yaml`.
 - **GIAB Ashkenazi-TRIO WES+RNA — DONE (2026-07-01).** HG002/HG003/HG004, non-1000G GERMLINE,
   clinical SBT gold truth (Stanford; F1000 8:1751 Table 1; Mendelian-consistent). **WES CC=MV=1.000
-  (9/9 perfect); RNA CC=MV=0.889 (8/9).** ChampHLA's strong modalities, no LOH. Reads RNA
+  (9/9 perfect); RNA CC=MV=0.889 (8/9).** PanelHLA's strong modalities, no LOH. Reads RNA
   SRR15909917-19 / WES SRR2962669/2692/2694. `analysis/giab_trio_benchmark/README.md`.
 - **SweHLA / SweGen — AWAITING ACCESS.** User requested EGA (study **EGAS50000000906**, CRAM/GRCh38)
   + NBIS SweHLA truth; build ready (`analysis/swehla_benchmark/PHASE0_STATUS.md`).
