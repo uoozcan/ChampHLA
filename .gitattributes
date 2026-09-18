@@ -1,0 +1,23 @@
+# Text files are normalised to LF in the repository.
+* text=auto eol=lf
+
+# These run on Linux (CSC Roihu/Puhti, inside containers, in CI). A CRLF line
+# ending in any of them produces "\r: command not found" or, worse, a shebang that
+# silently resolves to the wrong interpreter. This repository is edited from
+# Windows, so the guard is not theoretical.
+*.sh    text eol=lf
+*.nf    text eol=lf
+*.py    text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.config text eol=lf
+
+# Caller outputs and reference tables are data: never touch their bytes.
+*.tsv   -text
+*.csv   -text
+*.sif   binary
+*.gz    binary
+*.jar   binary
+*.docx  binary
+*.xlsx  binary
+*.pptx  binary
