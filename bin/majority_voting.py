@@ -4,6 +4,7 @@
 import argparse
 import csv
 import json
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -65,6 +66,34 @@ def clip_01(value):
     return parsed
 
 
+def weight_key(tool):
+    """Normalised tool key for weight lookup.
+
+    conf/tool_weights_*.json spells tools "OptiType" and "HLA-HD"; the rows in
+    aggregated_calls.tsv say "optitype" and "hlahd", because that is what
+    modules/aggregation.nf emits. Strip case and separators so the two agree --
+    the same normalisation the algorithm-family map uses.
+    """
+    return re.sub(r"[^a-z0-9]", "", clean_token(tool).lower())
+
+
+def flat_weight(weights, tool):
+    """Weight from a flat {tool: number} file, or None if this is not one.
+
+    Returns None rather than 0.0 so the caller can tell "no such tool in a flat
+    file" from "this file is not flat at all".
+    """
+    if not isinstance(weights, dict):
+        return None
+    flat = {}
+    for name, value in weights.items():
+        if isinstance(value, (int, float)):
+            flat[weight_key(name)] = value
+    if not flat:
+        return None
+    return flat.get(weight_key(tool))
+
+
 def mean_tool_weight_from_raw_accuracy(raw_accuracy, tool):
     gene_scores = raw_accuracy.get(tool, {}) if isinstance(raw_accuracy, dict) else {}
     values = [clip_01(gene_scores.get(gene)) for gene in TRUTH_SUPPORTED_GENES]
@@ -88,6 +117,15 @@ def lookup_weight(weights, row, use_gene_specific, equal_mode=False):
     modality = clean_token(row.get("modality")).lower()
     gene = clean_token(row.get("gene"))
 
+    # Flat schema: {"OptiType": 0.4974, ...}. This is what the repository's own
+    # conf/tool_weights_{wgs,wes,rna}.json files use; without this branch they
+    # resolved to zero for every tool and the consensus called nothing.
+    if "tool_weights" not in weights and "gene_weights" not in weights \
+            and "raw_accuracy" not in weights:
+        value = flat_weight(weights, tool)
+        if value is not None:
+            return clip_01(value)
+
     # Native runtime schema support.
     if "tool_weights" in weights or "gene_weights" in weights:
         if use_gene_specific:
@@ -95,7 +133,9 @@ def lookup_weight(weights, row, use_gene_specific, equal_mode=False):
             value = gene_weight.get("final_weight")
             if value is not None:
                 return clip_01(value)
-        tool_weight = weights.get("tool_weights", {}).get(tool, {}).get(modality, {})
+        tool_weights = weights.get("tool_weights", {})
+        by_key = {weight_key(name): entry for name, entry in tool_weights.items()}
+        tool_weight = by_key.get(weight_key(tool), {}).get(modality, {})
         value = tool_weight.get("final_weight")
         if value is not None:
             return clip_01(value)
