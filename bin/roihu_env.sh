@@ -26,8 +26,16 @@
 # samtools 1.21.
 
 export CSC_ENV_INIT_NON_INTERACTIVE=yes
+
+# zz-csc-env.sh tests [ -z "$PS1" ] without guarding it, so under `set -u` -- which
+# any careful launcher uses -- sourcing it aborts with "PS1: unbound variable".
+# Drop nounset just across the source and put it back exactly as it was.
+_panelhla_nounset=0
+case "$-" in *u*) _panelhla_nounset=1; set +u ;; esac
 # shellcheck disable=SC1091
 source /etc/profile.d/zz-csc-env.sh
+[ "${_panelhla_nounset}" = 1 ] && set -u
+unset _panelhla_nounset
 
 module load bio-apps/v202603
 module load nextflow/25.10.2-standalone
