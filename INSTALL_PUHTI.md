@@ -17,10 +17,10 @@ From your local machine:
 
 ```bash
 # Download the pipeline from GitHub (after release)
-git clone https://github.com/yourusername/hla-typing-pipeline.git
+git clone https://github.com/uoozcan/mvhla.git
 
 # Or if you have the files locally, upload to Puhti
-scp -r hla-typing-pipeline your-username@puhti.csc.fi:/scratch/project_2008084/
+scp -r mvhla your-username@puhti.csc.fi:/scratch/project_2008084/
 ```
 
 ### Step 2: Set Up on Puhti
@@ -29,7 +29,7 @@ Login to Puhti and navigate to the pipeline:
 
 ```bash
 ssh your-username@puhti.csc.fi
-cd /scratch/project_2008084/hla-typing-pipeline
+cd /scratch/project_2008084/mvhla
 ```
 
 ### Step 3: Load Required Modules
@@ -331,14 +331,14 @@ sbatch submit_slurm.sh
 To update the pipeline:
 
 ```bash
-cd /scratch/project_2008084/hla-typing-pipeline
+cd /scratch/project_2008084/mvhla
 
 # Pull latest changes (after GitHub release)
 git pull origin main
 
 # Or re-download
-rm -rf hla-typing-pipeline
-git clone https://github.com/yourusername/hla-typing-pipeline.git
+rm -rf mvhla
+git clone https://github.com/uoozcan/mvhla.git
 ```
 
 ## 💡 Best Practices
@@ -358,7 +358,7 @@ git clone https://github.com/yourusername/hla-typing-pipeline.git
 - Docs: https://docs.csc.fi
 
 ### Pipeline Issues
-- GitHub: https://github.com/yourusername/hla-typing-pipeline/issues
+- GitHub: https://github.com/uoozcan/mvhla/issues
 - Check logs first
 - Include error messages
 - Describe your data type

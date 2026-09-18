@@ -1,0 +1,93 @@
+# GIAB Ashkenazi-trio RNA external validation (HG002/HG003/HG004) — ChampHLA / MVHLA
+# NON-1000G germline; clinical SBT gold truth (Stanford Blood Center; F1000 8:1751 Table 1;
+# HG002 cross-confirmed Chin 2020). Frozen 1000G RNA Champion-Challenger policy (no re-learning).
+truth:
+  path: /scratch/project_2008084/pihla-publish/analysis/giab_trio_benchmark/truth_long.tsv
+  source: "Adams et al. 2005, J Transl Med 3:11 (PMC555742), Table 2 (SBT class I)"
+  acquisition_date: 2005-03-04
+  imgt_hla_version: 3.59.0          # normalisation version (truth carried at 2-field)
+  supported_loci:
+  - A
+  - B
+  - C
+
+manifests:
+  # Built in Phase 3 once the RNA pipeline has produced per-tool outputs:
+  sequencing_source: /scratch/project_2008084/pihla-publish/analysis/giab_trio_benchmark/rna/sequencing_source.tsv
+
+benchmark:
+  resolution: 2
+  secondary_resolutions:
+  - 2
+  - 3
+  tool_coverage_policy: phase_gated
+  consensus:
+    min_margin: 0.15
+    min_support: 0.55
+  # FROZEN tuned RNA Champion-Challenger policy from the 1000G RNA truth-backed run
+  # (champion_by_gene + override optimum support=0.35, margin=0.0, tools=2).
+  champion_challenger:
+    enabled: true
+    fallback_method: weighted_consensus
+    champion_by_gene:
+      A: OptiType
+      B: ArcasHLA
+      C: ArcasHLA
+    override_policy:
+      min_challenger_support_fraction: 0.35
+      min_challenger_margin: 0.0
+      min_supporting_tools: 2
+      require_non_ambiguity_override: true
+
+runs:
+# ── RNA-seq only (WES unavailable: NCI watson BAM server unresponsive 2026-06-24) ──────────────
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/arcashla/*/*.genes.json
+  confidence_parser: arcashla_genes_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/arcashla/
+  modality: rnaseq
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/*_arcashla.txt
+  sample_from_path_regex: /results/([^/]+)/arcashla/
+  tool: ArcasHLA
+- confidence_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/optitype/*/*_result.tsv
+  confidence_parser: optitype_result_objective
+  confidence_sample_from_path_regex: /results/([^/]+)/optitype/
+  modality: rnaseq
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/*_optitype.txt
+  sample_from_path_regex: /results/([^/]+)/optitype/
+  tool: OptiType
+- modality: rnaseq
+  parser: seq2hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/*_seq2hla.txt
+  sample_from_path_regex: /results/([^/]+)/seq2hla/
+  tool: Seq2HLA
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/t1k/t1k_out/*_genotype.tsv
+  confidence_parser: t1k_genotype_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/t1k/
+  modality: rnaseq
+  parser: t1k_table
+  result_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/*_t1k.txt
+  sample_from_path_regex: /results/([^/]+)/t1k/
+  tool: T1K
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/hlahd/*/*/result/*_*.read.txt
+  confidence_parser: hlahd_read_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/hlahd/
+  modality: rnaseq
+  parser: hlahd_table
+  result_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/*_hlahd.txt
+  sample_from_path_regex: /results/([^/]+)/hlahd/
+  tool: HLA-HD
+# SpecHLA: coverage-only on RNA (DNA tool; high N-masking on RNA reads) — matches 1000G RNA config.
+- coverage_only: true
+  modality: rnaseq
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/giab_trio/rna/results/**/*_spechla.txt
+  sample_from_path_regex: /results/([^/]+)/spechla/
+  tool: SpecHLA

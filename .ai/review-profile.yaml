@@ -1,0 +1,20 @@
+{
+  "project": "pihla",
+  "base_branch": "main",
+  "review_command": "/review",
+  "review_scope_defaults": [
+    "uncommitted changes",
+    "compare against base branch",
+    "focus on benchmark regressions, scientific integrity, and missing tests"
+  ],
+  "required_checks": [
+    "benchmark scope matches reporting policy",
+    "tests or parser validations are still green",
+    "runtime path assumptions are not silently changed"
+  ],
+  "severity_rubric": {
+    "high": "Scientific or workflow regression, unsafe benchmark claim, or broken core execution.",
+    "medium": "Behavioral issue, missing validation, or misleading documentation.",
+    "low": "Non-blocking cleanup, follow-up task, or clarity gap."
+  }
+}

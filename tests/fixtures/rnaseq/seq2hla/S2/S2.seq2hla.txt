@@ -1,0 +1,8 @@
+# seq2HLA results for S2
+# Tool: seq2HLA v2.3 - Class I + II, RNA-seq
+# Confidence threshold: > 0.5
+#
+Gene	Allele1	Allele2	Reads1	Reads2
+A	A*03:01	A*24:02	NA	NA
+B	B*44:02	B*35:01	NA	NA
+C	C*04:01	C*05:01	NA	NA

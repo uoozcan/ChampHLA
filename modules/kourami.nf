@@ -63,8 +63,8 @@ process KOURAMI {
             echo "[Kourami] WARNING: could not detect chr6 in BAM header for ${sample_id}"
             CHR="6"
         fi
-        echo "[Kourami] Extracting HLA region from \${CHR}:28000000-34000000..."
-        samtools view -b ${bam} "\${CHR}:28000000-34000000" | \
+        echo "[Kourami] Extracting HLA region from \${CHR}:${params.hla_region_start}-${params.hla_region_end}..."
+        samtools view -b ${bam} "\${CHR}:${params.hla_region_start}-${params.hla_region_end}" | \
             samtools sort -n -@ ${task.cpus} | \
             samtools fastq -1 ${sample_id}._hla_1.fq.gz -2 ${sample_id}._hla_2.fq.gz -s /dev/null -
         R1="${sample_id}._hla_1.fq.gz"

@@ -1,0 +1,5 @@
+# Kourami results for S1
+Gene	Allele1	Allele2	Reads1	Reads2
+A	A*01:01	A*02:01	546	532
+B	B*07:02	B*08:01	498	480
+C	C*07:01	C*07:02	420	412

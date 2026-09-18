@@ -23,6 +23,10 @@ process ARCASHLA {
     script:
     def min_count = (params.seq_type == 'dna') ? 5 : 75
     """
+    # Redirect arcasHLA temp files to scratch (container /tmp is too small for exome BAMs)
+    export TMPDIR="\$(pwd)/arcas_tmp"
+    mkdir -p "\${TMPDIR}"
+
     # Create output directory
     mkdir -p ${sample_id}
 
@@ -44,6 +48,11 @@ process ARCASHLA {
     # Rename extracted FASTQs to use sample_id as stem
     if ls ${sample_id}/*.extracted.fq.gz 1>/dev/null 2>&1; then
         FQFILES=(\$(ls ${sample_id}/*.extracted.fq.gz))
+        # Patch arcasHLA align.py for KeyError: '0' bug (counts.get instead of counts[key])
+        mkdir -p arcas_patch
+        cp /home/arcasHLA-master/scripts/*.py ./arcas_patch/
+        sed -i "s/count = counts\\[eq\\]/count = counts.get(eq, 0)/" ./arcas_patch/align.py
+        export PYTHONPATH="\$(pwd)/arcas_patch:\${PYTHONPATH:-}"
         arcasHLA genotype "\${FQFILES[@]}" \
             -o ${sample_id} \
             -t ${task.cpus} \
@@ -125,6 +134,11 @@ process ARCASHLA_FASTQ {
     fi
 
     echo "[Running arcasHLA genotype from FASTQ...]"
+    # Patch arcasHLA align.py for KeyError: '0' bug (counts.get instead of counts[key])
+    mkdir -p arcas_patch
+    cp /home/arcasHLA-master/scripts/*.py ./arcas_patch/
+    sed -i "s/count = counts\\[eq\\]/count = counts.get(eq, 0)/" ./arcas_patch/align.py
+    export PYTHONPATH="\$(pwd)/arcas_patch:\${PYTHONPATH:-}"
     arcasHLA genotype \
         ${sample_id}/${sample_id}.1.fq.gz \
         ${sample_id}/${sample_id}.2.fq.gz \

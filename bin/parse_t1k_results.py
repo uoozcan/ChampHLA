@@ -32,8 +32,8 @@ def parse_t1k_genotype(input_path: str, output_path: str) -> None:
                 gene = parts[0].strip()
                 if not gene.startswith('HLA-'):
                     gene = f"HLA-{gene}"
-                allele1 = parts[1].strip() if len(parts) > 1 else '-'
-                allele2 = parts[3].strip() if len(parts) > 3 else '-'
+                allele1 = parts[2].split(',')[0].strip() if len(parts) > 2 else '-'
+                allele2 = parts[5].split(',')[0].strip() if len(parts) > 5 else '-'
                 # Normalize blanks
                 allele1 = allele1 if allele1 not in ('', '.', 'NA', 'None') else '-'
                 allele2 = allele2 if allele2 not in ('', '.', 'NA', 'None') else '-'

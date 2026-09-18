@@ -48,6 +48,7 @@ process OPTITYPE_FASTQ {
     """
     # Create output directory
     mkdir -p ${sample_id}
+    trap 'rm -f R1.fastq R2.fastq core.*' EXIT
 
     # Prepare FASTQ files
     if [[ "${fastq1}" == *.gz ]]; then
@@ -99,5 +100,11 @@ EOF
     "${task.process}":
         optitype: \$(OptiTypePipeline.py --version 2>&1 | head -1 || echo "1.3.5")
     END_VERSIONS
+    """
+
+    stub:
+    """
+    printf '# OptiType results for ${sample_id} (STUB)\nGene\tAllele1\tAllele2\nHLA-A\tA*02:01\tA*11:01\nHLA-B\tB*07:02\tB*08:01\nHLA-C\tC*03:04\tC*04:01\n' > ${sample_id}_optitype.txt
+    echo '"${task.process}": {optitype: "stub"}' > versions.yml
     """
 }

@@ -1,0 +1,74 @@
+# IHWG/IHIW WGS external validation (MHC reference cells) — ChampHLA / MVHLA
+# NON-1000G, study-verified (PRJNA764575, cell_line-annotated). Truth: IPD-IMGT IHIW multi-lab
+# 4-field consensus (truth_long.tsv=2f; truth_long_4field.tsv=4f). Frozen WGS CC policy.
+# n=4 homozygous MHC-reference cells (SSTO/DBB/APD/QBL); KAS116 excluded (long-read only).
+truth:
+  path: /scratch/project_2008084/pihla-publish/analysis/ihwg_benchmark/truth_long.tsv
+  source: "HG002 clinical SBT (Chin 2020 PMC7508831); HG005/parents Immuannot (IPD-IMGT/HLA)"
+  imgt_hla_version: 3.59.0
+  supported_loci:
+  - A
+  - B
+  - C
+
+manifests:
+  sequencing_source: /scratch/project_2008084/pihla-publish/analysis/ihwg_benchmark/wgs/sequencing_source.tsv
+
+benchmark:
+  resolution: 2
+  secondary_resolutions:
+  - 2
+  - 3
+  tool_coverage_policy: phase_gated
+  consensus:
+    min_margin: 0.15
+    min_support: 0.55
+  # FROZEN WGS Champion-Challenger policy (from conf/benchmark_1000g_wgs_wave2.yaml).
+  champion_challenger:
+    enabled: true
+    fallback_method: weighted_consensus
+    champion_by_gene:
+      A: T1K
+      B: OptiType
+      C: OptiType
+    override_policy:
+      min_challenger_support_fraction: 0.65
+      min_challenger_margin: 0.2
+      min_supporting_tools: 2
+      require_non_ambiguity_override: true
+
+runs:
+# ── WGS (GIAB GRCh38 MHC slice) ──────────────────────────────────────────────
+- confidence_glob: /scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/optitype/*/*_result.tsv
+  confidence_parser: optitype_result_objective
+  confidence_sample_from_path_regex: /results/([^/]+)/optitype/
+  modality: wgs
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/*_optitype.txt
+  sample_from_path_regex: /results/([^/]+)/optitype/
+  tool: OptiType
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/t1k/t1k_out/*_genotype.tsv
+  confidence_parser: t1k_genotype_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/t1k/
+  modality: wgs
+  parser: t1k_table
+  result_glob: /scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/*_t1k.txt
+  sample_from_path_regex: /results/([^/]+)/t1k/
+  tool: T1K
+- modality: wgs
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/*_spechla.txt
+  sample_from_path_regex: /results/([^/]+)/spechla/
+  tool: SpecHLA
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/hlahd/*/*/result/*_*.read.txt
+  confidence_parser: hlahd_read_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/hlahd/
+  modality: wgs
+  parser: hlahd_table
+  result_glob: /scratch/project_2008084/hla_calibration/ihwg/wgs/results/**/*_hlahd.txt
+  sample_from_path_regex: /results/([^/]+)/hlahd/
+  tool: HLA-HD

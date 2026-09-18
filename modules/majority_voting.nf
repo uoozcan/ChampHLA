@@ -11,16 +11,24 @@ process MAJORITY_VOTING {
 
     input:
     path calls_tsv
+    val modality
 
     output:
-    path "consensus_calls.tsv", emit: consensus
-    path "runtime_weights.json", emit: weights
+    path "consensus_calls.tsv",                   emit: consensus
+    path "consensus_calls_clinical_warnings.tsv", emit: clinical_warnings, optional: true
+    path "runtime_weights.json",                  emit: weights
 
     script:
-    def modality = params.run_modality ?: (params.input_type == 'fastq' ? (params.seq_type == 'rna' ? 'rnaseq' : 'wes') : 'wgs')
     def minWeight = params.consensus_min_weight ?: 0.0
     def useGeneSpecific = params.consensus_use_gene_specific_weights ? '--use-gene-specific' : ''
+    def weighting = params.weighting ?: 'calibrated'
+    // Resolve weight file: explicit override > auto by modality > fall back to equal
     def weightFile = params.consensus_weight_file ?: ''
+    if (!weightFile && weighting == 'calibrated') {
+        if      (modality == 'wgs')    weightFile = "${projectDir}/conf/tool_weights_wgs.json"
+        else if (modality == 'wes')    weightFile = "${projectDir}/conf/tool_weights_wes.json"
+        else if (modality in ['rnaseq','rna']) weightFile = "${projectDir}/conf/tool_weights_rna.json"
+    }
     """
     if [ -n "${weightFile}" ] && [ -f "${weightFile}" ]; then
       cp "${weightFile}" runtime_weights.json
@@ -61,8 +69,16 @@ PYEOF
       --calls ${calls_tsv} \
       --weights runtime_weights.json \
       --output consensus_calls.tsv \
+      --weighting ${weighting} \
       --min-weight ${minWeight} \
       ${useGeneSpecific}
+    """
+
+    stub:
+    """
+    echo '{"tool_weights": {}, "gene_weights": {}}' > runtime_weights.json
+    printf 'sample\tgene\tallele1\tallele2\ttotal_weight\tagreeing_tools\tcontributing_tools\tconsensus_status\tchosen_by\twarnings\n' > consensus_calls.tsv
+    printf 'sample1\tA\tA*02:01\tA*11:01\t2.0\t2\t2\tcalled\toptitype,hlahd\t\n' >> consensus_calls.tsv
     """
 }
 
@@ -74,8 +90,10 @@ workflow MAJORITY_VOTING_WORKFLOW {
     ch_hlahd
     ch_polysolver
     ch_kourami
+    ch_locityper
     ch_t1k
     ch_seq2hla
+    ch_modality
 
     main:
     ch_all_results = ch_optitype.map { sample_id, f -> f }
@@ -84,11 +102,12 @@ workflow MAJORITY_VOTING_WORKFLOW {
         .mix(ch_hlahd.map { sample_id, f -> f })
         .mix(ch_polysolver.map { sample_id, f -> f })
         .mix(ch_kourami.map { sample_id, f -> f })
+        .mix(ch_locityper.map { sample_id, f -> f })
         .mix(ch_t1k.map { sample_id, f -> f })
         .mix(ch_seq2hla.map { sample_id, f -> f })
 
-    AGGREGATE_RESULTS(ch_all_results.collect())
-    MAJORITY_VOTING(AGGREGATE_RESULTS.out.calls)
+    AGGREGATE_RESULTS(ch_all_results.collect(), ch_modality)
+    MAJORITY_VOTING(AGGREGATE_RESULTS.out.calls, ch_modality)
 
     emit:
     calls = AGGREGATE_RESULTS.out.calls

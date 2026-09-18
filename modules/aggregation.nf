@@ -9,12 +9,12 @@ process AGGREGATE_RESULTS {
 
     input:
     path result_files
+    val modality
 
     output:
     path "aggregated_calls.tsv", emit: calls
 
     script:
-    def modality = params.run_modality ?: (params.input_type == 'fastq' ? (params.seq_type == 'rna' ? 'rnaseq' : 'wes') : 'wgs')
     """
     printf '%s\n' ${result_files} > result_files.list
     python3 - << 'PYEOF'
@@ -25,17 +25,19 @@ from pathlib import Path
 with open("result_files.list", "r", encoding="utf-8") as fh:
     files = [Path(line.strip()) for line in fh if line.strip()]
 modality = "${modality}"
+vote_genes = {g.strip().replace("HLA-", "").upper() for g in "${params.mv_genes ?: "A,B,C"}".split(",") if g.strip()}
 
 # Expected naming from modules: <sample>_<tool>.txt
 name_patterns = {
-    "optitype": re.compile(r"^(?P<sample>.+)_optitype\.txt$"),
-    "arcashla": re.compile(r"^(?P<sample>.+)_arcashla\.txt$"),
-    "spechla": re.compile(r"^(?P<sample>.+)_spechla\.txt$"),
-    "hlahd": re.compile(r"^(?P<sample>.+)_hlahd\.txt$"),
-    "polysolver": re.compile(r"^(?P<sample>.+)_polysolver\.txt$"),
-    "kourami": re.compile(r"^(?P<sample>.+)_kourami\.txt$"),
-    "t1k": re.compile(r"^(?P<sample>.+)_t1k\.txt$"),
-    "seq2hla": re.compile(r"^(?P<sample>.+)_seq2hla\.txt$"),
+    "optitype": re.compile(r"^(?P<sample>.+)_optitype[.]txt"),
+    "arcashla": re.compile(r"^(?P<sample>.+)_arcashla[.]txt"),
+    "spechla": re.compile(r"^(?P<sample>.+)_spechla[.]txt"),
+    "hlahd": re.compile(r"^(?P<sample>.+)_hlahd[.]txt"),
+    "polysolver": re.compile(r"^(?P<sample>.+)_polysolver[.]txt"),
+    "kourami": re.compile(r"^(?P<sample>.+)_kourami[.]txt"),
+    "locityper": re.compile(r"^(?P<sample>.+)_locityper[.]txt"),
+    "t1k": re.compile(r"^(?P<sample>.+)_t1k[.]txt"),
+    "seq2hla": re.compile(r"^(?P<sample>.+)_seq2hla[.]txt"),
 }
 
 rows = []
@@ -61,8 +63,10 @@ for f in sorted(files):
             parts = line.split("\t")
             if len(parts) < 3:
                 continue
-            gene = parts[0].strip().replace("HLA-", "")
+            gene = parts[0].strip().replace("HLA-", "").upper()
             if gene.lower() == "gene":
+                continue
+            if gene not in vote_genes:
                 continue
             a1 = parts[1].strip()
             a2 = parts[2].strip()
@@ -86,5 +90,12 @@ with out.open("w", encoding="utf-8", newline="") as handle:
     for row in rows:
         w.writerow(row)
 PYEOF
+    """
+
+    stub:
+    """
+    printf 'sample\ttool\tmodality\tgene\tallele1\tallele2\tis_callable\n' > aggregated_calls.tsv
+    printf 'sample1\toptitype\t${modality}\tA\tA*02:01\tA*11:01\t1\n' >> aggregated_calls.tsv
+    printf 'sample1\thlahd\t${modality}\tA\tA*02:01\tA*11:01\t1\n' >> aggregated_calls.tsv
     """
 }

@@ -1,0 +1,77 @@
+# GIAB/HPRC external-validation benchmark (WGS) — ChampHLA / MVHLA
+# Independent, NON-1000G germline cohort (GIAB PGP samples). Reads: open GIAB GRCh38 Illumina WGS
+# (chr6 MHC slice). Truth: HG002 clinical SBT gold (Chin 2020, PMC7508831); HG005/parents via Immuannot
+# on long-read assemblies (assembly-grounded, not in-silico short-read).
+# Framing: held-out generalisation test applying the FROZEN 1000G-derived WGS Champion-Challenger policy
+# (champions A=T1K, B/C=OptiType; override support=0.65, margin=0.20, tools=2) without re-learning.
+# Caveat: WGS is ChampHLA's weakest modality (1000G holdout ~0.47) — the CC-vs-MV contrast is the point.
+truth:
+  path: /scratch/project_2008084/pihla-publish/analysis/hprc_benchmark/truth_long.tsv
+  source: "HG002 clinical SBT (Chin 2020 PMC7508831); HG005/parents Immuannot (IPD-IMGT/HLA)"
+  imgt_hla_version: 3.59.0
+  supported_loci:
+  - A
+  - B
+  - C
+
+manifests:
+  sequencing_source: /scratch/project_2008084/pihla-publish/analysis/hprc_benchmark/sequencing_source.tsv
+
+benchmark:
+  resolution: 2
+  secondary_resolutions:
+  - 2
+  - 3
+  tool_coverage_policy: phase_gated
+  consensus:
+    min_margin: 0.15
+    min_support: 0.55
+  # FROZEN WGS Champion-Challenger policy (from conf/benchmark_1000g_wgs_wave2.yaml).
+  champion_challenger:
+    enabled: true
+    fallback_method: weighted_consensus
+    champion_by_gene:
+      A: T1K
+      B: OptiType
+      C: OptiType
+    override_policy:
+      min_challenger_support_fraction: 0.65
+      min_challenger_margin: 0.2
+      min_supporting_tools: 2
+      require_non_ambiguity_override: true
+
+runs:
+# ── WGS (GIAB GRCh38 MHC slice) ──────────────────────────────────────────────
+- confidence_glob: /scratch/project_2008084/hla_calibration/hprc/wgs/results/**/optitype/*/*_result.tsv
+  confidence_parser: optitype_result_objective
+  confidence_sample_from_path_regex: /results/([^/]+)/optitype/
+  modality: wgs
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/hprc/wgs/results/**/*_optitype.txt
+  sample_from_path_regex: /results/([^/]+)/optitype/
+  tool: OptiType
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/hprc/wgs/results/**/t1k/t1k_out/*_genotype.tsv
+  confidence_parser: t1k_genotype_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/t1k/
+  modality: wgs
+  parser: t1k_table
+  result_glob: /scratch/project_2008084/hla_calibration/hprc/wgs/results/**/*_t1k.txt
+  sample_from_path_regex: /results/([^/]+)/t1k/
+  tool: T1K
+- modality: wgs
+  parser: long_hla_table
+  result_glob: /scratch/project_2008084/hla_calibration/hprc/wgs/results/**/*_spechla.txt
+  sample_from_path_regex: /results/([^/]+)/spechla/
+  tool: SpecHLA
+- confidence_defaults:
+    target_reads: 50
+  confidence_glob: /scratch/project_2008084/hla_calibration/hprc/wgs/results/**/hlahd/*/*/result/*_*.read.txt
+  confidence_parser: hlahd_read_confidence
+  confidence_sample_from_path_regex: /results/([^/]+)/hlahd/
+  modality: wgs
+  parser: hlahd_table
+  result_glob: /scratch/project_2008084/hla_calibration/hprc/wgs/results/**/*_hlahd.txt
+  sample_from_path_regex: /results/([^/]+)/hlahd/
+  tool: HLA-HD

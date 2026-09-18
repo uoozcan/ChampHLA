@@ -18,11 +18,9 @@ process SPECHLA {
 
     output:
     tuple val(sample_id), path("${sample_id}_spechla.txt"), emit: results
-    tuple val(sample_id), path("${sample_id}/*"), emit: full_results, optional: true
     path "versions.yml", emit: versions
 
     script:
-    def ref = reference == 'hg19' ? 'hg19' : 'hg38'
     def use_local = params.use_local_spechla ?: false
     """
     # Set up SpecHLA environment
@@ -45,6 +43,7 @@ process SPECHLA {
 
     # Create output directory
     mkdir -p ${sample_id}
+    trap 'rm -f ${sample_id}/hla_region.bam ${sample_id}/namesort.bam ${sample_id}/R1.fastq ${sample_id}/R2.fastq ${sample_id}/R1.fastq.gz ${sample_id}/R2.fastq.gz core.*' EXIT
 
     # Check for BAM index, create if missing
     if [ ! -f "${hla_bam}.bai" ] && [ ! -f "${hla_bam.baseName}.bai" ]; then
@@ -52,9 +51,15 @@ process SPECHLA {
         samtools index ${hla_bam}
     fi
 
-    # Step 1: Convert pre-extracted HLA BAM to FASTQ for the local SpecHLA install
-    echo "[Step 1] Preparing FASTQs from pipeline-generated HLA BAM..."
-    samtools sort -n ${hla_bam} -o ${sample_id}/namesort.bam
+    # Step 1: Extract HLA region then convert to FASTQ
+    # SpecHLA docs recommend using HLA reads only; name-sorting the full WGS BAM is very slow
+    echo "[Step 1] Extracting HLA region from input BAM..."
+    CHR=\$(samtools view -H ${hla_bam} | awk '/^@SQ.*SN:chr6\t/{print "chr6"; exit} /^@SQ.*SN:6\t/{print "6"; exit}')
+    if [ -z "\$CHR" ]; then CHR=6; fi
+    samtools view -b ${hla_bam} "\${CHR}:${params.hla_region_start}-${params.hla_region_end}" > ${sample_id}/hla_region.bam
+    echo "[Step 1b] Preparing FASTQs from HLA region BAM..."
+    samtools sort -n ${sample_id}/hla_region.bam -o ${sample_id}/namesort.bam
+    rm -f ${sample_id}/hla_region.bam
     # samtools 1.3.1 doesn't auto-compress, output to uncompressed then gzip
     samtools fastq \
         -1 ${sample_id}/R1.fastq \
@@ -73,7 +78,7 @@ process SPECHLA {
         -2 R2.fastq.gz \
         -o . \
         -j ${task.cpus} \
-        -u ${ref == 'hg19' ? 0 : 1}
+        -u ${params.spechla_exon_only ?: 0}
     cd ..
 
     # Step 3: Parse results
@@ -109,10 +114,10 @@ process SPECHLA_FASTQ {
 
     input:
     tuple val(sample_id), path(fastq1), path(fastq2)
+    val exon_only
 
     output:
     tuple val(sample_id), path("${sample_id}_spechla.txt"), emit: results
-    tuple val(sample_id), path("${sample_id}/*"), emit: full_results, optional: true
     path "versions.yml", emit: versions
 
     script:
@@ -138,6 +143,7 @@ process SPECHLA_FASTQ {
 
     # Create output directory
     mkdir -p ${sample_id}
+    trap 'rm -f ${sample_id}/R1.fastq.gz ${sample_id}/R2.fastq.gz core.*' EXIT
 
     # Link FASTQ files using absolute paths (relative symlinks break after 'cd ${sample_id}')
     if [[ "${fastq1}" == *.gz ]]; then
@@ -157,7 +163,7 @@ process SPECHLA_FASTQ {
         -2 R2.fastq.gz \
         -o . \
         -j ${task.cpus} \
-        -u 1
+        -u ${exon_only}
     cd ..
 
     # Parse results

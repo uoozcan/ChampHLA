@@ -1,0 +1,63 @@
+name: AI Ops Prep
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  prepare-review-or-triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure handoff directory exists
+        run: mkdir -p .ai/handoffs/_automation
+
+      - name: Prepare PR review draft
+        if: github.event_name == 'pull_request'
+        run: |
+          ts="$(date -u +%Y%m%d-%H%M%S)"
+          cat > ".ai/handoffs/_automation/pr-review-${ts}.md" <<EOF2
+          # Automated Codex Review Prep
+
+          - Event: pull_request
+          - Repository: ${{ github.repository }}
+          - PR number: ${{ github.event.pull_request.number }}
+          - Review mode: use Codex "/review"
+          - Base branch: ${{ github.event.pull_request.base.ref }}
+          - Head branch: ${{ github.event.pull_request.head.ref }}
+          - Policy: read-only review prep only, no code mutation
+
+          Use `.ai/review-profile.yaml` for severity and required checks.
+          EOF2
+
+      - name: Prepare CI failure triage draft
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success'
+        run: |
+          ts="$(date -u +%Y%m%d-%H%M%S)"
+          cat > ".ai/handoffs/_automation/ci-failure-${ts}.md" <<EOF2
+          # Automated Codex CI Triage Prep
+
+          - Event: workflow_run
+          - Workflow: ${{ github.event.workflow_run.name }}
+          - Conclusion: ${{ github.event.workflow_run.conclusion }}
+          - Suggested lead tool: codex
+          - Policy: summarize likely cause, affected surface, and next command only
+
+          This draft is intentionally non-mutating and should be reviewed by a human before follow-up work.
+          EOF2
+
+      - name: Upload AI prep artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-ops-prep
+          path: .ai/handoffs/_automation/
