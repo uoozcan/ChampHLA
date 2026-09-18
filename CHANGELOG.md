@@ -40,6 +40,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   inside the repository; and relative config paths were re-anchored when the runner
   serialised a config into a temporary directory. 19 failures to 0.
 
+### Fixed — Roihu
+
+- **The pipeline can be started on Roihu at all.** Every `slurm_*.sh` said
+  `module load nextflow`, a Puhti idiom that cannot work there:
+  `/etc/profile.d/zz-csc-env.sh`, which defines `module`, returns immediately when
+  `$PS1` is unset -- so in every SLURM batch script -- unless
+  `CSC_ENV_INIT_NON_INTERACTIVE=yes` is exported first; and the bare name
+  `nextflow` has no default version and sits behind a `bio-apps/v202603`
+  prerequisite. `bin/roihu_env.sh` holds the working sequence (nextflow 25.10.2,
+  openjdk 17.0.11, samtools 1.21) and `slurm_panelhla_roihu.sh` is the launcher.
+  Nextflow was never missing from Roihu; nothing here knew how to ask for it.
+
+- **HLA-HD could not run on Roihu.** `conf/roihu_params.yaml` pointed `hlahd_db` at
+  a host directory that was never migrated and does not exist, so `hlahd.sh` was
+  handed a missing `-f <db>/freq_data`. `main.nf` only checks the parameter is
+  non-empty, so the wrong path passed the guard. The database ships inside
+  `hlahd.sif`; the parameter now names it (`/app/hlahd.1.4.0`).
+
+- **POLYSOLVER produced nothing on chr-prefixed BAMs.** Its own
+  `shell_call_hla_type` hardcodes the hg38 HLA regions as `6:29941260-...` while
+  GRCh38_full_analysis_set BAMs name the contig `chr6`, so every query matched
+  nothing. The module now detects the naming from the BAM header and rewrites the
+  queries, and records the exit status instead of discarding it with `|| true`.
+
+- **Nine more placeholder-result writers removed**, across polysolver, kourami,
+  locityper and immuannot, on top of the five fixed earlier. Each wrote a
+  header-only file and exited 0 when its tool produced nothing -- one kourami
+  branch called `exit 0` outright. No module manufactures an empty result now.
+
+- **CI parses the Nextflow workflow.** It previously ran `pytest` and nothing else,
+  so a malformed process block could reach `main` with the tests green. Pinned to
+  Nextflow 25.10.2, the version Roihu provides.
+
+- **Nextflow 26.x is incompatible** and the manifest now says so
+  (`>=23.04.0, <26.0.0`). Its strict config parser rejects function definitions in
+  `nextflow.config`, and `check_max()` is one. Lifting the bound means migrating to
+  `process.resourceLimits`.
+
+- `.gitattributes` pins LF for scripts, configs and workflow files. The repository
+  is edited from Windows and deployed to Linux.
+
 ### Added
 - **Algorithm-family and correlation-aware challenger gates.**
   `champion_challenger.override_policy.gate_mode` selects `tool_count` (default,
