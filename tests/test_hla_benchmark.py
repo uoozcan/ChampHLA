@@ -1041,5 +1041,150 @@ class CiwdBenchmarkOutputTest(unittest.TestCase):
                 self.assertIn(col, harmonized[0])
 
 
+class ToolFamilyGateTest(unittest.TestCase):
+    """The algorithm-family diversity gate on challenger overrides.
+
+    Callers within a family share an alignment strategy and reference
+    representation, so they fail on the same alleles. A count of supporting tools
+    therefore overstates how much independent evidence backs a challenger; the gate
+    counts distinct families instead. In the published measurement every override it
+    reverted was backed by two callers from a single family, and three of those four
+    overrides were wrong.
+    """
+
+    FAMILIES = REPO / "conf" / "tool_families.yaml"
+
+    def test_the_shipped_map_has_the_three_families(self):
+        families = hb.load_tool_families(str(self.FAMILIES))
+        self.assertEqual(hb.family_of("OptiType", families), "alignment")
+        self.assertEqual(hb.family_of("POLYSOLVER", families), "alignment")
+        self.assertEqual(hb.family_of("SpecHLA", families), "assembly_graph")
+        self.assertEqual(hb.family_of("T1K", families), "assembly_graph")
+        self.assertEqual(hb.family_of("ArcasHLA", families), "kmer")
+        self.assertEqual(hb.family_of("Seq2HLA", families), "kmer")
+
+    def test_two_tools_from_one_family_count_as_one(self):
+        """The case the gate exists for, and the only case it fired on."""
+        families = hb.load_tool_families(str(self.FAMILIES))
+        self.assertEqual(hb.count_supporting_families(["HLA-HD", "POLYSOLVER"], families), 1)
+        self.assertEqual(hb.count_supporting_families(["HLA-HD", "OptiType"], families), 1)
+        self.assertEqual(hb.count_supporting_families(["SpecHLA", "T1K"], families), 1)
+        # A tool count would pass all three at min_supporting_tools = 2.
+
+    def test_three_tools_from_one_family_still_count_as_one(self):
+        families = hb.load_tool_families(str(self.FAMILIES))
+        self.assertEqual(hb.count_supporting_families(["OptiType", "HLA-HD", "POLYSOLVER"], families), 1)
+
+    def test_tools_from_different_families_count_separately(self):
+        families = hb.load_tool_families(str(self.FAMILIES))
+        self.assertEqual(hb.count_supporting_families(["OptiType", "T1K"], families), 2)
+        self.assertEqual(hb.count_supporting_families(["ArcasHLA", "T1K", "OptiType"], families), 3)
+
+    def test_an_unknown_tool_fails_open_into_its_own_family(self):
+        """Merging an unknown tool would make the gate weaker than it looks."""
+        families = hb.load_tool_families(str(self.FAMILIES))
+        self.assertNotEqual(hb.family_of("NewCaller", families), hb.family_of("OptiType", families))
+        self.assertNotEqual(hb.family_of("NewCaller", families), hb.family_of("OtherNewCaller", families))
+        self.assertEqual(hb.count_supporting_families(["NewCaller", "OptiType"], families), 2)
+
+    def test_a_missing_map_falls_back_to_the_defaults(self):
+        self.assertEqual(hb.load_tool_families(str(REPO / "conf" / "no_such_file.yaml")),
+                         dict(hb.DEFAULT_TOOL_FAMILIES))
+        self.assertEqual(hb.load_tool_families(None), dict(hb.DEFAULT_TOOL_FAMILIES))
+
+    def test_the_shipped_map_agrees_with_the_defaults(self):
+        """conf/tool_families.yaml and DEFAULT_TOOL_FAMILIES must not drift apart."""
+        self.assertEqual(hb.load_tool_families(str(self.FAMILIES)), dict(hb.DEFAULT_TOOL_FAMILIES))
+
+    def _settings(self, **policy):
+        config = {"benchmark": {"champion_challenger": {
+            "enabled": True,
+            "champion_by_gene": {"A": "OptiType"},
+            "override_policy": policy,
+        }}}
+        return hb.champion_challenger_settings(config)
+
+    def test_the_default_gate_mode_is_tool_count(self):
+        """What the published ChampionChallenger rows were produced under.
+
+        Changing this default would change what a default run of the shipped
+        configs reports, so the paper's comparator would stop being reproducible.
+        """
+        settings = self._settings()
+        self.assertEqual(settings["override_policy"]["gate_mode"], "tool_count")
+        self.assertEqual(settings["override_policy"]["min_supporting_families"], 2)
+
+    def test_every_supported_gate_mode_is_accepted(self):
+        for mode in ("tool_count", "family_count", "correlation", "learned"):
+            self.assertEqual(self._settings(gate_mode=mode)["override_policy"]["gate_mode"], mode)
+
+    def test_an_unknown_gate_mode_is_rejected(self):
+        """Silently falling back to tool_count would make a typo look like it worked."""
+        with self.assertRaises(ValueError):
+            self._settings(gate_mode="family")
+        with self.assertRaises(ValueError):
+            self._settings(gate_mode="families_count")
+
+
+class FamilyGatedChampionChallengerTest(unittest.TestCase):
+    """gate_mode: family_count end to end, against tool_count on the same inputs."""
+
+    def _run(self, gate_mode, outdir, config_path):
+        config = yaml.safe_load((FIXTURES / "benchmark_config.yaml").read_text(encoding="utf-8"))
+        config = hb.resolve_config_paths(config, FIXTURES)
+        config.setdefault("benchmark", {})
+        config["benchmark"]["tool_families"] = str(REPO / "conf" / "tool_families.yaml")
+        config["benchmark"]["champion_challenger"] = {
+            "enabled": True,
+            "champion_by_gene": {"A": "OptiType", "B": "OptiType", "C": "OptiType"},
+            "fallback_method": "weighted_consensus",
+            "override_policy": {
+                "min_challenger_support_fraction": 0.65,
+                "min_challenger_margin": 0.20,
+                "min_supporting_tools": 2,
+                "require_non_ambiguity_override": True,
+                "gate_mode": gate_mode,
+                "min_supporting_families": 2,
+            },
+        }
+        config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
+        subprocess.run([PYTHON, str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)],
+                       check=True, cwd=str(REPO))
+        # The trace table is where the gate records what it did: which tools
+        # supported a challenger, how many families they span, and under which
+        # gate_mode the override was allowed or refused.
+        with (outdir / "tables" / "champion_challenger_trace.tsv").open("r", encoding="utf-8") as handle:
+            return list(csv.DictReader(handle, delimiter="\t"))
+
+    def test_family_count_records_its_mode_and_family_support(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            rows = self._run("family_count", tmpdir / "out", tmpdir / "family.yaml")
+            self.assertTrue(rows)
+            self.assertTrue(all(row["gate_mode"] == "family_count" for row in rows))
+            # supporting_families is populated wherever a champion was callable.
+            self.assertTrue(any(row.get("supporting_families") not in ("", None) for row in rows))
+
+    def test_family_count_never_allows_an_override_tool_count_refuses(self):
+        """The gate only ever removes overrides; it cannot manufacture new ones.
+
+        Counting families is counting a partition of the supporting tools, so it is
+        bounded above by the tool count. An override the looser gate refused must
+        stay refused.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            by_tools = self._run("tool_count", tmpdir / "tool_out", tmpdir / "tool.yaml")
+            by_family = self._run("family_count", tmpdir / "family_out", tmpdir / "family.yaml")
+            self.assertEqual(len(by_tools), len(by_family))
+
+            def overridden(rows):
+                return {(r["sample"], r["gene"]) for r in rows
+                        if r.get("override_triggered") == "1"}
+
+            self.assertTrue(overridden(by_family) <= overridden(by_tools),
+                            "family_count produced an override that tool_count refused")
+
+
 if __name__ == "__main__":
     unittest.main()

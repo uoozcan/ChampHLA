@@ -2046,6 +2046,136 @@ def load_runtime_weight_override(config):
         return json.load(handle)
 
 
+# --- Family-aware / correlation-aware challenger support -----------------------------------------
+# Algorithmic-family map (Figure S11 grouping). Used as a surrogate for methodological independence
+# in the challenger diversity gate: tools within a family share alignment strategy / reference
+# representation and therefore correlated blind spots on IPD-IMGT/HLA.
+DEFAULT_TOOL_FAMILIES = {
+    "optitype": "alignment", "hlahd": "alignment", "polysolver": "alignment",
+    "kourami": "assembly_graph", "spechla": "assembly_graph", "t1k": "assembly_graph",
+    "arcashla": "kmer", "seq2hla": "kmer",
+}
+
+
+def load_tool_families(path=None):
+    """Return {tool_token: family}. Falls back to DEFAULT_TOOL_FAMILIES when no path is given or the
+    file is absent. YAML schema: {families: {family_name: [tool, ...]}}."""
+    if not path:
+        return dict(DEFAULT_TOOL_FAMILIES)
+    p = Path(path)
+    if not p.exists():
+        return dict(DEFAULT_TOOL_FAMILIES)
+    with p.open("r", encoding="utf-8") as handle:
+        raw = yaml.safe_load(handle) or {}
+    families = raw.get("families", raw) if isinstance(raw, dict) else {}
+    mapping = {}
+    for family, tools in (families or {}).items():
+        for tool in tools or []:
+            mapping[clean_token(tool).lower()] = clean_token(family).lower()
+    return mapping or dict(DEFAULT_TOOL_FAMILIES)
+
+
+def family_key(tool):
+    """Normalised lookup key for a tool name.
+
+    The Nextflow aggregation emits "hlahd" while every benchmark config spells the
+    same tool "HLA-HD", so a plain lower-case lookup missed it and HLA-HD fell open
+    into its own singleton family -- which makes the diversity gate weaker than it
+    reads, precisely on the tool involved in most of the overrides it catches.
+    Separators are dropped so both spellings land on one key. This can only merge
+    two names for the same tool; genuinely unknown tools still fail open.
+    """
+    return re.sub(r"[^a-z0-9]", "", clean_token(tool).lower())
+
+
+def family_of(tool, family_map):
+    """Family for a tool; unknown tools get their own singleton family (fail-open)."""
+    key = family_key(tool)
+    mapping = family_map or {}
+    fam = mapping.get(key)
+    if not fam:
+        # Maps loaded from YAML are keyed as written; re-key them before giving up.
+        fam = {family_key(name): value for name, value in mapping.items()}.get(key)
+    return fam if fam else "__%s" % key
+
+
+def count_supporting_families(tools, family_map):
+    return len({family_of(tool, family_map) for tool in set(tools)})
+
+
+def compute_tool_coerror_correlation(rows, min_shared=10):
+    """Estimate a per-tool co-error correlation matrix rho[t_i][t_j] in [0, 1] from `rows` (the
+    training fold only, to avoid leakage). For each tool an error indicator is defined over the loci
+    where it is callable: error = callable-but-not-2field-correct. rho_ij is the Pearson (phi)
+    correlation of the two error vectors over loci where BOTH tools are callable, clipped to [0, 1]
+    and shrunk toward 0 when few loci are shared. This captures shared blind spots: tools that tend
+    to be wrong on the same loci are treated as redundant voters. rho_ii = 1.0."""
+    # tool -> {locus_key: error(0/1)} over callable loci
+    err_by_tool = defaultdict(dict)
+    for row in rows:
+        tool = clean_token(row.get("tool", ""))
+        if not tool or row.get("is_callable") != "1":
+            continue
+        locus = (row.get("sample", ""), row.get("modality", ""), row.get("gene", ""))
+        err_by_tool[tool][locus] = 0 if row.get("is_correct") == "1" else 1
+    tools = sorted(err_by_tool)
+    rho = {t: {t: 1.0} for t in tools}
+    for i in range(len(tools)):
+        for j in range(i + 1, len(tools)):
+            ti, tj = tools[i], tools[j]
+            shared = set(err_by_tool[ti]) & set(err_by_tool[tj])
+            n = len(shared)
+            if n == 0:
+                value = 0.0
+            else:
+                a = [err_by_tool[ti][k] for k in shared]
+                b = [err_by_tool[tj][k] for k in shared]
+                var_a = statistics.pvariance(a) if n > 1 else 0.0
+                var_b = statistics.pvariance(b) if n > 1 else 0.0
+                if var_a <= 0.0 or var_b <= 0.0:
+                    # No variance in at least one vector: redundant only if both are the same
+                    # constant error pattern (e.g. both always wrong on shared loci).
+                    value = 1.0 if a == b else 0.0
+                else:
+                    mean_a = sum(a) / n
+                    mean_b = sum(b) / n
+                    cov = sum((x - mean_a) * (y - mean_b) for x, y in zip(a, b)) / n
+                    denom_corr = math.sqrt(var_a * var_b)
+                    value = cov / denom_corr if denom_corr > 0 else 0.0
+                    value = max(0.0, min(1.0, value))
+                # Shrink toward 0 for sparsely-shared pairs to avoid noise-driven discounts.
+                if n < min_shared:
+                    value *= n / float(min_shared)
+            rho[ti][tj] = value
+            rho[tj][ti] = value
+    return rho
+
+
+def effective_independent_voters(tools, tool_weights, corr_matrix):
+    """Effective number of independent voters for a supporting set:
+        n_eff = (sum_i w_i)^2 / (sum_ij w_i w_j rho_ij),   rho_ii = 1.
+    Reduces to |tools| for independent, equal-weight voters and to 1 for perfectly correlated ones.
+    Unknown pairs default to rho=0 (independent). Falls back to the tool count when weights/matrix
+    are unavailable."""
+    uniq = sorted(set(tools))
+    if not uniq:
+        return 0.0
+    weights = {t: float((tool_weights or {}).get(t, 1.0) or 0.0) for t in uniq}
+    if all(w <= 0 for w in weights.values()):
+        weights = {t: 1.0 for t in uniq}
+    total = sum(weights.values())
+    if total <= 0:
+        return float(len(uniq))
+    denom = 0.0
+    for ti in uniq:
+        for tj in uniq:
+            rho = 1.0 if ti == tj else (corr_matrix or {}).get(ti, {}).get(tj, 0.0)
+            denom += weights[ti] * weights[tj] * rho
+    if denom <= 0:
+        return float(len(uniq))
+    return (total * total) / denom
+
+
 def classify_consensus_status(top_support, margin, thresholds, has_callable, is_tie):
     if not has_callable:
         return "no_call"
@@ -2651,6 +2781,104 @@ def locus_expert_consensus_settings(config):
     return {"enabled": bool(raw.get("enabled")) and bool(panel_sets), "parent_method": parent_method, "panel_sets": panel_sets}
 
 
+def _load_champion_overrides(value):
+    """Opt-in cohort/modality champion overrides (PI #32). Accept an inline dict or a path to a
+    JSON file (conf/champion_overrides.json), returning {cohort_id: {modality: {gene: tool}}}
+    normalized. Never raises: an unreadable/malformed source yields an empty map so the frozen
+    default is used."""
+    data = value
+    if isinstance(value, str) and value.strip():
+        try:
+            data = json.loads(Path(value).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}
+    if not isinstance(data, dict):
+        return {}
+    if isinstance(data.get("champion_overrides"), dict):
+        data = data["champion_overrides"]
+    out = {}
+    for cohort, by_mod in data.items():
+        if not isinstance(by_mod, dict):
+            continue
+        cm = {}
+        for modality, by_gene in by_mod.items():
+            if not isinstance(by_gene, dict):
+                continue
+            cm[clean_token(modality).lower()] = {normalize_gene(g): clean_token(t)
+                                                 for g, t in by_gene.items() if clean_token(t)}
+        out[clean_token(cohort)] = cm
+    return out
+
+
+def champion_for(settings, modality, gene, superpopulation=None):
+    """Champion tool for (modality, gene[, superpopulation]).
+
+    Resolution order (first match wins):
+      1. population-aware champion: settings['champion_by_gene_population'][gene][superpopulation]
+         (A1; only populated when a training-fold population champion cleared the population floor);
+      2. cohort-reselected override when champion_source == 'cohort_reselected' and one exists;
+      3. the frozen/global champion settings['champion_by_gene'][gene].
+    With no population map and the default source ('frozen') this is exactly
+    settings['champion_by_gene'][gene] (fully backward-compatible)."""
+    frozen = settings.get("champion_by_gene", {}).get(gene, "")
+    if superpopulation:
+        pop = clean_token(superpopulation).upper()
+        pop_champ = (settings.get("champion_by_gene_population", {})
+                     .get(gene, {}).get(pop, ""))
+        if pop_champ:
+            return pop_champ
+    if settings.get("champion_source", "frozen") != "cohort_reselected":
+        return frozen
+    cohort = settings.get("cohort_id", "")
+    override = (settings.get("champion_overrides", {})
+                .get(cohort, {}).get(clean_token(modality).lower(), {}).get(gene, ""))
+    return override or frozen
+
+
+_CIWD_CATALOGUE = None
+
+
+def _get_ciwd_catalogue():
+    """Lazily load and cache the CIWD commonness catalogue (reuses bin/ciwd.py; no recompute)."""
+    global _CIWD_CATALOGUE
+    if _CIWD_CATALOGUE is None:
+        import ciwd as _ciwd
+        _CIWD_CATALOGUE = _ciwd.load_ciwd()
+    return _CIWD_CATALOGUE
+
+
+def ciwd_plausibility(pair, group="total"):
+    """A2 signal: is a two-field allele pair biologically plausible per the CIWD catalogue?
+    Returns (n_implausible, plausible) where plausible == (no allele in the pair is not-CIWD/absent).
+    A pair with a not-CIWD allele is a candidate error / novel allele (the same QC signal used in
+    analysis/ciwd_stratified). Empty/uncallable alleles are ignored (treated as plausible)."""
+    cat = _get_ciwd_catalogue()
+    n_implausible = 0
+    for allele in pair:
+        a = clean_token(allele)
+        if not a:
+            continue
+        if cat.is_implausible(a, group):
+            n_implausible += 1
+    return n_implausible, (n_implausible == 0)
+
+
+def _load_champion_by_gene_population(raw):
+    """Normalise a nested {gene: {SUPERPOP: tool}} population-champion map. Empty/invalid -> {}."""
+    out = {}
+    if not isinstance(raw, dict):
+        return out
+    for gene, by_pop in raw.items():
+        if not isinstance(by_pop, dict):
+            continue
+        g = normalize_gene(gene)
+        cell = {clean_token(pop).upper(): clean_token(tool)
+                for pop, tool in by_pop.items() if clean_token(pop) and clean_token(tool)}
+        if cell:
+            out[g] = cell
+    return out
+
+
 def champion_challenger_settings(config):
     benchmark_cfg = (config or {}).get("benchmark", {}) if isinstance(config, dict) else {}
     raw = benchmark_cfg.get("champion_challenger", {}) if isinstance(benchmark_cfg, dict) else {}
@@ -2658,24 +2886,49 @@ def champion_challenger_settings(config):
         return {
             "enabled": False,
             "champion_by_gene": {},
+            "champion_by_gene_population": {},
+            "champion_source": "frozen",
+            "cohort_id": "",
+            "champion_overrides": {},
             "fallback_method": "weighted_consensus",
             "override_policy": {
                 "min_challenger_support_fraction": 0.65,
                 "min_challenger_margin": 0.20,
                 "min_supporting_tools": 2,
                 "require_non_ambiguity_override": True,
+                "gate_mode": "tool_count",
+                "min_supporting_families": 2,
+                "min_effective_voters": 2.0,
+                "use_ciwd_prior": False,
+                "ciwd_relax": 0.15,
             },
         }
     override_policy = raw.get("override_policy", {}) if isinstance(raw.get("override_policy", {}), dict) else {}
+    gate_mode = clean_token(override_policy.get("gate_mode", "tool_count")).lower() or "tool_count"
+    if gate_mode not in ("tool_count", "family_count", "correlation", "learned"):
+        raise ValueError("champion_challenger.override_policy.gate_mode must be one of tool_count, family_count, correlation, learned")
+    champion_source = clean_token(raw.get("champion_source", "frozen")).lower() or "frozen"
+    if champion_source not in ("frozen", "cohort_reselected"):
+        raise ValueError("champion_challenger.champion_source must be one of frozen, cohort_reselected")
     return {
         "enabled": bool(raw.get("enabled")),
         "champion_by_gene": {normalize_gene(gene): clean_token(tool) for gene, tool in (raw.get("champion_by_gene", {}) or {}).items() if clean_token(tool)},
+        "champion_by_gene_population": _load_champion_by_gene_population(raw.get("champion_by_gene_population", {})),
+        "champion_source": champion_source,
+        "cohort_id": clean_token(raw.get("cohort_id", "")),
+        "champion_overrides": _load_champion_overrides(raw.get("champion_overrides", {})) if champion_source == "cohort_reselected" else {},
         "fallback_method": clean_token(raw.get("fallback_method", "weighted_consensus")).lower() or "weighted_consensus",
         "override_policy": {
             "min_challenger_support_fraction": float(override_policy.get("min_challenger_support_fraction", 0.65)),
             "min_challenger_margin": float(override_policy.get("min_challenger_margin", 0.20)),
             "min_supporting_tools": int(override_policy.get("min_supporting_tools", 2)),
             "require_non_ambiguity_override": bool(override_policy.get("require_non_ambiguity_override", True)),
+            "gate_mode": gate_mode,
+            "min_supporting_families": int(override_policy.get("min_supporting_families", 2)),
+            "min_effective_voters": float(override_policy.get("min_effective_voters", 2.0)),
+            "use_ciwd_prior": bool(override_policy.get("use_ciwd_prior", False)),
+            "ciwd_relax": float(override_policy.get("ciwd_relax", 0.15)),
+            "learned_gate": override_policy.get("learned_gate") if gate_mode == "learned" else None,
         },
     }
 
@@ -2697,6 +2950,13 @@ def validate_champion_challenger_settings(settings, rows, benchmark_genes):
             raise ValueError("champion_challenger contains unsupported gene: %s" % gene)
         if champion not in available_tools:
             raise ValueError("champion_challenger references unknown champion tool %s for gene %s" % (champion, gene))
+    for gene, by_pop in settings.get("champion_by_gene_population", {}).items():
+        if gene not in allowed_genes:
+            raise ValueError("champion_by_gene_population contains unsupported gene: %s" % gene)
+        for pop, champion in by_pop.items():
+            if champion not in available_tools:
+                raise ValueError("champion_by_gene_population references unknown champion tool %s for gene %s (pop %s)"
+                                 % (champion, gene, pop))
     return settings
 
 
@@ -2803,10 +3063,12 @@ def ambiguity_override_allowed(pair, require_non_ambiguity_override):
     return not any("/" in allele for allele in pair if allele)
 
 
-def build_champion_challenger_outputs(rows, runtime_weights, config, mode, benchmark_genes):
+def build_champion_challenger_outputs(rows, runtime_weights, config, mode, benchmark_genes, family_map=None, corr_matrix=None):
     settings = validate_champion_challenger_settings(champion_challenger_settings(config), rows, benchmark_genes)
     if not settings.get("enabled"):
         return [], [], [], [], []
+    if family_map is None:
+        family_map = load_tool_families(clean_token((config or {}).get("benchmark", {}).get("tool_families", "")) or None)
     weighted_baseline = build_weighted_consensus_rows(rows, runtime_weights, config)
     weighted_index = {(row["sample"], row["modality"], row["gene"]): row for row in weighted_baseline}
     grouped = defaultdict(list)
@@ -2817,7 +3079,8 @@ def build_champion_challenger_outputs(rows, runtime_weights, config, mode, bench
     policy = settings["override_policy"]
     for key, entries in sorted(grouped.items(), key=lambda item: (modality_sort_key(item[0][1]), item[0][0], gene_sort_key(item[0][2]))):
         sample, modality, gene = key
-        champion_tool = settings["champion_by_gene"].get(gene, "")
+        superpop = entries[0].get("superpopulation", entries[0].get("population", "")) or ""
+        champion_tool = champion_for(settings, modality, gene, superpop)
         champion_entry = next((row for row in entries if row["tool"] == champion_tool), None)
         fallback_row = dict(weighted_index.get(key, empty_consensus_call_row(entries, "ChampionChallenger", [])))
         fallback_row["method"] = "ChampionChallenger"
@@ -2850,6 +3113,9 @@ def build_champion_challenger_outputs(rows, runtime_weights, config, mode, bench
                 "challenger_support_fraction": "",
                 "challenger_support_margin": "",
                 "supporting_tools": "",
+                "supporting_families": "",
+                "effective_voters": "",
+                "gate_mode": settings["override_policy"].get("gate_mode", "tool_count"),
             })
             continue
         champion_pair = allele_pair(champion_entry)
@@ -2861,6 +3127,9 @@ def build_champion_challenger_outputs(rows, runtime_weights, config, mode, bench
         challenger_support_fraction = None
         challenger_support_margin = None
         supporting_tools = 0
+        supporting_families = 0
+        effective_voters = 0.0
+        gate_mode = policy.get("gate_mode", "tool_count")
         top_weights = {}
         if challenger and total_weight:
             pair, meta = challenger
@@ -2868,16 +3137,52 @@ def build_champion_challenger_outputs(rows, runtime_weights, config, mode, bench
             runner_up_weight = ranked[1][1]["weight"] if len(ranked) > 1 and ranked[0][0] == champion_pair else ranked[0][1]["weight"]
             challenger_support_margin = round((meta["weight"] - runner_up_weight) / total_weight, 4)
             supporting_tools = len(set(meta["tools"]))
+            supporting_families = count_supporting_families(meta["tools"], family_map)
+            effective_voters = round(effective_independent_voters(meta["tools"], meta["tool_weights"], corr_matrix), 4)
             top_weights = meta["tool_weights"]
-            if (
-                challenger_support_fraction >= policy["min_challenger_support_fraction"]
-                and challenger_support_margin >= policy["min_challenger_margin"]
-                and supporting_tools >= policy["min_supporting_tools"]
-                and ambiguity_override_allowed(pair, policy["require_non_ambiguity_override"])
-            ):
+            if gate_mode == "family_count":
+                diversity_ok = supporting_families >= policy["min_supporting_families"]
+            elif gate_mode == "correlation":
+                diversity_ok = effective_voters >= policy["min_effective_voters"]
+            else:
+                diversity_ok = supporting_tools >= policy["min_supporting_tools"]
+
+            # A2: CIWD allele-frequency prior. When the champion pair carries a biologically
+            # implausible (not-CIWD) allele and the challenger pair is CIWD-plausible, relax the
+            # support/margin thresholds by ciwd_relax. Diversity and non-ambiguity gates are NOT
+            # relaxed (the prior only lowers the *evidence* bar for a plausible, corroborated,
+            # unambiguous challenger against an implausible champion). Default off.
+            support_thr = policy["min_challenger_support_fraction"]
+            margin_thr = policy["min_challenger_margin"]
+            ciwd_relaxed = False
+            if policy.get("use_ciwd_prior"):
+                _, champ_plausible = ciwd_plausibility(champion_pair)
+                _, chall_plausible = ciwd_plausibility(pair)
+                if (not champ_plausible) and chall_plausible:
+                    relax = float(policy.get("ciwd_relax", 0.15))
+                    support_thr = max(0.0, support_thr - relax)
+                    margin_thr = max(0.0, margin_thr - relax)
+                    ciwd_relaxed = True
+            # Decision: A3 learned model (if active) OR the threshold-AND. Non-ambiguity is a hard gate
+            # in both cases; the learned gate replaces only the support/margin/diversity evidence bar.
+            if gate_mode == "learned" and policy.get("learned_gate"):
+                import cc_learned_gate as _clg
+                _, champ_plausible_l = ciwd_plausibility(champion_pair)
+                _, chall_plausible_l = ciwd_plausibility(pair)
+                feats = _clg.feature_vector(challenger_support_fraction, challenger_support_margin,
+                                            supporting_tools, supporting_families,
+                                            not champ_plausible_l, chall_plausible_l)
+                gate_accept = _clg.predict_accept(policy["learned_gate"], feats)
+                accept_reason = "challenger_override_learned"
+            else:
+                gate_accept = (challenger_support_fraction >= support_thr
+                               and challenger_support_margin >= margin_thr
+                               and diversity_ok)
+                accept_reason = "challenger_override_ciwd" if ciwd_relaxed else "challenger_override"
+            if gate_accept and ambiguity_override_allowed(pair, policy["require_non_ambiguity_override"]):
                 chosen_pair = pair
                 override_triggered = True
-                override_reason = "challenger_override"
+                override_reason = accept_reason
         ambiguity = evaluate_ambiguity(list(chosen_pair), [entries[0]["truth_allele1"], entries[0]["truth_allele2"]], 2)
         call_rows.append({
             "sample": sample,
@@ -2932,6 +3237,9 @@ def build_champion_challenger_outputs(rows, runtime_weights, config, mode, bench
             "challenger_support_fraction": as_string_number(challenger_support_fraction),
             "challenger_support_margin": as_string_number(challenger_support_margin),
             "supporting_tools": supporting_tools,
+            "supporting_families": supporting_families,
+            "effective_voters": as_string_number(effective_voters),
+            "gate_mode": gate_mode,
             "top_tool_weights_json": json.dumps(top_weights, sort_keys=True, separators=(",", ":")),
         })
     comparison_rows = [dict(row, method_type="ensemble") for row in summarize_consensus_method(call_rows)]
@@ -4685,7 +4993,7 @@ def main():
     write_tsv(output_dir / "tables" / "meta_consensus_calls.tsv", meta_rows, ["sample", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "is_ambiguity_compatible", "is_resolution_compatible", "compatibility_grade", "match_grade", "imgt_hla_version", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "discordance_tag"])
     write_tsv(output_dir / "tables" / "meta_consensus_decision_trace.tsv", meta_trace_rows, ["sample", "population", "modality", "gene", "benchmark_mode", "method", "winning_pair", "runner_up_pair", "winning_support_fraction", "winning_support_margin", "contributing_tools", "top_tool_weights_json", "call_status", "is_correct", "support_weight_sum", "mean_calibrated_probability", "agreement_bonus", "gene_strength_bonus", "ambiguity_bonus", "fragmentation_penalty", "meta_score"])
     write_tsv(output_dir / "tables" / "champion_challenger_calls.tsv", champion_challenger_rows, ["sample", "population", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "truth_allele1_3field", "truth_allele2_3field", "allele1_3field", "allele2_3field", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_correct_g_group", "is_correct_p_group", "is_ambiguity_compatible", "is_resolution_compatible", "compatibility_grade", "match_grade", "imgt_hla_version", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "discordance_tag", "champion_tool", "override_triggered", "override_reason"])
-    write_tsv(output_dir / "tables" / "champion_challenger_trace.tsv", champion_challenger_trace_rows, ["sample", "population", "modality", "gene", "method", "champion_tool", "champion_pair", "challenger_pair", "override_triggered", "override_reason", "call_status", "is_correct", "challenger_support_fraction", "challenger_support_margin", "supporting_tools", "top_tool_weights_json"])
+    write_tsv(output_dir / "tables" / "champion_challenger_trace.tsv", champion_challenger_trace_rows, ["sample", "population", "modality", "gene", "method", "champion_tool", "champion_pair", "challenger_pair", "override_triggered", "override_reason", "call_status", "is_correct", "challenger_support_fraction", "challenger_support_margin", "supporting_tools", "supporting_families", "effective_voters", "gate_mode", "top_tool_weights_json"])
     write_tsv(output_dir / "tables" / "gated_consensus_calls.tsv", gated_rows, ["sample", "population", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_ambiguity_compatible", "is_resolution_compatible", "compatibility_grade", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "difficulty_class", "selected_policy"])
     write_tsv(output_dir / "tables" / "gated_consensus_trace.tsv", gated_trace_rows, ["sample", "population", "modality", "gene", "method", "difficulty_class", "selected_policy", "distinct_pair_count", "callable_tool_count", "weighted_winning_pair", "weighted_runner_up_pair", "weighted_support_fraction", "weighted_support_margin", "majority_pair", "majority_weighted_disagree", "weighted_top_pair_is_duplicated", "alternative_nonduplicated_exists", "hardness_reasons", "call_status", "is_correct"])
     write_tsv(output_dir / "tables" / "locus_expert_consensus_calls.tsv", locus_expert_rows, ["panel_name", "parent_method", "sample", "population", "modality", "gene", "method", "truth_allele1", "truth_allele2", "allele1", "allele2", "call_status", "is_callable", "is_correct", "is_correct_2field", "is_correct_3field", "is_ambiguity_compatible", "is_resolution_compatible", "compatibility_grade", "agreeing_tools", "contributing_tools", "support_fraction", "support_margin", "total_weight", "selected_tools"])

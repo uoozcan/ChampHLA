@@ -1,0 +1,20 @@
+# Algorithmic-family map for the challenger diversity gate (family-aware / correlation-aware support).
+# Groups match Figure S11 (inter-tool agreement by algorithmic family). Keys are the harmonized
+# `tool` tokens emitted by modules/aggregation.nf (lower-case). Tools absent here fall back to their
+# own singleton family (fail-open: never silently merges voters).
+#
+# Rationale: tools within a family share alignment strategy / reference representation and therefore
+# correlated blind spots on IPD-IMGT/HLA, so counting families (or correlation-discounted effective
+# voters) is a better surrogate for methodological independence than a raw tool count.
+families:
+  alignment:        # alignment-to-IMGT + optimisation/Bayesian
+    - optitype
+    - hlahd
+    - polysolver
+  assembly_graph:   # assembly / graph / targeted-exon reconstruction
+    - kourami
+    - spechla
+    - t1k
+  kmer:             # k-mer / pseudo-alignment
+    - arcashla
+    - seq2hla

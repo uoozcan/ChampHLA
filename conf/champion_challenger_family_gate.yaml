@@ -1,0 +1,52 @@
+# Algorithm-family diversity gate on challenger overrides — opt-in overlay.
+#
+# WHAT IT CHANGES
+#
+# The Champion–Challenger override rule normally requires a challenger to be backed
+# by at least `min_supporting_tools` callers. Counting callers overstates how much
+# independent evidence there is: callers within an algorithmic family share an
+# alignment strategy and reference representation, so they fail on the same alleles.
+# Three alignment-based callers agreeing is weaker evidence than one alignment and
+# one assembly-graph caller agreeing.
+#
+# `gate_mode: family_count` replaces the caller count with a count of distinct
+# families, requiring `min_supporting_families`. Families come from
+# conf/tool_families.yaml: alignment (OptiType, HLA-HD, POLYSOLVER), assembly graph
+# (Kourami, SpecHLA, T1K), k-mer (ArcasHLA, seq2HLA). A caller absent from that map
+# forms its own singleton family, so the gate never merges voters silently.
+#
+# `gate_mode: correlation` is the continuous form: it discounts voters by their
+# measured co-error correlation and requires `min_effective_voters` independent
+# voters. It is estimated on the training fold only.
+#
+# WHY IT IS NOT THE DEFAULT
+#
+# The shipped default stays `tool_count`, because that is what produced the
+# ChampionChallenger results reported in the manuscript (369/390 WES, 306/321
+# RNA-seq). A default run of the published configs must keep reproducing them.
+#
+# The paper reports this gate separately, as FamilyGatedCC: it reverted 4 of 25
+# challenger overrides, every one backed by two callers from a single family, and
+# three of those four overrides were wrong. Net +1 WES locus and 0 on RNA-seq; it
+# does not significantly exceed the vote in either assay. See the manuscript's
+# Supplementary S2a and decisions/20260918_family_gate_measurement.json in the
+# analysis repository.
+#
+# HOW TO USE IT
+#
+#   nextflow run . -params-file conf/roihu_params.yaml \
+#       -c conf/champion_challenger_family_gate.yaml
+#
+# or merge the `benchmark:` block below into a benchmark config before passing it to
+# bin/hla_benchmark.py. It overrides only the gate; every other Champion–Challenger
+# setting comes from the config it is layered onto.
+
+benchmark:
+  tool_families: conf/tool_families.yaml
+  champion_challenger:
+    override_policy:
+      # family_count | correlation | tool_count | learned
+      gate_mode: family_count
+      min_supporting_families: 2
+      # Used only when gate_mode is `correlation`.
+      min_effective_voters: 2.0

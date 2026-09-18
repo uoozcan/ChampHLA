@@ -1,0 +1,4 @@
+{
+  "_comment": "Opt-in cohort/modality champion overrides (PI #32). Only cohorts whose held-out recommendation was 'adopt_reselected' appear here. Applied only when a benchmark config sets champion_challenger.champion_source: cohort_reselected. Frozen defaults are never modified.",
+  "champion_overrides": {}
+}
