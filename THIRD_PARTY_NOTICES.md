@@ -28,6 +28,25 @@ CSC Roihu, at the path given.
 | Kourami | BSD 3-Clause | `hla_tools/kourami/kourami-0.9.6/LICENSE` |
 | arcasHLA | GPL-3.0 | `/projappl/project_2008084/arcas/.../LICENSE` |
 | SpecHLA | MIT | `/projappl/project_2008084/SpecHLAx/License` |
+| POLYSOLVER | **See below — code and image differ** | `polysolver.sif:/home/polysolver/license/POLYSOLVER_License.docx` |
+
+### POLYSOLVER: the code and the image are not under the same terms
+
+POLYSOLVER's own source is distributed under a BSD-style licence (Broad Institute and
+Dana-Farber, 2013–2017), which does not restrict commercial use. Its licence then
+adds:
+
+> The docker is available for academic/non-profit users only. Commercial use requires
+> a Novoalign license or commercial licenses for other software as applicable.
+
+The image bundles GATK, MuTect, Novoalign, eigentools (GPL-3), VCFtools, samtools,
+PLINK, PLINK/SEQ, Strelka and BioPerl. **PanelHLA invokes the image, not the source**,
+so the academic and non-profit restriction is the one that applies in practice. This
+is the single most restrictive term across the panel and is what makes an assembled
+PanelHLA run research-use.
+
+Quoting only the BSD header would misdescribe it; so would calling POLYSOLVER
+non-commercial software. Both halves have to be stated together.
 
 SpecHLA bundles two components with their own terms, both permissive:
 
@@ -38,18 +57,21 @@ SpecHLA bundles two components with their own terms, both permissive:
 
 ## TO CONFIRM before submission
 
-These callers are deployed only as container images and ship no licence file that
-could be read from the installation, so their terms could not be verified here. They
-must be confirmed from upstream and recorded before release. Two of them are widely
-understood to restrict commercial use, which is precisely why they must be checked
-rather than assumed.
+These callers ship no licence of their own inside their container image. That was
+checked rather than assumed: each image was searched with `singularity exec
+--no-mount tmp`, excluding conda package metadata and the host `/tmp`. The result is
+recorded so the search is not repeated.
 
-| Caller | Where to confirm | Note |
+| Caller | In-image search result | Where to confirm |
 |---|---|---|
-| HLA-HD | Kyoto University distribution terms | Built from a separately obtained source copy (`HLA_collections/hlahd.dockerfile`); a licence agreement is understood to be required, and academic use free. Confirm. |
-| POLYSOLVER | Broad Institute distribution terms | Understood to restrict use to non-commercial research. Confirm. |
-| T1K | upstream repository | No licence file in the deployment. |
-| seq2HLA | upstream repository | No licence file in the deployment. Not a member of any voting panel in this study. |
+| HLA-HD 1.4.0 | Absent. The two `LICENSE` files in the image (`/usr/local/bin/LICENSE`, `/home/biodocker/bin/LICENSE`) both belong to **bowtie2**, which sits in those directories; `/app/hlahd.1.4.0/Readme.txt` is installation instructions only. | Kyoto University distribution terms. A licence agreement is understood to be required, with academic use free. |
+| T1K | Absent. Only conda dependency licences under `/usr/local/conda-meta/`. | Upstream repository. |
+| seq2HLA | Absent. Only conda dependency licences. Not a member of any voting panel in this study. | Upstream repository. |
+
+**A licence file inside a container is not automatically the caller's licence.** The
+HLA-HD image demonstrates it: a GPL-3 file sits two directories from the tool and
+belongs to something else entirely. Attribution here is by reading, not by
+proximity.
 
 ## Reference data
 
