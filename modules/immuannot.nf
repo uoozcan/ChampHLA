@@ -42,7 +42,13 @@ process IMMUANNOT {
 
     if [ -z "${refdata}" ] || [ ! -e "${refdata}" ]; then
         echo "[Immuannot] ERROR: params.immuannot_refdata not set or missing: '${refdata}'"
-        printf "# Immuannot results for ${sample_id}\n# WARNING: refdata missing\nGene\tAllele1\tAllele2\n" > ${sample_id}_immuannot.txt
+        # Never manufacture an empty result. A placeholder file is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- see modules/spechla.nf for what that cost.
+        echo "Immuannot produced no parsable output for ${sample_id}" >&2
+        echo "Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
         echo '"${task.process}": {immuannot: "missing-refdata"}' > versions.yml
         exit 0
     fi
@@ -61,7 +67,13 @@ process IMMUANNOT {
             --output ${sample_id}_immuannot.txt \
             --crosswalk-output ${sample_id}_immuannot.crosswalk.tsv
     else
-        printf "# Immuannot results for ${sample_id}\n# WARNING: Immuannot produced no GTF\nGene\tAllele1\tAllele2\n" > ${sample_id}_immuannot.txt
+        # Never manufacture an empty result. A placeholder file is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- see modules/spechla.nf for what that cost.
+        echo "Immuannot produced no parsable output for ${sample_id}" >&2
+        echo "Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     cat <<-END_VERSIONS > versions.yml

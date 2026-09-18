@@ -73,8 +73,14 @@ process KOURAMI {
 
     if [ ! -f "\$R1" ] || [ ! -s "\$R1" ]; then
         echo "[Kourami] WARNING: HLA read extraction produced no output for ${sample_id}"
-        printf "# Kourami results for ${sample_id}\n# WARNING: HLA read extraction failed\nGene\tAllele1\tAllele2\tReads1\tReads2\n" > ${sample_id}_kourami.txt
-        exit 0
+        # Never manufacture an empty result. A placeholder file is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- see modules/spechla.nf for what that cost.
+        # This branch also used to `exit 0`, reporting success outright.
+        echo "Kourami produced no parsable output for ${sample_id}" >&2
+        echo "Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     # Step 2: Align extracted HLA reads to the augmented Kourami panel
@@ -104,7 +110,13 @@ process KOURAMI {
             --sample ${sample_id} \
             --output ${sample_id}_kourami.txt
     else
-        printf "# Kourami results for ${sample_id}\n# WARNING: Kourami produced no output\nGene\tAllele1\tAllele2\tReads1\tReads2\n" > ${sample_id}_kourami.txt
+        # Never manufacture an empty result. A placeholder file is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- see modules/spechla.nf for what that cost.
+        echo "Kourami produced no parsable output for ${sample_id}" >&2
+        echo "Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     # Cleanup large intermediate files

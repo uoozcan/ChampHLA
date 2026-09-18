@@ -47,7 +47,13 @@ process LOCITYPER {
 
     if [ -z "${db}" ] || [ ! -e "${db}" ]; then
         echo "[Locityper] ERROR: params.locityper_db not set or missing: '${db}'"
-        printf "# Locityper results for ${sample_id}\n# WARNING: DB missing\nGene\tAllele1\tAllele2\n" > ${sample_id}_locityper.txt
+        # Never manufacture an empty result. A placeholder file is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- see modules/spechla.nf for what that cost.
+        echo "Locityper produced no parsable output for ${sample_id}" >&2
+        echo "Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
         echo '"${task.process}": {locityper: "missing-db"}' > versions.yml
         exit 0
     fi
@@ -80,7 +86,13 @@ process LOCITYPER {
             --confidence-output ${sample_id}_locityper.confidence.tsv \
             ${loci_arg}
     else
-        printf "# Locityper results for ${sample_id}\n# WARNING: Locityper produced no output\nGene\tAllele1\tAllele2\n" > ${sample_id}_locityper.txt
+        # Never manufacture an empty result. A placeholder file is
+        # indistinguishable downstream from a caller that genuinely typed
+        # nothing -- see modules/spechla.nf for what that cost.
+        echo "Locityper produced no parsable output for ${sample_id}" >&2
+        echo "Working directory contains:" >&2
+        ls -la . >&2 || true
+        exit 1
     fi
 
     cat <<-END_VERSIONS > versions.yml
