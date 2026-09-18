@@ -95,10 +95,10 @@ process LOCITYPER {
         exit 1
     fi
 
-    cat <<-END_VERSIONS > versions.yml
-	"${task.process}":
-	    locityper: "\$(locityper --version 2>/dev/null | head -n1 | sed 's/^[^0-9]*//' || echo unknown)"
-	END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+locityper: "\$(locityper --version 2>/dev/null | head -n1 | sed 's/^[^0-9]*//' || echo unknown)"
+END_VERSIONS
     """
 
     stub:

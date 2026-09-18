@@ -102,10 +102,10 @@ EOF
     rm -f R1.fastq R2.fastq
 
     # Version info
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        optitype: \$(OptiTypePipeline.py --version 2>&1 | head -1 || echo "1.3.5")
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    optitype: \$(OptiTypePipeline.py --version 2>&1 | head -1 || echo "1.3.5")
+END_VERSIONS
     """
 
     stub:

@@ -109,9 +109,9 @@ process POLYSOLVER {
         exit 1
     fi
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        polysolver: "v4"
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    polysolver: "v4"
+END_VERSIONS
     """
 }

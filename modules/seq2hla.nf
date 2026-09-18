@@ -50,9 +50,9 @@ process SEQ2HLA {
         --prefix "${sample_id}." \
         --output ${sample_id}_seq2hla.txt
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        seq2hla: "2.3"
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    seq2hla: "2.3"
+END_VERSIONS
     """
 }

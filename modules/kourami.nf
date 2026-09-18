@@ -124,9 +124,9 @@ process KOURAMI {
     rm -f ${sample_id}._hla_1.fq.gz ${sample_id}._hla_2.fq.gz
     rm -f ${sample_id}._extract_1.fq.gz ${sample_id}._extract_2.fq.gz
 
-    cat <<-END_VERSIONS > versions.yml
-	"${task.process}":
-	    kourami: "0.9.6"
-	END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+kourami: "0.9.6"
+END_VERSIONS
     """
 }

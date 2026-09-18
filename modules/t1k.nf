@@ -64,11 +64,11 @@ process T1K_LONGREADS {
         exit 1
     fi
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        t1k: \$(run-t1k --version 2>&1 | grep -oP '[0-9]+\\.[0-9]+\\.[0-9]+' | head -1 || echo "1.0.9")
-        platform: "${preset}"
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    t1k: \$(run-t1k --version 2>&1 | grep -oP '[0-9]+\\.[0-9]+\\.[0-9]+' | head -1 || echo "1.0.9")
+    platform: "${preset}"
+END_VERSIONS
     """
 }
 
@@ -134,9 +134,9 @@ process T1K_FASTQ {
         exit 1
     fi
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        t1k: \$(run-t1k --version 2>&1 | grep -oP '[0-9]+\\.[0-9]+\\.[0-9]+' | head -1 || echo "1.0.9")
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    t1k: \$(run-t1k --version 2>&1 | grep -oP '[0-9]+\\.[0-9]+\\.[0-9]+' | head -1 || echo "1.0.9")
+END_VERSIONS
     """
 }

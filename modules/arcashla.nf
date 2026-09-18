@@ -97,10 +97,10 @@ PYEOF
     fi
 
     # Version info
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        arcashla: \$(arcasHLA 2>&1 | grep -oP '(?<=arcasHLA )[0-9.]+' | head -1 || echo "unknown")
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    arcashla: \$(arcasHLA 2>&1 | grep -oP '(?<=arcasHLA )[0-9.]+' | head -1 || echo "unknown")
+END_VERSIONS
     """
 }
 
@@ -195,9 +195,9 @@ PYEOF
     fi
 
     # Version info
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        arcashla: \$(arcasHLA 2>&1 | grep -oP '(?<=arcasHLA )[0-9.]+' | head -1 || echo "unknown")
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    arcashla: \$(arcasHLA 2>&1 | grep -oP '(?<=arcasHLA )[0-9.]+' | head -1 || echo "unknown")
+END_VERSIONS
     """
 }

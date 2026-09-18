@@ -112,11 +112,11 @@ process SPECHLA {
     rm -f ${sample_id}/namesort.bam
 
     # Version info
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        spechla: "1.0.7"
-        samtools: \$(samtools --version | head -1 | cut -d' ' -f2)
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    spechla: "1.0.7"
+    samtools: \$(samtools --version | head -1 | cut -d' ' -f2)
+END_VERSIONS
     """
 }
 
@@ -210,9 +210,9 @@ process SPECHLA_FASTQ {
     fi
 
     # Version info
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        spechla: "1.0.7"
-    END_VERSIONS
+    cat <<END_VERSIONS > versions.yml
+"${task.process}":
+    spechla: "1.0.7"
+END_VERSIONS
     """
 }
