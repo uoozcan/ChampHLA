@@ -1,7 +1,7 @@
 sample	population	modality	data_locator	available
-S1	EUR	wgs	/scratch/project_2008084/pihla-publish/tests/fixtures/wgs	1
-S1	EUR	wes	/scratch/project_2008084/pihla-publish/tests/fixtures/wes	1
-S1	EUR	rnaseq	/scratch/project_2008084/pihla-publish/tests/fixtures/rnaseq	1
-S2	AFR	wgs	/scratch/project_2008084/pihla-publish/tests/fixtures/wgs	1
-S2	AFR	wes	/scratch/project_2008084/pihla-publish/tests/fixtures/wes	1
-S2	AFR	rnaseq	/scratch/project_2008084/pihla-publish/tests/fixtures/rnaseq	1
+S1	EUR	wgs	wgs	1
+S1	EUR	wes	wes	1
+S1	EUR	rnaseq	rnaseq	1
+S2	AFR	wgs	wgs	1
+S2	AFR	wes	wes	1
+S2	AFR	rnaseq	rnaseq	1

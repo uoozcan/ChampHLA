@@ -91,6 +91,18 @@ genome/
 !test_data/example*
 !test/example*
 
+# Files this repository must track despite the broad rules above.
+#
+# The blanket *.txt and *.log rules exist to keep Nextflow run output out of the
+# tree. They also silently excluded requirements.txt -- which is why CI's
+# "pip install -r requirements.txt" had never once succeeded -- and every caller
+# result fixture under tests/fixtures (hla.result.txt, *.t1k.txt, time.log). The
+# existing fixtures survive only because they were committed before the rule bit;
+# a new one could not be added without -f.
+!requirements.txt
+!requirements-analysis.txt
+!tests/fixtures/**
+
 # Environment files
 .env
 .env.local

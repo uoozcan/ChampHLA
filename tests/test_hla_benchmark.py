@@ -2,11 +2,19 @@ import csv
 import json
 import importlib.util
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 import yaml
+
+# The benchmark scripts are launched as subprocesses. Naming the interpreter
+# python3 runs whatever python3 happens to be on PATH; on Windows that is a
+# Microsoft Store stub, so every subprocess test here failed with exit 9009
+# without testing anything. sys.executable is the interpreter already running
+# this suite, which is the one the tests mean.
+PYTHON = sys.executable
 
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "bin" / "hla_benchmark.py"
@@ -23,7 +31,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             outdir = Path(tmpdir) / "out"
             config = FIXTURES / "benchmark_config.yaml"
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             summary_path = outdir / "tables" / "summary_full_cohort.tsv"
             self.assertTrue(summary_path.exists())
@@ -205,7 +213,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             config_path = tmpdir / "benchmark_prob.yaml"
             config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
 
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             with (outdir / "tables" / "harmonized_benchmark_rows.tsv").open("r", encoding="utf-8") as handle:
                 harmonized = list(csv.DictReader(handle, delimiter="\t"))
@@ -244,7 +252,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             config_path = tmpdir / "benchmark_ablation.yaml"
             config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
 
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             comparison_path = outdir / "tables" / "ablation_method_comparison.tsv"
             per_gene_path = outdir / "tables" / "ablation_method_per_gene.tsv"
@@ -326,7 +334,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             config_path = tmpdir / "benchmark_locus_expert.yaml"
             config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
 
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             calls_path = outdir / "tables" / "locus_expert_consensus_calls.tsv"
             trace_path = outdir / "tables" / "locus_expert_decision_trace.tsv"
@@ -397,7 +405,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             config_path = tmpdir / "benchmark_champion.yaml"
             config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
 
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             calls_path = outdir / "tables" / "champion_challenger_calls.tsv"
             trace_path = outdir / "tables" / "champion_challenger_trace.tsv"
@@ -519,7 +527,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             config_path = tmpdir / "benchmark_gated.yaml"
             config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
 
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             calls_path = outdir / "tables" / "gated_consensus_calls.tsv"
             trace_path = outdir / "tables" / "gated_consensus_trace.tsv"
@@ -599,7 +607,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             config_path = tmpdir / "benchmark_sweeps.yaml"
             config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
 
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             weighted_path = outdir / "sweeps" / "wes_weighted_threshold_sweep.tsv"
             champion_path = outdir / "sweeps" / "wes_champion_override_sweep.tsv"
@@ -648,7 +656,7 @@ class BenchmarkWorkflowTest(unittest.TestCase):
             config_path = tmpdir / "benchmark_sweeps_rna.yaml"
             config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
 
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config_path), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             weighted_path = outdir / "sweeps" / "rna_weighted_threshold_sweep.tsv"
             champion_path = outdir / "sweeps" / "rna_champion_override_sweep.tsv"
@@ -1009,7 +1017,7 @@ class CiwdBenchmarkOutputTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             outdir = Path(tmpdir) / "out"
             config = FIXTURES / "benchmark_config.yaml"
-            subprocess.run(["python3", str(SCRIPT), "--config", str(config), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
+            subprocess.run([PYTHON, str(SCRIPT), "--config", str(config), "--output-dir", str(outdir)], check=True, cwd=str(REPO))
 
             strat_path = outdir / "tables" / "summary_ciwd_stratified.tsv"
             self.assertTrue(strat_path.exists())

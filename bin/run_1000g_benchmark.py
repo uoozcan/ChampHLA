@@ -6,6 +6,7 @@ import csv
 import json
 import shutil
 import subprocess
+import sys
 import tempfile
 from collections import Counter, defaultdict
 from copy import deepcopy
@@ -45,6 +46,24 @@ def parse_args():
 def load_yaml(path):
     with path.open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle) or {}
+
+
+def resolve_manifest_paths(config, config_dir):
+    """Anchor manifests.* paths to the directory holding the config file.
+
+    hla_benchmark.resolve_config_paths already does this for truth.path and the
+    run globs. The manifest entries were left resolving against the working
+    directory, so a config that named them relatively worked only when invoked
+    from one particular directory -- and this runner then rewrote the config into
+    a temporary directory before handing it on, which moved the anchor again.
+    """
+    manifests = config.get("manifests", {})
+    for key in ("truth_manifest", "sequencing_manifest", "cohort_manifest",
+                "sequencing_source", "sequencing_manifest_source", "population_manifest"):
+        value = manifests.get(key)
+        if value and not Path(value).is_absolute():
+            manifests[key] = str((config_dir / value).resolve())
+    return config
 
 
 def save_yaml(path, payload):
@@ -137,8 +156,12 @@ def run_benchmark(config_payload, output_dir, weight_alpha=0.7, weight_beta=0.3,
     with tempfile.TemporaryDirectory() as tmpdir:
         cfg_path = Path(tmpdir) / "benchmark.yaml"
         save_yaml(cfg_path, config_payload)
+        # sys.executable, not "python3": this runner is one script in a pair and
+        # must hand hla_benchmark.py the interpreter it is itself running under.
+        # Resolving "python3" on PATH picks up whatever else is installed -- on
+        # Windows a Microsoft Store stub that exits 9009 without running anything.
         cmd = [
-            "python3",
+            sys.executable,
             str(Path(__file__).with_name("hla_benchmark.py")),
             "--config",
             str(cfg_path),
@@ -329,7 +352,13 @@ def copy_training_artifacts(training_dir, output_dir):
 
 def main():
     args = parse_args()
-    config = load_yaml(Path(args.config))
+    config_path = Path(args.config).resolve()
+    config = load_yaml(config_path)
+    # Resolve every relative path while the config file's own directory is still
+    # known. run_benchmark() serialises the config into a temporary directory
+    # before invoking hla_benchmark.py, which would otherwise resolve them there.
+    config = hb.resolve_config_paths(config, config_path.parent)
+    config = resolve_manifest_paths(config, config_path.parent)
     if args.benchmark_mode:
         config.setdefault("benchmark", {})
         config["benchmark"]["mode"] = args.benchmark_mode

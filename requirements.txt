@@ -1,0 +1,7 @@
+# Runtime dependencies for the benchmark itself.
+#
+# The whole tested path -- bin/hla_benchmark.py, bin/run_1000g_benchmark.py and the
+# manifest builders -- needs PyYAML and nothing else. Keeping this file minimal is
+# deliberate: running the benchmark should not require the plotting and document
+# stack, which lives in requirements-analysis.txt.
+PyYAML>=6.0

@@ -1,11 +1,19 @@
 import csv
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 import yaml
+
+# The benchmark scripts are launched as subprocesses. Naming the interpreter
+# python3 runs whatever python3 happens to be on PATH; on Windows that is a
+# Microsoft Store stub, so every subprocess test here failed with exit 9009
+# without testing anything. sys.executable is the interpreter already running
+# this suite, which is the one the tests mean.
+PYTHON = sys.executable
 
 REPO = Path(__file__).resolve().parents[1]
 FIXTURES = REPO / "tests" / "fixtures"
@@ -14,13 +22,37 @@ PHASE_GATED_SCRIPT = REPO / "bin" / "build_1000g_phase_gated_inputs.py"
 RUN_SCRIPT = REPO / "bin" / "run_1000g_benchmark.py"
 
 
+def load_fixture_config():
+    """The 1000G fixture config, with its relative paths made absolute.
+
+    Paths in a benchmark config resolve against that config's own directory. These
+    tests copy the fixture, edit it, and write it into a temporary directory, which
+    moves that anchor -- so they resolve the paths here, against the fixture
+    directory, before the copy travels.
+    """
+    payload = yaml.safe_load((FIXTURES / "benchmark_1000g_config.yaml").read_text(encoding="utf-8"))
+    truth = payload.get("truth", {})
+    if truth.get("path") and not Path(truth["path"]).is_absolute():
+        truth["path"] = str((FIXTURES / truth["path"]).resolve())
+    for run in payload.get("runs", []):
+        for key in ("result_glob", "runtime_glob", "confidence_glob"):
+            value = run.get(key)
+            if value and not Path(value).is_absolute():
+                run[key] = str((FIXTURES / value).resolve())
+    manifests = payload.get("manifests", {})
+    for key, value in list(manifests.items()):
+        if value and not Path(value).is_absolute():
+            manifests[key] = str((FIXTURES / value).resolve())
+    return payload
+
+
 class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
     def test_manifest_builder_outputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             outdir = Path(tmpdir) / "manifests"
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(BUILD_SCRIPT),
                     "--truth",
                     str(FIXTURES / "truth.tsv"),
@@ -63,7 +95,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             (rna / "S1" / "arcashla" / "S1_arcashla.txt").write_text("A\tA*01:01\tA*02:01\n", encoding="utf-8")
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(PHASE_GATED_SCRIPT),
                     "--truth-csv",
                     str(FIXTURES / "truth.tsv"),
@@ -95,7 +127,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             outdir = Path(tmpdir) / "benchmark"
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(RUN_SCRIPT),
                     "--config",
                     str(FIXTURES / "benchmark_1000g_config.yaml"),
@@ -137,7 +169,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             outdir = tmpdir / "benchmark"
-            config_payload = yaml.safe_load((FIXTURES / "benchmark_1000g_config.yaml").read_text(encoding="utf-8"))
+            config_payload = load_fixture_config()
             config_payload.setdefault("benchmark", {})
             config_payload["benchmark"]["mode"] = "probabilistic_recalibrated"
             config_payload["benchmark"]["probabilistic_calibration"] = {"method": "platt", "cv_strategy": "loo"}
@@ -145,7 +177,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             config_path.write_text(yaml.safe_dump(config_payload), encoding="utf-8")
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(RUN_SCRIPT),
                     "--config",
                     str(config_path),
@@ -175,7 +207,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             outdir = tmpdir / "benchmark"
-            config_payload = yaml.safe_load((FIXTURES / "benchmark_1000g_config.yaml").read_text(encoding="utf-8"))
+            config_payload = load_fixture_config()
             config_payload.setdefault("benchmark", {})
             config_payload["benchmark"]["ensemble_ablation"] = {
                 "enabled": True,
@@ -188,7 +220,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             config_path.write_text(yaml.safe_dump(config_payload), encoding="utf-8")
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(RUN_SCRIPT),
                     "--config",
                     str(config_path),
@@ -211,7 +243,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             outdir = tmpdir / "benchmark"
-            config_payload = yaml.safe_load((FIXTURES / "benchmark_1000g_config.yaml").read_text(encoding="utf-8"))
+            config_payload = load_fixture_config()
             config_payload.setdefault("benchmark", {})
             config_payload["benchmark"]["locus_expert_consensus"] = {
                 "enabled": True,
@@ -231,7 +263,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             config_path.write_text(yaml.safe_dump(config_payload), encoding="utf-8")
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(RUN_SCRIPT),
                     "--config",
                     str(config_path),
@@ -255,7 +287,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             outdir = tmpdir / "benchmark"
-            config_payload = yaml.safe_load((FIXTURES / "benchmark_1000g_config.yaml").read_text(encoding="utf-8"))
+            config_payload = load_fixture_config()
             config_payload.setdefault("benchmark", {})
             config_payload["benchmark"]["champion_challenger"] = {
                 "enabled": True,
@@ -272,7 +304,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             config_path.write_text(yaml.safe_dump(config_payload), encoding="utf-8")
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(RUN_SCRIPT),
                     "--config",
                     str(config_path),
@@ -296,7 +328,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             outdir = tmpdir / "benchmark"
-            config_payload = yaml.safe_load((FIXTURES / "benchmark_1000g_config.yaml").read_text(encoding="utf-8"))
+            config_payload = load_fixture_config()
             config_payload.setdefault("benchmark", {})
             config_payload["benchmark"]["champion_challenger"] = {
                 "enabled": True,
@@ -325,7 +357,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             config_path.write_text(yaml.safe_dump(config_payload), encoding="utf-8")
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(RUN_SCRIPT),
                     "--config",
                     str(config_path),
@@ -349,7 +381,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             outdir = tmpdir / "benchmark"
-            config_payload = yaml.safe_load((FIXTURES / "benchmark_1000g_config.yaml").read_text(encoding="utf-8"))
+            config_payload = load_fixture_config()
             config_payload["benchmark_analysis"] = {
                 "threshold_sweeps": {
                     "enabled": True,
@@ -370,7 +402,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             config_path.write_text(yaml.safe_dump(config_payload), encoding="utf-8")
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(RUN_SCRIPT),
                     "--config",
                     str(config_path),
@@ -389,7 +421,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             outdir = tmpdir / "benchmark"
-            config_payload = yaml.safe_load((FIXTURES / "benchmark_1000g_config.yaml").read_text(encoding="utf-8"))
+            config_payload = load_fixture_config()
             config_payload["runs"] = [dict(run) for run in config_payload["runs"] if run.get("modality") == "rnaseq"]
             for run in config_payload["runs"]:
                 if run.get("tool") == "SpecHLA":
@@ -414,7 +446,7 @@ class ThousandGenomesBenchmarkWorkflowTest(unittest.TestCase):
             config_path.write_text(yaml.safe_dump(config_payload), encoding="utf-8")
             subprocess.run(
                 [
-                    "python3",
+                    PYTHON,
                     str(RUN_SCRIPT),
                     "--config",
                     str(config_path),
