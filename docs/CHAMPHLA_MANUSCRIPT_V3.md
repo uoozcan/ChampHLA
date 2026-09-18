@@ -1,5 +1,19 @@
 # ChampHLA Manuscript Draft V3
 
+> **Superseded draft — do not cite or edit.**
+>
+> This is the V3 manuscript as it stood before the 2026-09-08 amendment, which
+> demoted Champion–Challenger to a reported ablation and made the equal-weight
+> plurality vote the primary method. Its framing, its headline numbers and the
+> project name throughout are out of date, and no WGS accuracy figure in it may be
+> used — the legacy WGS inputs are `validity=invalid`.
+>
+> The current manuscript lives in the separate publication tree
+> (`champhla_publication_candidate/manuscripts/benchmark/`), together with the
+> pre-registrations, the statistical artifacts and the truth firewall. The
+> `.bak-*` files beside this one are frozen snapshots and are left exactly as they
+> were.
+
 ## Title
 **ChampHLA: a reproducible Nextflow ensemble for champion–challenger HLA typing across WGS, WES, and RNA sequencing**
 

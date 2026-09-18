@@ -1,5 +1,19 @@
 # ChampHLA — Supplementary Materials
 
+> **Superseded draft — do not cite or edit.**
+>
+> This is the V3 manuscript as it stood before the 2026-09-08 amendment, which
+> demoted Champion–Challenger to a reported ablation and made the equal-weight
+> plurality vote the primary method. Its framing, its headline numbers and the
+> project name throughout are out of date, and no WGS accuracy figure in it may be
+> used — the legacy WGS inputs are `validity=invalid`.
+>
+> The current manuscript lives in the separate publication tree
+> (`champhla_publication_candidate/manuscripts/benchmark/`), together with the
+> pre-registrations, the statistical artifacts and the truth firewall. The
+> `.bak-*` files beside this one are frozen snapshots and are left exactly as they
+> were.
+
 **Supplementary material for:** *ChampHLA: a reproducible Nextflow ensemble for champion–challenger HLA typing across WGS, WES, and RNA sequencing.* Özcan et al.
 
 This document contains all supplementary figures, tables, and notes referenced by the main manuscript. Supplementary Figures are numbered S1–S14, Supplementary Tables S1–S3, and Supplementary Notes S1–S8, each series numbered independently. All figures are regenerable from the deposited benchmark tables via the scripts noted in Data Availability; each caption records its source figure stem under `analysis/figures_final/`.
