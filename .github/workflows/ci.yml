@@ -45,6 +45,11 @@ jobs:
           java-version: '17'
 
       - name: Install Nextflow
+        # Pinned to the version CSC Roihu provides (nextflow/25.10.2-standalone).
+        # CI should gate what we actually run. Nextflow 26.x additionally rejects
+        # this repository's nextflow.config -- see the manifest note there.
+        env:
+          NXF_VER: 25.10.2
         run: |
           curl -s https://get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
